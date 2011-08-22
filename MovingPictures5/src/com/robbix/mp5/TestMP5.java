@@ -310,10 +310,12 @@ public class TestMP5
 			
 			ArrayList<ImageIcon> icons = new ArrayList<ImageIcon>();
 			
-			for (File iconFile : iconDir.listFiles())
+			for (File iconFile : iconDir.listFiles(Utils.BMP))
 			{
 				icons.add(new ImageIcon(Utils.shrink(ImageIO.read(iconFile))));
 			}
+			
+			if (icons.isEmpty()) continue;
 			
 			CommandButton button = new CommandButton(icons);
 			button.setActionCommand(iconDir.getName());

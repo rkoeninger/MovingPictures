@@ -25,15 +25,15 @@ public class TileSet
 		
 		TileSet set = new TileSet();
 		
-		File[] plains = new File(rootDir, "plain").listFiles();
+		File[] plains = new File(rootDir, "plain").listFiles(Utils.BMP);
 		
 		for (int x = 0; x < plains.length; ++x)
 		{
 			set.tiles.put("plain/" + x, ImageIO.read(plains[x]));
 			set.plainCount++;
 		}
-
-		File[] bulldozed = new File(rootDir, "bulldozed").listFiles();
+		
+		File[] bulldozed = new File(rootDir, "bulldozed").listFiles(Utils.BMP);
 		
 		for (int x = 0; x < bulldozed.length; ++x)
 		{
@@ -41,7 +41,8 @@ public class TileSet
 			set.bulldozedCount++;
 		}
 		
-		Neighbors[] tileOrder2 = new Neighbors[]{
+		Neighbors[] tileOrder2 = new Neighbors[]
+		{
 			Neighbors.EW,
 			Neighbors.NS,
 			Neighbors.SW,
@@ -60,10 +61,10 @@ public class TileSet
 			Neighbors.NONE
 		};
 		
-		File[] wallsG = new File(rootDir, "wall/greenhealth").listFiles();
-		File[] wallsY = new File(rootDir, "wall/yellowhealth").listFiles();
-		File[] wallsR = new File(rootDir, "wall/redhealth").listFiles();
-		File[] tubes  = new File(rootDir, "tube").listFiles();
+		File[] wallsG = new File(rootDir, "wall/greenhealth").listFiles(Utils.BMP);
+		File[] wallsY = new File(rootDir, "wall/yellowhealth").listFiles(Utils.BMP);
+		File[] wallsR = new File(rootDir, "wall/redhealth").listFiles(Utils.BMP);
+		File[] tubes  = new File(rootDir, "tube").listFiles(Utils.BMP);
 		
 		sortFiles(wallsG);
 		sortFiles(wallsY);

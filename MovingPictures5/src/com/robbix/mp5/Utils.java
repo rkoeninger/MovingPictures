@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,6 +73,14 @@ public class Utils
 	{
 		return (int) (System.currentTimeMillis() / delay % size);
 	}
+	
+	public static final FileFilter BMP = new FileFilter()
+	{
+		public boolean accept(File file)
+		{
+			return file.isFile() && file.getName().endsWith(".bmp");
+		}
+	};
 	
 	/**
 	 * Attempts to set swing look and feel to the local system's

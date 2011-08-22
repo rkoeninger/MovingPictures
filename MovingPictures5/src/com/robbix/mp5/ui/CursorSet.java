@@ -12,10 +12,11 @@ public class CursorSet
 		
 		for (File dir : rootDir.listFiles())
 		{
-			if (! dir.isDirectory())
-				continue;
+			File xmlFile = new File(dir, dir.getName() + ".xml");
 			
-			cursorSet.cursors.put(dir.getName(), AnimatedCursor.load(dir));
+			if (! xmlFile.exists()) continue;
+			
+			cursorSet.cursors.put(dir.getName(), AnimatedCursor.load(xmlFile));
 		}
 		
 		return cursorSet;
