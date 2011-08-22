@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<UnitType type="vehicle" unitType="eConVec" civ="Eden">
+	<DisplayName>ConVec</DisplayName>
+	<Acknowledgement>conVec</Acknowledgement>
+	<Activites>
+		<Activity>move</Activity>
+		<Activity>construct</Activity>
+	</Activites>
+	<Cost>
+		<Resource type="common ore" amount="250"/>
+	</Cost>
+	<Stats hp="300"
+		   speed="1.5"
+		   sightRange="3"
+		   armor="none"
+		   rotationSpeed="1"
+		   rotationDegree="16"/>
+</UnitType>

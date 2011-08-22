@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="vehicle" unitType="eConVec" color="#0000ff">
+	<Activity name="move"
+			  path="./move"
+			  majorTurnFrameCount="3"
+			  minorTurnFrameCount="1"
+			  fileNumber="2577"
+			  offsetX="-11"
+			  offsetY="-7">
+		<Direction name="e"   offsetX="-3" offsetY="9"/>
+		<Direction name="ene" offsetX="-2" offsetY="10"/>
+		<Direction name="ne"  offsetX="-7" offsetY="9"/>
+		<Direction name="nne" offsetX="-4" offsetY="9"/>
+		<Direction name="n"   offsetX="-4" offsetY="7"/>
+		<Direction name="nnw" offsetX="-2" offsetY="8"/>
+		<Direction name="nw"  offsetX="-2" offsetY="9"/>
+		<Direction name="wnw" offsetX="-5" offsetY="9"/>
+		<Direction name="w"   offsetX="1"  offsetY="10"/>
+		<Direction name="wsw" offsetX="-5" offsetY="10"/>
+		<Direction name="sw"  offsetX="-7" offsetY="8"/>
+		<Direction name="ssw" offsetX="-3" offsetY="7"/>
+		<Direction name="s"   offsetX="-4" offsetY="5"/>
+		<Direction name="sse" offsetX="-5" offsetY="6"/>
+		<Direction name="se"  offsetX="-5" offsetY="8"/>
+		<Direction name="ese" offsetX="0"  offsetY="9"/>
+	</Activity>
+	<Activity name="dockDown"
+			  path="./dockDown"
+			  fileNumber="2897"
+			  frameCount="120"
+			  offsetX="-11"
+			  offsetY="-8">
+		<OffsetFrame offsetX="1"  offsetY="8"/>
+		<OffsetFrame offsetX="0"  offsetY="8"/>
+		<OffsetFrame offsetX="-1" offsetY="8"/>
+		<OffsetFrame offsetX="-2" offsetY="8"/>
+		<OffsetFrame offsetX="-3" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="7"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="5"/>
+		<OffsetFrame offsetX="-4" offsetY="4"/>
+		<OffsetFrame offsetX="-4" offsetY="3"/>
+		<OffsetFrame offsetX="-4" offsetY="2"/>
+		<OffsetFrame offsetX="-4" offsetY="1"/>
+		<OffsetFrame offsetX="-4" offsetY="0"/>
+		<OffsetFrame offsetX="-4" offsetY="-1"/>
+		<OffsetFrame offsetX="-4" offsetY="-2"/>
+		<OffsetFrame offsetX="-4" offsetY="-3"/>
+		<OffsetFrame offsetX="-4" offsetY="-4"/>
+		<OffsetFrame offsetX="-4" offsetY="-5"/>
+		<OffsetFrame offsetX="-4" offsetY="-6"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="7"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="5"/>
+		<OffsetFrame offsetX="-4" offsetY="4"/>
+		<OffsetFrame offsetX="-4" offsetY="3"/>
+		<OffsetFrame offsetX="-4" offsetY="1"/>
+		<OffsetFrame offsetX="-4" offsetY="2"/>
+		<OffsetFrame offsetX="-4" offsetY="3"/>
+		<OffsetFrame offsetX="-4" offsetY="5"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="5"/>
+		<OffsetFrame offsetX="-4" offsetY="5"/>
+		<OffsetFrame offsetX="-4" offsetY="7"/>
+		<OffsetFrame offsetX="-4" offsetY="7"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+	</Activity>
+	<Activity name="dockUp"
+			  path="./dockUp"
+			  fileNumber="3017"
+			  frameCount="127"
+			  offsetX="-11"
+			  offsetY="-8">
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="7"/>
+		<OffsetFrame offsetX="-4" offsetY="7"/>
+		<OffsetFrame offsetX="-4" offsetY="5"/>
+		<OffsetFrame offsetX="-4" offsetY="5"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="5"/>
+		<OffsetFrame offsetX="-4" offsetY="3"/>
+		<OffsetFrame offsetX="-4" offsetY="2"/>
+		<OffsetFrame offsetX="-4" offsetY="1"/>
+		<OffsetFrame offsetX="-4" offsetY="3"/>
+		<OffsetFrame offsetX="-4" offsetY="4"/>
+		<OffsetFrame offsetX="-4" offsetY="5"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="7"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="-7"/>
+		<OffsetFrame offsetX="-4" offsetY="-6"/>
+		<OffsetFrame offsetX="-4" offsetY="-5"/>
+		<OffsetFrame offsetX="-4" offsetY="-4"/>
+		<OffsetFrame offsetX="-4" offsetY="-3"/>
+		<OffsetFrame offsetX="-4" offsetY="-2"/>
+		<OffsetFrame offsetX="-4" offsetY="-1"/>
+		<OffsetFrame offsetX="-4" offsetY="0"/>
+		<OffsetFrame offsetX="-4" offsetY="1"/>
+		<OffsetFrame offsetX="-4" offsetY="2"/>
+		<OffsetFrame offsetX="-4" offsetY="3"/>
+		<OffsetFrame offsetX="-4" offsetY="4"/>
+		<OffsetFrame offsetX="-4" offsetY="5"/>
+		<OffsetFrame offsetX="-4" offsetY="6"/>
+		<OffsetFrame offsetX="-4" offsetY="7"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-4" offsetY="8"/>
+		<OffsetFrame offsetX="-3" offsetY="8"/>
+		<OffsetFrame offsetX="-2" offsetY="8"/>
+		<OffsetFrame offsetX="-1" offsetY="8"/>
+		<OffsetFrame offsetX="0"  offsetY="8"/>
+		<OffsetFrame offsetX="1"  offsetY="8"/>
+		<OffsetFrame offsetX="1"  offsetY="8"/>
+		<OffsetFrame offsetX="1"  offsetY="8"/>
+		<OffsetFrame offsetX="1"  offsetY="8"/>
+		<OffsetFrame offsetX="1"  offsetY="8"/>
+		<OffsetFrame offsetX="1"  offsetY="8"/>
+	</Activity>
+	<Activity name="construct"
+			  path="./construct"
+			  fileNumber="17144"
+			  frameCount="31"
+			  offsetX="-11"
+			  offsetY="-7">
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="7"/>
+		<OffsetFrame offsetX="-7" offsetY="3"/>
+		<OffsetFrame offsetX="-7" offsetY="1"/>
+		<OffsetFrame offsetX="-7" offsetY="1"/>
+		<OffsetFrame offsetX="-7" offsetY="1"/>
+		<OffsetFrame offsetX="-7" offsetY="1"/>
+		<OffsetFrame offsetX="-7" offsetY="1"/>
+		<OffsetFrame offsetX="-7" offsetY="1"/>
+		<OffsetFrame offsetX="-7" offsetY="1"/>
+		<OffsetFrame offsetX="-7" offsetY="1"/>
+		<OffsetFrame offsetX="-7" offsetY="1"/>
+		<OffsetFrame offsetX="-7" offsetY="3"/>
+		<OffsetFrame offsetX="-7" offsetY="7"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+		<OffsetFrame offsetX="-7" offsetY="8"/>
+	</Activity>
+</SpriteSet>

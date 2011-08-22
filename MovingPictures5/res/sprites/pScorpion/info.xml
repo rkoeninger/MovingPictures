@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="vehicle" unitType="pScorpion" color="#0000ff">
+	<Activity name="move"
+			  path="./move"
+			  majorTurnFrameCount="6"
+			  minorTurnFrameCount="1"
+			  fileNumber="16691"
+			  offsetX="3"
+			  offsetY="4">
+		<Direction name="e"   offsetX="-2" offsetY="3"/>
+		<Direction name="ene" offsetX="-2" offsetY="2"/>
+		<Direction name="ne"  offsetX="-2" offsetY="2"/>
+		<Direction name="nne" offsetX="-2" offsetY="1"/>
+		<Direction name="n"   offsetX="-2" offsetY="1"/>
+		<Direction name="nnw" offsetX="-1" offsetY="1"/>
+		<Direction name="nw"  offsetX="-2" offsetY="2"/>
+		<Direction name="wnw" offsetX="-2" offsetY="2"/>
+		<Direction name="w"   offsetX="-2" offsetY="3"/>
+		<Direction name="wsw" offsetX="-2" offsetY="3"/>
+		<Direction name="sw"  offsetX="-2" offsetY="3"/>
+		<Direction name="ssw" offsetX="-2" offsetY="3"/>
+		<Direction name="s"   offsetX="-2" offsetY="3"/>
+		<Direction name="sse" offsetX="-2" offsetY="3"/>
+		<Direction name="se"  offsetX="-2" offsetY="3"/>
+		<Direction name="ese" offsetX="-2" offsetY="3"/>
+	</Activity>
+</SpriteSet>

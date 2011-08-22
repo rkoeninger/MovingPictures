@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AnimatedCursor name="dock"
+				duration="32"
+				bgcolor="#ff00ff"
+				hotspotX="13"
+				hotspotY="9">
+	<Frame image="dock0.bmp"/>
+	<Frame image="dock1.bmp"/>
+	<Frame image="dock2.bmp"/>
+	<Frame image="dock3.bmp"/>
+	<Frame image="dock4.bmp"/>
+	<Frame image="dock5.bmp"/>
+	<Frame image="dock6.bmp"/>
+	<Frame image="dock7.bmp"/>
+</AnimatedCursor>

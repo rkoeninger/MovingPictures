@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<UnitType type="turret" unitType="pSupernovaSingleTurret" civ="Plymouth">
+	<DisplayName>Supernova Single Turret</DisplayName>
+	<Stats damage="1500" reloadDelay="0" attackRange="2"/>
+</UnitType>

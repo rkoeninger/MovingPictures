@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="ambient" eventType="aAcidCloud" translucency="0.5">
+	<Event name="cloud1"
+		path="./cloud1"
+		   fileNumber="13787"
+		   frameCount="5"
+		   x="-93"
+		   y="-89">
+		<OffsetFrame x="80" y="74"/>
+		<OffsetFrame x="62" y="58"/>
+		<OffsetFrame x="48" y="43"/>
+		<OffsetFrame x="41" y="36"/>
+		<OffsetFrame x="33" y="28"/>
+	</Event>
+	<Event name="cloud2"
+		path="./cloud2"
+		   fileNumber="13792"
+		   frameCount="8"
+		   x="-93"
+		   y="-89">
+		<OffsetFrame x="24" y="16"/>
+		<OffsetFrame x="26" y="14"/>
+		<OffsetFrame x="28" y="12"/>
+		<OffsetFrame x="28" y="12"/>
+		<OffsetFrame x="28" y="13"/>
+		<OffsetFrame x="26" y="15"/>
+		<OffsetFrame x="25" y="16"/>
+		<OffsetFrame x="25" y="17"/>
+	</Event>
+	<Event name="cloud3"
+		path="./cloud3"
+		   fileNumber="13800"
+		   frameCount="8"
+		   x="-93"
+		   y="-89">
+		<OffsetFrame x="24" y="16"/>
+		<OffsetFrame x="26" y="14"/>
+		<OffsetFrame x="28" y="12"/>
+		<OffsetFrame x="29" y="14"/>
+		<OffsetFrame x="32" y="17"/>
+		<OffsetFrame x="32" y="34"/>
+		<OffsetFrame x="33" y="26"/>
+		<OffsetFrame x="35" y="37"/>
+	</Event>
+</SpriteSet>

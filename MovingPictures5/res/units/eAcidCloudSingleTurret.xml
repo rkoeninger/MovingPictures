@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<UnitType type="turret" unitType="eAcidCloudSingleTurret" civ="Eden">
+	<DisplayName>Acid Cloud Single Turret</DisplayName>
+	<Stats damage="20" reloadDelay="200" attackRange="7"/>
+</UnitType>

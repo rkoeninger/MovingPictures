@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="ambient" eventType="aSupernovaExplosion">
+	<Event name="explosion"
+		   path="."
+		   fileNumber="16057"
+		   frameCount="13"
+		   x="-88"
+		   y="-88">
+		<OffsetFrame x="89" y="87"/>
+		<OffsetFrame x="62" y="58"/>
+		<OffsetFrame x="26" y="22"/>
+		<OffsetFrame x="18" y="16"/>
+		<OffsetFrame x="10" y="12"/>
+		<OffsetFrame x="9"  y="9"/>
+		<OffsetFrame x="9"  y="12"/>
+		<OffsetFrame x="11" y="9"/>
+		<OffsetFrame x="15" y="5"/>
+		<OffsetFrame x="14" y="5"/>
+		<OffsetFrame x="16" y="1"/>
+		<OffsetFrame x="14" y="2"/>
+		<OffsetFrame x="22" y="10"/>
+	</Event>
+</SpriteSet>

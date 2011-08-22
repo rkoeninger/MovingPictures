@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="ambient" eventType="oTerrainFixture">
+	<Event name="wall"
+		   path="."
+		   fileNumber="5555551"
+		   frameCount="1">
+	</Event>
+	<Event name="tube"
+		   path="."
+		   fileNumber="5555550"
+		   frameCount="1">
+	</Event>
+</SpriteSet>

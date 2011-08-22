@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<UnitType type="tank" unitType="pRPGLynx" civ="Plymouth">
+	<DisplayName>RPG Lynx</DisplayName>
+	<Cost>
+		<Resource type="common ore" amount="500"/>
+	</Cost>
+	<Chassis>pLynxChassis</Chassis>
+	<Turret>pRPGSingleTurret</Turret>
+</UnitType>

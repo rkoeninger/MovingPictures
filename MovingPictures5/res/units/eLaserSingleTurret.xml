@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<UnitType type="turret" unitType="eLaserSingleTurret" civ="Eden">
+	<DisplayName>Laser Single Turret</DisplayName>
+	<Stats damage="40" reloadDelay="80" attackRange="4"/>
+</UnitType>

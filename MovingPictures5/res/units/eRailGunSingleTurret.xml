@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<UnitType type="turret" unitType="eRailGunSingleTurret" civ="Eden">
+	<DisplayName>Rail Gun Single Turret</DisplayName>
+	<Stats damage="90" reloadDelay="125" attackRange="5.5"/>
+</UnitType>

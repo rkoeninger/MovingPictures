@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<UnitType type="tank" unitType="pMicrowaveLynx" civ="Plymouth">
+	<DisplayName>Microwave Lynx</DisplayName>
+	<Cost>
+		<Resource type="common ore" amount="250"/>
+	</Cost>
+	<Chassis>pLynxChassis</Chassis>
+	<Turret>pMicrowaveSingleTurret</Turret>
+</UnitType>

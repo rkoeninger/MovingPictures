@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="vehicle" unitType="eRoboMiner" color="#0000ff">
+	<Activity name="move"
+			  path="./move"
+			  majorTurnFrameCount="1"
+			  minorTurnFrameCount="1"
+			  fileNumber="15386"
+			  offsetX="-5"
+			  offsetY="-5">
+		<Direction name="e"   offsetX="-4"  offsetY="6"/>
+		<Direction name="ene" offsetX="-14" offsetY="8"/>
+		<Direction name="ne"  offsetX="-4"  offsetY="8"/>
+		<Direction name="nne" offsetX="-13" offsetY="9"/>
+		<Direction name="n"   offsetX="-6"  offsetY="9"/>
+		<Direction name="nnw" offsetX="-20" offsetY="7"/>
+		<Direction name="nw"  offsetX="-6"  offsetY="6"/>
+		<Direction name="wnw" offsetX="-12" offsetY="5"/>
+		<Direction name="w"   offsetX="-4"  offsetY="5"/>
+		<Direction name="wsw" offsetX="-13" offsetY="5"/>
+		<Direction name="sw"  offsetX="-3"  offsetY="4"/>
+		<Direction name="ssw" offsetX="-20" offsetY="3"/>
+		<Direction name="s"   offsetX="-5"  offsetY="3"/>
+		<Direction name="sse" offsetX="-21" offsetY="3"/>
+		<Direction name="se"  offsetX="-5"  offsetY="3"/>
+		<Direction name="ese" offsetX="-20" offsetY="5"/>
+	</Activity>
+</SpriteSet>

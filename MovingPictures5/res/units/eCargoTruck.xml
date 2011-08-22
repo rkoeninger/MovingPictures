@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<UnitType type="vehicle" unitType="eCargoTruck" civ="Eden">
+	<DisplayName>Cargo Truck</DisplayName>
+	<Acknowledgement>cargoTruck</Acknowledgement>
+	<Activites>
+		<Activity>move</Activity>
+		<Activity>dump</Activity>
+		<Activity>dockUp</Activity>
+		<Activity>dockDown</Activity>
+		<Activity>mineLoad</Activity>
+	</Activites>
+	<Cost>
+		<Resource type="common ore" amount="200"/>
+	</Cost>
+	<Stats hp="200"
+		   speed="1.8"
+		   sightRange="4"
+		   armor="none"
+		   rotationSpeed="1"
+		   rotationDegree="16"/>
+</UnitType>

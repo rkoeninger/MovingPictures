@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<UnitType type="vehicle" unitType="pScout" civ="Plymouth">
+	<DisplayName>Scout</DisplayName>
+	<Acknowledgement>scout</Acknowledgement>
+	<Activites>
+		<Activity>move</Activity>
+	</Activites>
+	<Cost>
+		<Resource type="common ore" amount="100"/>
+	</Cost>
+	<Stats hp="150"
+		   speed="2.0"
+		   sightRange="7"
+		   armor="none"
+		   rotationSpeed="1"
+		   rotationDegree="16"/>
+</UnitType>

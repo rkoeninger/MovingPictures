@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="turret" unitType="eLaserSingleTurret" color="#0000ff">
+	<Activity name="turret"
+			  path="./turret"
+			  fileNumber="16298"
+			  offsetX="0"
+			  offsetY="-7">
+		<Direction name="e" offsetX="8" offsetY="5">
+			<Hotspot x="22" y="8"/>
+		</Direction>
+		<Direction name="ene" offsetX="7" offsetY="3">
+			<Hotspot x="22" y="4"/>
+		</Direction>
+		<Direction name="ne" offsetX="7" offsetY="2">
+			<Hotspot x="19" y="1"/>
+		</Direction>
+		<Direction name="nne" offsetX="9" offsetY="2">
+			<Hotspot x="14" y="-1"/>
+		</Direction>
+		<Direction name="n" offsetX="10" offsetY="0">
+			<Hotspot x="7" y="-1"/>
+		</Direction>
+		<Direction name="nnw" offsetX="8" offsetY="2">
+			<Hotspot x="3" y="-1"/>
+		</Direction>
+		<Direction name="nw" offsetX="6" offsetY="2">
+			<Hotspot x="1" y="1"/>
+		</Direction>
+		<Direction name="wnw" offsetX="6" offsetY="3">
+			<Hotspot x="-1" y="4"/>
+		</Direction>
+		<Direction name="w" offsetX="4" offsetY="5">
+			<Hotspot x="-1" y="8"/>
+		</Direction>
+		<Direction name="wsw" offsetX="4" offsetY="7">
+			<Hotspot x="-1" y="12"/>
+		</Direction>
+		<Direction name="sw" offsetX="6" offsetY="6">
+			<Hotspot x="-1" y="18"/>
+		</Direction>
+		<Direction name="ssw" offsetX="6" offsetY="5">
+			<Hotspot x="3" y="22"/>
+		</Direction>
+		<Direction name="s" offsetX="9" offsetY="5">
+			<Hotspot x="8" y="25"/>
+		</Direction>
+		<Direction name="sse" offsetX="10" offsetY="5">
+			<Hotspot x="14" y="23"/>
+		</Direction>
+		<Direction name="se" offsetX="8" offsetY="7">
+			<Hotspot x="19" y="19"/>
+		</Direction>
+		<Direction name="ese" offsetX="8" offsetY="8">
+			<Hotspot x="22" y="12"/>
+		</Direction>
+	</Activity>
+</SpriteSet>

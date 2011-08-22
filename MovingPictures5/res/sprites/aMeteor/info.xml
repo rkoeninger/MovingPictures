@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="ambient" eventType="aMeteor">
+	<Event name="flying"
+		   path="./flying"
+		   fileNumber="14181"
+		   frameCount="5"
+		   x="-32"
+		   y="-60">
+		<OffsetFrame x="1" y="0"/>
+		<OffsetFrame x="0" y="1"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="1"/>
+		<OffsetFrame x="2" y="1"/>
+	</Event>
+	<Event name="forming"
+		   path="./forming"
+		   fileNumber="14395"
+		   frameCount="5"
+		   x="-40"
+		   y="-40">
+		<OffsetFrame x="6" y="50"/>
+		<OffsetFrame x="3" y="39"/>
+		<OffsetFrame x="2" y="25"/>
+		<OffsetFrame x="3" y="12"/>
+		<OffsetFrame x="5" y="0"/>
+	</Event>
+	<Event name="impact"
+		   path="./impact"
+		   fileNumber="16039"
+		   frameCount="9"
+		   x="-32"
+		   y="-62">
+		<OffsetFrame x="23" y="40"/>
+		<OffsetFrame x="19" y="48"/>
+		<OffsetFrame x="16" y="39"/>
+		<OffsetFrame x="17" y="25"/>
+		<OffsetFrame x="10" y="19"/>
+		<OffsetFrame x="16" y="12"/>
+		<OffsetFrame x="12" y="6"/>
+		<OffsetFrame x="9"  y="10"/>
+		<OffsetFrame x="34" y="16"/>
+	</Event>
+</SpriteSet>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AnimatedCursor name="move"
+				duration="80"
+				bgcolor="#ff00ff"
+				hotspotX="0"
+				hotspotY="0">
+	<Frame image="move0.bmp"/>
+	<Frame image="move1.bmp"/>
+	<Frame image="move2.bmp"/>
+	<Frame image="move3.bmp"/>
+</AnimatedCursor>

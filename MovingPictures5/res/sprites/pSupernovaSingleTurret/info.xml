@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="turret" unitType="pSupernovaSingleTurret" color="#0000ff">
+	<Activity name="turret"
+			  path="./turret"
+			  fileNumber="16023"
+			  offsetX="-4"
+			  offsetY="-12">
+		<Direction name="e"   offsetX="12" offsetY="13"/>
+		<Direction name="ene" offsetX="12" offsetY="13"/>
+		<Direction name="ne"  offsetX="12" offsetY="13"/>
+		<Direction name="nne" offsetX="12" offsetY="13"/>
+		<Direction name="n"   offsetX="12" offsetY="13"/>
+		<Direction name="nnw" offsetX="12" offsetY="13"/>
+		<Direction name="nw"  offsetX="12" offsetY="13"/>
+		<Direction name="wnw" offsetX="12" offsetY="13"/>
+		<Direction name="w"   offsetX="12" offsetY="13"/>
+		<Direction name="wsw" offsetX="12" offsetY="13"/>
+		<Direction name="sw"  offsetX="12" offsetY="13"/>
+		<Direction name="ssw" offsetX="12" offsetY="13"/>
+		<Direction name="s"   offsetX="12" offsetY="13"/>
+		<Direction name="sse" offsetX="12" offsetY="13"/>
+		<Direction name="se"  offsetX="12" offsetY="13"/>
+		<Direction name="ese" offsetX="12" offsetY="13"/>
+	</Activity>
+</SpriteSet>

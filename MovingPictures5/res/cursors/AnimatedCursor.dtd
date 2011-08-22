@@ -1,0 +1,18 @@
+<!-- put the following at the top of each AnimatedCursor xml file           -->
+<!-- <!DOCTYPE AnimatedCursor SYSTEM "../animatedCursor.dtd">               -->
+
+<!ELEMENT AnimatedCursor (Frame+)>
+<!ATTLIST AnimatedCursor name     CDATA #REQUIRED>
+<!ATTLIST AnimatedCursor duration CDATA #IMPLIED>
+<!ATTLIST AnimatedCursor bgcolor  CDATA #IMPLIED>
+<!ATTLIST AnimatedCursor hotspotX CDATA #IMPLIED>
+<!ATTLIST AnimatedCursor hotspotY CDATA #IMPLIED>
+<!-- duration, bgcolor, hotspotX, hotspotY do not each have to be defined   -->
+<!-- for <AnimatedCursor> so long as they are each defined for every <Frame>-->
+
+<!ELEMENT Frame EMPTY>
+<!ATTLIST Frame image    CDATA #REQUIRED>
+<!ATTLIST Frame duration CDATA #IMPLIED>
+<!ATTLIST Frame bgcolor  CDATA #IMPLIED>
+<!ATTLIST Frame hotspotX CDATA #IMPLIED>
+<!ATTLIST Frame hotspotY CDATA #IMPLIED>

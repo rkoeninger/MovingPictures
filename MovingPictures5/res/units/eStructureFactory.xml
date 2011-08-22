@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<UnitType type="structure" unitType="eStructureFactory" civ="Eden">
+	<DisplayName>Structure Factory</DisplayName>
+	<Acknowledgement>factory</Acknowledgement>
+	<Cost>
+		<Resource type="common ore" amount="400"/>
+	</Cost>
+	<Staff workers="1" scientists="0"/>
+	<Stats hp="2000" sightRange="5" armor="medium"/>
+	<Footprint>STRUCT_4_BY_3_NO_SE_CORNER</Footprint>
+</UnitType>

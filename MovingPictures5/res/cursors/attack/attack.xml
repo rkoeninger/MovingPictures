@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AnimatedCursor name="attack"
+				duration="38"
+				bgcolor="#ff00ff"
+				hotspotX="16"
+				hotspotY="16">
+	<Frame image="attack0.bmp"/>
+	<Frame image="attack1.bmp"/>
+	<Frame image="attack2.bmp"/>
+	<Frame image="attack3.bmp"/>
+</AnimatedCursor>

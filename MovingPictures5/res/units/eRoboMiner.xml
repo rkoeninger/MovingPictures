@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<UnitType type="vehicle" unitType="eRoboMiner" civ="Eden">
+	<DisplayName>RoboMiner</DisplayName>
+	<Acknowledgement>roboMiner</Acknowledgement>
+	<Activites>
+		<Activity>move</Activity>
+	</Activites>
+	<Cost>
+		<Resource type="common ore" amount="250"/>
+	</Cost>
+	<Stats hp="100"
+		   speed="1"
+		   sightRange="3"
+		   armor="none"
+		   rotationSpeed="1"
+		   rotationDegree="16"/>
+</UnitType>

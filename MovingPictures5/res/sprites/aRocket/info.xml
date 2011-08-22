@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="ambient" eventType="aRocket">
+	<Event name="projectile"
+		   path="./projectile"
+		   fileNumber="10430"
+		   frameCount="32"
+		   x="0"
+		   y="0">
+		<OffsetFrame x="12" y="1"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="11" y="0"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="8"  y="0"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="3"  y="0"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="1"  y="0"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="0"  y="1"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="0"  y="5"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="0"  y="8"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="0"  y="9"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="1"  y="8"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="4"  y="9"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="8"  y="8"/>
+		<OffsetFrame x="0"  y="0"/>
+		<OffsetFrame x="11" y="5"/>
+		<OffsetFrame x="0"  y="0"/>
+	</Event>
+	<Event name="smokePuff1"
+		   path="./smokePuff1"
+		   fileNumber="10526"
+		   frameCount="6"
+		   x="-8"
+		   y="-8">
+		<OffsetFrame x="6" y="7"/>
+		<OffsetFrame x="5" y="5"/>
+		<OffsetFrame x="4" y="5"/>
+		<OffsetFrame x="4" y="4"/>
+		<OffsetFrame x="4" y="4"/>
+		<OffsetFrame x="4" y="4"/>
+	</Event>
+	<Event name="smokePuff2"
+		   path="./smokePuff2"
+		   fileNumber="10532"
+		   frameCount="6"
+		   x="-11"
+		   y="-12">
+		<OffsetFrame x="10" y="11"/>
+		<OffsetFrame x="9"  y="9"/>
+		<OffsetFrame x="7"  y="9"/>
+		<OffsetFrame x="7"  y="9"/>
+		<OffsetFrame x="6"  y="9"/>
+		<OffsetFrame x="8"  y="10"/>
+	</Event>
+	<Event name="smokePuff3"
+		   path="./smokePuff3"
+		   fileNumber="10538"
+		   frameCount="6"
+		   x="-10"
+		   y="-11">
+		<OffsetFrame x="9" y="11"/>
+		<OffsetFrame x="7" y="9"/>
+		<OffsetFrame x="6" y="8"/>
+		<OffsetFrame x="7" y="8"/>
+		<OffsetFrame x="7" y="8"/>
+		<OffsetFrame x="8" y="7"/>
+	</Event>
+	<Event name="explosion"
+		   path="./explosion"
+		   fileNumber="2329"
+		   frameCount="12"
+		   x="-32"
+		   y="-32">
+		<OffsetFrame x="14" y="15"/>
+		<OffsetFrame x="11" y="10"/>
+		<OffsetFrame x="9"  y="9"/>
+		<OffsetFrame x="7"  y="7"/>
+		<OffsetFrame x="6"  y="4"/>
+		<OffsetFrame x="4"  y="3"/>
+		<OffsetFrame x="5"  y="1"/>
+		<OffsetFrame x="4"  y="1"/>
+		<OffsetFrame x="4"  y="0"/>
+		<OffsetFrame x="4"  y="0"/>
+		<OffsetFrame x="10" y="11"/>
+		<OffsetFrame x="22" y="23"/>
+	</Event>
+	<Event name="smokeRing1"
+		   path="./smokeRing1"
+		   fileNumber="12328"
+		   frameCount="2"
+		   x="-21"
+		   y="-14">
+		<OffsetFrame x="20" y="12"/>
+		<OffsetFrame x="18" y="9"/>
+	</Event>
+	<Event name="smokeRing2"
+		   path="./smokeRing2"
+		   fileNumber="12330"
+		   frameCount="31"
+		   x="-22"
+		   y="-14">
+		<OffsetFrame x="17" y="8"/>
+		<OffsetFrame x="17" y="8"/>
+		<OffsetFrame x="17" y="8"/>
+		<OffsetFrame x="17" y="7"/>
+		<OffsetFrame x="17" y="7"/>
+		<OffsetFrame x="18" y="7"/>
+		<OffsetFrame x="18" y="7"/>
+		<OffsetFrame x="18" y="7"/>
+		<OffsetFrame x="18" y="7"/>
+		<OffsetFrame x="18" y="7"/>
+		<OffsetFrame x="18" y="6"/>
+		<OffsetFrame x="18" y="6"/>
+		<OffsetFrame x="19" y="6"/>
+		<OffsetFrame x="19" y="6"/>
+		<OffsetFrame x="19" y="6"/>
+		<OffsetFrame x="19" y="6"/>
+		<OffsetFrame x="19" y="6"/>
+		<OffsetFrame x="19" y="6"/>
+		<OffsetFrame x="19" y="6"/>
+		<OffsetFrame x="18" y="6"/>
+		<OffsetFrame x="18" y="6"/>
+		<OffsetFrame x="18" y="7"/>
+		<OffsetFrame x="18" y="7"/>
+		<OffsetFrame x="18" y="7"/>
+		<OffsetFrame x="18" y="7"/>
+		<OffsetFrame x="18" y="7"/>
+		<OffsetFrame x="17" y="7"/>
+		<OffsetFrame x="17" y="7"/>
+		<OffsetFrame x="17" y="8"/>
+		<OffsetFrame x="17" y="8"/>
+		<OffsetFrame x="17" y="8"/>
+	</Event>
+	<Event name="smokeRing3"
+		   path="./smokeRing3"
+		   fileNumber="12361"
+		   frameCount="8"
+		   x="-20"
+		   y="-16">
+		<OffsetFrame x="16" y="8"/>
+		<OffsetFrame x="15" y="7"/>
+		<OffsetFrame x="13" y="5"/>
+		<OffsetFrame x="13" y="4"/>
+		<OffsetFrame x="11" y="4"/>
+		<OffsetFrame x="10" y="3"/>
+		<OffsetFrame x="8"  y="2"/>
+		<OffsetFrame x="8"  y="1"/>
+	</Event>
+</SpriteSet>

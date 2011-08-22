@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<UnitType type="vehicle" unitType="pRoboDozer" civ="Plymouth">
+	<DisplayName>RoboDozer</DisplayName>
+	<Acknowledgement>roboDozer</Acknowledgement>
+	<Activites>
+		<Activity>move</Activity>
+		<Activity>bulldoze</Activity>
+	</Activites>
+	<Cost>
+		<Resource type="common ore" amount="250"/>
+	</Cost>
+	<Stats hp="300"
+		   speed="0.5"
+		   sightRange="3"
+		   armor="none"
+		   rotationSpeed="8"
+		   rotationDegree="8"/>
+</UnitType>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="turret" unitType="eAcidCloudSingleTurret" color="#0000ff">
+	<Activity name="turret"
+			  path="./turret"
+			  fileNumber="16362"
+			  offsetX="-4"
+			  offsetY="-12">
+		<Direction name="e" offsetX="16" offsetY="15">
+			<Hotspot x="21" y="7"/>
+		</Direction>
+		<Direction name="ene" offsetX="16" offsetY="14">
+			<Hotspot x="19" y="1"/>
+		</Direction>
+		<Direction name="ne" offsetX="16" offsetY="11">
+			<Hotspot x="15" y="0"/>
+		</Direction>
+		<Direction name="nne" offsetX="16" offsetY="10">
+			<Hotspot x="12" y="-1"/>
+		</Direction>
+		<Direction name="n" offsetX="16" offsetY="9">
+			<Hotspot x="5" y="-2"/>
+		</Direction>
+		<Direction name="nnw" offsetX="11" offsetY="10">
+			<Hotspot x="3" y="-1"/>
+		</Direction>
+		<Direction name="nw" offsetX="8" offsetY="12">
+			<Hotspot x="1" y="0"/>
+		</Direction>
+		<Direction name="wnw" offsetX="7" offsetY="13">
+			<Hotspot x="0" y="1"/>
+		</Direction>
+		<Direction name="w" offsetX="6" offsetY="15">
+			<Hotspot x="-2" y="6"/>
+		</Direction>
+		<Direction name="wsw" offsetX="6" offsetY="16">
+			<Hotspot x="-1" y="12"/>
+		</Direction>
+		<Direction name="sw" offsetX="7" offsetY="15">
+			<Hotspot x="1" y="18"/>
+		</Direction>
+		<Direction name="ssw" offsetX="10" offsetY="15">
+			<Hotspot x="2" y="20"/>
+		</Direction>
+		<Direction name="s" offsetX="15" offsetY="16">
+			<Hotspot x="5" y="21"/>
+		</Direction>
+		<Direction name="sse" offsetX="16" offsetY="15">
+			<Hotspot x="13" y="20"/>
+		</Direction>
+		<Direction name="se" offsetX="15" offsetY="15">
+			<Hotspot x="18" y="17"/>
+		</Direction>
+		<Direction name="ese" offsetX="16" offsetY="16">
+			<Hotspot x="20" y="12"/>
+		</Direction>
+	</Activity>
+</SpriteSet>

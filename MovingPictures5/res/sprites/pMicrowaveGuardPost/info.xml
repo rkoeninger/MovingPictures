@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="guardPost" unitType="pMicrowaveGuardPost" color="#0000ff">
+	<Activity name="turret"
+			  path="./turret"
+			  fileNumber="14374"
+			  offsetX="-8"
+			  offsetY="-7">
+		<Direction name="e" offsetX="9" offsetY="9">
+			<Hotspot x="23" y="7"/>
+		</Direction>
+		<Direction name="ene" offsetX="7" offsetY="9">
+			<Hotspot x="24" y="2"/>
+		</Direction>
+		<Direction name="ne" offsetX="6" offsetY="7">
+			<Hotspot x="22" y="0"/>
+		</Direction>
+		<Direction name="nne" offsetX="8" offsetY="5">
+			<Hotspot x="17" y="-1"/>
+		</Direction>
+		<Direction name="n" offsetX="9" offsetY="6">
+			<Hotspot x="9" y="-1"/>
+		</Direction>
+		<Direction name="nnw" offsetX="9" offsetY="6">
+			<Hotspot x="5" y="0"/>
+		</Direction>
+		<Direction name="nw" offsetX="7" offsetY="7">
+			<Hotspot x="2" y="1"/>
+		</Direction>
+		<Direction name="wnw" offsetX="8" offsetY="9">
+			<Hotspot x="0" y="3"/>
+		</Direction>
+		<Direction name="w" offsetX="7" offsetY="9">
+			<Hotspot x="-1" y="7"/>
+		</Direction>
+		<Direction name="wsw" offsetX="7" offsetY="7">
+			<Hotspot x="1" y="15"/>
+		</Direction>
+		<Direction name="sw" offsetX="6" offsetY="6">
+			<Hotspot x="3" y="19"/>
+		</Direction>
+		<Direction name="ssw" offsetX="9" offsetY="7">
+			<Hotspot x="5" y="20"/>
+		</Direction>
+		<Direction name="s" offsetX="9" offsetY="10">
+			<Hotspot x="8" y="20"/>
+		</Direction>
+		<Direction name="sse" offsetX="9" offsetY="8">
+			<Hotspot x="16" y="19"/>
+		</Direction>
+		<Direction name="se" offsetX="6" offsetY="6">
+			<Hotspot x="21" y="18"/>
+		</Direction>
+		<Direction name="ese" offsetX="6" offsetY="7">
+			<Hotspot x="24" y="15"/>
+		</Direction>
+	</Activity>
+	<Activity name="build"
+			  path="./build"
+			  fileNumber="1918"
+			  frameCount="21"
+			  offsetX="0"
+			  offsetY="-12">
+		<OffsetFrame offsetX="12" offsetY="17"/>
+		<OffsetFrame offsetX="12" offsetY="17"/>
+		<OffsetFrame offsetX="9"  offsetY="17"/>
+		<OffsetFrame offsetX="9"  offsetY="17"/>
+		<OffsetFrame offsetX="9"  offsetY="17"/>
+		<OffsetFrame offsetX="9"  offsetY="17"/>
+		<OffsetFrame offsetX="9"  offsetY="17"/>
+		<OffsetFrame offsetX="9"  offsetY="17"/>
+		<OffsetFrame offsetX="9"  offsetY="16"/>
+		<OffsetFrame offsetX="9"  offsetY="15"/>
+		<OffsetFrame offsetX="9"  offsetY="14"/>
+		<OffsetFrame offsetX="10" offsetY="13"/>
+		<OffsetFrame offsetX="10" offsetY="12"/>
+		<OffsetFrame offsetX="10" offsetY="11"/>
+		<OffsetFrame offsetX="10" offsetY="10"/>
+		<OffsetFrame offsetX="10" offsetY="9"/>
+		<OffsetFrame offsetX="10" offsetY="8"/>
+		<OffsetFrame offsetX="10" offsetY="7"/>
+		<OffsetFrame offsetX="10" offsetY="8"/>
+		<OffsetFrame offsetX="10" offsetY="9"/>
+		<OffsetFrame offsetX="10" offsetY="10"/>
+	</Activity>
+</SpriteSet>

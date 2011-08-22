@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="turret" unitType="pRPGSingleTurret" color="#0000ff">
+	<Activity name="turret"
+			  path="./turret"
+			  fileNumber="16112"
+			  offsetX="-9"
+			  offsetY="-13">
+		<Direction name="e" offsetX="19" offsetY="16">
+			<Hotspot x="26" y="13"/>
+		</Direction>
+		<Direction name="ene" offsetX="18" offsetY="12">
+			<Hotspot x="26" y="6"/>
+		</Direction>
+		<Direction name="ne" offsetX="19" offsetY="7">
+			<Hotspot x="23" y="1"/>
+		</Direction>
+		<Direction name="nne" offsetX="20" offsetY="6">
+			<Hotspot x="19" y="-1"/>
+		</Direction>
+		<Direction name="n" offsetX="21" offsetY="6">
+			<Hotspot x="13" y="-1"/>
+		</Direction>
+		<Direction name="nnw" offsetX="18" offsetY="5">
+			<Hotspot x="7" y="-1"/>
+		</Direction>
+		<Direction name="nw" offsetX="13" offsetY="7">
+			<Hotspot x="0" y="1"/>
+		</Direction>
+		<Direction name="wnw" offsetX="9" offsetY="12">
+			<Hotspot x="-1" y="7"/>
+		</Direction>
+		<Direction name="w" offsetX="8" offsetY="16">
+			<Hotspot x="-1" y="13"/>
+		</Direction>
+		<Direction name="wsw" offsetX="9" offsetY="16">
+			<Hotspot x="-1" y="19"/>
+		</Direction>
+		<Direction name="sw" offsetX="11" offsetY="15">
+			<Hotspot x="-1" y="23"/>
+		</Direction>
+		<Direction name="ssw" offsetX="18" offsetY="14">
+			<Hotspot x="5" y="27"/>
+		</Direction>
+		<Direction name="s" offsetX="21" offsetY="14">
+			<Hotspot x="13" y="29"/>
+		</Direction>
+		<Direction name="sse" offsetX="21" offsetY="14">
+			<Hotspot x="21" y="26"/>
+		</Direction>
+		<Direction name="se" offsetX="19" offsetY="14">
+			<Hotspot x="26" y="23"/>
+		</Direction>
+		<Direction name="ese" offsetX="18" offsetY="16">
+			<Hotspot x="26" y="20"/>
+		</Direction>
+	</Activity>
+</SpriteSet>

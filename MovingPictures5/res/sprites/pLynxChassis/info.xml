@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="vehicle" unitType="pLynxChassis" color="#0000ff">
+	<Activity name="move"
+			  path="./move"
+			  majorTurnFrameCount="6"
+			  minorTurnFrameCount="1"
+			  fileNumber="15535"
+			  offsetX="-3"
+			  offsetY="-3">
+		<Direction name="e"   offsetX="-8"  offsetY="7"/>
+		<Direction name="ene" offsetX="-9"  offsetY="6"/>
+		<Direction name="ne"  offsetX="-14" offsetY="6"/>
+		<Direction name="nne" offsetX="-13" offsetY="3"/>
+		<Direction name="n"   offsetX="-11" offsetY="4"/>
+		<Direction name="nnw" offsetX="-8"  offsetY="4"/>
+		<Direction name="nw"  offsetX="-8"  offsetY="7"/>
+		<Direction name="wnw" offsetX="-7"  offsetY="7"/>
+		<Direction name="w"   offsetX="-1"  offsetY="6"/>
+		<Direction name="wsw" offsetX="-8"  offsetY="4"/>
+		<Direction name="sw"  offsetX="-10" offsetY="3"/>
+		<Direction name="ssw" offsetX="-9"  offsetY="0"/>
+		<Direction name="s"   offsetX="-10" offsetY="1"/>
+		<Direction name="sse" offsetX="-11" offsetY="3"/>
+		<Direction name="se"  offsetX="-10" offsetY="2"/>
+		<Direction name="ese" offsetX="-5"  offsetY="2"/>
+	</Activity>
+</SpriteSet>

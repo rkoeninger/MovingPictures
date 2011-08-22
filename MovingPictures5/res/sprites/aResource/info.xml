@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="ambient" eventType="aResource">
+	<Event name="common1"
+		   path="./common1"
+		   fileNumber="18470"
+		   frameCount="11"
+		   x="9"
+		   y="9">
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+	</Event>
+	<Event name="common2"
+		   path="./common2"
+		   fileNumber="18481"
+		   frameCount="11"
+		   x="7"
+		   y="9">
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="2"/>
+	</Event>
+	<Event name="common3"
+		   path="./common3"
+		   fileNumber="18492"
+		   frameCount="12"
+		   x="5"
+		   y="9">
+		<OffsetFrame x="3" y="3"/>
+		<OffsetFrame x="3" y="3"/>
+		<OffsetFrame x="3" y="3"/>
+		<OffsetFrame x="3" y="3"/>
+		<OffsetFrame x="2" y="2"/>
+		<OffsetFrame x="2" y="2"/>
+		<OffsetFrame x="1" y="0"/>
+		<OffsetFrame x="1" y="0"/>
+		<OffsetFrame x="1" y="0"/>
+		<OffsetFrame x="1" y="0"/>
+		<OffsetFrame x="2" y="2"/>
+		<OffsetFrame x="2" y="2"/>
+	</Event>
+	<Event name="rare1"
+		   path="./rare1"
+		   fileNumber="18504"
+		   frameCount="12"
+		   x="9"
+		   y="9">
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="2"/>
+	</Event>
+	<Event name="rare2"
+		   path="./rare2"
+		   fileNumber="18516"
+		   frameCount="12"
+		   x="7"
+		   y="9">
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="2"/>
+	</Event>
+	<Event name="rare3"
+		   path="./rare3"
+		   fileNumber="18528"
+		   frameCount="12"
+		   x="5"
+		   y="9">
+		<OffsetFrame x="3" y="3"/>
+		<OffsetFrame x="3" y="3"/>
+		<OffsetFrame x="3" y="3"/>
+		<OffsetFrame x="3" y="3"/>
+		<OffsetFrame x="2" y="2"/>
+		<OffsetFrame x="2" y="2"/>
+		<OffsetFrame x="1" y="0"/>
+		<OffsetFrame x="1" y="0"/>
+		<OffsetFrame x="1" y="0"/>
+		<OffsetFrame x="1" y="0"/>
+		<OffsetFrame x="2" y="2"/>
+		<OffsetFrame x="2" y="2"/>
+	</Event>
+	<Event name="unknown"
+		   path="./unknown"
+		   fileNumber="18540"
+		   frameCount="12"
+		   x="9"
+		   y="9">
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="2" y="3"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="0" y="0"/>
+		<OffsetFrame x="1" y="2"/>
+		<OffsetFrame x="1" y="2"/>
+	</Event>
+</SpriteSet>

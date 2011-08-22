@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="structure" unitType="pResidence" color="#0000ff">
+	<Activity name="still"
+			  path="./still"
+			  offsetX="-17"
+			  offsetY="-25">
+		<HealthState health="green"  fileNumber="1432"/>
+		<HealthState health="yellow" fileNumber="583"/>
+		<HealthState health="red"    fileNumber="584"/>
+	</Activity>
+	<Activity name="build"
+			  path="./build"
+			  fileNumber="1408"
+			  frameCount="24"
+			  offsetX="-5"
+			  offsetY="-31">
+		<OffsetFrame offsetX="15" offsetY="41"/>
+		<OffsetFrame offsetX="15" offsetY="41"/>
+		<OffsetFrame offsetX="14" offsetY="41"/>
+		<OffsetFrame offsetX="14" offsetY="41"/>
+		<OffsetFrame offsetX="14" offsetY="41"/>
+		<OffsetFrame offsetX="14" offsetY="41"/>
+		<OffsetFrame offsetX="14" offsetY="41"/>
+		<OffsetFrame offsetX="14" offsetY="41"/>
+		<OffsetFrame offsetX="14" offsetY="41"/>
+		<OffsetFrame offsetX="14" offsetY="41"/>
+		<OffsetFrame offsetX="14" offsetY="41"/>
+		<OffsetFrame offsetX="10" offsetY="41"/>
+		<OffsetFrame offsetX="10" offsetY="41"/>
+		<OffsetFrame offsetX="10" offsetY="41"/>
+		<OffsetFrame offsetX="10" offsetY="37"/>
+		<OffsetFrame offsetX="10" offsetY="37"/>
+		<OffsetFrame offsetX="10" offsetY="37"/>
+		<OffsetFrame offsetX="10" offsetY="37"/>
+		<OffsetFrame offsetX="10" offsetY="37"/>
+		<OffsetFrame offsetX="10" offsetY="37"/>
+		<OffsetFrame offsetX="10" offsetY="37"/>
+		<OffsetFrame offsetX="10" offsetY="37"/>
+		<OffsetFrame offsetX="10" offsetY="37"/>
+		<OffsetFrame offsetX="10" offsetY="37"/>
+	</Activity>
+	<Activity name="collapse"
+			  path="./collapse"
+			  fileNumber="2197"
+			  frameCount="8"
+			  offsetX="-8"
+			  offsetY="-27">
+		<OffsetFrame offsetX="1" offsetY="0"/>
+		<OffsetFrame offsetX="5" offsetY="1"/>
+		<OffsetFrame offsetX="5" offsetY="4"/>
+		<OffsetFrame offsetX="5" offsetY="8"/>
+		<OffsetFrame offsetX="5" offsetY="13"/>
+		<OffsetFrame offsetX="5" offsetY="21"/>
+		<OffsetFrame offsetX="5" offsetY="28"/>
+		<OffsetFrame offsetX="5" offsetY="32"/>
+	</Activity>
+</SpriteSet>

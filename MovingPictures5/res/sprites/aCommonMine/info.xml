@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="ambient" eventType="aCommonMine">
+	<Event name="platform"
+		   path="."
+		   fileNumber="18589"
+		   frameCount="1"
+		   x="0"
+		   y="0"/>
+</SpriteSet>

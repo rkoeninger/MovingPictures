@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<UnitType type="tank" unitType="pSupernovaLynx" civ="Plymouth">
+	<DisplayName>Supernova Lynx</DisplayName>
+	<Cost>
+		<Resource type="common ore" amount="800"/>
+	</Cost>
+	<Chassis>pLynxChassis</Chassis>
+	<Turret>pSupernovaSingleTurret</Turret>
+</UnitType>

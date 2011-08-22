@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="ambient" eventType="aDeath">
+	<Event name="guardPostKilled"
+		   path="./guardPostKilled"
+		   fileNumber="12369"
+		   frameCount="12"
+		   x="-21"
+		   y="-22">
+		<OffsetFrame x="22" y="23"/>
+		<OffsetFrame x="17" y="17"/>
+		<OffsetFrame x="14" y="14"/>
+		<OffsetFrame x="12" y="10"/>
+		<OffsetFrame x="10" y="8"/>
+		<OffsetFrame x="8"  y="5"/>
+		<OffsetFrame x="9"  y="3"/>
+		<OffsetFrame x="8"  y="3"/>
+		<OffsetFrame x="8"  y="1"/>
+		<OffsetFrame x="9"  y="3"/>
+		<OffsetFrame x="15" y="17"/>
+		<OffsetFrame x="36" y="38"/>
+	</Event>
+	<Event name="vehicleKilled"
+		   path="./vehicleKilled"
+		   fileNumber="24165"
+		   frameCount="14"
+		   x="-108"
+		   y="-70">
+		<OffsetFrame x="116" y="78"/>
+		<OffsetFrame x="104" y="73"/>
+		<OffsetFrame x="101" y="69"/>
+		<OffsetFrame x="100" y="61"/>
+		<OffsetFrame x="98"  y="58"/>
+		<OffsetFrame x="94"  y="56"/>
+		<OffsetFrame x="89"  y="53"/>
+		<OffsetFrame x="85"  y="53"/>
+		<OffsetFrame x="80"  y="56"/>
+		<OffsetFrame x="88"  y="61"/>
+		<OffsetFrame x="86"  y="61"/>
+		<OffsetFrame x="85"  y="62"/>
+		<OffsetFrame x="84"  y="67"/>
+		<OffsetFrame x="158" y="93"/>
+	</Event>
+	<Event name="arachnidKilled"
+		   path="./arachnidKilled"
+		   fileNumber="24146"
+		   frameCount="19"
+		   x="-41"
+		   y="-20">
+		<OffsetFrame x="49" y="25"/>
+		<OffsetFrame x="43" y="23"/>
+		<OffsetFrame x="40" y="21"/>
+		<OffsetFrame x="36" y="20"/>
+		<OffsetFrame x="31" y="20"/>
+		<OffsetFrame x="27" y="18"/>
+		<OffsetFrame x="24" y="15"/>
+		<OffsetFrame x="19" y="13"/>
+		<OffsetFrame x="15" y="14"/>
+		<OffsetFrame x="11" y="10"/>
+		<OffsetFrame x="38" y="12"/>
+		<OffsetFrame x="36" y="11"/>
+		<OffsetFrame x="38" y="13"/>
+		<OffsetFrame x="37" y="13"/>
+		<OffsetFrame x="40" y="16"/>
+		<OffsetFrame x="38" y="17"/>
+		<OffsetFrame x="39" y="23"/>
+		<OffsetFrame x="55" y="27"/>
+		<OffsetFrame x="55" y="35"/>
+	</Event>
+	<Event name="vehicleSelfDestruct"
+		   path="./vehicleSelfDestruct"
+		   fileNumber="12381"
+		   frameCount="13"
+		   x="-15"
+		   y="-4">
+		<OffsetFrame x="29" y="13"/>
+		<OffsetFrame x="27" y="12"/>
+		<OffsetFrame x="21" y="10"/>
+		<OffsetFrame x="9"  y="1"/>
+		<OffsetFrame x="6"  y="0"/>
+		<OffsetFrame x="8"  y="0"/>
+		<OffsetFrame x="5"  y="1"/>
+		<OffsetFrame x="7"  y="0"/>
+		<OffsetFrame x="9"  y="1"/>
+		<OffsetFrame x="9"  y="0"/>
+		<OffsetFrame x="17" y="1"/>
+		<OffsetFrame x="18" y="0"/>
+		<OffsetFrame x="22" y="0"/>
+	</Event>
+	<Event name="collapseSmoke1"
+		   path="./collapseSmoke1"
+		   fileNumber="17230"
+		   frameCount="12"
+		   x="0"
+		   y="0">
+		<OffsetFrame x="29" y="31"/>
+		<OffsetFrame x="20" y="21"/>
+		<OffsetFrame x="12" y="13"/>
+		<OffsetFrame x="14" y="7"/>
+		<OffsetFrame x="3"  y="3"/>
+		<OffsetFrame x="7"  y="3"/>
+		<OffsetFrame x="5"  y="-6"/>
+		<OffsetFrame x="2"  y="-3"/>
+		<OffsetFrame x="0"  y="2"/>
+		<OffsetFrame x="4"  y="7"/>
+		<OffsetFrame x="14" y="9"/>
+		<OffsetFrame x="22" y="15"/>
+	</Event>
+	<Event name="collapseSmoke2"
+		   path="./collapseSmoke2"
+		   fileNumber="17242"
+		   frameCount="12"
+		   x="0"
+		   y="0">
+		<OffsetFrame x="26" y="32"/>
+		<OffsetFrame x="16" y="16"/>
+		<OffsetFrame x="7"  y="12"/>
+		<OffsetFrame x="9"  y="9"/>
+		<OffsetFrame x="2"  y="7"/>
+		<OffsetFrame x="4"  y="7"/>
+		<OffsetFrame x="2"  y="6"/>
+		<OffsetFrame x="-1" y="2"/>
+		<OffsetFrame x="2"  y="8"/>
+		<OffsetFrame x="-1" y="10"/>
+		<OffsetFrame x="4"  y="8"/>
+		<OffsetFrame x="4"  y="8"/>
+	</Event>
+	<Event name="collapseSmoke3"
+		   path="./collapseSmoke3"
+		   fileNumber="17254"
+		   frameCount="12"
+		   x="-10"
+		   y="-16">
+		<OffsetFrame x="24" y="34"/>
+		<OffsetFrame x="13" y="20"/>
+		<OffsetFrame x="5"  y="15"/>
+		<OffsetFrame x="6"  y="13"/>
+		<OffsetFrame x="-1" y="7"/>
+		<OffsetFrame x="4"  y="10"/>
+		<OffsetFrame x="4"  y="-1"/>
+		<OffsetFrame x="0"  y="5"/>
+		<OffsetFrame x="-2" y="6"/>
+		<OffsetFrame x="-8" y="7"/>
+		<OffsetFrame x="-2" y="2"/>
+		<OffsetFrame x="1"  y="9"/>
+	</Event>
+	<Event name="collapseSmoke4"
+		   path="./collapseSmoke4"
+		   fileNumber="17266"
+		   frameCount="12"
+		   x="0"
+		   y="0">
+		<OffsetFrame x="23" y="69"/>
+		<OffsetFrame x="13" y="58"/>
+		<OffsetFrame x="8"  y="38"/>
+		<OffsetFrame x="9"  y="34"/>
+		<OffsetFrame x="2"  y="30"/>
+		<OffsetFrame x="7"  y="24"/>
+		<OffsetFrame x="7"  y="22"/>
+		<OffsetFrame x="6"  y="28"/>
+		<OffsetFrame x="5"  y="27"/>
+		<OffsetFrame x="3"  y="32"/>
+		<OffsetFrame x="4"  y="34"/>
+		<OffsetFrame x="8"  y="31"/>
+	</Event>
+	<Event name="collapseSmoke5"
+		   path="./collapseSmoke5"
+		   fileNumber="15773"
+		   frameCount="9"
+		   x="-10"
+		   y="-18">
+		<OffsetFrame x="17" y="31"/>
+		<OffsetFrame x="14" y="29"/>
+		<OffsetFrame x="11" y="24"/>
+		<OffsetFrame x="12" y="18"/>
+		<OffsetFrame x="9"  y="15"/>
+		<OffsetFrame x="11" y="16"/>
+		<OffsetFrame x="9"  y="14"/>
+		<OffsetFrame x="7"  y="15"/>
+		<OffsetFrame x="9"  y="18"/>
+	</Event>
+	<Event name="collapseSmoke6"
+		   path="./collapseSmoke6"
+		   fileNumber="14426"
+		   frameCount="10"
+		   x="-16"
+		   y="-10">
+		<OffsetFrame x="23" y="33"/>
+		<OffsetFrame x="16" y="28"/>
+		<OffsetFrame x="10" y="6"/>
+		<OffsetFrame x="3"  y="0"/>
+		<OffsetFrame x="6"  y="2"/>
+		<OffsetFrame x="3"  y="2"/>
+		<OffsetFrame x="0"  y="2"/>
+		<OffsetFrame x="1"  y="1"/>
+		<OffsetFrame x="7"  y="4"/>
+		<OffsetFrame x="18" y="7"/>
+	</Event>
+</SpriteSet>

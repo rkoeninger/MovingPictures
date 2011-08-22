@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<UnitType type="structure" unitType="pResidence" civ="Plymouth">
+	<DisplayName>Residence</DisplayName>
+	<Acknowledgement>residence</Acknowledgement>
+	<Cost>
+		<Resource type="common ore" amount="400"/>
+	</Cost>
+	<Staff workers="1" scientists="0"/>
+	<Stats hp="800" sightRange="5" armor="none"/>
+	<Footprint>STRUCT_2_BY_2</Footprint>
+</UnitType>

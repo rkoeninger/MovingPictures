@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="ambient" eventType="aStructureStatus">
+	<Event name="active"
+		   path="."
+		   fileNumber="108"
+		   frameCount="1"
+		   x="0"
+		   y="0"/>
+	<Event name="disabled"
+		   path="."
+		   fileNumber="109"
+		   frameCount="8"
+		   x="0"
+		   y="0"/>
+	<Event name="idle"
+		   path="."
+		   fileNumber="117"
+		   frameCount="1"
+		   x="0"
+		   y="0"/>
+</SpriteSet>
