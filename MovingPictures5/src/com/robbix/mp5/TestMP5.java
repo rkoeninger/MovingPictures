@@ -824,7 +824,7 @@ public class TestMP5
 		
 		for (File file : new File("./res/tileset").listFiles())
 		{
-			if (file.isDirectory())
+			if (file.isDirectory() && new File(file, "plain").exists())
 			{
 				tileSets.add(file.getName());
 			}
