@@ -150,19 +150,19 @@ public class DisplayPanel extends JComponent
 		else if (name.equals("Terrain Cost Map"))
 		{
 			showTerrainCostMap = isSet;
-			repaint();
+			refresh();
 		}
 		else if (name.equals("Terrain Cost Values"))
 		{
 			showTerrainCostValues = isSet;
 			cachedCostMapImage = null;
-			repaint();
+			refresh();
 		}
 		else if (name.equals("Cost Values as Factors"))
 		{
 			showCostValuesAsFactors = isSet;
 			cachedCostMapImage = null;
-			repaint();
+			refresh();
 		}
 		else if (name.equals("Night"))
 		{

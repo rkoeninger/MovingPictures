@@ -249,8 +249,10 @@ public class LayeredMap
 		costMap.setZero(pos);
 		spot.fixture = null;
 		spot.tileCode = tileSet.getBulldozedTile();
-
+		
 		clearFixture(pos);
+		
+		panel.refresh();
 	}
 	
 	public void clearFixture(Position pos)

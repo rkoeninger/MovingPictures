@@ -199,7 +199,7 @@ public class CommandUnitOverlay extends InputOverlay
 		}
 		else if (command.equals("bulldoze") && unit.getType().getName().contains("Dozer"))
 		{
-			unit.assignNext(new BulldozeTask(19 * 4)); // Four strokes
+			unit.interrupt(new BulldozeTask(19 * 4)); // Four strokes
 		}
 	}
 	
