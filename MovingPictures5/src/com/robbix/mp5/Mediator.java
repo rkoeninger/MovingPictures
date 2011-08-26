@@ -139,8 +139,8 @@ public class Mediator
 		if (range <= 0 || amount <= 0)
 			return;
 		
-		int absX = pos.x * 32;
-		int absY = pos.y * 32;
+		int absX = pos.x * map.getTileSize();
+		int absY = pos.y * map.getTileSize();
 		
 		int rangeInt = (int)Math.ceil(range);
 		
@@ -154,18 +154,39 @@ public class Mediator
 		for (int x = xMin; x <= xMax; ++x)
 		for (int y = yMin; y <= yMax; ++y)
 		{
-			Unit unit = map.getUnit(new Position(x, y));
+			Position current = new Position(x, y);
+			Unit unit = map.getUnit(current);
 			
 			if (unit != null)
 			{
-				int unitAbsX = x * 32 + unit.getXOffset();
-				int unitAbsY = y * 32 + unit.getYOffset();
+				int unitAbsX = unit.getAbsX();
+				int unitAbsY = unit.getAbsY();
 				
 				double absDist = Math.hypot(unitAbsX - absX, unitAbsY - absY);
 				
-				if (absDist <= (range * 32))
+				if (absDist <= (range * map.getTileSize()))
 				{
 					affectedUnits.add(unit);
+				}
+			}
+			
+			double absDist = current.getDistance(pos);
+			
+			if (absDist <= (range * map.getTileSize()))
+			{
+				if (map.hasWall(current) || map.hasTube(current))
+				{
+					int fixtureHP = map.getFixtureHP(current);
+					fixtureHP -= (int) amount;
+					
+					if (fixtureHP <= 0)
+					{
+						map.bulldoze(current);
+					}
+					else
+					{
+						map.setFixtureHP(current, fixtureHP);
+					}
 				}
 			}
 		}
@@ -174,6 +195,8 @@ public class Mediator
 		{
 			doDamage(null, unit, amount);
 		}
+		
+		panel.refresh();
 	}
 	
 	public static void doMove(Unit unit, Position pos)

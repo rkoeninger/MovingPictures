@@ -13,6 +13,7 @@ import javax.imageio.ImageIO;
 
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Neighbors;
+import com.robbix.mp5.unit.HealthBracket;
 
 public class TileSet
 {
@@ -98,10 +99,6 @@ public class TileSet
 		});
 	}
 	
-	public static final int GREEN  = 2;
-	public static final int YELLOW = 1;
-	public static final int RED    = 0;
-	
 	private Map<String, Image> tiles;
 	private Random rand;
 	
@@ -120,12 +117,17 @@ public class TileSet
 	{
 		return tiles.get(code);
 	}
-
-	public String getWallTile(Neighbors neighbors, int wallHealth)
+	
+	public String getWallTile(Neighbors neighbors)
+	{
+		return getWallTile(neighbors, HealthBracket.GREEN);
+	}
+	
+	public String getWallTile(Neighbors neighbors, HealthBracket health)
 	{
 		String healthCode = null;
 		
-		switch (wallHealth)
+		switch (health)
 		{
 			case GREEN:  healthCode = "green";  break;
 			case YELLOW: healthCode = "yellow"; break;

@@ -24,6 +24,7 @@ import com.robbix.mp5.basics.Neighbors;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.ui.DisplayPanel;
+import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 
 public class LayeredMap
@@ -79,11 +80,15 @@ public class LayeredMap
 		WALL, TUBE, MINE_PLATFORM
 	}
 	
+	private static final int WALL_MAX_HP = 500;
+	private static final int TUBE_MAX_HP = 2000;
+	
 	private static class Spot
 	{
 		Unit occupant;
 		Unit reservant;
 		Fixture fixture;
+		int fixtureHP;
 		String tileCode;
 		ResourceDeposit deposit;
 	}
@@ -192,7 +197,8 @@ public class LayeredMap
 			throw new IllegalStateException("fixture present");
 		
 		spot.fixture = Fixture.WALL;
-		spot.tileCode = tileSet.getWallTile(getWallNeighbors(pos), TileSet.GREEN);
+		spot.fixtureHP = WALL_MAX_HP;
+		spot.tileCode = tileSet.getWallTile(getWallNeighbors(pos));
 		costMap.setInfinite(pos);
 		
 		Position n = pos.shift(+0, -1);
@@ -201,16 +207,18 @@ public class LayeredMap
 		Position e = pos.shift(+1, +0);
 		
 		if (grid.getBounds().contains(n) && hasWall(n))
-			grid.get(n).tileCode = tileSet.getWallTile(getWallNeighbors(n), TileSet.GREEN);
+			grid.get(n).tileCode = tileSet.getWallTile(getWallNeighbors(n));
 		
 		if (grid.getBounds().contains(s) && hasWall(s))
-			grid.get(s).tileCode = tileSet.getWallTile(getWallNeighbors(s), TileSet.GREEN);
+			grid.get(s).tileCode = tileSet.getWallTile(getWallNeighbors(s));
 		
 		if (grid.getBounds().contains(w) && hasWall(w))
-			grid.get(w).tileCode = tileSet.getWallTile(getWallNeighbors(w), TileSet.GREEN);
+			grid.get(w).tileCode = tileSet.getWallTile(getWallNeighbors(w));
 		
 		if (grid.getBounds().contains(e) && hasWall(e))
-			grid.get(e).tileCode = tileSet.getWallTile(getWallNeighbors(e), TileSet.GREEN);
+			grid.get(e).tileCode = tileSet.getWallTile(getWallNeighbors(e));
+		
+		panel.refresh();
 	}
 	
 	public void putTube(Position pos)
@@ -221,6 +229,7 @@ public class LayeredMap
 			throw new IllegalStateException("fixture present");
 		
 		spot.fixture = Fixture.TUBE;
+		spot.fixtureHP = TUBE_MAX_HP;
 		spot.tileCode = tileSet.getTubeTile(getTubeNeighbors(pos));
 		costMap.setZero(pos);
 		
@@ -240,18 +249,15 @@ public class LayeredMap
 		
 		if (grid.getBounds().contains(e) && hasTube(e))
 			grid.get(e).tileCode = tileSet.getTubeTile(getTubeNeighbors(e));
+		
+		panel.refresh();
 	}
 	
 	public void bulldoze(Position pos)
 	{
-		Spot spot = grid.get(pos);
-		
-		costMap.setZero(pos);
-		spot.fixture = null;
-		spot.tileCode = tileSet.getBulldozedTile();
-		
 		clearFixture(pos);
-		
+		costMap.setZero(pos);
+		grid.get(pos).tileCode = tileSet.getBulldozedTile();
 		panel.refresh();
 	}
 	
@@ -259,6 +265,7 @@ public class LayeredMap
 	{
 		Spot spot = grid.get(pos);
 		spot.fixture = null;
+		spot.fixtureHP = 0;
 		
 		Position adj;
 		adj = pos.shift(+0, -1);
@@ -347,6 +354,36 @@ public class LayeredMap
 	public boolean hasMinePlatform(Position pos)
 	{
 		return grid.get(pos).fixture == Fixture.MINE_PLATFORM;
+	}
+	
+	public int getFixtureHP(Position pos)
+	{
+		Spot spot = grid.get(pos);
+		
+		if (!(spot.fixture == Fixture.TUBE || spot.fixture == Fixture.WALL))
+			throw new IllegalStateException("fixture doesn't have hp");
+		
+		return spot.fixtureHP;
+	}
+	
+	public void setFixtureHP(Position pos, int hp)
+	{
+		Spot spot = grid.get(pos);
+		
+		if (!(spot.fixture == Fixture.TUBE || spot.fixture == Fixture.WALL))
+			throw new IllegalStateException("fixture doesn't have hp");
+		
+		if (spot.fixture == Fixture.WALL)
+		{
+			double hpFactor = hp / (double) WALL_MAX_HP;
+			String[] tileCodeParts = spot.tileCode.split("/");
+			String neihborsString = tileCodeParts[tileCodeParts.length - 1];
+			Neighbors neighbors = Neighbors.valueOf(neihborsString);
+			HealthBracket health = HealthBracket.getDefault(hpFactor);
+			spot.tileCode = tileSet.getWallTile(neighbors, health);
+		}
+		
+		spot.fixtureHP = hp;
 	}
 	
 	public Neighbors getWallNeighbors(Position pos)
