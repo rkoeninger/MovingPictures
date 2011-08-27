@@ -20,7 +20,6 @@ import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.ai.task.TurretTask;
 import com.robbix.mp5.basics.FileFormatException;
 import com.robbix.mp5.basics.Filter;
-import com.robbix.mp5.basics.Footprint;
 
 public class UnitFactory
 {
@@ -273,6 +272,8 @@ public class UnitFactory
 			String footprintString = Utils.getValue(rootNode, "Footprint");
 			Footprint footprint = getFootprint(footprintString, xmlFile);
 			Cost cost = getCost(Utils.getNode(rootNode, "Cost"), xmlFile);
+			boolean source = Utils.getBooleanAttribute(statsNode, "connectionSource", false);
+			boolean needsConnection = Utils.getBooleanAttribute(statsNode, "needsConnection", false);
 			
 			names.add(civ + " " + displayName);
 			typeList.add(unitType);
@@ -285,7 +286,9 @@ public class UnitFactory
 				maxHP,
 				armor,
 				sightRange,
-				footprint
+				footprint,
+				source,
+				needsConnection
 			));
 		}
 		else if (type.equals("guardPost"))

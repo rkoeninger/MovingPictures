@@ -560,7 +560,7 @@ public class TestMP5
 		frame = new JFrame("Moving Pictures");
 		frame.setJMenuBar(menuBar);
 		frame.setLayout(new BorderLayout());
-		frame.add(commandBar, BorderLayout.EAST);
+//		frame.add(commandBar, BorderLayout.EAST);
 		frame.add(panel, BorderLayout.CENTER);
 		frame.add(statusesPanel, BorderLayout.SOUTH);
 		frame.setResizable(false);

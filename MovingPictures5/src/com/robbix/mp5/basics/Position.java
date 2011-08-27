@@ -1,5 +1,8 @@
 package com.robbix.mp5.basics;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * An immutable position on a grid. Measured in relative grid co-ordinates.
  * 
@@ -49,6 +52,41 @@ public class Position
 	public Position shift(Position pos)
 	{
 		return new Position(x + pos.x, y + pos.y);
+	}
+	
+	/**
+	 * Returns a set of this position's four neighbors n, s, e, w.
+	 */
+	public Set<Position> get4Neighbors()
+	{
+		Set<Position> neighbors = new HashSet<Position>();
+		
+		neighbors.add(shift(0, 1));
+		neighbors.add(shift(0, -1));
+		neighbors.add(shift(1, 0));
+		neighbors.add(shift(-1, 0));
+		
+		return neighbors;
+	}
+
+	/**
+	 * Returns a set of this position's eight neighbors
+	 * n, s, e, w, ne, nw, sw, se.
+	 */
+	public Set<Position> get8Neighbors()
+	{
+		Set<Position> neighbors = new HashSet<Position>();
+		
+		neighbors.add(shift(0, 1));
+		neighbors.add(shift(0, -1));
+		neighbors.add(shift(1, 0));
+		neighbors.add(shift(-1, 0));
+		neighbors.add(shift(1, 1));
+		neighbors.add(shift(1, -1));
+		neighbors.add(shift(-1, 1));
+		neighbors.add(shift(-1, -1));
+		
+		return neighbors;
 	}
 	
 	/**

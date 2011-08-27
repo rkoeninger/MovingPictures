@@ -90,8 +90,8 @@
 		   path="./collapseSmoke1"
 		   fileNumber="17230"
 		   frameCount="12"
-		   x="0"
-		   y="0">
+		   x="-18"
+		   y="-16">
 		<OffsetFrame x="29" y="31"/>
 		<OffsetFrame x="20" y="21"/>
 		<OffsetFrame x="12" y="13"/>

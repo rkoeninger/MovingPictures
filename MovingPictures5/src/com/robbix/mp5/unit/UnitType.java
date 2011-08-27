@@ -3,7 +3,6 @@ package com.robbix.mp5.unit;
 import java.util.Collections;
 import java.util.Set;
 
-import com.robbix.mp5.basics.Footprint;
 
 public class UnitType
 {
@@ -47,7 +46,9 @@ public class UnitType
 		int maxHP,
 		Armor armor,
 		double sightRange,
-		Footprint fp)
+		Footprint fp,
+		boolean connectionSource,
+		boolean needsConnection)
 	{
 		UnitType type = new UnitType();
 		
@@ -60,6 +61,8 @@ public class UnitType
 		type.armor = armor;
 		type.sightRange = sightRange;
 		type.fp = fp;
+		type.connectionSource = connectionSource;
+		type.needsConnection = needsConnection;
 		
 		return type;
 	}
@@ -181,6 +184,8 @@ public class UnitType
 	private String chassisTypeName;
 	private String turretTypeName;
 	private String ack;
+	private boolean connectionSource;
+	private boolean needsConnection;
 	
 	private UnitType()
 	{
@@ -269,6 +274,16 @@ public class UnitType
 	public Cost getCost()
 	{
 		return cost;
+	}
+	
+	public boolean isConnectionSource()
+	{
+		return connectionSource;
+	}
+	
+	public boolean needsConnection()
+	{
+		return needsConnection;
 	}
 	
 	public Set<Cargo.Type> getSupportedCargoTypes()

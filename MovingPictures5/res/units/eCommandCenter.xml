@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<UnitType type="structure" unitType="eCommandCenter" civ="Eden">
+	<DisplayName>Command Center</DisplayName>
+	<Acknowledgement>commandCenter</Acknowledgement>
+	<Cost>
+		<Resource type="common ore" amount="1000"/>
+	</Cost>
+	<Staff workers="4" scientists="2"/>
+	<Stats hp="2000" sightRange="5" armor="heavy" connectionSource="true"/>
+	<Footprint>STRUCT_3_BY_2</Footprint>
+</UnitType>

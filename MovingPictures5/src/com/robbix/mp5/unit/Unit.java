@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.robbix.mp5.Player;
 import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.basics.Direction;
-import com.robbix.mp5.basics.Footprint;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 
@@ -297,16 +296,32 @@ public class Unit
 	{
 		return type;
 	}
-
+	
+	public boolean isConnected()
+	{
+		return pos == null ? false : !needsConnection() || container.isAlive(pos);
+	}
+	
+	public boolean needsConnection()
+	{
+		return type.needsConnection();
+	}
+	
+	public boolean isConnectionSource()
+	{
+		return type.isConnectionSource();
+	}
+	
 	public String getStatusString()
 	{
-		return String.format("#%1$d %2$s %3$s %4$d/%5$d %6$s",
+		return String.format("#%1$d %2$s [%7$s] %3$s %4$d/%5$d %6$s",
 			serial,
 			type.getName(),
 			activity,
 			hp,
 			type.getMaxHP(),
-			(cargo != null ? cargo.toString() : "")
+			(cargo != null ? cargo.toString() : ""),
+			(isConnected() ? "connected" : "disconnected")
 		);
 	}
 	
@@ -543,7 +558,9 @@ public class Unit
 	
 	public boolean isDisabled()
 	{
-		return isStructure() && getHealthBracket() == HealthBracket.RED;
+		return isStructure() &&
+			(getHealthBracket() == HealthBracket.RED
+			|| !isConnected());
 	}
 	
 	/**

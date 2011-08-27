@@ -11,6 +11,7 @@
          armor="medium"
          damage="80"
          reloadDelay="60"
-         attackRange="5"/>
+         attackRange="5"
+         needsConnection="false"/>
 	<Footprint>STRUCT_1_BY_1</Footprint>
 </UnitType>
