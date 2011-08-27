@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="structure" unitType="eCommandCenter" color="#0000ff">
+	<Activity name="still"
+			  path="./still"
+			  offsetX="0"
+			  offsetY="-25">
+		<HealthState health="green"  fileNumber="218"/>
+		<HealthState health="yellow" fileNumber="147"/>
+		<HealthState health="red"    fileNumber="148"/>
+	</Activity>
+	<Activity name="build"
+			  path="./build"
+			  fileNumber="178"
+			  frameCount="40"
+			  offsetX="0"
+			  offsetY="-15">
+		<OffsetFrame offsetX="12" offsetY="35"/>
+		<OffsetFrame offsetX="12" offsetY="35"/>
+		<OffsetFrame offsetX="12" offsetY="35"/>
+		<OffsetFrame offsetX="12" offsetY="35"/>
+		<OffsetFrame offsetX="12" offsetY="35"/>
+		<OffsetFrame offsetX="12" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="35"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="29"/>
+		<OffsetFrame offsetX="10" offsetY="29"/>
+		<OffsetFrame offsetX="10" offsetY="29"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+		<OffsetFrame offsetX="10" offsetY="30"/>
+	</Activity>
+	<Activity name="collapse"
+			  path="./collapse"
+			  fileNumber="2044"
+			  frameCount="6"
+			  offsetX="-3"
+			  offsetY="-22">
+		<OffsetFrame offsetX="7" offsetY="6"/>
+		<OffsetFrame offsetX="7" offsetY="9"/>
+		<OffsetFrame offsetX="7" offsetY="11"/>
+		<OffsetFrame offsetX="7" offsetY="15"/>
+		<OffsetFrame offsetX="7" offsetY="19"/>
+		<OffsetFrame offsetX="7" offsetY="23"/>
+	</Activity>
+</SpriteSet>
