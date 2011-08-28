@@ -251,9 +251,9 @@ public class Mediator
 		if (!miner.isMiner())
 			throw new IllegalArgumentException();
 		
-		if (!miner.isIdle())
+		if (miner.isBusy())
 			return false;
-
+		
 		Position pos = miner.getPosition();
 		
 		if (!map.hasResourceDeposit(pos))
