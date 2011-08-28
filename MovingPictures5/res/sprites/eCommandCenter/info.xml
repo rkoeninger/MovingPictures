@@ -4,9 +4,9 @@
 			  path="./still"
 			  offsetX="0"
 			  offsetY="-25">
-		<HealthState health="green"  fileNumber="218"/>
-		<HealthState health="yellow" fileNumber="147"/>
-		<HealthState health="red"    fileNumber="148"/>
+		<HealthState health="green"  fileNumber="218" offsetX="0" offsetY="0"/>
+		<HealthState health="yellow" fileNumber="147" offsetX="0" offsetY="0"/>
+		<HealthState health="red"    fileNumber="148" offsetX="0" offsetY="8"/>
 	</Activity>
 	<Activity name="build"
 			  path="./build"

@@ -206,7 +206,7 @@ public class Mediator
 	
 	public static void doMove(Unit unit, Position pos, boolean interrupt)
 	{
-		if (unit.isStructure() || unit.isDead()) return;
+		if (unit.isStructure() || unit.getType().isGuardPostType() || unit.isDead()) return;
 		
 		List<Position> path = new AStar().getPath(
 			map.getTerrainCostMap(),

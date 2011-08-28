@@ -37,7 +37,7 @@ public class CommandUnitOverlay extends InputOverlay
 	
 	public void init()
 	{
-		if (!unit.isStructure())
+		if (!unit.isStructure() && !unit.getType().isGuardPostType())
 			getDisplay().setAnimatedCursor("move");
 	}
 	
