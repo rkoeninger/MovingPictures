@@ -213,14 +213,12 @@ public class CommandUnitOverlay extends InputOverlay
 		if (edge == 6)
 		{
 			Mediator.kill(unit);
-			
 			getDisplay().completeOverlay(this);
 			return;
 		}
 		else if (edge == 3)
 		{
 			Mediator.selfDestruct(unit);
-			
 			getDisplay().completeOverlay(this);
 			return;
 		}
@@ -263,7 +261,10 @@ public class CommandUnitOverlay extends InputOverlay
 					
 					if (smelter != null && smelter.getType().getName().contains("Smelter"))
 					{
-						unit.assignNow(new DockTask(smelter, Cargo.EMPTY));
+						if (!smelter.isDead() && !smelter.isDisabled())
+						{
+							unit.assignNow(new DockTask(smelter, Cargo.EMPTY));
+						}
 					}
 				}
 			}
@@ -282,7 +283,10 @@ public class CommandUnitOverlay extends InputOverlay
 						if (deposit == null)
 							throw new IllegalStateException("mine doesn't have deposit");
 						
-						unit.assignNow(new MineTask(deposit.getLoad()));
+						if (!mine.isDead() && !mine.isDisabled())
+						{
+							unit.assignNow(new MineTask(deposit.getLoad()));
+						}
 					}
 				}
 			}
@@ -298,7 +302,10 @@ public class CommandUnitOverlay extends InputOverlay
 				{
 					Unit sFactory = map.getUnit(adj);
 					
-					if (sFactory != null)
+					if (sFactory != null
+				&& sFactory.getType().getName().contains("StructureFactory")
+				&& !sFactory.isDead()
+				&& !sFactory.isDisabled())
 					{
 						unit.assignNow(new DockTask(
 							sFactory,
@@ -368,17 +375,13 @@ public class CommandUnitOverlay extends InputOverlay
 				}
 				
 				owner.spend(type.getCost());
-				
-				Unit newVehicle = Mediator.factory.newUnit(
-					type,
-					owner
-				);
+				Unit newVehicle = Mediator.factory.newUnit(type, owner);
 				
 				for (Position exitPos : getFactoryExits(unit.getPosition()))
 				{
 					if (getDisplay().getMap().canPlaceUnit(exitPos))
 					{
-						getDisplay().getMap().addUnit(newVehicle, exitPos);
+						getDisplay().getMap().putUnit(newVehicle, exitPos);
 						return;
 					}
 				}
@@ -397,7 +400,7 @@ public class CommandUnitOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		if (unit.isStructure())
+		if (unit.isStructure() || unit.getType().isGuardPostType())
 		{
 			getDisplay().completeOverlay(this);
 			return;
@@ -414,7 +417,6 @@ public class CommandUnitOverlay extends InputOverlay
 				return;
 			
 			Mediator.doAttack(unit.getTurret(), target);
-			
 			attackMode = false;
 			getDisplay().setAnimatedCursor("move");
 		}

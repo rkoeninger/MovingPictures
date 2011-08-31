@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="ambient" eventType="aMagmaVent">
+	<Event name="magmaVent"
+		   path="."
+		   fileNumber="10007"
+		   frameCount="10"
+		   x="0"
+		   y="0"/>
+</SpriteSet>

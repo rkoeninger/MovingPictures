@@ -123,7 +123,7 @@ public class BuildStructureOverlay extends InputOverlay
 				Utils.getPath(unit.getType().getName(), "build")
 			);
 			
-			d.getMap().addUnit(unit, pos);
+			d.getMap().putUnit(unit, pos);
 			unit.assignNow(new BuildTask(buildTime, 200));
 			unit.setActivity("build");
 			Mediator.sounds.play("structureBuild");

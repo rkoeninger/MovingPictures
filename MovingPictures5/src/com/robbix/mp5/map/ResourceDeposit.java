@@ -1,11 +1,15 @@
 package com.robbix.mp5.map;
 
+import com.robbix.mp5.Player;
 import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.unit.Cargo;
 
 public class ResourceDeposit implements Cloneable
 {
+	public static final ResourceDeposit UNKNOWN =
+		new ResourceDeposit(null, null, -1, -1, -1, -1, -1);
+	
 	public static ResourceDeposit get1BarCommon()
 	{
 		return new ResourceDeposit(
@@ -185,5 +189,10 @@ public class ResourceDeposit implements Cloneable
 	public Position getPosition()
 	{
 		return pos;
+	}
+	
+	public boolean isSurveyedBy(Player player)
+	{
+		return true;
 	}
 }

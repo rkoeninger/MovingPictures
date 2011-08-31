@@ -242,7 +242,7 @@ public class Mediator
 		
 		unit.setActivity("build");
 		unit.assignNow(new BuildTask(buildFrames, 100));
-		map.addUnit(unit, pos);
+		map.putUnit(unit, pos);
 		sounds.play("structureBuild");
 	}
 	

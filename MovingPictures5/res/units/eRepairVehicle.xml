@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<UnitType type="vehicle" unitType="eRepairVehicle" civ="Eden">
+	<DisplayName>Repair Vehicle</DisplayName>
+	<Acknowledgement>repairVehicle</Acknowledgement>
+	<Activites>
+		<Activity>move</Activity>
+		<Activity>repair</Activity>
+	</Activites>
+	<Cost>
+		<Resource type="common ore" amount="250"/>
+	</Cost>
+	<Stats hp="300"
+		   speed="1.5"
+		   sightRange="3"
+		   armor="none"
+		   rotationSpeed="1"
+		   rotationDegree="16"/>
+</UnitType>

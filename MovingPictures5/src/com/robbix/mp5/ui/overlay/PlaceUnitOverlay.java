@@ -113,7 +113,7 @@ public class PlaceUnitOverlay extends InputOverlay
 					return;
 			}
 			
-			d.getMap().addUnit(unit, pos);
+			d.getMap().putUnit(unit, pos);
 			d.refresh();
 			
 			if (factory != null)

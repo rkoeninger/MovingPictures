@@ -45,6 +45,7 @@ import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.UnitStatus;
 import com.robbix.mp5.ui.overlay.BuildStructureOverlay;
 import com.robbix.mp5.ui.overlay.PlaceBulldozeOverlay;
+import com.robbix.mp5.ui.overlay.PlaceGeyserOverlay;
 import com.robbix.mp5.ui.overlay.PlaceResourceOverlay;
 import com.robbix.mp5.ui.overlay.PlaceTubeOverlay;
 import com.robbix.mp5.ui.overlay.PlaceUnitOverlay;
@@ -352,6 +353,7 @@ public class TestMP5
 		final JMenu disastersMenu = new JMenu("Disasters");
 		final JMenuItem spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
 		final JMenuItem meteorShowerMenuItem = new JMenuItem("Meteor Shower");
+		final JMenuItem placeGeyserMenuItem = new JMenuItem("Place Geyser");
 		final JMenuItem placeWallMenuItem = new JMenuItem("Place Wall");
 		final JMenuItem placeTubeMenuItem = new JMenuItem("Place Tube");
 		final JMenuItem placeBulldozeMenuItem = new JMenuItem("Bulldoze");
@@ -532,6 +534,7 @@ public class TestMP5
 		soundMenu.add(playMusicMenuItem);
 		terrainMenu.add(placeWallMenuItem);
 		terrainMenu.add(placeTubeMenuItem);
+		terrainMenu.add(placeGeyserMenuItem);
 		terrainMenu.add(placeBulldozeMenuItem);
 		terrainMenu.add(placeResourceMenu);
 		disastersMenu.add(spawnMeteorMenuItem);
@@ -673,6 +676,15 @@ public class TestMP5
 				panel.pushOverlay(new PlaceBulldozeOverlay());
 			}
 		});
+		
+		placeGeyserMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				panel.pushOverlay(new PlaceGeyserOverlay());
+			}
+		});
+		
 		
 		placeWallMenuItem.addActionListener(new ActionListener()
 		{
@@ -931,27 +943,27 @@ public class TestMP5
 		for (int x = 0; x < 12; ++x)
 		for (int y = 0; y < 20; ++y)
 		{
-			map.addUnit(factory.newUnit("pScout"), new Position(x, y));
+			map.putUnit(factory.newUnit("pScout"), new Position(x, y));
 		}
 		
 		for (int x = 12; x < 30; x += 2)
 		for (int y = 13; y < 19; y += 2)
 		{
-			map.addUnit(factory.newUnit("pResidence"), new Position(x, y));
+			map.putUnit(factory.newUnit("pResidence"), new Position(x, y));
 		}
 		
-		map.addUnit(factory.newUnit("eVehicleFactory"), new Position(12, 1));
-		map.addUnit(factory.newUnit("eVehicleFactory"), new Position(16, 1));
-		map.addUnit(factory.newUnit("eVehicleFactory"), new Position(20, 1));
-		map.addUnit(factory.newUnit("eVehicleFactory"), new Position(24, 1));
-		map.addUnit(factory.newUnit("eStructureFactory"), new Position(12, 5));
-		map.addUnit(factory.newUnit("eStructureFactory"), new Position(16, 5));
-		map.addUnit(factory.newUnit("eStructureFactory"), new Position(20, 5));
-		map.addUnit(factory.newUnit("eStructureFactory"), new Position(24, 5));
-		map.addUnit(factory.newUnit("eCommonSmelter"), new Position(12, 9));
-		map.addUnit(factory.newUnit("eCommonSmelter"), new Position(16, 9));
-		map.addUnit(factory.newUnit("eCommonSmelter"), new Position(20, 9));
-		map.addUnit(factory.newUnit("eCommonSmelter"), new Position(24, 9));
+		map.putUnit(factory.newUnit("eVehicleFactory"), new Position(12, 1));
+		map.putUnit(factory.newUnit("eVehicleFactory"), new Position(16, 1));
+		map.putUnit(factory.newUnit("eVehicleFactory"), new Position(20, 1));
+		map.putUnit(factory.newUnit("eVehicleFactory"), new Position(24, 1));
+		map.putUnit(factory.newUnit("eStructureFactory"), new Position(12, 5));
+		map.putUnit(factory.newUnit("eStructureFactory"), new Position(16, 5));
+		map.putUnit(factory.newUnit("eStructureFactory"), new Position(20, 5));
+		map.putUnit(factory.newUnit("eStructureFactory"), new Position(24, 5));
+		map.putUnit(factory.newUnit("eCommonSmelter"), new Position(12, 9));
+		map.putUnit(factory.newUnit("eCommonSmelter"), new Position(16, 9));
+		map.putUnit(factory.newUnit("eCommonSmelter"), new Position(20, 9));
+		map.putUnit(factory.newUnit("eCommonSmelter"), new Position(24, 9));
 		
 		SpriteLibrary lib = game.getSpriteLibrary();
 		
@@ -1002,10 +1014,10 @@ public class TestMP5
 		convec3.setCargo(Cargo.newConVecCargo("eCommonSmelter"));
 		convec4.setCargo(Cargo.newConVecCargo("eCommandCenter"));
 		
-		map.addUnit(convec1, new Position(9,  7));
-		map.addUnit(convec2, new Position(10, 7));
-		map.addUnit(convec3, new Position(11, 7));
-		map.addUnit(convec4, new Position(12, 7));
+		map.putUnit(convec1, new Position(9,  7));
+		map.putUnit(convec2, new Position(10, 7));
+		map.putUnit(convec3, new Position(11, 7));
+		map.putUnit(convec4, new Position(12, 7));
 	}
 	
 	public static String mapMineRouteDemo()
@@ -1092,15 +1104,15 @@ public class TestMP5
 		Unit truck35 = factory.newUnit("eCargoTruck", player1);
 		Unit truck36 = factory.newUnit("eCargoTruck", player1);
 		
-		map.addUnit(smelter1, new Position(2,  2));
-		map.addUnit(smelter2, new Position(2,  8));
-		map.addUnit(smelter3, new Position(2,  14));
-		map.addUnit(smelter4, new Position(8,  2));
-		map.addUnit(smelter5, new Position(8,  8));
-		map.addUnit(smelter6, new Position(8,  14));
-		map.addUnit(smelter7, new Position(14, 2));
-		map.addUnit(smelter8, new Position(14, 8));
-		map.addUnit(smelter9, new Position(14, 14));
+		map.putUnit(smelter1, new Position(2,  2));
+		map.putUnit(smelter2, new Position(2,  8));
+		map.putUnit(smelter3, new Position(2,  14));
+		map.putUnit(smelter4, new Position(8,  2));
+		map.putUnit(smelter5, new Position(8,  8));
+		map.putUnit(smelter6, new Position(8,  14));
+		map.putUnit(smelter7, new Position(14, 2));
+		map.putUnit(smelter8, new Position(14, 8));
+		map.putUnit(smelter9, new Position(14, 14));
 		
 		map.putTube(new Position(7,  3));
 		map.putTube(new Position(13, 3));
@@ -1122,51 +1134,51 @@ public class TestMP5
 		map.putTube(new Position(23, 18));
 		map.putTube(new Position(24, 18));
 		
-		map.addUnit(factory.newUnit("eCommandCenter", player1), new Position(25, 17));
+		map.putUnit(factory.newUnit("eCommandCenter", player1), new Position(25, 17));
 		
-		map.addUnit(mine1, new Position(21, 2));
-		map.addUnit(mine2, new Position(21, 8));
-		map.addUnit(mine3, new Position(21, 14));
-		map.addUnit(mine4, new Position(25, 2));
-		map.addUnit(mine5, new Position(25, 8));
-		map.addUnit(mine6, new Position(25, 14));
+		map.putUnit(mine1, new Position(21, 2));
+		map.putUnit(mine2, new Position(21, 8));
+		map.putUnit(mine3, new Position(21, 14));
+		map.putUnit(mine4, new Position(25, 2));
+		map.putUnit(mine5, new Position(25, 8));
+		map.putUnit(mine6, new Position(25, 14));
 		
-		map.addUnit(truck1,  new Position(2,  6));
-		map.addUnit(truck2,  new Position(3,  6));
-		map.addUnit(truck3,  new Position(4,  6));
-		map.addUnit(truck4,  new Position(5,  6));
-		map.addUnit(truck5,  new Position(6,  6));
-		map.addUnit(truck6,  new Position(7,  6));
-		map.addUnit(truck7,  new Position(8,  6));
-		map.addUnit(truck8,  new Position(9,  6));
-		map.addUnit(truck9,  new Position(10, 6));
-		map.addUnit(truck10, new Position(11, 6));
-		map.addUnit(truck11, new Position(12, 6));
-		map.addUnit(truck12, new Position(13, 6));
-		map.addUnit(truck13, new Position(2,  12));
-		map.addUnit(truck14, new Position(3,  12));
-		map.addUnit(truck15, new Position(4,  12));
-		map.addUnit(truck16, new Position(5,  12));
-		map.addUnit(truck17, new Position(6,  12));
-		map.addUnit(truck18, new Position(7,  12));
-		map.addUnit(truck19, new Position(8,  12));
-		map.addUnit(truck20, new Position(9,  12));
-		map.addUnit(truck21, new Position(10, 12));
-		map.addUnit(truck22, new Position(11, 12));
-		map.addUnit(truck23, new Position(12, 12));
-		map.addUnit(truck24, new Position(13, 12));
-		map.addUnit(truck25, new Position(2,  18));
-		map.addUnit(truck26, new Position(3,  18));
-		map.addUnit(truck27, new Position(4,  18));
-		map.addUnit(truck28, new Position(5,  18));
-		map.addUnit(truck29, new Position(6,  18));
-		map.addUnit(truck30, new Position(7,  18));
-		map.addUnit(truck31, new Position(8,  18));
-		map.addUnit(truck32, new Position(9,  18));
-		map.addUnit(truck33, new Position(10, 18));
-		map.addUnit(truck34, new Position(11, 18));
-		map.addUnit(truck35, new Position(12, 18));
-		map.addUnit(truck36, new Position(13, 18));
+		map.putUnit(truck1,  new Position(2,  6));
+		map.putUnit(truck2,  new Position(3,  6));
+		map.putUnit(truck3,  new Position(4,  6));
+		map.putUnit(truck4,  new Position(5,  6));
+		map.putUnit(truck5,  new Position(6,  6));
+		map.putUnit(truck6,  new Position(7,  6));
+		map.putUnit(truck7,  new Position(8,  6));
+		map.putUnit(truck8,  new Position(9,  6));
+		map.putUnit(truck9,  new Position(10, 6));
+		map.putUnit(truck10, new Position(11, 6));
+		map.putUnit(truck11, new Position(12, 6));
+		map.putUnit(truck12, new Position(13, 6));
+		map.putUnit(truck13, new Position(2,  12));
+		map.putUnit(truck14, new Position(3,  12));
+		map.putUnit(truck15, new Position(4,  12));
+		map.putUnit(truck16, new Position(5,  12));
+		map.putUnit(truck17, new Position(6,  12));
+		map.putUnit(truck18, new Position(7,  12));
+		map.putUnit(truck19, new Position(8,  12));
+		map.putUnit(truck20, new Position(9,  12));
+		map.putUnit(truck21, new Position(10, 12));
+		map.putUnit(truck22, new Position(11, 12));
+		map.putUnit(truck23, new Position(12, 12));
+		map.putUnit(truck24, new Position(13, 12));
+		map.putUnit(truck25, new Position(2,  18));
+		map.putUnit(truck26, new Position(3,  18));
+		map.putUnit(truck27, new Position(4,  18));
+		map.putUnit(truck28, new Position(5,  18));
+		map.putUnit(truck29, new Position(6,  18));
+		map.putUnit(truck30, new Position(7,  18));
+		map.putUnit(truck31, new Position(8,  18));
+		map.putUnit(truck32, new Position(9,  18));
+		map.putUnit(truck33, new Position(10, 18));
+		map.putUnit(truck34, new Position(11, 18));
+		map.putUnit(truck35, new Position(12, 18));
+		map.putUnit(truck36, new Position(13, 18));
 		
 		truck1 .assignNow(new MineRouteTask(mine1, smelter1));
 		truck2 .assignNow(new MineRouteTask(mine4, smelter1));
@@ -1251,7 +1263,7 @@ public class TestMP5
 		for (int y = 2; y <= 5; ++y)
 		{
 			Unit tankMW = factory.newUnit("pMicrowaveLynx", player1);
-			map.addUnit(tankMW, new Position(x, y));
+			map.putUnit(tankMW, new Position(x, y));
 			tankMW.assignNow(new SteerTask(destination));
 		}
 		
@@ -1259,7 +1271,7 @@ public class TestMP5
 		for (int y = 2;  y <= 5;  ++y)
 		{
 			Unit tankRPG = factory.newUnit("pRPGLynx", player4);
-			map.addUnit(tankRPG, new Position(x, y));
+			map.putUnit(tankRPG, new Position(x, y));
 			tankRPG.assignNow(new SteerTask(destination));
 		}
 		
@@ -1267,7 +1279,7 @@ public class TestMP5
 		for (int y = 18; y <= 18; ++y)
 		{
 			Unit tankSN = factory.newUnit("pSupernovaLynx", player3);
-			map.addUnit(tankSN, new Position(x, y));
+			map.putUnit(tankSN, new Position(x, y));
 			tankSN.assignNow(new SteerTask(destination));
 		}
 		
@@ -1275,31 +1287,32 @@ public class TestMP5
 		for (int y = 9;  y <= 11; ++y)
 		{
 			Unit tankL = factory.newUnit("eLaserLynx", player2);
-			map.addUnit(tankL, new Position(x, y));
+			map.putUnit(tankL, new Position(x, y));
 		}
 		
 		for (int x = 18; x <= 20; ++x)
 		for (int y = 12; y <= 14; ++y)
 		{
 			Unit tankRG = factory.newUnit("eRailGunLynx", player2);
-			map.addUnit(tankRG, new Position(x, y));
+			map.putUnit(tankRG, new Position(x, y));
 		}
 		
 		for (int x = 21; x <= 23; ++x)
 		for (int y = 13; y <= 14; ++y)
 		{
 			Unit tankRG = factory.newUnit("eRailGunLynx", player2);
-			map.addUnit(tankRG, new Position(x, y));
+			map.putUnit(tankRG, new Position(x, y));
 		}
 		
-		map.addUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(20, 8));
-		map.addUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(21, 8));
-		map.addUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(22, 8));
+		map.putUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(19, 8));
+		map.putUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(20, 8));
+		map.putUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(21, 8));
+		map.putUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(22, 8));
 		
-		map.addUnit(factory.newUnit("pMicrowaveGuardPost", player2), new Position(21, 12));
-		map.addUnit(factory.newUnit("eCommandCenter",      player2), new Position(25, 15));
-		map.addUnit(factory.newUnit("eStructureFactory",   player2), new Position(19, 15));
-		map.addUnit(factory.newUnit("eVehicleFactory",     player2), new Position(25, 10));
+		map.putUnit(factory.newUnit("eLaserGuardPost",   player2), new Position(21, 12));
+		map.putUnit(factory.newUnit("eCommandCenter",    player2), new Position(25, 15));
+		map.putUnit(factory.newUnit("eStructureFactory", player2), new Position(19, 15));
+		map.putUnit(factory.newUnit("eVehicleFactory",   player2), new Position(25, 10));
 		
 		map.putTube(new Position(27, 14));
 		map.putTube(new Position(24, 16));

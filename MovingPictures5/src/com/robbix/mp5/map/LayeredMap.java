@@ -78,7 +78,7 @@ public class LayeredMap
 	
 	public static enum Fixture
 	{
-		WALL, TUBE, MINE_PLATFORM
+		WALL, TUBE, MINE_PLATFORM, GEYSER
 	}
 	
 	private static final int WALL_MAX_HP = 500;
@@ -209,7 +209,7 @@ public class LayeredMap
 		Spot spot = grid.get(pos);
 		
 		if (spot.fixture != null)
-			throw new IllegalStateException("fixture present");
+			throw new IllegalStateException("fixture present " + pos);
 		
 		spot.fixture = Fixture.WALL;
 		spot.fixtureHP = WALL_MAX_HP;
@@ -241,7 +241,7 @@ public class LayeredMap
 		Spot spot = grid.get(pos);
 		
 		if (spot.fixture != null)
-			throw new IllegalStateException("fixture present");
+			throw new IllegalStateException("fixture present " + pos);
 		
 		spot.fixture = Fixture.TUBE;
 		spot.fixtureHP = TUBE_MAX_HP;
@@ -266,6 +266,19 @@ public class LayeredMap
 		{
 			branchConnections(pos);
 		}
+		
+		panel.refresh();
+	}
+	
+	public void putGeyser(Position pos)
+	{
+		Spot spot = grid.get(pos);
+		
+		if (spot.fixture != null)
+			throw new IllegalStateException("fixture present " + pos);
+		
+		spot.fixture = Fixture.GEYSER;
+		costMap.setInfinite(pos);
 		
 		panel.refresh();
 	}
@@ -417,6 +430,11 @@ public class LayeredMap
 		return grid.get(pos).fixture == Fixture.TUBE;
 	}
 	
+	public boolean hasGeyser(Position pos)
+	{
+		return grid.get(pos).fixture == Fixture.GEYSER;
+	}
+	
 	public boolean hasMinePlatform(Position pos)
 	{
 		return grid.get(pos).fixture == Fixture.MINE_PLATFORM;
@@ -523,7 +541,7 @@ public class LayeredMap
 		return true;
 	}
 	
-	public void addUnit(Unit unit, Position pos)
+	public void putUnit(Unit unit, Position pos)
 	{
 		if (!canPlaceUnit(pos, unit.getFootprint()))
 			throw new IllegalStateException("can't place unit");
@@ -575,7 +593,9 @@ public class LayeredMap
 				if (!getBounds().contains(tubePos))
 					continue;
 				
-				boolean occupied = isOccupied(tubePos) || isReserved(tubePos);
+				boolean occupied = isOccupied(tubePos)
+					&& (grid.get(tubePos).occupant.isStructure()
+				|| grid.get(tubePos).occupant.getType().isGuardPostType());
 				
 				if (!occupied && !hasWall(tubePos) && !hasTube(tubePos))
 					putTube(tubePos);
@@ -605,7 +625,7 @@ public class LayeredMap
 	{
 		Unit unit = grid.get(pos).occupant;
 		
-		return unit != null && unit.isStructure();
+		return unit != null && (unit.isStructure() || unit.getType().isGuardPostType());
 	}
 	
 	public Unit getReservant(Position pos)

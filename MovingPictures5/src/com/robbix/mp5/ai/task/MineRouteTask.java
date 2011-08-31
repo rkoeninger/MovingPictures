@@ -59,9 +59,12 @@ public class MineRouteTask extends Task
 					return;
 				}
 				
-				LayeredMap map = unit.getContainer();
-				ResourceDeposit deposit = map.getResourceDeposit(resPosition);
-				unit.assignNext(new MineTask(deposit.getLoad()));
+				if (!mine.isDisabled())
+				{
+					LayeredMap map = unit.getContainer();
+					ResourceDeposit deposit = map.getResourceDeposit(resPosition);
+					unit.assignNext(new MineTask(deposit.getLoad()));
+				}
 			}
 			else
 			{
@@ -78,7 +81,10 @@ public class MineRouteTask extends Task
 					return;
 				}
 				
-				unit.assignNext(new DockTask(smelter, Cargo.EMPTY));
+				if (!smelter.isDisabled())
+				{
+					unit.assignNext(new DockTask(smelter, Cargo.EMPTY));
+				}
 			}
 			else
 			{

@@ -119,6 +119,11 @@ public class SpriteLibrary
 	
 	public synchronized List<Sprite> getSequence(ResourceDeposit res)
 	{
+		if (res == ResourceDeposit.UNKNOWN)
+		{
+			return getSequence("aResource/unknown");
+		}
+		
 		String resName =
 			res.getType() == ResourceType.COMMON_ORE
 				? "common"
@@ -169,7 +174,7 @@ public class SpriteLibrary
 			{
 				// Failover to random sprite
 				return Arrays.asList(new Sprite(
-					Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),//TODO: get tilesize somehow
+					Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),
 					-1,
 					0,
 					0
@@ -228,7 +233,7 @@ public class SpriteLibrary
 			return new Sprite(
 				Utils.getBlankImage(Utils.getRandomPrimaryColor(),
 					32 * w,
-					32 * h),//TODO: get tilesize somehow
+					32 * h),
 				0,
 				0,
 				0
@@ -271,7 +276,7 @@ public class SpriteLibrary
 			return new Sprite(
 				Utils.getBlankImage(Utils.getRandomPrimaryColor(),
 					32 * w,
-					32 * h),//TODO: get tilesize somehow
+					32 * h),
 				0,
 				0,
 				0
@@ -319,7 +324,7 @@ public class SpriteLibrary
 			}
 			
 			return new Sprite(
-				Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),//TODO: get tilesize somehow
+				Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),
 				0,
 				0,
 				0
@@ -369,7 +374,7 @@ public class SpriteLibrary
 			return new Sprite(
 				Utils.getBlankImage(Utils.getRandomPrimaryColor(),
 					32 * w,
-					32 * h),//TODO: get tilesize somehow
+					32 * h),
 				0,
 				0,
 				0
@@ -427,7 +432,7 @@ public class SpriteLibrary
 			}
 			
 			return new Sprite(
-				Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),//TODO: get tilesize somehow
+				Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),
 				0,
 				0,
 				0

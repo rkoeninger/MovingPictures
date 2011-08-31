@@ -115,7 +115,7 @@ public class SelectUnitOverlay extends InputOverlay
 	{
 		for (Unit unit : units)
 		{
-			if (!unit.isStructure() || unit.getType().isGuardPostType())
+			if (!unit.isStructure() && !unit.getType().isGuardPostType())
 			{
 				return true;
 			}

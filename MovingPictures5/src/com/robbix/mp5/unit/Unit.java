@@ -309,7 +309,7 @@ public class Unit
 	
 	public boolean isConnectionSource()
 	{
-		return type.isConnectionSource();
+		return type.isConnectionSource() && !isDisabled() && !isDead();
 	}
 	
 	public String getStatusString()
@@ -560,7 +560,7 @@ public class Unit
 	{
 		return isStructure() &&
 			(getHealthBracket() == HealthBracket.RED
-			|| !isConnected());
+			|| (needsConnection() && !isConnected()));
 	}
 	
 	/**

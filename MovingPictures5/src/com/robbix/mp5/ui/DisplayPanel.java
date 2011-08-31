@@ -487,7 +487,9 @@ public class DisplayPanel extends JComponent
 		 */
 		for (ResourceDeposit deposit : map.getResourceDeposits())
 		{
-			Sprite sprite = sprites.getSprite(deposit);
+			Sprite sprite = deposit.isSurveyedBy(currentPlayer)
+				? sprites.getSprite(deposit)
+				: sprites.getSprite(ResourceDeposit.UNKNOWN);
 			
 			g.drawImage(sprite.getImage(),
 				deposit.getPosition().x * tileSize + sprite.getXOffset(),
@@ -584,6 +586,7 @@ public class DisplayPanel extends JComponent
 				for (int y = 0; y < map.getHeight(); ++y)
 				for (int x = 0; x < map.getWidth();  ++x)
 				{
+					Position pos = new Position(x, y);
 					String tileCode = map.getTileCode(x, y);
 					
 					if (tileCode == null)
@@ -614,7 +617,7 @@ public class DisplayPanel extends JComponent
 					
 					cg.drawImage(img, x * tileSize, y * tileSize, null);
 					
-					if (map.hasMinePlatform(new Position(x, y)))
+					if (map.hasMinePlatform(pos))
 					{
 						Sprite platformSprite =
 							sprites.getSequence("aCommonMine/platform").get(0);
@@ -623,6 +626,18 @@ public class DisplayPanel extends JComponent
 							platformSprite.getImage(),
 							x * tileSize + platformSprite.getXOffset(),
 							y * tileSize + platformSprite.getYOffset(),
+							null
+						);
+					}
+					else if (map.hasGeyser(pos))
+					{
+						Sprite geyserSprite =
+							sprites.getSequence("aGeyser/geyser").get(0);
+						
+						cg.drawImage(
+							geyserSprite.getImage(),
+							x * tileSize + geyserSprite.getXOffset(),
+							y * tileSize + geyserSprite.getYOffset(),
 							null
 						);
 					}
