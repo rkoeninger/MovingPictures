@@ -6,11 +6,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,7 +47,8 @@ public class DisplayPanel extends JComponent
 	
 	private LinkedList<InputOverlay> overlays;
 	
-	private List<AmbientAnimation> animations = new LinkedList<AmbientAnimation>();
+	private List<AmbientAnimation> animations =
+		new LinkedList<AmbientAnimation>();
 	
 	private List<String> options = new ArrayList<String>(6){{
 		add("Grid");
@@ -356,7 +357,7 @@ public class DisplayPanel extends JComponent
 	public void setShowTerrainCostMap(boolean showTerrainCostMap)
 	{
 		this.showTerrainCostMap = showTerrainCostMap;
-		repaint();
+		refresh();
 	}
 	
 	public boolean getShowTerrainCostMap()
@@ -373,7 +374,7 @@ public class DisplayPanel extends JComponent
 			cachedCostMapImage = null;
 		}
 		
-		repaint();
+		refresh();
 	}
 	
 	public boolean getShowTerrainCostValues()
@@ -390,7 +391,7 @@ public class DisplayPanel extends JComponent
 			cachedCostMapImage = null;
 		}
 		
-		repaint();
+		refresh();
 	}
 	
 	public boolean getShowCostValuesAsFactors()
@@ -418,6 +419,11 @@ public class DisplayPanel extends JComponent
 	public void paintComponent(Graphics g)
 	{
 		final int tileSize = map.getTileSize();
+		final Rectangle rect = getVisibleRect();
+		int minX = (int) Math.floor(rect.x / (double) tileSize);
+		int minY = (int) Math.floor(rect.y / (double) tileSize);
+		int maxX = (int) Math.ceil((rect.x + rect.width) / (double) tileSize);
+		int maxY = (int) Math.ceil((rect.y + rect.height) / (double) tileSize);
 		
 		/*
 		 * Draw terrian.
@@ -426,12 +432,12 @@ public class DisplayPanel extends JComponent
 		 */
 		if (showBackground)
 		{
-			drawTerrain(g);
+			drawTerrain(g, rect);
 		}
 		else
 		{
 			g.setColor(getBackground());
-			g.fillRect(0, 0, getWidth(), getHeight());
+			g.fillRect(rect.x, rect.y, rect.width, rect.height);
 		}
 		
 		/*
@@ -439,14 +445,14 @@ public class DisplayPanel extends JComponent
 		 */
 		if (showGrid)
 		{
-			g.setColor(Utils.getBlackWhiteComplement(getBackground()));
+			g.setColor(Color.BLACK);
 			int w = getWidth();
 			int h = getHeight();
 			
-			for (int x = 1; x < w; ++x)
+			for (int x = minX; x < maxX; ++x)
 				g.drawLine(x * tileSize, 0, x * tileSize, h);
 			
-			for (int y = 1; y < h; ++y)
+			for (int y = minY; y < maxY; ++y)
 				g.drawLine(0, y * tileSize, w, y * tileSize);
 		}
 		
@@ -454,7 +460,7 @@ public class DisplayPanel extends JComponent
 		 * Draw input overlay
 		 */
 		if (! overlays.isEmpty())
-			overlays.getFirst().paintOverTerrian(g);
+			overlays.getFirst().paintOverTerrian(g, rect);
 		
 		/*
 		 * Draw units.
@@ -469,17 +475,9 @@ public class DisplayPanel extends JComponent
 		 */
 		synchronized (animations)
 		{
-			Iterator<AmbientAnimation> animationItr = animations.iterator();
-			
-			while (animationItr.hasNext())
-			{
-				AmbientAnimation animation = animationItr.next();
-				
-				if (getVisibleRect().intersects(animation.getBounds()))
-				{
+			for (AmbientAnimation animation : animations)
+				if (rect.intersects(animation.getBounds()))
 					animation.paint(g);
-				}
-			}
 		}
 		
 		/*
@@ -487,13 +485,19 @@ public class DisplayPanel extends JComponent
 		 */
 		for (ResourceDeposit deposit : map.getResourceDeposits())
 		{
+			int absX = deposit.getPosition().x * tileSize;
+			int absY = deposit.getPosition().y * tileSize;
+			
+			if (!rect.contains(absX + 16, absY + 16))
+				continue;
+			
 			Sprite sprite = deposit.isSurveyedBy(currentPlayer)
 				? sprites.getSprite(deposit)
 				: sprites.getSprite(ResourceDeposit.UNKNOWN);
 			
 			g.drawImage(sprite.getImage(),
-				deposit.getPosition().x * tileSize + sprite.getXOffset(),
-				deposit.getPosition().y * tileSize + sprite.getYOffset(),
+				absX + sprite.getXOffset(),
+				absY + sprite.getYOffset(),
 				null
 			);
 		}
@@ -504,19 +508,24 @@ public class DisplayPanel extends JComponent
 		if (night)
 		{
 			g.setColor(new Color(0, 0, 0, 127));
-			g.fillRect(0, 0, getWidth(), getHeight());
+			g.fillRect(rect.x, rect.y, rect.width, rect.height);
 		}
 		
 		/*
 		 * Draw input overlay
 		 */
 		if (! overlays.isEmpty())
-			overlays.getFirst().paintOverUnits(g);
+			overlays.getFirst().paintOverUnits(g, rect);
 	}
 	
-	private void drawTerrain(Graphics g)
+	private void drawTerrain(Graphics g, Rectangle rect)
 	{
 		final int tileSize = map.getTileSize();
+		
+		int minX = (int) Math.floor(rect.x / (double) tileSize);
+		int minY = (int) Math.floor(rect.y / (double) tileSize);
+		int maxX = (int) Math.ceil((rect.x + rect.width) / (double) tileSize);
+		int maxY = (int) Math.ceil((rect.y + rect.height) / (double) tileSize);
 		
 		if (showTerrainCostMap)
 		{
@@ -525,8 +534,8 @@ public class DisplayPanel extends JComponent
 				if (cachedCostMapImage == null)
 				{
 					cachedCostMapImage = new BufferedImage(
-						map.getWidth()  * tileSize,
-						map.getHeight() * tileSize,
+						rect.width,
+						rect.height,
 						BufferedImage.TYPE_INT_ARGB
 					);
 					Graphics cg = cachedCostMapImage.getGraphics();
@@ -535,8 +544,8 @@ public class DisplayPanel extends JComponent
 					
 					cg.setFont(Font.decode("Arial-9"));
 					
-					for (int y = 0; y < terrainCost.h; ++y)
-					for (int x = 0; x < terrainCost.w; ++x)
+					for (int y = minY; y < maxY; ++y)
+					for (int x = minX; x < maxX; ++x)
 					{
 						cg.setColor(Utils.getGrayscale(
 							terrainCost.getScaleFactor(x, y)
@@ -582,9 +591,9 @@ public class DisplayPanel extends JComponent
 					BufferedImage.TYPE_INT_ARGB
 				);
 				Graphics cg = cachedTerrain.getGraphics();
-				
-				for (int y = 0; y < map.getHeight(); ++y)
-				for (int x = 0; x < map.getWidth();  ++x)
+
+				for (int y = minY; y < maxY; ++y)
+				for (int x = minX; x < maxX; ++x)
 				{
 					Position pos = new Position(x, y);
 					String tileCode = map.getTileCode(x, y);

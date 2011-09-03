@@ -24,9 +24,10 @@ public class SelectUnitOverlay extends InputOverlay
 		getDisplay().showStatus((Unit)null);
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		final int w = getDisplay().getWidth();
+		g.translate(rect.x, rect.y);
+		final int w = rect.width;
 		g.setColor(Color.RED);
 		g.setFont(Font.decode("Arial-12"));
 		g.drawString("Left Click to Select", w / 2 - 35, 30);
@@ -37,6 +38,8 @@ public class SelectUnitOverlay extends InputOverlay
 			g.setColor(TRANS_RED);
 			g.fillRect(dragArea.x, dragArea.y, dragArea.width, dragArea.height);
 		}
+
+		g.translate(-rect.x, -rect.y);
 	}
 	
 	public void onLeftClick(int x, int y)

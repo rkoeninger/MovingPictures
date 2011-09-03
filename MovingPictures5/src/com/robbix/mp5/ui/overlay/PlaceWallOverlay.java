@@ -3,6 +3,7 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
@@ -17,13 +18,15 @@ public class PlaceWallOverlay extends InputOverlay
 	
 	private Position pos = null;
 	
-	public void paintOverUnits(Graphics g)
+	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		final int w = getDisplay().getWidth();
+		g.translate(rect.x, rect.y);
+		final int w = rect.width;
 		g.setColor(Color.RED);
 		g.setFont(Font.decode("Arial-12"));
 		g.drawString("Left Click to Place", w / 2 - 35, 30);
 		g.drawString("Right Click to Cancel", w / 2 - 35, 50);
+		g.translate(-rect.x, -rect.y);
 
 		if (pos == null) return;
 		

@@ -4,8 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +31,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
@@ -501,12 +505,12 @@ public class TestMP5
 			panelOptionMenuItem.setActionCommand(options.get(i));
 			
 			if (options.get(i).equals("Grid"))
-				panelOptionMenuItem.setAccelerator(
-					KeyStroke.getKeyStroke(
-						KeyEvent.VK_G,
-						KeyEvent.ALT_DOWN_MASK
-					)
-				);
+			{
+				panelOptionMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_G,
+					KeyEvent.ALT_DOWN_MASK
+				));
+			}
 			
 			panelOptionMenuItem.addActionListener(displayOptionListener);
 		}
@@ -560,17 +564,39 @@ public class TestMP5
 		statusesPanel.add(unitStatusLabel);
 		statusesPanel.add(playerStatusLabel);
 		
+		Rectangle windowBounds = Utils.getWindowBounds();
+		
+		final AdjustmentListener viewListener = new AdjustmentListener()
+		{
+			public void adjustmentValueChanged(AdjustmentEvent e)
+			{
+				panel.refresh();
+			}
+		};
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setViewportView(panel);
+		scrollPane.getHorizontalScrollBar().addAdjustmentListener(viewListener);
+		scrollPane.getVerticalScrollBar().addAdjustmentListener(viewListener);
+		
 		frame = new JFrame("Moving Pictures");
 		frame.setJMenuBar(menuBar);
 		frame.setLayout(new BorderLayout());
 //		frame.add(commandBar, BorderLayout.EAST);
-		frame.add(panel, BorderLayout.CENTER);
+		frame.add(scrollPane, BorderLayout.CENTER);
 		frame.add(statusesPanel, BorderLayout.SOUTH);
 		frame.setResizable(false);
-		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLocationRelativeTo(null);
 		frame.setIconImages(Arrays.asList(smallIcon, mediumIcon));
+		frame.pack();
+		frame.setSize(
+			Math.min(frame.getWidth(),  windowBounds.width),
+			Math.min(frame.getHeight(), windowBounds.height)
+		);
+		frame.setLocation(
+			windowBounds.x + (windowBounds.width  - frame.getWidth())  / 2,
+			windowBounds.y + (windowBounds.height - frame.getHeight()) / 2
+		);
 		frame.setVisible(true);
 		
 		meteorShowerMenuItem.addActionListener(new ActionListener()
@@ -1022,7 +1048,7 @@ public class TestMP5
 	
 	public static String mapMineRouteDemo()
 	{
-		return "widePlain";
+		return "bigPlain";
 	}
 	
 	public static void setupMineRouteDemo(Game game)

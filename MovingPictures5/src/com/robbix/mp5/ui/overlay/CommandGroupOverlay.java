@@ -3,6 +3,7 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.util.Set;
 
 import com.robbix.mp5.Mediator;
@@ -34,15 +35,16 @@ public class CommandGroupOverlay extends InputOverlay
 		getDisplay().completeOverlay(this);
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		for (Unit unit : units)
 		{
 			CommandUnitOverlay.paintSelectedUnitBox(g, unit);
 		}
 		
-		final int w = getDisplay().getWidth();
-		final int h = getDisplay().getHeight();
+		g.translate(rect.x, rect.y);
+		final int w = rect.width;
+		final int h = rect.height;
 		g.setColor(Color.RED);
 		
 		g.setFont(Font.decode("Arial-12"));
@@ -53,14 +55,18 @@ public class CommandGroupOverlay extends InputOverlay
 		g.setFont(Font.decode("Arial-bold-20"));
 		g.drawString("Kill", 20, h - 30);
 		g.drawString("SD", 20, h / 2 + 10);
+		
+		g.translate(-rect.x, -rect.y);
 	}
 	
 	public void onMiddleClick(int x, int y)
 	{
-		final int w = getDisplay().getWidth();
-		final int h = getDisplay().getHeight();
+		final int w = getDisplay().getVisibleRect().width;
+		final int h = getDisplay().getVisibleRect().height;
+		final int x0 = getDisplay().getVisibleRect().x;
+		final int y0 = getDisplay().getVisibleRect().y;
 		
-		int edge = (x / (w / 3)) + ((y / (h / 3)) * 3);
+		int edge = ((x - x0) / (w / 3)) + (((y - y0) / (h / 3)) * 3);
 		
 		if (edge == 6)
 		{

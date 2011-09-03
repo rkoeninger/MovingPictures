@@ -2,6 +2,7 @@ package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -23,8 +24,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	private DisplayPanel panel;
 	private Point pressedPoint = null;
 	
-	public void paintOverTerrian(Graphics g){}
-	public void paintOverUnits(Graphics g){}
+	public void paintOverTerrian(Graphics g, Rectangle rect){}
+	public void paintOverUnits(Graphics g, Rectangle rect){}
 	
 	public void setDisplay(DisplayPanel panel)
 	{
@@ -59,7 +60,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		if (pressedPoint != null)
 		{
 			if (pressedPoint.distanceSq(e.getPoint()) < DRAG_THRESHOLD)
-			{
+			{				
 				switch (e.getButton())
 				{
 					case MouseEvent.BUTTON1:

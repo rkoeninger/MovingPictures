@@ -1,6 +1,8 @@
 package com.robbix.mp5;
 
 import java.awt.Color;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
@@ -81,6 +83,12 @@ public class Utils
 			return file.isFile() && file.getName().endsWith(".bmp");
 		}
 	};
+	
+	public static Rectangle getWindowBounds()
+	{
+		return GraphicsEnvironment.getLocalGraphicsEnvironment()
+								  .getMaximumWindowBounds();
+	}
 	
 	/**
 	 * Attempts to set swing look and feel to the local system's

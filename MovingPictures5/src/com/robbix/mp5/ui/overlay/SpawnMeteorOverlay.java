@@ -2,6 +2,7 @@ package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 import com.robbix.mp5.Mediator;
@@ -22,12 +23,14 @@ public class SpawnMeteorOverlay extends InputOverlay
 		getDisplay().setAnimatedCursor(null);
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		final int w = getDisplay().getWidth();
+		g.translate(rect.x, rect.y);
+		final int w = rect.width;
 		g.setColor(Color.RED);
 		g.drawString("Left Click to Spawn", w / 2 - 35, 30);
 		g.drawString("Right Click to Cancel", w / 2 - 35, 50);
+		g.translate(-rect.x, -rect.y);
 	}
 	
 	public void onLeftClick(int x, int y)
