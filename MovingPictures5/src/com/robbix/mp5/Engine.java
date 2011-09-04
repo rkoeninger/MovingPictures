@@ -19,27 +19,20 @@ public class Engine
 	private static final int DEFAULT_DELAY = 10;
 	
 	private boolean paused;
-	
+	private Game game;
 	private LayeredMap map;
 	private DisplayPanel panel;
-	
 	private Runnable animationCycle;
 	private Timer timer;
-	
 	private int previousDelay;
-	
 	private int frame;
-	
-	private Set<Trigger> triggers;
 	
 	public Engine(Game game)
 	{
+		this.game = game;
 		map = game.getMap();
 		panel = game.getDisplay();
 		paused = true;
-		
-		triggers = new HashSet<Trigger>();
-		
 		animationCycle = new AnimationCycle();
 		timer = new Timer(DEFAULT_DELAY, new ThreadCycle());
 		previousDelay = -1;
@@ -80,22 +73,6 @@ public class Engine
 	public void dispose()
 	{
 		pause();
-	}
-	
-	public void addTrigger(Trigger trigger)
-	{
-		synchronized (triggers)
-		{
-			triggers.add(trigger);
-		}
-	}
-	
-	public void removeTrigger(Trigger trigger)
-	{
-		synchronized (triggers)
-		{
-			triggers.remove(trigger);
-		}
 	}
 	
 	public int getDelay()
@@ -168,9 +145,9 @@ public class Engine
 				/*
 				 * Triggers
 				 */
-				synchronized (triggers)
+				synchronized (game.getTriggers())
 				{
-					for (Trigger trigger : triggers)
+					for (Trigger trigger : game.getTriggers())
 					{
 						trigger.step(Mediator.game, frame);
 					}

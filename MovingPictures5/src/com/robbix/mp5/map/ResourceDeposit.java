@@ -7,9 +7,6 @@ import com.robbix.mp5.unit.Cargo;
 
 public class ResourceDeposit implements Cloneable
 {
-	public static final ResourceDeposit UNKNOWN =
-		new ResourceDeposit(null, null, -1, -1, -1, -1, -1);
-	
 	public static ResourceDeposit get1BarCommon()
 	{
 		return new ResourceDeposit(

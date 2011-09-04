@@ -111,6 +111,12 @@ public class SpriteLibrary
 		return getSequence(res).get(0);
 	}
 	
+	public synchronized Sprite getUnknownDepositSprite()
+	{
+		List<Sprite> seq = getSequence("aResource/unknown");
+		return seq.get(Utils.getTimeBasedIndex(100, seq.size()));
+	}
+	
 	public Sprite getSprite(ResourceDeposit res)
 	{
 		List<Sprite> seq = getSequence(res);
@@ -119,11 +125,6 @@ public class SpriteLibrary
 	
 	public synchronized List<Sprite> getSequence(ResourceDeposit res)
 	{
-		if (res == ResourceDeposit.UNKNOWN)
-		{
-			return getSequence("aResource/unknown");
-		}
-		
 		String resName =
 			res.getType() == ResourceType.COMMON_ORE
 				? "common"

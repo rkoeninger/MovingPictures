@@ -31,6 +31,7 @@ public class SelectUnitOverlay extends InputOverlay
 		g.setColor(Color.RED);
 		g.setFont(Font.decode("Arial-12"));
 		g.drawString("Left Click to Select", w / 2 - 35, 30);
+		g.translate(-rect.x, -rect.y);
 		
 		if (dragArea != null)
 		{
@@ -38,8 +39,6 @@ public class SelectUnitOverlay extends InputOverlay
 			g.setColor(TRANS_RED);
 			g.fillRect(dragArea.x, dragArea.y, dragArea.width, dragArea.height);
 		}
-
-		g.translate(-rect.x, -rect.y);
 	}
 	
 	public void onLeftClick(int x, int y)

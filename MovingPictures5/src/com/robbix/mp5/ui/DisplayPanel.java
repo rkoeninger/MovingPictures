@@ -10,7 +10,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +21,7 @@ import com.robbix.mp5.Player;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.CostMap;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.map.TileSet;
@@ -50,15 +51,15 @@ public class DisplayPanel extends JComponent
 	private List<AmbientAnimation> animations =
 		new LinkedList<AmbientAnimation>();
 	
-	private List<String> options = new ArrayList<String>(6){{
-		add("Grid");
-		add("Background");
-		add("Unit Layer State");
-		add("Terrain Cost Map");
-		add("Terrain Cost Values");
-		add("Cost Values as Factors");
-		add("Night");
-	}};
+	private List<String> options = Arrays.asList(
+		"Grid",
+		"Background",
+		"Unit Layer State",
+		"Terrain Cost Map",
+		"Terrain Cost Values",
+		"Cost Values as Factors",
+		"Night"
+	);
 	
 	private boolean showGrid = false;
 	private boolean showUnitLayerState = false;
@@ -79,7 +80,7 @@ public class DisplayPanel extends JComponent
 		CursorSet cursors)
 	{
 		if (map == null || sprites == null || tiles == null || cursors == null)
-			throw new NullPointerException();
+			throw new IllegalArgumentException();
 		
 		this.map = map;
 		map.setDisplayPanel(this);
@@ -413,17 +414,33 @@ public class DisplayPanel extends JComponent
 	}
 	
 	/**
-	 * Paints the visible region of the map, including terrain, units and
+	 * Gets the region of positions currently visible on this display.
+	 */
+	public Region getVisibleRegion()
+	{
+		Rectangle rect = getVisibleRect();
+		int tileSize = map.getTileSize();
+		
+		int minX = (int) Math.floor(rect.x / (double) tileSize);
+		int minY = (int) Math.floor(rect.y / (double) tileSize);
+		int maxX = (int) Math.ceil((rect.x + rect.width) / (double) tileSize);
+		int maxY = (int) Math.ceil((rect.y + rect.height) / (double) tileSize);
+		
+		maxX = Math.min(maxX, map.getWidth()  - 1);
+		maxY = Math.min(maxY, map.getHeight() - 1);
+		
+		return new Region(minX, minY, maxX - minX + 1, maxY - minY + 1);
+	}
+	
+	/**
+	 * Paints the visible rect of the map, including terrain, units and
 	 * overlays.
 	 */
 	public void paintComponent(Graphics g)
 	{
 		final int tileSize = map.getTileSize();
 		final Rectangle rect = getVisibleRect();
-		int minX = (int) Math.floor(rect.x / (double) tileSize);
-		int minY = (int) Math.floor(rect.y / (double) tileSize);
-		int maxX = (int) Math.ceil((rect.x + rect.width) / (double) tileSize);
-		int maxY = (int) Math.ceil((rect.y + rect.height) / (double) tileSize);
+		final Region region = getVisibleRegion();
 		
 		/*
 		 * Draw terrian.
@@ -449,10 +466,10 @@ public class DisplayPanel extends JComponent
 			int w = getWidth();
 			int h = getHeight();
 			
-			for (int x = minX; x < maxX; ++x)
+			for (int x = region.x; x < region.getMaxX(); ++x)
 				g.drawLine(x * tileSize, 0, x * tileSize, h);
 			
-			for (int y = minY; y < maxY; ++y)
+			for (int y = region.y; y < region.getMaxY(); ++y)
 				g.drawLine(0, y * tileSize, w, y * tileSize);
 		}
 		
@@ -493,7 +510,7 @@ public class DisplayPanel extends JComponent
 			
 			Sprite sprite = deposit.isSurveyedBy(currentPlayer)
 				? sprites.getSprite(deposit)
-				: sprites.getSprite(ResourceDeposit.UNKNOWN);
+				: sprites.getUnknownDepositSprite();
 			
 			g.drawImage(sprite.getImage(),
 				absX + sprite.getXOffset(),
@@ -521,11 +538,7 @@ public class DisplayPanel extends JComponent
 	private void drawTerrain(Graphics g, Rectangle rect)
 	{
 		final int tileSize = map.getTileSize();
-		
-		int minX = (int) Math.floor(rect.x / (double) tileSize);
-		int minY = (int) Math.floor(rect.y / (double) tileSize);
-		int maxX = (int) Math.ceil((rect.x + rect.width) / (double) tileSize);
-		int maxY = (int) Math.ceil((rect.y + rect.height) / (double) tileSize);
+		final Region region = getVisibleRegion();
 		
 		if (showTerrainCostMap)
 		{
@@ -544,8 +557,8 @@ public class DisplayPanel extends JComponent
 					
 					cg.setFont(Font.decode("Arial-9"));
 					
-					for (int y = minY; y < maxY; ++y)
-					for (int x = minX; x < maxX; ++x)
+					for (int y = region.y; y < region.getMaxY(); ++y)
+					for (int x = region.x; x < region.getMaxX(); ++x)
 					{
 						cg.setColor(Utils.getGrayscale(
 							terrainCost.getScaleFactor(x, y)
@@ -592,8 +605,8 @@ public class DisplayPanel extends JComponent
 				);
 				Graphics cg = cachedTerrain.getGraphics();
 
-				for (int y = minY; y < maxY; ++y)
-				for (int x = minX; x < maxX; ++x)
+				for (int y = region.y; y < region.getMaxY(); ++y)
+				for (int x = region.x; x < region.getMaxX(); ++x)
 				{
 					Position pos = new Position(x, y);
 					String tileCode = map.getTileCode(x, y);

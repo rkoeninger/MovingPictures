@@ -45,6 +45,8 @@ public class Region implements Iterable<Position>
 	public int getWidth() { return w; }
 	public int getHeight(){ return h; }
 	public int getArea()  { return a; }
+	public int getMaxX()  { return x + w; }
+	public int getMaxY()  { return y + h; }
 	
 	/**
 	 * Creates a Region with it's upper-left corner at (0, 0)

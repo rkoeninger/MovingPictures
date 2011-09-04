@@ -7,8 +7,6 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +29,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
@@ -74,10 +71,8 @@ public class TestMP5
 	private static final File RES_DIR = new File("./res");
 	
 	private static Player currentPlayer;
-	
 	private static Game game;
 	private static Engine engine;
-	
 	private static JFrame frame;
 	private static Map<Integer, JMenuItem> playerMenuItems =
 		new HashMap<Integer, JMenuItem>();
@@ -150,7 +145,9 @@ public class TestMP5
 		}
 		
 		if (tileSetName == null)
+		{
 			tileSetName = DEFAULT_TILE_SET;
+		}
 		
 		if (mapName == null)
 		{
@@ -167,12 +164,13 @@ public class TestMP5
 			}
 		}
 		
+		Utils.trySystemLookAndFeel();
+		
 		/*-------------------------------------------------------------------*
 		 * Load map, units, sprites, cursors
 		 * Create players
 		 * Create engine
 		 * Init Mediator
-		 * Setup demo
 		 */
 		game = Game.load(
 			RES_DIR,
@@ -188,25 +186,6 @@ public class TestMP5
 		if (musicOn) Mediator.sounds.playMusic("ep1");
 		
 		currentPlayer = game.getDefaultPlayer();
-		
-		if (demoName != null)
-		{
-			Method setupDemo = demos.get(demoName);
-			
-			if (setupDemo == null)
-				throw new IllegalArgumentException(demoName + " not found");
-			
-			try
-			{
-				setupDemo.invoke(null, game);
-			}
-			catch (Exception exc)
-			{
-				throw new Error("Failed to setup demo", exc);
-			}
-		}
-		
-		Utils.trySystemLookAndFeel();
 		
 		/*-------------------------------------------------------------------*
 		 * Prepare live-updating status labels
@@ -566,26 +545,13 @@ public class TestMP5
 		
 		Rectangle windowBounds = Utils.getWindowBounds();
 		
-		final AdjustmentListener viewListener = new AdjustmentListener()
-		{
-			public void adjustmentValueChanged(AdjustmentEvent e)
-			{
-				panel.refresh();
-			}
-		};
-		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setViewportView(panel);
-		scrollPane.getHorizontalScrollBar().addAdjustmentListener(viewListener);
-		scrollPane.getVerticalScrollBar().addAdjustmentListener(viewListener);
-		
 		frame = new JFrame("Moving Pictures");
 		frame.setJMenuBar(menuBar);
 		frame.setLayout(new BorderLayout());
 //		frame.add(commandBar, BorderLayout.EAST);
-		frame.add(scrollPane, BorderLayout.CENTER);
+		frame.add(game.getView(), BorderLayout.CENTER);
 		frame.add(statusesPanel, BorderLayout.SOUTH);
-		frame.setResizable(false);
+//		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 		frame.pack();
@@ -597,13 +563,12 @@ public class TestMP5
 			windowBounds.x + (windowBounds.width  - frame.getWidth())  / 2,
 			windowBounds.y + (windowBounds.height - frame.getHeight()) / 2
 		);
-		frame.setVisible(true);
 		
 		meteorShowerMenuItem.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				engine.addTrigger(new MeteorShowerTrigger(1, 300));
+				game.getTriggers().add(new MeteorShowerTrigger(1, 300));
 				game.getSoundBank().play("savant_meteorApproaching");
 			}
 		});
@@ -839,9 +804,28 @@ public class TestMP5
 		});
 		
 		/*--------------------------------------------------------------------*
+		 * Setup demo
 		 * Start mechanics
 		 */
+		if (demoName != null)
+		{
+			Method setupDemo = demos.get(demoName);
+			
+			if (setupDemo == null)
+				throw new IllegalArgumentException(demoName + " not found");
+			
+			try
+			{
+				setupDemo.invoke(null, game);
+			}
+			catch (Exception exc)
+			{
+				throw new Error("Failed to setup demo", exc);
+			}
+		}
+		
 		engine.play();
+		frame.setVisible(true);
 	}
 	
 	private static void selectPlayer(int playerID)
@@ -1062,20 +1046,6 @@ public class TestMP5
 		
 		selectPlayer(1);
 		
-		ResourceDeposit res1 = ResourceDeposit.get1BarCommon();
-		ResourceDeposit res2 = ResourceDeposit.get2BarCommon();
-		ResourceDeposit res3 = ResourceDeposit.get3BarCommon();
-		ResourceDeposit res4 = ResourceDeposit.get1BarCommon();
-		ResourceDeposit res5 = ResourceDeposit.get2BarCommon();
-		ResourceDeposit res6 = ResourceDeposit.get3BarCommon();
-		
-		map.putResourceDeposit(res1, new Position(22, 2));
-		map.putResourceDeposit(res2, new Position(22, 8));
-		map.putResourceDeposit(res3, new Position(22, 14));
-		map.putResourceDeposit(res4, new Position(26, 2));
-		map.putResourceDeposit(res5, new Position(26, 8));
-		map.putResourceDeposit(res6, new Position(26, 14));
-		
 		Unit smelter1 = factory.newUnit("eCommonSmelter", player1);
 		Unit smelter2 = factory.newUnit("eCommonSmelter", player1);
 		Unit smelter3 = factory.newUnit("eCommonSmelter", player1);
@@ -1092,43 +1062,6 @@ public class TestMP5
 		Unit mine4 = factory.newUnit("eCommonMine", player1);
 		Unit mine5 = factory.newUnit("eCommonMine", player1);
 		Unit mine6 = factory.newUnit("eCommonMine", player1);
-		
-		Unit truck1  = factory.newUnit("eCargoTruck", player1);
-		Unit truck2  = factory.newUnit("eCargoTruck", player1);
-		Unit truck3  = factory.newUnit("eCargoTruck", player1);
-		Unit truck4  = factory.newUnit("eCargoTruck", player1);
-		Unit truck5  = factory.newUnit("eCargoTruck", player1);
-		Unit truck6  = factory.newUnit("eCargoTruck", player1);
-		Unit truck7  = factory.newUnit("eCargoTruck", player1);
-		Unit truck8  = factory.newUnit("eCargoTruck", player1);
-		Unit truck9  = factory.newUnit("eCargoTruck", player1);
-		Unit truck10 = factory.newUnit("eCargoTruck", player1);
-		Unit truck11 = factory.newUnit("eCargoTruck", player1);
-		Unit truck12 = factory.newUnit("eCargoTruck", player1);
-		Unit truck13 = factory.newUnit("eCargoTruck", player1);
-		Unit truck14 = factory.newUnit("eCargoTruck", player1);
-		Unit truck15 = factory.newUnit("eCargoTruck", player1);
-		Unit truck16 = factory.newUnit("eCargoTruck", player1);
-		Unit truck17 = factory.newUnit("eCargoTruck", player1);
-		Unit truck18 = factory.newUnit("eCargoTruck", player1);
-		Unit truck19 = factory.newUnit("eCargoTruck", player1);
-		Unit truck20 = factory.newUnit("eCargoTruck", player1);
-		Unit truck21 = factory.newUnit("eCargoTruck", player1);
-		Unit truck22 = factory.newUnit("eCargoTruck", player1);
-		Unit truck23 = factory.newUnit("eCargoTruck", player1);
-		Unit truck24 = factory.newUnit("eCargoTruck", player1);
-		Unit truck25 = factory.newUnit("eCargoTruck", player1);
-		Unit truck26 = factory.newUnit("eCargoTruck", player1);
-		Unit truck27 = factory.newUnit("eCargoTruck", player1);
-		Unit truck28 = factory.newUnit("eCargoTruck", player1);
-		Unit truck29 = factory.newUnit("eCargoTruck", player1);
-		Unit truck30 = factory.newUnit("eCargoTruck", player1);
-		Unit truck31 = factory.newUnit("eCargoTruck", player1);
-		Unit truck32 = factory.newUnit("eCargoTruck", player1);
-		Unit truck33 = factory.newUnit("eCargoTruck", player1);
-		Unit truck34 = factory.newUnit("eCargoTruck", player1);
-		Unit truck35 = factory.newUnit("eCargoTruck", player1);
-		Unit truck36 = factory.newUnit("eCargoTruck", player1);
 		
 		map.putUnit(smelter1, new Position(2,  2));
 		map.putUnit(smelter2, new Position(2,  8));
@@ -1162,86 +1095,48 @@ public class TestMP5
 		
 		map.putUnit(factory.newUnit("eCommandCenter", player1), new Position(25, 17));
 		
-		map.putUnit(mine1, new Position(21, 2));
-		map.putUnit(mine2, new Position(21, 8));
-		map.putUnit(mine3, new Position(21, 14));
-		map.putUnit(mine4, new Position(25, 2));
-		map.putUnit(mine5, new Position(25, 8));
-		map.putUnit(mine6, new Position(25, 14));
+		ResourceDeposit res1 = ResourceDeposit.get1BarCommon();
+		ResourceDeposit res2 = ResourceDeposit.get2BarCommon();
+		ResourceDeposit res3 = ResourceDeposit.get3BarCommon();
+		ResourceDeposit res4 = ResourceDeposit.get1BarCommon();
+		ResourceDeposit res5 = ResourceDeposit.get2BarCommon();
+		ResourceDeposit res6 = ResourceDeposit.get3BarCommon();
 		
-		map.putUnit(truck1,  new Position(2,  6));
-		map.putUnit(truck2,  new Position(3,  6));
-		map.putUnit(truck3,  new Position(4,  6));
-		map.putUnit(truck4,  new Position(5,  6));
-		map.putUnit(truck5,  new Position(6,  6));
-		map.putUnit(truck6,  new Position(7,  6));
-		map.putUnit(truck7,  new Position(8,  6));
-		map.putUnit(truck8,  new Position(9,  6));
-		map.putUnit(truck9,  new Position(10, 6));
-		map.putUnit(truck10, new Position(11, 6));
-		map.putUnit(truck11, new Position(12, 6));
-		map.putUnit(truck12, new Position(13, 6));
-		map.putUnit(truck13, new Position(2,  12));
-		map.putUnit(truck14, new Position(3,  12));
-		map.putUnit(truck15, new Position(4,  12));
-		map.putUnit(truck16, new Position(5,  12));
-		map.putUnit(truck17, new Position(6,  12));
-		map.putUnit(truck18, new Position(7,  12));
-		map.putUnit(truck19, new Position(8,  12));
-		map.putUnit(truck20, new Position(9,  12));
-		map.putUnit(truck21, new Position(10, 12));
-		map.putUnit(truck22, new Position(11, 12));
-		map.putUnit(truck23, new Position(12, 12));
-		map.putUnit(truck24, new Position(13, 12));
-		map.putUnit(truck25, new Position(2,  18));
-		map.putUnit(truck26, new Position(3,  18));
-		map.putUnit(truck27, new Position(4,  18));
-		map.putUnit(truck28, new Position(5,  18));
-		map.putUnit(truck29, new Position(6,  18));
-		map.putUnit(truck30, new Position(7,  18));
-		map.putUnit(truck31, new Position(8,  18));
-		map.putUnit(truck32, new Position(9,  18));
-		map.putUnit(truck33, new Position(10, 18));
-		map.putUnit(truck34, new Position(11, 18));
-		map.putUnit(truck35, new Position(12, 18));
-		map.putUnit(truck36, new Position(13, 18));
+		map.putResourceDeposit(res1, new Position(37, 32));
+		map.putResourceDeposit(res2, new Position(37, 38));
+		map.putResourceDeposit(res3, new Position(37, 44));
+		map.putResourceDeposit(res4, new Position(41, 32));
+		map.putResourceDeposit(res5, new Position(41, 38));
+		map.putResourceDeposit(res6, new Position(41, 44));
 		
-		truck1 .assignNow(new MineRouteTask(mine1, smelter1));
-		truck2 .assignNow(new MineRouteTask(mine4, smelter1));
-		truck3 .assignNow(new MineRouteTask(mine2, smelter2));
-		truck4 .assignNow(new MineRouteTask(mine5, smelter2));
-		truck5 .assignNow(new MineRouteTask(mine3, smelter3));
-		truck6 .assignNow(new MineRouteTask(mine6, smelter3));
-		truck7 .assignNow(new MineRouteTask(mine1, smelter4));
-		truck8 .assignNow(new MineRouteTask(mine4, smelter4));
-		truck9 .assignNow(new MineRouteTask(mine2, smelter5));
-		truck10.assignNow(new MineRouteTask(mine5, smelter5));
-		truck11.assignNow(new MineRouteTask(mine3, smelter6));
-		truck12.assignNow(new MineRouteTask(mine6, smelter6));
-		truck13.assignNow(new MineRouteTask(mine1, smelter7));
-		truck14.assignNow(new MineRouteTask(mine4, smelter7));
-		truck15.assignNow(new MineRouteTask(mine2, smelter8));
-		truck16.assignNow(new MineRouteTask(mine5, smelter8));
-		truck17.assignNow(new MineRouteTask(mine3, smelter9));
-		truck18.assignNow(new MineRouteTask(mine6, smelter9));
-		truck19.assignNow(new MineRouteTask(mine1, smelter1));
-		truck20.assignNow(new MineRouteTask(mine4, smelter1));
-		truck21.assignNow(new MineRouteTask(mine2, smelter2));
-		truck22.assignNow(new MineRouteTask(mine5, smelter2));
-		truck23.assignNow(new MineRouteTask(mine3, smelter3));
-		truck24.assignNow(new MineRouteTask(mine6, smelter3));
-		truck25.assignNow(new MineRouteTask(mine1, smelter4));
-		truck26.assignNow(new MineRouteTask(mine4, smelter4));
-		truck27.assignNow(new MineRouteTask(mine2, smelter5));
-		truck28.assignNow(new MineRouteTask(mine5, smelter5));
-		truck29.assignNow(new MineRouteTask(mine3, smelter6));
-		truck30.assignNow(new MineRouteTask(mine6, smelter6));
-		truck31.assignNow(new MineRouteTask(mine1, smelter7));
-		truck32.assignNow(new MineRouteTask(mine4, smelter7));
-		truck33.assignNow(new MineRouteTask(mine2, smelter8));
-		truck34.assignNow(new MineRouteTask(mine5, smelter8));
-		truck35.assignNow(new MineRouteTask(mine3, smelter9));
-		truck36.assignNow(new MineRouteTask(mine6, smelter9));
+		map.putUnit(mine1, new Position(36, 32));
+		map.putUnit(mine2, new Position(36, 38));
+		map.putUnit(mine3, new Position(36, 44));
+		map.putUnit(mine4, new Position(40, 32));
+		map.putUnit(mine5, new Position(40, 38));
+		map.putUnit(mine6, new Position(40, 44));
+		
+		List<Unit> mines = Arrays.asList(
+			mine1, mine2, mine3,
+			mine4, mine5, mine6
+		);
+		List<Unit> smelters = Arrays.asList(
+			smelter1, smelter2, smelter3,
+			smelter4, smelter5, smelter6,
+			smelter7, smelter8, smelter9
+		);
+		
+		Unit truck;
+		int truckCount = 0;
+		
+		for (Unit mine : mines)
+		for (Unit smelter : smelters)
+		{
+			truck = factory.newUnit("eCargoTruck", player1);
+			truck.assignNow(new MineRouteTask(mine, smelter));
+			map.putUnit(truck, new Position(truckCount % 16 + 2, truckCount / 16 + 20));
+			truckCount++;
+		}
 		
 		SpriteLibrary lib = game.getSpriteLibrary();
 		
@@ -1382,6 +1277,102 @@ public class TestMP5
 		{
 			ioe.printStackTrace();
 		}
+	}
+	
+	public static String mapBigCombatDemo()
+	{
+		return "bigPlain";
+	}
+	
+	public static void setupBigCombatDemo(Game game)
+	{
+		LayeredMap map = game.getMap();
+		UnitFactory factory = game.getUnitFactory();
+		
+		Position center = new Position(
+			map.getWidth() / 2,
+			map.getHeight() / 2
+		);
+		
+		Player player1 = new Player(1, "Axen", 320);
+		Player player2 = new Player(2, "Emma", 200);
+		Player player3 = new Player(3, "Nguyen", 40);
+		Player player4 = new Player(4, "Frost", 160);
+		Player player5 = new Player(5, "Brook", 95);
+		
+		game.addPlayer(player1);
+		game.addPlayer(player2);
+		game.addPlayer(player3);
+		game.addPlayer(player4);
+		game.addPlayer(player5);
+		
+		for (int x = 1; x <= 15; ++x)
+		for (int y = 1; y <= 11; ++y)
+		{
+			Unit tank = factory.newUnit("pMicrowaveLynx", player1);
+			map.putUnit(tank, new Position(x, y));
+			tank.assignNow(new SteerTask(center));
+		}
+
+		for (int x = 36; x <= 46; ++x)
+		for (int y = 1;  y <= 15;  ++y)
+		{
+			Unit tank = factory.newUnit("eLaserLynx", player2);
+			map.putUnit(tank, new Position(x, y));
+			tank.assignNow(new SteerTask(center));
+		}
+
+		for (int x = 1;  x <= 11;  ++x)
+		for (int y = 31; y <= 46; ++y)
+		{
+			Unit tank = factory.newUnit("pRPGLynx", player3);
+			map.putUnit(tank, new Position(x, y));
+			tank.assignNow(new SteerTask(center));
+		}
+
+		for (int x = 31; x <= 46; ++x)
+		for (int y = 36; y <= 46; ++y)
+		{
+			Unit tank = factory.newUnit("eRailGunLynx", player4);
+			map.putUnit(tank, new Position(x, y));
+			tank.assignNow(new SteerTask(center));
+		}
+		
+		for (int x = 20; x <= 29; ++x)
+		for (int y = 20; y <= 29; ++y)
+		{
+			Unit tank = factory.newUnit("eAcidCloudLynx", player5);
+			map.putUnit(tank, new Position(x, y));
+		}
+		
+		SpriteLibrary lib = game.getSpriteLibrary();
+		
+		try
+		{
+			lib.loadModule("eLynxChassis");
+			lib.loadModule("pLynxChassis");
+			lib.loadModule("eLaserSingleTurret");
+			lib.loadModule("eRailGunSingleTurret");
+			lib.loadModule("eAcidCloudSingleTurret");
+			lib.loadModule("pMicrowaveSingleTurret");
+			lib.loadModule("pRPGSingleTurret");
+			lib.loadModule("pSupernovaSingleTurret");
+			lib.loadModule("pMicrowaveGuardPost");
+			lib.loadModule("eStructureFactory");
+			lib.loadModule("eVehicleFactory");
+			lib.loadModule("eCommonSmelter");
+			lib.loadModule("aDeath");
+			lib.loadModule("aRocket");
+			lib.loadModule("aAcidCloud");
+			lib.loadModule("aSupernovaExplosion");
+			lib.loadModule("aStructureStatus");
+		}
+		catch (IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
+		
+		game.getView().center(center);
 	}
 	
 	public static class NotMyTeamFilter extends Filter<Unit>
