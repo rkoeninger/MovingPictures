@@ -544,7 +544,7 @@ public class LayeredMap
 	public void putUnit(Unit unit, Position pos)
 	{
 		if (!canPlaceUnit(pos, unit.getFootprint()))
-			throw new IllegalStateException("can't place unit");
+			throw new IllegalStateException("can't place unit " + pos);
 		
 		if (unit.getContainer() != null)
 			throw new IllegalStateException("Unit already in a UnitLayer");

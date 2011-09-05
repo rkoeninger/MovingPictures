@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1041,108 +1042,71 @@ public class TestMP5
 		UnitFactory factory = game.getUnitFactory();
 		
 		Player player1 = new Player(1, "Mining Operation", 200);
-		
 		game.addPlayer(player1);
-		
 		selectPlayer(1);
 		
-		Unit smelter1 = factory.newUnit("eCommonSmelter", player1);
-		Unit smelter2 = factory.newUnit("eCommonSmelter", player1);
-		Unit smelter3 = factory.newUnit("eCommonSmelter", player1);
-		Unit smelter4 = factory.newUnit("eCommonSmelter", player1);
-		Unit smelter5 = factory.newUnit("eCommonSmelter", player1);
-		Unit smelter6 = factory.newUnit("eCommonSmelter", player1);
-		Unit smelter7 = factory.newUnit("eCommonSmelter", player1);
-		Unit smelter8 = factory.newUnit("eCommonSmelter", player1);
-		Unit smelter9 = factory.newUnit("eCommonSmelter", player1);
+		List<Unit> mines    = new ArrayList<Unit>();
+		List<Unit> smelters = new ArrayList<Unit>();
 		
-		Unit mine1 = factory.newUnit("eCommonMine", player1);
-		Unit mine2 = factory.newUnit("eCommonMine", player1);
-		Unit mine3 = factory.newUnit("eCommonMine", player1);
-		Unit mine4 = factory.newUnit("eCommonMine", player1);
-		Unit mine5 = factory.newUnit("eCommonMine", player1);
-		Unit mine6 = factory.newUnit("eCommonMine", player1);
+		for (int x = 2; x < 44; x += 6)
+		for (int y = 2; y < 20; y += 6)
+		{
+			Unit smelter = factory.newUnit("eCommonSmelter", player1);
+			map.putUnit(smelter, new Position(x, y));
+			map.putTube(new Position(x + 5, y + 1));
+			map.putTube(new Position(x + 2, y + 4));
+			map.putTube(new Position(x + 2, y + 5));
+			smelters.add(smelter);
+		}
 		
-		map.putUnit(smelter1, new Position(2,  2));
-		map.putUnit(smelter2, new Position(2,  8));
-		map.putUnit(smelter3, new Position(2,  14));
-		map.putUnit(smelter4, new Position(8,  2));
-		map.putUnit(smelter5, new Position(8,  8));
-		map.putUnit(smelter6, new Position(8,  14));
-		map.putUnit(smelter7, new Position(14, 2));
-		map.putUnit(smelter8, new Position(14, 8));
-		map.putUnit(smelter9, new Position(14, 14));
+		map.putUnit(factory.newUnit("eCommandCenter", player1), new Position(44, 2));
 		
-		map.putTube(new Position(7,  3));
-		map.putTube(new Position(13, 3));
-		map.putTube(new Position(7,  9));
-		map.putTube(new Position(13, 9));
-		map.putTube(new Position(7,  15));
-		map.putTube(new Position(13, 15));
-		map.putTube(new Position(4,  6));
-		map.putTube(new Position(4,  7));
-		map.putTube(new Position(4,  12));
-		map.putTube(new Position(4,  13));
-		map.putTube(new Position(16, 18));
-		map.putTube(new Position(17, 18));
-		map.putTube(new Position(18, 18));
-		map.putTube(new Position(19, 18));
-		map.putTube(new Position(20, 18));
-		map.putTube(new Position(21, 18));
-		map.putTube(new Position(22, 18));
-		map.putTube(new Position(23, 18));
-		map.putTube(new Position(24, 18));
-		
-		map.putUnit(factory.newUnit("eCommandCenter", player1), new Position(25, 17));
-		
-		ResourceDeposit res1 = ResourceDeposit.get1BarCommon();
-		ResourceDeposit res2 = ResourceDeposit.get2BarCommon();
-		ResourceDeposit res3 = ResourceDeposit.get3BarCommon();
-		ResourceDeposit res4 = ResourceDeposit.get1BarCommon();
-		ResourceDeposit res5 = ResourceDeposit.get2BarCommon();
-		ResourceDeposit res6 = ResourceDeposit.get3BarCommon();
-		
-		map.putResourceDeposit(res1, new Position(37, 32));
-		map.putResourceDeposit(res2, new Position(37, 38));
-		map.putResourceDeposit(res3, new Position(37, 44));
-		map.putResourceDeposit(res4, new Position(41, 32));
-		map.putResourceDeposit(res5, new Position(41, 38));
-		map.putResourceDeposit(res6, new Position(41, 44));
-		
-		map.putUnit(mine1, new Position(36, 32));
-		map.putUnit(mine2, new Position(36, 38));
-		map.putUnit(mine3, new Position(36, 44));
-		map.putUnit(mine4, new Position(40, 32));
-		map.putUnit(mine5, new Position(40, 38));
-		map.putUnit(mine6, new Position(40, 44));
-		
-		List<Unit> mines = Arrays.asList(
-			mine1, mine2, mine3,
-			mine4, mine5, mine6
-		);
-		List<Unit> smelters = Arrays.asList(
-			smelter1, smelter2, smelter3,
-			smelter4, smelter5, smelter6,
-			smelter7, smelter8, smelter9
-		);
+		for (int x = 2;  x < 46; x += 4)
+		for (int y = 38; y < 45; y += 4)
+		{
+			ResourceDeposit res = ResourceDeposit.get2BarCommon();
+			map.putResourceDeposit(res, new Position(x + 1, y));
+			Unit mine = factory.newUnit("eCommonMine", player1);
+			map.putUnit(mine, new Position(x, y));
+			mines.add(mine);
+		}
 		
 		Unit truck;
+		int truckIndex = 0;
 		int truckCount = 0;
+		
+		Collections.shuffle(mines);
+		Collections.shuffle(smelters);
 		
 		for (Unit mine : mines)
 		for (Unit smelter : smelters)
 		{
-			truck = factory.newUnit("eCargoTruck", player1);
-			truck.assignNow(new MineRouteTask(mine, smelter));
-			map.putUnit(truck, new Position(truckCount % 16 + 2, truckCount / 16 + 20));
-			truckCount++;
+			if (Utils.randInt(0, 5) % 6 == 0)
+			{
+				Position pos = new Position(
+					truckIndex % 42 + 2,
+					truckIndex / 42 + 24
+				);
+				
+				truck = factory.newUnit("eCargoTruck", player1);
+				truck.assignNow(new MineRouteTask(mine, smelter));
+				map.putUnit(truck, pos);
+				truckCount++;
+			}
+			
+			truckIndex++;
 		}
+		
+		System.out.println(mines.size() + " mines");
+		System.out.println(smelters.size() + " smelters");
+		System.out.println(truckCount + " trucks");
 		
 		SpriteLibrary lib = game.getSpriteLibrary();
 		
 		try
 		{
 			lib.loadModule("eCargoTruck");
+			lib.loadModule("eCommandCenter");
 			lib.loadModule("eCommonSmelter");
 			lib.loadModule("eCommonMine");
 			lib.loadModule("aResource");
@@ -1152,139 +1116,16 @@ public class TestMP5
 		{
 			ioe.printStackTrace();
 		}
+		
+		game.getView().center(new Position(24, 26));
 	}
 	
 	public static String mapCombatDemo()
 	{
-		return "widePlain";
-	}
-	
-	public static void setupCombatDemo(Game game)
-	{
-		LayeredMap map = game.getMap();
-		UnitFactory factory = game.getUnitFactory();
-		
-		Player player1 = new Player(1, "Axen", 320);
-		Player player2 = new Player(2, "Emma", 200);
-		Player player3 = new Player(3, "Nguyen", 40);
-		Player player4 = new Player(4, "Frost", 160);
-		Player player5 = new Player(5, "Brook", 270);
-		Player player6 = new Player(6, "Kraft", 95);
-		
-		game.addPlayer(player1);
-		game.addPlayer(player2);
-		game.addPlayer(player3);
-		game.addPlayer(player4);
-		game.addPlayer(player5);
-		game.addPlayer(player6);
-		
-		Position destination = new Position(22, 13);
-		
-		for (int x = 1; x <= 7; ++x)
-		for (int y = 2; y <= 5; ++y)
-		{
-			Unit tankMW = factory.newUnit("pMicrowaveLynx", player1);
-			map.putUnit(tankMW, new Position(x, y));
-			tankMW.assignNow(new SteerTask(destination));
-		}
-		
-		for (int x = 22; x <= 28; ++x)
-		for (int y = 2;  y <= 5;  ++y)
-		{
-			Unit tankRPG = factory.newUnit("pRPGLynx", player4);
-			map.putUnit(tankRPG, new Position(x, y));
-			tankRPG.assignNow(new SteerTask(destination));
-		}
-		
-		for (int x = 2;  x <= 7;  ++x)
-		for (int y = 18; y <= 18; ++y)
-		{
-			Unit tankSN = factory.newUnit("pSupernovaLynx", player3);
-			map.putUnit(tankSN, new Position(x, y));
-			tankSN.assignNow(new SteerTask(destination));
-		}
-		
-		for (int x = 18; x <= 23; ++x)
-		for (int y = 9;  y <= 11; ++y)
-		{
-			Unit tankL = factory.newUnit("eLaserLynx", player2);
-			map.putUnit(tankL, new Position(x, y));
-		}
-		
-		for (int x = 18; x <= 20; ++x)
-		for (int y = 12; y <= 14; ++y)
-		{
-			Unit tankRG = factory.newUnit("eRailGunLynx", player2);
-			map.putUnit(tankRG, new Position(x, y));
-		}
-		
-		for (int x = 21; x <= 23; ++x)
-		for (int y = 13; y <= 14; ++y)
-		{
-			Unit tankRG = factory.newUnit("eRailGunLynx", player2);
-			map.putUnit(tankRG, new Position(x, y));
-		}
-		
-		map.putUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(19, 8));
-		map.putUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(20, 8));
-		map.putUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(21, 8));
-		map.putUnit(factory.newUnit("eAcidCloudLynx", player2), new Position(22, 8));
-		
-		map.putUnit(factory.newUnit("eLaserGuardPost",   player2), new Position(21, 12));
-		map.putUnit(factory.newUnit("eCommandCenter",    player2), new Position(25, 15));
-		map.putUnit(factory.newUnit("eStructureFactory", player2), new Position(19, 15));
-		map.putUnit(factory.newUnit("eVehicleFactory",   player2), new Position(25, 10));
-		
-		map.putTube(new Position(27, 14));
-		map.putTube(new Position(24, 16));
-		
-		map.putWall(new Position(17, 19));
-		map.putWall(new Position(17, 18));
-		map.putWall(new Position(17, 17));
-		map.putWall(new Position(17, 16));
-		map.putWall(new Position(17, 9));
-		map.putWall(new Position(17, 8));
-		map.putWall(new Position(18, 8));
-		map.putWall(new Position(23, 8));
-		map.putWall(new Position(24, 8));
-		map.putWall(new Position(25, 8));
-		map.putWall(new Position(26, 8));
-		map.putWall(new Position(27, 8));
-		
-		SpriteLibrary lib = game.getSpriteLibrary();
-		
-		try
-		{
-			lib.loadModule("eLynxChassis");
-			lib.loadModule("pLynxChassis");
-			lib.loadModule("eLaserSingleTurret");
-			lib.loadModule("eRailGunSingleTurret");
-			lib.loadModule("eAcidCloudSingleTurret");
-			lib.loadModule("pMicrowaveSingleTurret");
-			lib.loadModule("pRPGSingleTurret");
-			lib.loadModule("pSupernovaSingleTurret");
-			lib.loadModule("pMicrowaveGuardPost");
-			lib.loadModule("eStructureFactory");
-			lib.loadModule("eVehicleFactory");
-			lib.loadModule("eCommonSmelter");
-			lib.loadModule("aDeath");
-			lib.loadModule("aRocket");
-			lib.loadModule("aAcidCloud");
-			lib.loadModule("aSupernovaExplosion");
-			lib.loadModule("aStructureStatus");
-		}
-		catch (IOException ioe)
-		{
-			ioe.printStackTrace();
-		}
-	}
-	
-	public static String mapBigCombatDemo()
-	{
 		return "bigPlain";
 	}
 	
-	public static void setupBigCombatDemo(Game game)
+	public static void setupCombatDemo(Game game)
 	{
 		LayeredMap map = game.getMap();
 		UnitFactory factory = game.getUnitFactory();
@@ -1313,7 +1154,7 @@ public class TestMP5
 			map.putUnit(tank, new Position(x, y));
 			tank.assignNow(new SteerTask(center));
 		}
-
+		
 		for (int x = 36; x <= 46; ++x)
 		for (int y = 1;  y <= 15;  ++y)
 		{
