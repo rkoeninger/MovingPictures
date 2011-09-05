@@ -43,6 +43,7 @@ public class DisplayPanel extends JComponent
 	
 	private UnitStatus unitStatus;
 	private PlayerStatus playerStatus;
+	private TitleBar titleBar;
 	
 	private Player currentPlayer;
 	
@@ -199,6 +200,11 @@ public class DisplayPanel extends JComponent
 		this.playerStatus = status;
 	}
 	
+	public void setTitleBar(TitleBar titleBar)
+	{
+		this.titleBar = titleBar;
+	}
+	
 	public void showStatus(Unit unit)
 	{
 		if (unitStatus != null)
@@ -214,6 +220,12 @@ public class DisplayPanel extends JComponent
 			playerStatus.showStatus(player);
 		
 		currentPlayer = player;
+	}
+	
+	public void showFrameNumber(int frameNumber)
+	{
+		if (titleBar != null)
+			titleBar.showFrameNumber(frameNumber);
 	}
 	
 	public void setAnimatedCursor(String name)
@@ -485,7 +497,8 @@ public class DisplayPanel extends JComponent
 		 * Units are returned by UnitLayer iterator already in z-order.
 		 */
 		for (Unit unit : map.getUnitIterator(true))
-			drawUnit(unit, g);
+			if (region.intersects(unit.getFootprint().getInnerRegion()))
+				drawUnit(unit, g);
 		
 		/*
 		 * Draw ambient animations

@@ -142,6 +142,8 @@ public class Engine
 		{
 			synchronized (Engine.this)
 			{
+				panel.showFrameNumber(frame);
+				
 				/*
 				 * Triggers
 				 */

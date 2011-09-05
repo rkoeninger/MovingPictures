@@ -44,6 +44,7 @@ import com.robbix.mp5.ui.CommandButton;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.PlayerStatus;
 import com.robbix.mp5.ui.SpriteLibrary;
+import com.robbix.mp5.ui.TitleBar;
 import com.robbix.mp5.ui.UnitStatus;
 import com.robbix.mp5.ui.overlay.BuildStructureOverlay;
 import com.robbix.mp5.ui.overlay.PlaceBulldozeOverlay;
@@ -272,6 +273,14 @@ public class TestMP5
 				}
 			}
 		};
+
+		TitleBar titleBar = new TitleBar()
+		{
+			public void showFrameNumber(int frameNumber)
+			{
+				frame.setTitle("Moving Pictures - [" + frameNumber + "]");
+			}
+		};
 		
 		/*-------------------------------------------------------------------*
 		 * Load command button icons
@@ -315,6 +324,7 @@ public class TestMP5
 		final DisplayPanel panel = game.getDisplay();
 		panel.setUnitStatus(unitStatus);
 		panel.setPlayerStatus(playerStatus);
+		panel.setTitleBar(titleBar);
 		panel.setShowGrid(false);
 		panel.setShowUnitLayerState(false);
 		panel.setShowTerrainCostMap(false);
