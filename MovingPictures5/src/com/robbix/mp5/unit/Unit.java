@@ -2,6 +2,7 @@ package com.robbix.mp5.unit;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,6 +12,8 @@ import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
+import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteLibrary;
 
 /**
  * Hashcode and equals methods remain defaults, since there should
@@ -64,6 +67,7 @@ public class Unit
 	private Unit turret;
 	private Unit chassis;
 	
+	private List<Sprite> animationSequence;
 	private int animationFrame = 0;
 		
 	private LayeredMap container;
@@ -267,6 +271,7 @@ public class Unit
 			throw new IllegalStateException("Not a truck");
 		
 		this.cargo = cargo == null ? Cargo.EMPTY : cargo;
+		clearAnimationSequence();
 	}
 	
 	public Cargo getCargo()
@@ -282,6 +287,7 @@ public class Unit
 	public void setActivity(String activity)
 	{
 		this.activity = activity;
+		clearAnimationSequence();
 	}
 	
 	public String getActivity()
@@ -323,6 +329,31 @@ public class Unit
 			(cargo != null ? cargo.toString() : ""),
 			(isConnected() ? " " : " [disconnected] ")
 		);
+	}
+	
+	public List<Sprite> getAnimationSequence()
+	{
+		return animationSequence;
+	}
+	
+	public void setAnimationSequence(SpriteLibrary lib)
+	{
+		animationSequence = lib.getSequence(this);
+	}
+	
+	public void setAnimationSequence(List<Sprite> seq)
+	{
+		animationSequence = seq;
+	}
+	
+	public void clearAnimationSequence()
+	{
+		animationSequence = null;
+	}
+	
+	public boolean hasAnimationSequence()
+	{
+		return animationSequence != null;
 	}
 	
 	public int getAnimationFrame()
@@ -413,12 +444,15 @@ public class Unit
 	public void rotate(int steps)
 	{
 		this.dir = dir.rotate(steps);
+		resetAnimationFrame();
+		clearAnimationSequence();
 	}
 	
 	public void setDirection(Direction dir)
 	{
 		this.dir = dir;
-		animationFrame = 0;
+		resetAnimationFrame();
+		clearAnimationSequence();
 	}
 	
 	public Direction getDirection()

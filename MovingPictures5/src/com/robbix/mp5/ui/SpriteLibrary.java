@@ -70,6 +70,7 @@ public class SpriteLibrary
 	
 	private HashMap<String, Sprite> sprites;
 	private HashMap<String, Integer> groupInfo;
+	private HashMap<String, List<Sprite>> groups;
 	
 	private File rootDir;
 	
@@ -78,7 +79,8 @@ public class SpriteLibrary
 		loadedModules = new HashSet<String>(64);
 		
 		sprites = new HashMap<String, Sprite>(2048);
-		groupInfo = new HashMap<String, Integer>(128);
+		groups = new HashMap<String, List<Sprite>>(256);
+		groupInfo = new HashMap<String, Integer>(256);
 	}
 	
 	public Point getHotspot(Unit turret)
@@ -330,6 +332,45 @@ public class SpriteLibrary
 				0,
 				0
 			);
+		}
+	}
+	
+	public synchronized List<Sprite> getSequence(Unit unit)
+	{
+		String activity = unit.getActivity();
+		
+		if (unit.isStructure()
+		|| (unit.getType().isGuardPostType() && activity.equals("build")))
+		{
+			String parentPath = Utils.getPath(
+				unit.getType().getName(),
+				activity,
+				activity.equals("still") ? unit.getHealthBracket().name().toLowerCase() : null,
+				activity.equals("build") ? unit.getAnimationFrame() : null
+			);
+			
+			List<Sprite> seq = groups.get(parentPath);
+			return seq != null ? seq : getSequence(parentPath);
+		}
+		else
+		{
+			String parentPath;
+			String dir = unit.getDirection().getShortName();
+			boolean dependsCargo = unit.isTruck();
+			boolean dependsDirection =
+				activity.contains("dock")
+			 || activity.contains("mine")
+			 || activity.contains("construct");
+			
+			parentPath = Utils.getPath(
+				unit.getType().getName(),
+				activity,
+				dependsCargo ? unit.getCargo().getType() : null,
+				dependsDirection ? null : dir
+			);
+			
+			List<Sprite> seq = groups.get(parentPath);
+			return seq != null ? seq : getSequence(parentPath);
 		}
 	}
 	

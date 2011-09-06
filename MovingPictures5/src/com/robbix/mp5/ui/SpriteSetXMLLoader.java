@@ -407,6 +407,8 @@ class SpriteSetXMLLoader
 					
 					Image img = loadFrame(activityDir, fileNumber);
 					
+					metadata.put(parentSpritePath, 1);
+					
 					sprites.put(
 						parentSpritePath,
 						new Sprite(
@@ -561,6 +563,8 @@ class SpriteSetXMLLoader
 				direction.getShortName()
 			);
 			
+			metadata.put(parentSpritePath, 1);
+			
 			int h = 0;
 			
 			for (Node hotspotNode : hotspotNodes)
@@ -645,6 +649,8 @@ class SpriteSetXMLLoader
 						activityName,
 						direction.getShortName()
 					);
+					
+					metadata.put(parentSpritePath, 1);
 					
 					int h = 0;
 					

@@ -689,7 +689,13 @@ public class DisplayPanel extends JComponent
 	 */
 	private void drawUnit(Unit unit, Graphics g)
 	{
-		final Sprite sprite = sprites.getSprite(unit);
+		if (!unit.hasAnimationSequence())
+		{
+			unit.setAnimationSequence(sprites);
+		}
+		
+		final List<Sprite> seq = unit.getAnimationSequence();
+		final Sprite sprite = seq.get(unit.getAnimationFrame() % seq.size());
 		
 		final int tileSize = map.getTileSize();
 		
