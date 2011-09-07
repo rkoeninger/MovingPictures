@@ -2,10 +2,15 @@ package com.robbix.mp5.ui;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JScrollPane;
+import javax.swing.Timer;
 
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
@@ -16,14 +21,19 @@ public class DisplayPanelView extends JScrollPane
 	private static final long serialVersionUID = 2037569908237169908L;
 	
 	private DisplayPanel panel;
+	private Timer scrollTimer;
+	private int dx, dy;
+	private int scrollSpeed = 16;
 	
 	public DisplayPanelView(DisplayPanel panel)
 	{
 		this.panel = panel;
 		setViewportView(panel);
-		AdjustmentListener listener = new ViewChangeListener();
-		getHorizontalScrollBar().addAdjustmentListener(listener);
-		getVerticalScrollBar()  .addAdjustmentListener(listener);
+		panel.addKeyListener(new KeyScrollListener());
+		AdjustmentListener viewListener = new ViewChangeListener();
+		getHorizontalScrollBar().addAdjustmentListener(viewListener);
+		getVerticalScrollBar().addAdjustmentListener(viewListener);
+		scrollTimer = new Timer(20, new ScrollLoop());
 	}
 	
 	public void setViewPosition(Point p)
@@ -154,6 +164,74 @@ public class DisplayPanelView extends JScrollPane
 		}
 		
 		setViewPosition(new Point(x, y));
+	}
+	
+	private class ScrollLoop implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			Point viewPosition = panel.getVisibleRect().getLocation();
+			viewPosition.translate(dx, dy);
+			setViewPosition(viewPosition);
+		}
+	}
+	
+	private class KeyScrollListener extends KeyAdapter
+	{
+		public void keyPressed(KeyEvent e)
+		{
+			if (e.getModifiers() == 0)
+			{
+				if (e.getKeyCode() == KeyEvent.VK_UP)
+				{
+					dy = -scrollSpeed;
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_DOWN)
+				{
+					dy = scrollSpeed;
+				}
+				
+				if (e.getKeyCode() == KeyEvent.VK_LEFT)
+				{
+					dx = -scrollSpeed;
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+				{
+					dx = scrollSpeed;
+				}
+			}
+			
+			scrollTimer.start();
+		}
+		
+		public void keyReleased(KeyEvent e)
+		{
+			if (e.getModifiers() == 0)
+			{
+				if (e.getKeyCode() == KeyEvent.VK_UP)
+				{
+					dy = 0;
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_DOWN)
+				{
+					dy = 0;
+				}
+				
+				if (e.getKeyCode() == KeyEvent.VK_LEFT)
+				{
+					dx = 0;
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+				{
+					dx = 0;
+				}
+			}
+			
+			if (dx == 0 && dy == 0)
+			{
+				scrollTimer.stop();
+			}
+		}
 	}
 	
 	private class ViewChangeListener implements AdjustmentListener

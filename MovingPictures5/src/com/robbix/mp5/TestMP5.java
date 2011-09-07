@@ -273,7 +273,7 @@ public class TestMP5
 				}
 			}
 		};
-
+		
 		TitleBar titleBar = new TitleBar()
 		{
 			public void showFrameNumber(int frameNumber)

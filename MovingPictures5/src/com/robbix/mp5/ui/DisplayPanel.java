@@ -90,6 +90,8 @@ public class DisplayPanel extends JComponent
 		this.cursors = cursors;
 		this.overlays = new LinkedList<InputOverlay>();
 		setBackground(new Color(127, 127, 255));
+		setFocusable(true);
+		setFocusTraversalKeysEnabled(false);
 		setPreferredSize(new Dimension(map.getWidth()  * map.getTileSize(),
 		                               map.getHeight() * map.getTileSize()));
 	}
