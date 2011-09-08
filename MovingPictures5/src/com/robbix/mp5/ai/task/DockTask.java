@@ -1,9 +1,9 @@
 package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.Player;
 import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.basics.Direction;
+import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 

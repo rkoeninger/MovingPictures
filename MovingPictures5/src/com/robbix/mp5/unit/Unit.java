@@ -7,11 +7,11 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.robbix.mp5.Player;
 import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
+import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteLibrary;
 

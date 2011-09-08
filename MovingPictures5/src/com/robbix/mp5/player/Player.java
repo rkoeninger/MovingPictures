@@ -1,9 +1,10 @@
-package com.robbix.mp5;
+package com.robbix.mp5.player;
 
 import java.awt.Color;
 import java.util.EnumMap;
 import java.util.Map;
 
+import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.unit.Cost;
 
 public class Player

@@ -11,7 +11,6 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.robbix.mp5.Player;
 import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.TestMP5;
 import com.robbix.mp5.Utils;
@@ -20,6 +19,7 @@ import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.ai.task.TurretTask;
 import com.robbix.mp5.basics.FileFormatException;
 import com.robbix.mp5.basics.Filter;
+import com.robbix.mp5.player.Player;
 
 public class UnitFactory
 {

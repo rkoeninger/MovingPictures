@@ -12,6 +12,7 @@ import com.robbix.mp5.ai.task.ConstructTask;
 import com.robbix.mp5.ai.task.PathTask;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
+import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.SoundBank;
 import com.robbix.mp5.ui.Sprite;

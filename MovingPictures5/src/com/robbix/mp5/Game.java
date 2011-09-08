@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.TileSet;
+import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.CursorSet;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.DisplayPanelView;

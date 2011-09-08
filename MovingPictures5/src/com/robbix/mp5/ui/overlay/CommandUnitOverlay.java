@@ -10,7 +10,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.Player;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.BulldozeTask;
 import com.robbix.mp5.ai.task.DockTask;
@@ -20,6 +19,7 @@ import com.robbix.mp5.basics.JListDialog;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;

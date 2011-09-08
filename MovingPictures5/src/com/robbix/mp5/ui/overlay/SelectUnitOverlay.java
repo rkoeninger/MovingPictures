@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.Player;
+import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
 
 public class SelectUnitOverlay extends InputOverlay
