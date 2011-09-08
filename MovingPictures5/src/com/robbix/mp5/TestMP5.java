@@ -277,9 +277,13 @@ public class TestMP5
 		
 		TitleBar titleBar = new TitleBar()
 		{
-			public void showFrameNumber(int frameNumber)
+			public void showFrameNumber(int frameNumber, double frameRate)
 			{
-				frame.setTitle("Moving Pictures - [" + frameNumber + "]");
+				frame.setTitle(String.format(
+					"Moving Pictures - [%1$d] %2$.2f fps",
+					frameNumber,
+					frameRate
+				));
 			}
 		};
 		
@@ -301,7 +305,8 @@ public class TestMP5
 		
 		for (File iconDir : new File(RES_DIR, "art/commandButtons").listFiles())
 		{
-			if (!iconDir.isDirectory()) continue;
+			if (!iconDir.isDirectory())
+				continue;
 			
 			ArrayList<ImageIcon> icons = new ArrayList<ImageIcon>();
 			
@@ -310,7 +315,8 @@ public class TestMP5
 				icons.add(new ImageIcon(Utils.shrink(ImageIO.read(iconFile))));
 			}
 			
-			if (icons.isEmpty()) continue;
+			if (icons.isEmpty())
+				continue;
 			
 			CommandButton button = new CommandButton(icons);
 			button.setActionCommand(iconDir.getName());

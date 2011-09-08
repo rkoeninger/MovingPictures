@@ -137,12 +137,23 @@ public class Engine
 	{
 		Set<Runnable> callbacks = new HashSet<Runnable>();
 		AtomicReference<Runnable> returnValue = new AtomicReference<Runnable>();
+		long prevTime;
+		int framePeriod = 8;
+		double fps = 0.0;
 		
 		public void run()
 		{
 			synchronized (Engine.this)
 			{
-				panel.showFrameNumber(frame);
+				long time = System.nanoTime();
+				
+				if (frame % framePeriod == 0 && frame != 0)
+				{
+					fps = 1000000000.0 / (time - prevTime);
+				}
+				
+				prevTime = time;
+				panel.showFrameNumber(frame, fps);
 				
 				/*
 				 * Triggers

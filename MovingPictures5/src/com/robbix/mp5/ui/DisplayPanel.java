@@ -224,10 +224,10 @@ public class DisplayPanel extends JComponent
 		currentPlayer = player;
 	}
 	
-	public void showFrameNumber(int frameNumber)
+	public void showFrameNumber(int frameNumber, double frameRate)
 	{
 		if (titleBar != null)
-			titleBar.showFrameNumber(frameNumber);
+			titleBar.showFrameNumber(frameNumber, frameRate);
 	}
 	
 	public void setAnimatedCursor(String name)
