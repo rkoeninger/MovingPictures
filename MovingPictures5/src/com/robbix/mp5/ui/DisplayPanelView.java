@@ -33,7 +33,29 @@ public class DisplayPanelView extends JScrollPane
 		AdjustmentListener viewListener = new ViewChangeListener();
 		getHorizontalScrollBar().addAdjustmentListener(viewListener);
 		getVerticalScrollBar().addAdjustmentListener(viewListener);
+		setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		setWheelScrollingEnabled(false);
 		scrollTimer = new Timer(20, new ScrollLoop());
+	}
+	
+	public void showScrollbars(boolean show)
+	{
+		if (show)
+		{
+			setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		}
+		else
+		{
+			setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+			setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		}
+	}
+	
+	public boolean areScrollBarsVisible()
+	{
+		return getVerticalScrollBarPolicy() == JScrollPane.VERTICAL_SCROLLBAR_ALWAYS;
 	}
 	
 	public void setViewPosition(Point p)

@@ -43,6 +43,7 @@ import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.CommandButton;
 import com.robbix.mp5.ui.DisplayPanel;
+import com.robbix.mp5.ui.DisplayPanelView;
 import com.robbix.mp5.ui.PlayerStatus;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.TitleBar;
@@ -351,6 +352,7 @@ public class TestMP5
 		final JMenuItem throttleMenuItem = new JMenuItem("Unthrottle");
 		throttleMenuItem.setEnabled(engine.isThrottled());
 		final JMenuItem exitMenuItem = new JMenuItem("Exit");
+		final JMenuItem scrollBarsMenuItem = new JMenuItem("Scroll Bars");
 		final JMenu disastersMenu = new JMenu("Disasters");
 		final JMenuItem spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
 		final JMenuItem meteorShowerMenuItem = new JMenuItem("Meteor Shower");
@@ -512,6 +514,8 @@ public class TestMP5
 			panelOptionMenuItem.addActionListener(displayOptionListener);
 		}
 		
+		displayMenu.add(scrollBarsMenuItem);
+		
 		pauseMenuItem.setAccelerator(
 			KeyStroke.getKeyStroke(KeyEvent.VK_PAUSE, 0)
 		);
@@ -581,6 +585,15 @@ public class TestMP5
 			windowBounds.x + (windowBounds.width  - frame.getWidth())  / 2,
 			windowBounds.y + (windowBounds.height - frame.getHeight()) / 2
 		);
+		
+		scrollBarsMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				DisplayPanelView view = game.getView();
+				view.showScrollbars(! view.areScrollBarsVisible());
+			}
+		});
 		
 		meteorShowerMenuItem.addActionListener(new ActionListener()
 		{
