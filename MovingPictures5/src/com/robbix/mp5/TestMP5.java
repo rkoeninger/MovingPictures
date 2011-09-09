@@ -1103,7 +1103,6 @@ public class TestMP5
 		
 		Unit truck;
 		int truckIndex = 0;
-		int truckCount = 0;
 		
 		Collections.shuffle(mines);
 		Collections.shuffle(smelters);
@@ -1121,15 +1120,10 @@ public class TestMP5
 				truck = factory.newUnit("eCargoTruck", player1);
 				truck.assignNow(new MineRouteTask(mine, smelter));
 				map.putUnit(truck, pos);
-				truckCount++;
 			}
 			
 			truckIndex++;
 		}
-		
-		System.out.println(mines.size() + " mines");
-		System.out.println(smelters.size() + " smelters");
-		System.out.println(truckCount + " trucks");
 		
 		SpriteLibrary lib = game.getSpriteLibrary();
 		

@@ -163,6 +163,33 @@ public class SpriteLibrary
 		return frameCount;
 	}
 	
+	public synchronized Sprite getSprite(String path)
+	{
+		Sprite sprite = sprites.get(path);
+		
+		if (sprite == null)
+		{
+			try
+			{
+				String parentPath = path.substring(0, path.indexOf('/'));
+				loadModule(new File(rootDir, parentPath));
+				sprite = sprites.get(path);
+			}
+			catch (IOException exc)
+			{
+				return new Sprite(
+					Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),
+					-1,
+					0,
+					0
+				);
+			}
+		}
+		
+		groups.put(path, Arrays.asList(sprite));
+		return sprite;
+	}
+	
 	public synchronized List<Sprite> getSequence(String path)
 	{
 		if (!groupInfo.containsKey(path))
@@ -194,7 +221,8 @@ public class SpriteLibrary
 		
 		for (int i = 0; i < frameCount; ++i)
 			spriteList.add(sprites.get(path + "/" + i));
-			
+		
+		groups.put(path, spriteList);
 		return spriteList;
 	}
 	
@@ -345,12 +373,17 @@ public class SpriteLibrary
 			String parentPath = Utils.getPath(
 				unit.getType().getName(),
 				activity,
-				activity.equals("still") ? unit.getHealthBracket().name().toLowerCase() : null,
-				activity.equals("build") ? unit.getAnimationFrame() : null
+				activity.equals("still") ? unit.getHealthBracket().name().toLowerCase() : null
 			);
 			
 			List<Sprite> seq = groups.get(parentPath);
-			return seq != null ? seq : getSequence(parentPath);
+			
+			if (seq != null)
+				return seq;
+			
+			return activity.equals("still")
+				? Arrays.asList(getSprite(parentPath))
+				: getSequence(parentPath);
 		}
 		else
 		{

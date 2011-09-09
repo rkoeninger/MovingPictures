@@ -123,6 +123,11 @@ public class Unit
 			throw new IllegalArgumentException("HP out of range");
 		
 		this.hp = hp;
+		
+		if (type.isStructureType())
+		{
+			clearAnimationSequence();
+		}
 	}
 	
 	public int getHP()
