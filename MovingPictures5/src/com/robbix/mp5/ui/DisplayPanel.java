@@ -698,10 +698,7 @@ public class DisplayPanel extends JComponent
 		
 		final List<Sprite> seq = unit.getAnimationSequence();
 		final Sprite sprite = seq.get(unit.getAnimationFrame() % seq.size());
-		// FIXME: getting null sprite from seq
-		
 		final int tileSize = map.getTileSize();
-		
 		int posX = unit.getX() * tileSize;
 		int posY = unit.getY() * tileSize;
 		
