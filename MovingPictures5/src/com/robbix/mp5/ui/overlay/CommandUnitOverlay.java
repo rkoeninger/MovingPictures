@@ -153,6 +153,7 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			g.drawString("Dump", 20, 25);
 			g.drawString("Mine", w - 50, 25);
+			g.drawString("Route", w - 70, h / 2 - 30);
 			g.drawString("Dock", w - 50, h - 30);
 		}
 		else if (unit.getType().getName().contains("ConVec"))
@@ -252,6 +253,10 @@ public class CommandUnitOverlay extends InputOverlay
 					Mediator.sounds.play("dump");
 					unit.interrupt(new DumpTask());
 				}
+			}
+			else if (edge == 5)
+			{
+				getDisplay().pushOverlay(new SelectMineRouteOverlay(unit));
 			}
 			else if (edge == 8)
 			{
