@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -177,12 +178,7 @@ public class SpriteLibrary
 			}
 			catch (IOException exc)
 			{
-				return new Sprite(
-					Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),
-					-1,
-					0,
-					0
-				);
+				return randomSprite();
 			}
 		}
 		
@@ -200,15 +196,11 @@ public class SpriteLibrary
 			{
 				loadModule(new File(rootDir, parentPath));
 			}
-			catch (IOException io)
+			catch (IOException e)
 			{
 				// Failover to random sprite
-				return Arrays.asList(new Sprite(
-					Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),
-					-1,
-					0,
-					0
-				));
+				e.printStackTrace();
+				return Collections.singletonList(randomSprite());
 			}
 		}
 		
@@ -261,14 +253,7 @@ public class SpriteLibrary
 			int w = unit.getFootprint().getInnerRegion().getWidth();
 			int h = unit.getFootprint().getInnerRegion().getHeight();
 			
-			return new Sprite(
-				Utils.getBlankImage(Utils.getRandomPrimaryColor(),
-					32 * w,
-					32 * h),
-				0,
-				0,
-				0
-			);
+			return randomSprite(w, h);
 		}
 		else if (unit.getType().isGuardPostType())
 		{
@@ -299,19 +284,10 @@ public class SpriteLibrary
 			catch (IOException e)
 			{
 				// Ignore and failover to blank image
+				e.printStackTrace();
 			}
 			
-			int w = unit.getFootprint().getInnerRegion().getWidth();
-			int h = unit.getFootprint().getInnerRegion().getHeight();
-			
-			return new Sprite(
-				Utils.getBlankImage(Utils.getRandomPrimaryColor(),
-					32 * w,
-					32 * h),
-				0,
-				0,
-				0
-			);
+			return randomSprite();
 		}
 		else
 		{
@@ -352,14 +328,10 @@ public class SpriteLibrary
 			catch (IOException e)
 			{
 				// Ignore and failover to blank image
+				e.printStackTrace();
 			}
 			
-			return new Sprite(
-				Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),
-				0,
-				0,
-				0
-			);
+			return randomSprite();
 		}
 	}
 	
@@ -441,19 +413,13 @@ public class SpriteLibrary
 			catch (IOException e)
 			{
 				// Ignore and failover to blank image
+				e.printStackTrace();
 			}
 			
 			int w = unit.getFootprint().getInnerRegion().getWidth();
 			int h = unit.getFootprint().getInnerRegion().getHeight();
 			
-			return new Sprite(
-				Utils.getBlankImage(Utils.getRandomPrimaryColor(),
-					32 * w,
-					32 * h),
-				0,
-				0,
-				0
-			);
+			return randomSprite(w, h);
 		}
 		else
 		{
@@ -504,19 +470,26 @@ public class SpriteLibrary
 			catch (IOException e)
 			{
 				// Ignore and failover to blank image
+				e.printStackTrace();
 			}
 			
-			return new Sprite(
-				Utils.getBlankImage(Utils.getRandomPrimaryColor(), 32, 32),
-				0,
-				0,
-				0
-			);
+			return randomSprite();
 		}
 	}
 	
 	public Sprite getShadow(Unit unit)
 	{
 		return null;
+	}
+	
+	private static Sprite randomSprite()
+	{
+		return randomSprite(1, 1);
+	}
+	
+	private static Sprite randomSprite(int w, int h)
+	{
+		return new Sprite(Utils.getBlankImage(
+			Utils.getRandomPrimaryColor(), w * 32, h * 32),0,0,0);
 	}
 }

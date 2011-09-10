@@ -14,7 +14,9 @@ import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.BulldozeTask;
 import com.robbix.mp5.ai.task.DockTask;
 import com.robbix.mp5.ai.task.DumpTask;
+import com.robbix.mp5.ai.task.EarthworkerConstructTask;
 import com.robbix.mp5.ai.task.MineTask;
+import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.JListDialog;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
@@ -161,6 +163,11 @@ public class CommandUnitOverlay extends InputOverlay
 			g.drawString("Construct", w - 100, 25);
 			g.drawString("Dock", w - 50, h - 30);
 		}
+		else if (unit.getType().getName().contains("Earthworker"))
+		{
+			g.drawString("Build Wall", w - 100, 25);
+			g.drawString("Build Tube", w - 100, h / 2 - 30);
+		}
 		else if (unit.hasTurret())
 		{
 			g.drawString("Attack", w - 60, 25);
@@ -300,6 +307,21 @@ public class CommandUnitOverlay extends InputOverlay
 						}
 					}
 				}
+			}
+		}
+		else if (unit.getType().getName().contains("Earthworker"))
+		{
+			if (edge == 2 || edge == 5)
+			{
+				Direction dir = unit.getDirection();
+				Position buildPos = dir.apply(unit.getPosition());
+				unit.assignNow(new EarthworkerConstructTask(
+					buildPos,
+					edge == 2
+						? LayeredMap.Fixture.WALL
+						: LayeredMap.Fixture.TUBE,
+					50
+				));
 			}
 		}
 		else if (unit.getType().getName().contains("ConVec"))

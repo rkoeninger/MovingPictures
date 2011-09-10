@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<UnitType type="vehicle" unitType="eEarthworker" civ="Eden">
+	<DisplayName>Earthworker</DisplayName>
+	<Acknowledgement>earthworker</Acknowledgement>
+	<Activites>
+		<Activity>move</Activity>
+		<Activity>construct</Activity>
+	</Activites>
+	<Cost>
+		<Resource type="common ore" amount="250"/>
+	</Cost>
+	<Stats hp="400"
+		   speed="1.1"
+		   sightRange="3"
+		   armor="none"
+		   rotationSpeed="2"
+		   rotationDegree="16"/>
+</UnitType>

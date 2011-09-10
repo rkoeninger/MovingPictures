@@ -4,11 +4,11 @@ import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.unit.Unit;
 
-public class ConstructTask extends Task
+public class ConVecConstructTask extends Task
 {
 	private Unit target;
 	
-	public ConstructTask(Unit target)
+	public ConVecConstructTask(Unit target)
 	{
 		super(true, new Filter<Unit>()
 		{

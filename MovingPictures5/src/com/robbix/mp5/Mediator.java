@@ -8,7 +8,7 @@ import java.util.Set;
 import com.robbix.mp5.ai.AStar;
 import com.robbix.mp5.ai.task.AttackTask;
 import com.robbix.mp5.ai.task.BuildTask;
-import com.robbix.mp5.ai.task.ConstructTask;
+import com.robbix.mp5.ai.task.ConVecConstructTask;
 import com.robbix.mp5.ai.task.PathTask;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
@@ -295,7 +295,7 @@ public class Mediator
 		Unit struct = factory.newUnit(structTypeName, owner);
 		doBuild(struct, structPos);
 		
-		conVec.assignNow(new ConstructTask(struct));
+		conVec.assignNow(new ConVecConstructTask(struct));
 		conVec.setCargo(Cargo.EMPTY);
 		
 		panel.refresh();
