@@ -42,6 +42,11 @@ public class AStar// implements Pathfinder
 		this.heuristic = heuristic;
 	}
 	
+	public List<Position> getPath(CostMap course, Position start, Position end)
+	{
+		return getPath(course, start, end, 0);
+	}
+	
 	/**
 	 * Gets a (mostly) optimal path from start to end through the given
 	 * CostMap. The CostMap can simply be the terrain texture from
@@ -50,7 +55,11 @@ public class AStar// implements Pathfinder
 	 * 
 	 * Returns null if a path cannot be found.
 	 */
-	public List<Position> getPath(CostMap course, Position start, Position end)
+	public List<Position> getPath(
+		CostMap course,
+		Position start,
+		Position end,
+		double distance)
 	{
 		/*
 		 * Go ahead and return null now if end is an unreachable spot.
@@ -62,7 +71,7 @@ public class AStar// implements Pathfinder
 		 * Get complete search tree. If it's null, then no path could be
 		 * found, so return null.
 		 */
-		List<PosPair> nodes = getNodes(course, start, end);
+		List<PosPair> nodes = getNodes(course, start, end, distance);
 		
 		if (nodes == null)
 			return null;
@@ -85,6 +94,10 @@ public class AStar// implements Pathfinder
 		}
 		
 		Collections.reverse(path);
+		
+		if (distance == 1)
+			path = path.subList(0, path.size() - 1);
+		
 		return path;
 	}
 	
@@ -96,7 +109,11 @@ public class AStar// implements Pathfinder
 	 * Returns null if all alternative paths were exhausted and one could not
 	 * be found.
 	 */
-	private List<PosPair> getNodes(CostMap course, Position start, Position end)
+	private List<PosPair> getNodes(
+		CostMap course,
+		Position start,
+		Position end,
+		double distance)
 	{
 		Map<Position, Cost> openSet = new HashMap<Position, Cost>(64);
 		Set<Position> closedSet = new HashSet<Position>(128);
@@ -130,6 +147,7 @@ public class AStar// implements Pathfinder
 			/*
 			 * If we found the end, we're done.
 			 */
+//			if (sqDistance(end, current) <= distance)
 			if (end.equals(current))
 				return Arrays.asList(nodes.toArray(new PosPair[0]));
 			
@@ -249,4 +267,12 @@ public class AStar// implements Pathfinder
 			this.to = to;
 		}
 	}
+	
+	/**
+	 * Finds the square of the straight-line distance.
+	 */
+//	private static double sqDistance(Position a, Position b)
+//	{
+//		return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+//	}
 }

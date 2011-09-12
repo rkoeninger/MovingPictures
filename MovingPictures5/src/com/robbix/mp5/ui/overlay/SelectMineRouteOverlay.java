@@ -57,6 +57,11 @@ public class SelectMineRouteOverlay extends InputOverlay
 		
 		g.drawString("Right Click to Cancel", w / 2 - 25, 50);
 		g.translate(-rect.x, -rect.y);
+		
+		for (Unit truck : trucks)
+		{
+			CommandUnitOverlay.paintSelectedUnitBox(g, truck);
+		}
 	}
 	
 	public void onLeftClick(int x, int y)

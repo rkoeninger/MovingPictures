@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.unit.Cost;
+import com.robbix.mp5.unit.Unit;
 
 public class Player
 {
@@ -44,6 +45,11 @@ public class Player
 	public Color getColor()
 	{
 		return color;
+	}
+	
+	public boolean owns(Unit unit)
+	{
+		return equals(unit.getOwner());
 	}
 	
 	public Map<ResourceType, Integer> getResources()

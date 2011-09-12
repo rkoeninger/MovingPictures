@@ -21,6 +21,12 @@ public class RotateTask extends Task
 	
 	public void step(Unit unit)
 	{
+		if (unit.getDirection() == destination)
+		{
+			unit.completeTask(this);
+			return;
+		}
+		
 		if (rotationProgress == -1)
 		{
 			rotationProgress = 0;

@@ -397,6 +397,11 @@ public class Unit
 		return type.isStructureType();
 	}
 	
+	public boolean isGuardPost()
+	{
+		return type.isGuardPostType();
+	}
+	
 	public boolean isTruck()
 	{
 		return type.getName().contains("Truck");

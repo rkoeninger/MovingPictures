@@ -182,8 +182,18 @@ public class SpriteLibrary
 			}
 		}
 		
-		groups.put(path, Arrays.asList(sprite));
-		return sprite;
+		if (sprite != null)
+		{
+			groups.put(path, Arrays.asList(sprite));
+			return sprite;
+		}
+		
+		List<Sprite> seq = getSequence(path);
+		
+		if (seq == null)
+			return null;
+		
+		return seq.get(0);
 	}
 	
 	public synchronized List<Sprite> getSequence(String path)

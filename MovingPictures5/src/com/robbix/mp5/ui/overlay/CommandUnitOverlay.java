@@ -311,17 +311,19 @@ public class CommandUnitOverlay extends InputOverlay
 		}
 		else if (unit.getType().getName().contains("Earthworker"))
 		{
-			if (edge == 2 || edge == 5)
+			if (edge == 2)
 			{
 				Direction dir = unit.getDirection();
 				Position buildPos = dir.apply(unit.getPosition());
 				unit.assignNow(new EarthworkerConstructTask(
 					buildPos,
-					edge == 2
-						? LayeredMap.Fixture.WALL
-						: LayeredMap.Fixture.TUBE,
-					50
+					LayeredMap.Fixture.WALL,
+					48
 				));
+			}
+			else if (edge == 5)
+			{
+				getDisplay().pushOverlay(new BuildTubeOverlay(unit));
 			}
 		}
 		else if (unit.getType().getName().contains("ConVec"))

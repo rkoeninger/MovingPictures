@@ -974,11 +974,8 @@ public class TestMP5
 		UnitFactory factory = game.getUnitFactory();
 		
 		Player player1 = new Player(1, "Targets", 45);
-		
 		game.addPlayer(player1);
-		
 		selectPlayer(1);
-		
 		factory.setDefaultOwner(player1);
 		
 		for (int x = 0; x < 12; ++x)
@@ -1036,29 +1033,30 @@ public class TestMP5
 		UnitFactory factory = game.getUnitFactory();
 		
 		Player player1 = new Player(1, "Factories", 275);
-		
 		game.addPlayer(player1);
-		
 		selectPlayer(1);
+		factory.setDefaultOwner(player1);
 		
 		player1.addResource(ResourceType.COMMON_ORE, 50000);
 		player1.addResource(ResourceType.RARE_ORE,   50000);
 		player1.addResource(ResourceType.FOOD,       50000);
 		
-		Unit convec1 = factory.newUnit("eConVec", player1);
-		Unit convec2 = factory.newUnit("eConVec", player1);
-		Unit convec3 = factory.newUnit("eConVec", player1);
-		Unit convec4 = factory.newUnit("eConVec", player1);
+		Unit convec1     = factory.newUnit("eConVec");
+		Unit convec2     = factory.newUnit("eConVec");
+		Unit convec3     = factory.newUnit("eConVec");
+		Unit convec4     = factory.newUnit("eConVec");
+		Unit earthworker = factory.newUnit("eEarthworker");
 		
 		convec1.setCargo(Cargo.newConVecCargo("eVehicleFactory"));
 		convec2.setCargo(Cargo.newConVecCargo("eStructureFactory"));
 		convec3.setCargo(Cargo.newConVecCargo("eCommonSmelter"));
 		convec4.setCargo(Cargo.newConVecCargo("eCommandCenter"));
 		
-		map.putUnit(convec1, new Position(9,  7));
-		map.putUnit(convec2, new Position(10, 7));
-		map.putUnit(convec3, new Position(11, 7));
-		map.putUnit(convec4, new Position(12, 7));
+		map.putUnit(convec1,     new Position(9,  7));
+		map.putUnit(convec2,     new Position(10, 7));
+		map.putUnit(convec3,     new Position(11, 7));
+		map.putUnit(convec4,     new Position(12, 7));
+		map.putUnit(earthworker, new Position(10, 9));
 	}
 	
 	public static String mapMineRouteDemo()

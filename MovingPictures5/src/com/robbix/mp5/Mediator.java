@@ -9,9 +9,13 @@ import com.robbix.mp5.ai.AStar;
 import com.robbix.mp5.ai.task.AttackTask;
 import com.robbix.mp5.ai.task.BuildTask;
 import com.robbix.mp5.ai.task.ConVecConstructTask;
+import com.robbix.mp5.ai.task.EarthworkerConstructTask;
 import com.robbix.mp5.ai.task.PathTask;
+import com.robbix.mp5.ai.task.RotateTask;
+import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
+import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.SoundBank;
@@ -200,19 +204,36 @@ public class Mediator
 		panel.refresh();
 	}
 	
+	public static void doEarthworkerBuild(Unit unit, Position pos, Fixture fixture)
+	{
+		doApproach(unit, pos);
+		unit.assignLater(new EarthworkerConstructTask(pos, fixture, 48));
+	}
+	
 	public static void doMove(Unit unit, Position pos)
 	{
-		doMove(unit, pos, true);
+		doMove(unit, pos, true, 0);
 	}
 	
 	public static void doMove(Unit unit, Position pos, boolean interrupt)
+	{
+		doMove(unit, pos, interrupt, 0);
+	}
+
+	public static void doMove(Unit unit, Position pos, double distance)
+	{
+		doMove(unit, pos, true, distance);
+	}
+	
+	public static void doMove(Unit unit, Position pos, boolean interrupt, double distance)
 	{
 		if (unit.isStructure() || unit.getType().isGuardPostType() || unit.isDead()) return;
 		
 		List<Position> path = new AStar().getPath(
 			map.getTerrainCostMap(),
 			unit.getPosition(),
-			pos
+			pos,
+			distance
 		);
 		
 		if (path == null) return;
@@ -225,6 +246,28 @@ public class Mediator
 		{
 			unit.assignNext(new PathTask(path));
 		}
+	}
+	
+	public static void doApproach(Unit unit, Position pos)
+	{
+		if (unit.isStructure() || unit.getType().isGuardPostType() || unit.isDead())
+			return;
+		
+		List<Position> path = new AStar().getPath(
+			map.getTerrainCostMap(),
+			unit.getPosition(),
+			pos,
+			1
+		);
+		
+		if (path == null)
+			return;
+		
+		Position last = path.get(path.size() - 1);
+		Direction dir = Direction.getMoveDirection(last, pos);
+		
+		unit.assignNext(new PathTask(path));
+		unit.assignLater(new RotateTask(dir));
 	}
 	
 	public static void doGroupMove(Set<Unit> units, Position pos)

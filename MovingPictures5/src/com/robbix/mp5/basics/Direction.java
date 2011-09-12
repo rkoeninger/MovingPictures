@@ -124,6 +124,10 @@ public class Direction
 		// y-axis is inverted, so dy is inverted
 		int dx = b.x - a.x;
 		int dy = b.y - a.y;
+		
+		if (dx == 0 && dy == 0)
+			return null;
+		
 		return angleMap[revsTo16Steps(Math.atan2(-dy, dx) / (2 * PI))];
 	}
 	

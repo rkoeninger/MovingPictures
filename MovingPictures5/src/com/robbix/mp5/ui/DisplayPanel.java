@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,6 +37,8 @@ public class DisplayPanel extends JComponent
 	private SpriteLibrary sprites;
 	private TileSet tiles;
 	private CursorSet cursors;
+	
+	private int tileSize = 32;
 	
 	private BufferedImage cachedTerrain = null;
 	private BufferedImage cachedCostMapImage = null;
@@ -427,23 +430,114 @@ public class DisplayPanel extends JComponent
 		return animations;
 	}
 	
-	/**
-	 * Gets the region of positions currently visible on this display.
-	 */
-	public Region getVisibleRegion()
+	public int getTileSize()
 	{
-		Rectangle rect = getVisibleRect();
-		int tileSize = map.getTileSize();
-		
+		return tileSize;
+	}
+	
+	public Position getPosition(Point point)
+	{
+		return new Position(point.x / tileSize, point.y / tileSize);
+	}
+	
+	public Position getPosition(int absX, int absY)
+	{
+		return new Position(absX / tileSize, absY / tileSize);
+	}
+	
+	public Point getPoint(Position pos)
+	{
+		return new Point(pos.x * tileSize, pos.y * tileSize);
+	}
+	
+	public Region getRegion(Rectangle rect)
+	{
 		int minX = (int) Math.floor(rect.x / (double) tileSize);
 		int minY = (int) Math.floor(rect.y / (double) tileSize);
 		int maxX = (int) Math.ceil((rect.x + rect.width) / (double) tileSize);
 		int maxY = (int) Math.ceil((rect.y + rect.height) / (double) tileSize);
 		
-		maxX = Math.min(maxX, map.getWidth()  - 1);
-		maxY = Math.min(maxY, map.getHeight() - 1);
-		
-		return new Region(minX, minY, maxX - minX + 1, maxY - minY + 1);
+		return new Region(minX, minY, maxX - minX, maxY - minY);
+	}
+	
+	public Rectangle getRectangle(Region region)
+	{
+		return new Rectangle(
+			region.x * tileSize,
+			region.y * tileSize,
+			region.w * tileSize,
+			region.h * tileSize
+		);
+	}
+	
+	/**
+	 * Gets the region of positions currently visible on this display.
+	 */
+	public Region getVisibleRegion()
+	{
+		return getRegion(getVisibleRect());
+	}
+	
+	public void draw(Graphics g, Position pos)
+	{
+		g.drawRect(pos.x * tileSize, pos.y * tileSize, tileSize, tileSize);
+	}
+	
+	public void fill(Graphics g, Position pos)
+	{
+		g.fillRect(pos.x * tileSize, pos.y * tileSize, tileSize, tileSize);
+	}
+	
+	public void drawPosition(Graphics g, int x, int y)
+	{
+		g.drawRect(x * tileSize, y * tileSize, tileSize, tileSize);
+	}
+	
+	public void fillPosition(Graphics g, int x, int y)
+	{
+		g.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+	}
+	
+	public void draw(Graphics g, Rectangle rect)
+	{
+		g.drawRect(rect.x, rect.y, rect.width, rect.height);
+	}
+	
+	public void fill(Graphics g, Rectangle rect)
+	{
+		g.fillRect(rect.x, rect.y, rect.width, rect.height);
+	}
+	
+	public void draw(Graphics g, Image img, Point point)
+	{
+		g.drawImage(img, point.x, point.y, null);
+	}
+	
+	public void draw(Graphics g, Image img, Position pos)
+	{
+		g.drawImage(img, pos.x * tileSize, pos.y * tileSize, null);
+	}
+	
+	public void draw(Graphics g, Sprite sprite, Position pos)
+	{
+		g.drawImage(
+			sprite.getImage(),
+			pos.x * tileSize + sprite.getXOffset(),
+			pos.y * tileSize + sprite.getYOffset(),
+			null
+		);
+	}
+	
+	public void draw(Graphics g, Sprite sprite, Point point, Player owner)
+	{
+		g.drawImage(
+			owner == null
+				? sprite.getImage()
+				: sprite.getImage(owner.getColorHue()),
+			point.x + sprite.getXOffset(),
+			point.y + sprite.getYOffset(),
+			null
+		);
 	}
 	
 	/**
@@ -452,9 +546,8 @@ public class DisplayPanel extends JComponent
 	 */
 	public void paintComponent(Graphics g)
 	{
-		final int tileSize = map.getTileSize();
 		final Rectangle rect = getVisibleRect();
-		final Region region = getVisibleRegion();
+		final Region region = getRegion(rect);
 		
 		/*
 		 * Draw terrian.
@@ -468,7 +561,7 @@ public class DisplayPanel extends JComponent
 		else
 		{
 			g.setColor(getBackground());
-			g.fillRect(rect.x, rect.y, rect.width, rect.height);
+			fill(g, rect);
 		}
 		
 		/*
@@ -517,21 +610,19 @@ public class DisplayPanel extends JComponent
 		 */
 		for (ResourceDeposit deposit : map.getResourceDeposits())
 		{
-			int absX = deposit.getPosition().x * tileSize;
-			int absY = deposit.getPosition().y * tileSize;
+			Point resPoint = getPoint(deposit.getPosition());
 			
-			if (!rect.contains(absX + 16, absY + 16))
+			if (!rect.contains(resPoint.x + 16, resPoint.y + 16))
 				continue;
 			
 			Sprite sprite = deposit.isSurveyedBy(currentPlayer)
 				? sprites.getSprite(deposit)
 				: sprites.getUnknownDepositSprite();
 			
-			g.drawImage(sprite.getImage(),
-				absX + sprite.getXOffset(),
-				absY + sprite.getYOffset(),
-				null
-			);
+			resPoint.x += sprite.getXOffset();
+			resPoint.y += sprite.getYOffset();
+			
+			draw(g, sprite.getImage(), resPoint);
 		}
 		
 		/*
@@ -540,7 +631,7 @@ public class DisplayPanel extends JComponent
 		if (night)
 		{
 			g.setColor(new Color(0, 0, 0, 127));
-			g.fillRect(rect.x, rect.y, rect.width, rect.height);
+			fill(g, rect);
 		}
 		
 		/*
@@ -552,7 +643,6 @@ public class DisplayPanel extends JComponent
 	
 	private void drawTerrain(Graphics g, Rectangle rect)
 	{
-		final int tileSize = map.getTileSize();
 		final Region region = getVisibleRegion();
 		
 		if (showTerrainCostMap)
@@ -567,9 +657,7 @@ public class DisplayPanel extends JComponent
 						BufferedImage.TYPE_INT_ARGB
 					);
 					Graphics cg = cachedCostMapImage.getGraphics();
-					
 					CostMap terrainCost = map.getTerrainCostMap();
-					
 					cg.setFont(Font.decode("Arial-9"));
 					
 					for (int y = region.y; y < region.getMaxY(); ++y)
@@ -578,12 +666,7 @@ public class DisplayPanel extends JComponent
 						cg.setColor(Utils.getGrayscale(
 							terrainCost.getScaleFactor(x, y)
 						));
-						cg.fillRect(
-							x * tileSize,
-							y * tileSize,
-							tileSize,
-							tileSize
-						);
+						fillPosition(cg, x, y);
 						
 						if (showTerrainCostValues)
 						{
@@ -629,12 +712,7 @@ public class DisplayPanel extends JComponent
 					if (tileCode == null)
 					{
 						cg.setColor(Color.YELLOW);
-						cg.fillRect(
-							x * tileSize,
-							y * tileSize,
-							tileSize,
-							tileSize
-						);
+						fill(cg, pos);
 						continue;
 					}
 					
@@ -643,40 +721,19 @@ public class DisplayPanel extends JComponent
 					if (img == null)
 					{
 						cg.setColor(Color.YELLOW);
-						cg.fillRect(
-							x * tileSize,
-							y * tileSize,
-							tileSize,
-							tileSize
-						);
+						fill(cg, pos);
 						continue;
 					}
 					
-					cg.drawImage(img, x * tileSize, y * tileSize, null);
+					draw(cg, img, pos);
 					
 					if (map.hasMinePlatform(pos))
 					{
-						Sprite platformSprite =
-							sprites.getSequence("aCommonMine/platform").get(0);
-						
-						cg.drawImage(
-							platformSprite.getImage(),
-							x * tileSize + platformSprite.getXOffset(),
-							y * tileSize + platformSprite.getYOffset(),
-							null
-						);
+						draw(cg, sprites.getSprite("aCommonMine/platform"), pos);
 					}
 					else if (map.hasGeyser(pos))
 					{
-						Sprite geyserSprite =
-							sprites.getSequence("aGeyser/geyser").get(0);
-						
-						cg.drawImage(
-							geyserSprite.getImage(),
-							x * tileSize + geyserSprite.getXOffset(),
-							y * tileSize + geyserSprite.getYOffset(),
-							null
-						);
+						draw(cg, sprites.getSprite("aGeyser/geyser"), pos);
 					}
 				}
 			}
@@ -696,100 +753,61 @@ public class DisplayPanel extends JComponent
 			unit.setAnimationSequence(sprites);
 		}
 		
-		final List<Sprite> seq = unit.getAnimationSequence();
-		final Sprite sprite = seq.get(unit.getAnimationFrame() % seq.size());
-		final int tileSize = map.getTileSize();
-		int posX = unit.getX() * tileSize;
-		int posY = unit.getY() * tileSize;
+		List<Sprite> seq = unit.getAnimationSequence();
+		Sprite sprite = seq.get(unit.getAnimationFrame() % seq.size());
+		Point unitPoint = new Point(unit.getAbsX(), unit.getAbsY());
 		
 		if (showUnitLayerState && !unit.isTurret())
 		{
 			g.setColor(Utils.getTranslucency(Color.RED, 127));
 			
 			for (Position pos : unit.getFootprint().iterator(unit.getPosition()))
-			{
-				g.fillRect(
-					pos.x * tileSize,
-					pos.y * tileSize,
-					tileSize,
-					tileSize
-				);
-			}
+				fill(g, pos);
 			
 			g.setColor(Utils.getTranslucency(Color.BLUE, 127));
 			
 			for (Position pos : unit.getMap().getReservations(unit))
-			{
-				g.fillRect(
-					pos.x * tileSize,
-					pos.y * tileSize,
-					tileSize,
-					tileSize
-				);
-			}
+				fill(g, pos);
 		}
 		
-		posX += unit.getXOffset();
-		posY += unit.getYOffset();
-		posX += sprite.getXOffset();
-		posY += sprite.getYOffset();
-		
-		Image img = unit.getOwner() == null
-			? sprite.getImage()
-			: sprite.getImage(unit.getOwner().getColorHue());
-		
-		g.drawImage(img, posX, posY, null);
+		draw(g, sprite, unitPoint, unit.getOwner());
 		
 		if (unit.hasTurret())
 		{
 			drawUnit(unit.getTurret(), g);
 		}
-		else if (unit.getType().isGuardPostType() && currentPlayer.equals(unit.getOwner()))
+		else
 		{
-			if (unit.isIdle())
-			{
-				List<Sprite> statusSpriteGroup =
-					sprites.getSequence("aStructureStatus/idle");
-				Sprite statusSprite = statusSpriteGroup.get(0);
-				
-				g.drawImage(statusSprite.getImage(), unit.getX() * tileSize, unit.getY() * tileSize, null);
-			}
-			else if (unit.isDisabled())
-			{
-				List<Sprite> statusSpriteGroup =
-					sprites.getSequence("aStructureStatus/disabled");
-				int frame = (int)((System.currentTimeMillis() / 100) % statusSpriteGroup.size());
-				Sprite statusSprite = statusSpriteGroup.get(frame);
-				
-				g.drawImage(statusSprite.getImage(), unit.getX() * tileSize, unit.getY() * tileSize, null);
-			}
+			drawStatusLight(g, unit);
 		}
-		else if (unit.isStructure() && currentPlayer.equals(unit.getOwner()))
+	}
+	
+	/**
+	 * Draws upper-left corner status light for structures and guard posts.
+	 * Green "active" lights are not draw for guard posts.
+	 * Unit must be owned by current viewing player to have status light drawn.
+	 */
+	private void drawStatusLight(Graphics g, Unit unit)
+	{
+		if (!currentPlayer.owns(unit))
+			return;
+		
+		Position pos = unit.getPosition();
+		
+		if (unit.isGuardPost() || unit.isStructure())
 		{
 			if (unit.isIdle())
 			{
-				List<Sprite> statusSpriteGroup =
-					sprites.getSequence("aStructureStatus/idle");
-				Sprite statusSprite = statusSpriteGroup.get(0);
-				
-				g.drawImage(statusSprite.getImage(), unit.getX() * tileSize, unit.getY() * tileSize, null);
+				draw(g, sprites.getSprite("aStructureStatus/idle"), pos);
 			}
 			else if (unit.isDisabled())
 			{
-				List<Sprite> statusSpriteGroup =
-					sprites.getSequence("aStructureStatus/disabled");
-				int frame = (int)((System.currentTimeMillis() / 100) % statusSpriteGroup.size());
-				Sprite statusSprite = statusSpriteGroup.get(frame);
-				
-				g.drawImage(statusSprite.getImage(), unit.getX() * tileSize, unit.getY() * tileSize, null);
+				List<Sprite> seq = sprites.getSequence("aStructureStatus/disabled");
+				draw(g, seq.get(Utils.getTimeBasedIndex(100, seq.size())), pos);
 			}
-			else
+			else if (unit.isStructure()) // Active light only for structures
 			{
-				List<Sprite> statusSpriteGroup =
-					sprites.getSequence("aStructureStatus/active");
-				Sprite statusSprite = statusSpriteGroup.get(0);
-				
-				g.drawImage(statusSprite.getImage(), unit.getX() * tileSize, unit.getY() * tileSize, null);
+				draw(g, sprites.getSprite("aStructureStatus/active"), pos);
 			}
 		}
 	}
