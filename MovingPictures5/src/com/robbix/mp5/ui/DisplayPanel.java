@@ -593,7 +593,7 @@ public class DisplayPanel extends JComponent
 		 */
 		for (Unit unit : map.getUnitIterator(true))
 			if (region.intersects(unit.getFootprint().getInnerRegion()))
-				drawUnit(unit, g);
+				drawUnit(g, unit);
 		
 		/*
 		 * Draw ambient animations
@@ -641,10 +641,14 @@ public class DisplayPanel extends JComponent
 			overlays.getFirst().paintOverUnits(g, rect);
 	}
 	
+	private static Font costMapFont = Font.decode("Arial-9");
+	
+	/**
+	 * Draws terrain (surface or cost map) depending on options using
+	 * Graphics g in the visible rect.
+	 */
 	private void drawTerrain(Graphics g, Rectangle rect)
 	{
-		final Region region = getVisibleRegion();
-		
 		if (showTerrainCostMap)
 		{
 			synchronized (cacheLock)
@@ -657,36 +661,8 @@ public class DisplayPanel extends JComponent
 						BufferedImage.TYPE_INT_ARGB
 					);
 					Graphics cg = cachedCostMapImage.getGraphics();
-					CostMap terrainCost = map.getTerrainCostMap();
-					cg.setFont(Font.decode("Arial-9"));
-					
-					for (int y = region.y; y < region.getMaxY(); ++y)
-					for (int x = region.x; x < region.getMaxX(); ++x)
-					{
-						cg.setColor(Utils.getGrayscale(
-							terrainCost.getScaleFactor(x, y)
-						));
-						fillPosition(cg, x, y);
-						
-						if (showTerrainCostValues)
-						{
-							cg.setColor(Utils.getBlackWhiteComplement(
-								cg.getColor()
-							));
-							
-							double cost = showCostValuesAsFactors
-								? terrainCost.getScaleFactor(x, y)
-								: terrainCost.get(x, y);
-							
-							cg.drawString(
-								Double.isInfinite(cost)
-									? "Inf"
-									: String.format("%.2f", cost),
-								x * tileSize + 3,
-								y * tileSize + 11
-							);
-						}
-					}
+					drawCostMap(cg, getVisibleRegion());
+					cg.dispose();
 				}
 				
 				g.drawImage(cachedCostMapImage, 0, 0, null);
@@ -702,40 +678,8 @@ public class DisplayPanel extends JComponent
 					BufferedImage.TYPE_INT_ARGB
 				);
 				Graphics cg = cachedTerrain.getGraphics();
-
-				for (int y = region.y; y < region.getMaxY(); ++y)
-				for (int x = region.x; x < region.getMaxX(); ++x)
-				{
-					Position pos = new Position(x, y);
-					String tileCode = map.getTileCode(x, y);
-					
-					if (tileCode == null)
-					{
-						cg.setColor(Color.YELLOW);
-						fill(cg, pos);
-						continue;
-					}
-					
-					Image img = tiles.getTile(tileCode);
-					
-					if (img == null)
-					{
-						cg.setColor(Color.YELLOW);
-						fill(cg, pos);
-						continue;
-					}
-					
-					draw(cg, img, pos);
-					
-					if (map.hasMinePlatform(pos))
-					{
-						draw(cg, sprites.getSprite("aCommonMine/platform"), pos);
-					}
-					else if (map.hasGeyser(pos))
-					{
-						draw(cg, sprites.getSprite("aGeyser/geyser"), pos);
-					}
-				}
+				drawSurface(cg, getVisibleRegion());
+				cg.dispose();
 			}
 			
 			g.drawImage(cachedTerrain, 0, 0, null);
@@ -743,10 +687,87 @@ public class DisplayPanel extends JComponent
 	}
 	
 	/**
+	 * Draws the terrain costmap using Graphics g with in given visible Region.
+	 */
+	private void drawCostMap(Graphics g, Region region)
+	{
+		CostMap terrainCost = map.getTerrainCostMap();
+		g.setFont(costMapFont);
+		
+		for (int y = region.y; y < region.getMaxY(); ++y)
+		for (int x = region.x; x < region.getMaxX(); ++x)
+		{
+			g.setColor(Utils.getGrayscale(
+				terrainCost.getScaleFactor(x, y)
+			));
+			fillPosition(g, x, y);
+			
+			if (showTerrainCostValues)
+			{
+				g.setColor(Utils.getBlackWhiteComplement(
+					g.getColor()
+				));
+				
+				double cost = showCostValuesAsFactors
+					? terrainCost.getScaleFactor(x, y)
+					: terrainCost.get(x, y);
+				
+				g.drawString(
+					Double.isInfinite(cost)
+						? "Inf"
+						: String.format("%.2f", cost),
+					x * tileSize + 3,
+					y * tileSize + 11
+				);
+			}
+		}
+	}
+	
+	/**
+	 * Draws the terrain surface image using Graphics g in the visible Region.
+	 */
+	private void drawSurface(Graphics g, Region region)
+	{
+		for (int y = region.y; y < region.getMaxY(); ++y)
+		for (int x = region.x; x < region.getMaxX(); ++x)
+		{
+			Position pos = new Position(x, y);
+			String tileCode = map.getTileCode(x, y);
+			
+			if (tileCode == null)
+			{
+				g.setColor(Color.YELLOW);
+				fill(g, pos);
+				continue;
+			}
+			
+			Image img = tiles.getTile(tileCode);
+			
+			if (img == null)
+			{
+				g.setColor(Color.YELLOW);
+				fill(g, pos);
+				continue;
+			}
+			
+			draw(g, img, pos);
+			
+			if (map.hasMinePlatform(pos))
+			{
+				draw(g, sprites.getSprite("aCommonMine/platform"), pos);
+			}
+			else if (map.hasGeyser(pos))
+			{
+				draw(g, sprites.getSprite("aGeyser/geyser"), pos);
+			}
+		}
+	}
+	
+	/**
 	 * Gets the sprite for the given Unit in its current state and renders it
 	 * along with any overlays - i.e. the UnitLayer state.
 	 */
-	private void drawUnit(Unit unit, Graphics g)
+	private void drawUnit(Graphics g, Unit unit)
 	{
 		if (!unit.hasAnimationSequence())
 		{
@@ -774,7 +795,7 @@ public class DisplayPanel extends JComponent
 		
 		if (unit.hasTurret())
 		{
-			drawUnit(unit.getTurret(), g);
+			drawUnit(g, unit.getTurret());
 		}
 		else
 		{
@@ -792,10 +813,10 @@ public class DisplayPanel extends JComponent
 		if (!currentPlayer.owns(unit))
 			return;
 		
-		Position pos = unit.getPosition();
-		
 		if (unit.isGuardPost() || unit.isStructure())
 		{
+			Position pos = unit.getPosition();
+			
 			if (unit.isIdle())
 			{
 				draw(g, sprites.getSprite("aStructureStatus/idle"), pos);
@@ -805,7 +826,7 @@ public class DisplayPanel extends JComponent
 				List<Sprite> seq = sprites.getSequence("aStructureStatus/disabled");
 				draw(g, seq.get(Utils.getTimeBasedIndex(100, seq.size())), pos);
 			}
-			else if (unit.isStructure()) // Active light only for structures
+			else if (unit.isStructure())
 			{
 				draw(g, sprites.getSprite("aStructureStatus/active"), pos);
 			}

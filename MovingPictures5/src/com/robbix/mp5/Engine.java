@@ -138,7 +138,7 @@ public class Engine
 		Set<Runnable> callbacks = new HashSet<Runnable>();
 		AtomicReference<Runnable> returnValue = new AtomicReference<Runnable>();
 		long prevTime;
-		int framePeriod = 8;
+		int framePeriod = 32;
 		double fps = 0.0;
 		
 		public void run()
