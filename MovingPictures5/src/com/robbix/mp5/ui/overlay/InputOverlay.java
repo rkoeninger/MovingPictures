@@ -1,5 +1,7 @@
 package com.robbix.mp5.ui.overlay;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -11,17 +13,19 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.ui.DisplayPanel;
 
-// TODO: API input events (mousePressed, mouseDragged, keyPressed)
-//       need to call MovingPictures input handler methods
-//       (i.e. leftClick, rectDragged)
 public abstract class InputOverlay
 implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 {
+	public static final Font OVERLAY_FONT = Font.decode("Arial-12");
+	public static final Color TRANS_RED = new Color(255, 0, 0, 127);
+	
 	private static int DRAG_THRESHOLD = 16;
 	
-	private DisplayPanel panel;
+	protected DisplayPanel panel;
+	private Point currentPoint = null;
 	private Point pressedPoint = null;
 	
 	public void paintOverTerrian(Graphics g, Rectangle rect){}
@@ -36,7 +40,22 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	{
 		return panel;
 	}
-
+	
+	public boolean isCursorOnGrid()
+	{
+		return panelContains(currentPoint);
+	}
+	
+	public Point getCursorPoint()
+	{
+		return currentPoint;
+	}
+	
+	public Position getCursorPosition()
+	{
+		return panel.getPosition(currentPoint);
+	}
+	
 	public void init(){}
 	public void dispose(){}
 	
@@ -47,8 +66,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public void onAreaDragging(int x, int y, int w, int h){}
 	public void onAreaDragCancelled(){}
 	public void onCommand(String command){}
-	
-	public final void mouseClicked(MouseEvent e){}
 	
 	public final void mousePressed(MouseEvent e)
 	{
@@ -102,7 +119,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		}
 	}
 
-	public void mouseDragged(MouseEvent e)
+	public final void mouseDragged(MouseEvent e)
 	{
 		if (pressedPoint != null)
 		{
@@ -127,11 +144,34 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		}
 	}
 	
-	public void mouseEntered(MouseEvent e){}
-	public void mouseExited(MouseEvent e){}
-	public void mouseMoved(MouseEvent e){}
-	public void mouseWheelMoved(MouseWheelEvent e){}
-	public void keyTyped(KeyEvent e){}
-	public void keyPressed(KeyEvent e){}
-	public void keyReleased(KeyEvent e){}
+	public final void mouseEntered(MouseEvent e)
+	{
+		currentPoint = panelContains(e.getPoint()) ? e.getPoint() : null;
+	}
+	
+	public final void mouseExited(MouseEvent e)
+	{
+		currentPoint = null;
+	}
+	
+	public final void mouseMoved(MouseEvent e)
+	{
+		currentPoint = panelContains(e.getPoint()) ? e.getPoint() : null;
+	}
+	
+	public final void mouseClicked(MouseEvent e){}
+	public final void mouseWheelMoved(MouseWheelEvent e){}
+	public final void keyTyped(KeyEvent e){}
+	public final void keyPressed(KeyEvent e){}
+	public final void keyReleased(KeyEvent e){}
+	
+	private boolean panelContains(Point p)
+	{
+		return p == null
+			? false
+			:  p.x > 0
+			&& p.y > 0
+			&& p.x < panel.getWidth()
+			&& p.y < panel.getHeight();
+	}
 }

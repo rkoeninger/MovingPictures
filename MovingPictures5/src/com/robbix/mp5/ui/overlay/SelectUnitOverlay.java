@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.HashMap;
@@ -17,40 +16,37 @@ public class SelectUnitOverlay extends InputOverlay
 {
 	private Rectangle dragArea;
 	
-	static Color TRANS_RED = new Color(255, 0, 0, 127);
-	
 	public void dispose()
 	{
-		getDisplay().showStatus((Unit)null);
+		panel.showStatus((Unit)null);
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		g.translate(rect.x, rect.y);
-		final int w = rect.width;
 		g.setColor(Color.RED);
-		g.setFont(Font.decode("Arial-12"));
-		g.drawString("Left Click to Select", w / 2 - 35, 30);
+		g.setFont(OVERLAY_FONT);
+		g.drawString("Left Click to Select", rect.width / 2 - 35, 30);
 		g.translate(-rect.x, -rect.y);
 		
 		if (dragArea != null)
 		{
-			g.drawRect(dragArea.x, dragArea.y, dragArea.width, dragArea.height);
+			panel.draw(g, dragArea);
 			g.setColor(TRANS_RED);
-			g.fillRect(dragArea.x, dragArea.y, dragArea.width, dragArea.height);
+			panel.fill(g, dragArea);
 		}
 	}
 	
 	public void onLeftClick(int x, int y)
 	{
-		Unit selected = getDisplay().getMap().getUnitAbsolute(x, y);
+		Unit selected = panel.getMap().getUnitAbsolute(x, y);
 		
 		if (selected != null)
 		{
 			Mediator.sounds.play(selected.getType().getAcknowledgement());
-			getDisplay().pushOverlay(new CommandUnitOverlay(selected));
-			getDisplay().showStatus(selected);
-			getDisplay().showStatus(selected.getOwner());
+			panel.pushOverlay(new CommandUnitOverlay(selected));
+			panel.showStatus(selected);
+			panel.showStatus(selected.getOwner());
 		}
 	}
 	
@@ -67,7 +63,7 @@ public class SelectUnitOverlay extends InputOverlay
 	public void onAreaDragged(int x, int y, int w, int h)
 	{
 		dragArea = null;
-		Set<Unit> selected = getDisplay().getMap().getAllAbsolute(x, y, w, h);
+		Set<Unit> selected = panel.getMap().getAllAbsolute(x, y, w, h);
 		
 		if (!selected.isEmpty())
 		{
@@ -78,17 +74,17 @@ public class SelectUnitOverlay extends InputOverlay
 				filterNonStructure(selected);
 				Unit leadUnit = getLeadUnit(selected);
 				Mediator.sounds.play(leadUnit.getType().getAcknowledgement());
-				getDisplay().pushOverlay(new CommandGroupOverlay(selected));
-				getDisplay().showStatus((Unit)null);
-				getDisplay().showStatus(focusedPlayer);
+				panel.pushOverlay(new CommandGroupOverlay(selected));
+				panel.showStatus((Unit)null);
+				panel.showStatus(focusedPlayer);
 			}
 			else
 			{
 				Unit struct = getLeadUnit(selected);
 				Mediator.sounds.play(struct.getType().getAcknowledgement());
-				getDisplay().pushOverlay(new CommandUnitOverlay(struct));
-				getDisplay().showStatus(struct);
-				getDisplay().showStatus(struct.getOwner());
+				panel.pushOverlay(new CommandUnitOverlay(struct));
+				panel.showStatus(struct);
+				panel.showStatus(struct.getOwner());
 			}
 		}
 	}

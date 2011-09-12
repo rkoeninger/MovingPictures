@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.Set;
@@ -27,35 +26,34 @@ public class SelectMineRouteOverlay extends InputOverlay
 	
 	public void init()
 	{
-		getDisplay().setAnimatedCursor("dock");
+		panel.setAnimatedCursor("dock");
 	}
 	
 	public void dispose()
 	{
-		getDisplay().setAnimatedCursor(null);
+		panel.setAnimatedCursor(null);
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		g.translate(rect.x, rect.y);
-		final int w = rect.width;
 		g.setColor(Color.RED);
-		g.setFont(Font.decode("Arial-12"));
+		g.setFont(OVERLAY_FONT);
 		
 		if (mine == null && smelter == null)
 		{
-			g.drawString("Left Click to Select Mine/Smelter", w / 2 - 45, 30);
+			g.drawString("Left Click to Select Mine/Smelter", rect.width / 2 - 45, 30);
 		}
 		else if (mine == null && smelter != null)
 		{
-			g.drawString("Left Click to Select Mine", w / 2 - 35, 30);
+			g.drawString("Left Click to Select Mine", rect.width / 2 - 35, 30);
 		}
 		else if (mine != null && smelter == null)
 		{
-			g.drawString("Left Click to Select Smelter", w / 2 - 35, 30);
+			g.drawString("Left Click to Select Smelter", rect.width / 2 - 35, 30);
 		}
 		
-		g.drawString("Right Click to Cancel", w / 2 - 25, 50);
+		g.drawString("Right Click to Cancel", rect.width / 2 - 25, 50);
 		g.translate(-rect.x, -rect.y);
 		
 		for (Unit truck : trucks)
@@ -66,7 +64,7 @@ public class SelectMineRouteOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Unit selected = getDisplay().getMap().getUnitAbsolute(x, y);
+		Unit selected = panel.getMap().getUnitAbsolute(x, y);
 		
 		if (selected != null)
 		{
@@ -87,12 +85,12 @@ public class SelectMineRouteOverlay extends InputOverlay
 				truck.assignNow(new MineRouteTask(mine, smelter));
 			}
 			
-			getDisplay().completeOverlay(this);
+			panel.completeOverlay(this);
 		}
 	}
 	
 	public void onRightClick(int x, int y)
 	{
-		getDisplay().completeOverlay(this);
+		panel.completeOverlay(this);
 	}
 }

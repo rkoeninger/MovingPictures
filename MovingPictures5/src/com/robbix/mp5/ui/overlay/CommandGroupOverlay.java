@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.unit.Unit;
 
 public class CommandGroupOverlay extends InputOverlay
@@ -34,18 +33,18 @@ public class CommandGroupOverlay extends InputOverlay
 	
 	public void init()
 	{
-		getDisplay().setAnimatedCursor("move");
+		panel.setAnimatedCursor("move");
 	}
 	
 	public void dispose()
 	{
-		getDisplay().showStatus((Unit)null);
-		getDisplay().setAnimatedCursor(null);
+		panel.showStatus((Unit)null);
+		panel.setAnimatedCursor(null);
 	}
 	
 	public void onRightClick(int x, int y)
 	{
-		getDisplay().completeOverlay(this);
+		panel.completeOverlay(this);
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
@@ -79,10 +78,11 @@ public class CommandGroupOverlay extends InputOverlay
 	
 	public void onMiddleClick(int x, int y)
 	{
-		final int w = getDisplay().getVisibleRect().width;
-		final int h = getDisplay().getVisibleRect().height;
-		final int x0 = getDisplay().getVisibleRect().x;
-		final int y0 = getDisplay().getVisibleRect().y;
+		Rectangle rect = panel.getVisibleRect();
+		int w = rect.width;
+		int h = rect.height;
+		int x0 = rect.x;
+		int y0 = rect.y;
 		
 		int edge = ((x - x0) / (w / 3)) + (((y - y0) / (h / 3)) * 3);
 		
@@ -112,18 +112,16 @@ public class CommandGroupOverlay extends InputOverlay
 				}
 			}
 			
-			getDisplay().pushOverlay(new SelectMineRouteOverlay(trucks));
+			panel.pushOverlay(new SelectMineRouteOverlay(trucks));
 			return;
 		}
 		
-		getDisplay().completeOverlay(this);
+		panel.completeOverlay(this);
 	}
 	
 	public void onLeftClick(int x, int y)
 	{
-		final int tileSize = getDisplay().getMap().getTileSize();
-		Position targetPos = new Position(x / tileSize, y / tileSize);
-		Mediator.doGroupMove(units, targetPos);
+		Mediator.doGroupMove(units, panel.getPosition(x, y));
 		Mediator.sounds.play("beep2");
 	}
 }

@@ -41,23 +41,23 @@ public class CommandUnitOverlay extends InputOverlay
 	public void init()
 	{
 		if (!unit.isStructure() && !unit.getType().isGuardPostType())
-			getDisplay().setAnimatedCursor("move");
+			panel.setAnimatedCursor("move");
 	}
 	
 	public void dispose()
 	{
-		getDisplay().showStatus((Unit)null);
-		getDisplay().setAnimatedCursor(null);
+		panel.showStatus((Unit)null);
+		panel.setAnimatedCursor(null);
 	}
 	
 	public void onRightClick(int x, int y)
 	{
-		getDisplay().completeOverlay(this);
+		panel.completeOverlay(this);
 	}
 	
 	public static void paintSelectedUnitBox(Graphics g, Unit unit)
 	{
-		if (unit.isDead()) return;
+		if (unit.isDead() || unit.isFloating()) return;
 		
 		int tileSize = unit.getMap().getTileSize();
 		int absWidth = unit.getWidth() * tileSize;
@@ -137,7 +137,7 @@ public class CommandUnitOverlay extends InputOverlay
 		final int h = rect.height;
 		g.setColor(Color.RED);
 		
-		g.setFont(Font.decode("Arial-12"));
+		g.setFont(OVERLAY_FONT);
 		g.drawString("Left Click to Move", w / 2 - 25, 30);
 		g.drawString("Middle Click on Command", w / 2 - 25, 50);
 		g.drawString("Right Click to Cancel", w / 2 - 25, 70);
@@ -192,7 +192,7 @@ public class CommandUnitOverlay extends InputOverlay
 	{
 		if (command.equals("attack"))
 		{
-			getDisplay().setAnimatedCursor("attack");
+			panel.setAnimatedCursor("attack");
 			attackMode = true;
 		}
 		else if (command.equals("stop"))
@@ -202,7 +202,7 @@ public class CommandUnitOverlay extends InputOverlay
 		else if (command.equals("selfDestruct"))
 		{
 			Mediator.selfDestruct(unit);
-			getDisplay().completeOverlay(this);
+			panel.completeOverlay(this);
 		}
 		else if (command.equals("dump") && unit.isTruck() && !unit.isCargoEmpty())
 		{
@@ -217,23 +217,23 @@ public class CommandUnitOverlay extends InputOverlay
 	
 	public void onMiddleClick(int x, int y)
 	{
-		final int w = getDisplay().getVisibleRect().width;
-		final int h = getDisplay().getVisibleRect().height;
-		final int x0 = getDisplay().getVisibleRect().x;
-		final int y0 = getDisplay().getVisibleRect().y;
+		final int w = panel.getVisibleRect().width;
+		final int h = panel.getVisibleRect().height;
+		final int x0 = panel.getVisibleRect().x;
+		final int y0 = panel.getVisibleRect().y;
 		
 		int edge = ((x - x0) / (w / 3)) + (((y - y0) / (h / 3)) * 3);
 		
 		if (edge == 6)
 		{
 			Mediator.kill(unit);
-			getDisplay().completeOverlay(this);
+			panel.completeOverlay(this);
 			return;
 		}
 		else if (edge == 3)
 		{
 			Mediator.selfDestruct(unit);
-			getDisplay().completeOverlay(this);
+			panel.completeOverlay(this);
 			return;
 		}
 		
@@ -263,7 +263,7 @@ public class CommandUnitOverlay extends InputOverlay
 			}
 			else if (edge == 5)
 			{
-				getDisplay().pushOverlay(new SelectMineRouteOverlay(unit));
+				panel.pushOverlay(new SelectMineRouteOverlay(unit));
 			}
 			else if (edge == 8)
 			{
@@ -271,7 +271,7 @@ public class CommandUnitOverlay extends InputOverlay
 					return;
 				
 				Position adj = unit.getPosition().shift(0, -1);
-				LayeredMap map = getDisplay().getMap();
+				LayeredMap map = panel.getMap();
 				
 				if (map.getBounds().contains(adj))
 				{
@@ -289,7 +289,7 @@ public class CommandUnitOverlay extends InputOverlay
 			else if (edge == 2)
 			{
 				Position adj = unit.getPosition().shift(1, 0);
-				LayeredMap map = getDisplay().getMap();
+				LayeredMap map = panel.getMap();
 				
 				if (map.getBounds().contains(adj))
 				{
@@ -323,7 +323,7 @@ public class CommandUnitOverlay extends InputOverlay
 			}
 			else if (edge == 5)
 			{
-				getDisplay().pushOverlay(new BuildTubeOverlay(unit));
+				panel.pushOverlay(new BuildTubeOverlay(unit));
 			}
 		}
 		else if (unit.getType().getName().contains("ConVec"))
@@ -331,7 +331,7 @@ public class CommandUnitOverlay extends InputOverlay
 			if (edge == 8)
 			{
 				Position adj = unit.getPosition().shift(0, -1);
-				LayeredMap map = getDisplay().getMap();
+				LayeredMap map = panel.getMap();
 				
 				if (map.getBounds().contains(adj))
 				{
@@ -360,7 +360,7 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			if (edge == 2)
 			{
-				getDisplay().setAnimatedCursor("attack");
+				panel.setAnimatedCursor("attack");
 				attackMode = true;
 			}
 		}
@@ -370,7 +370,7 @@ public class CommandUnitOverlay extends InputOverlay
 			{
 				if (Mediator.doBuildMine(unit))
 				{
-					getDisplay().completeOverlay(this);
+					panel.completeOverlay(this);
 				}
 			}
 		}
@@ -400,7 +400,7 @@ public class CommandUnitOverlay extends InputOverlay
 				if (!owner.canAfford(type.getCost()))
 				{
 					JOptionPane.showMessageDialog(
-						getDisplay(),
+						panel,
 						"can't afford it",
 						"not enough monies",
 						JOptionPane.ERROR_MESSAGE
@@ -414,21 +414,21 @@ public class CommandUnitOverlay extends InputOverlay
 				
 				for (Position exitPos : getFactoryExits(unit.getPosition()))
 				{
-					if (getDisplay().getMap().canPlaceUnit(exitPos))
+					if (panel.getMap().canPlaceUnit(exitPos))
 					{
-						getDisplay().getMap().putUnit(newVehicle, exitPos);
+						panel.getMap().putUnit(newVehicle, exitPos);
 						return;
 					}
 				}
 				
-				JOptionPane.showMessageDialog(getDisplay(), "can't exit");
+				JOptionPane.showMessageDialog(panel, "can't exit");
 			}
 		}
 		else if (unit.getType().getName().contains("StructureFactory"))
 		{
 			if (edge == 2)
 			{
-				JOptionPane.showMessageDialog(getDisplay(), "not implemented");
+				JOptionPane.showMessageDialog(panel, "not implemented");
 			}
 		}
 	}
@@ -437,11 +437,11 @@ public class CommandUnitOverlay extends InputOverlay
 	{
 		if (unit.isStructure() || unit.getType().isGuardPostType())
 		{
-			getDisplay().completeOverlay(this);
+			panel.completeOverlay(this);
 			return;
 		}
 		
-		final int tileSize = getDisplay().getMap().getTileSize();
+		final int tileSize = panel.getMap().getTileSize();
 		Position targetPos = new Position(x / tileSize, y / tileSize);
 		
 		if (attackMode)
@@ -453,7 +453,7 @@ public class CommandUnitOverlay extends InputOverlay
 			
 			Mediator.doAttack(unit.getTurret(), target);
 			attackMode = false;
-			getDisplay().setAnimatedCursor("move");
+			panel.setAnimatedCursor("move");
 		}
 		else
 		{

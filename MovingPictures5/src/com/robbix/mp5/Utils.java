@@ -34,6 +34,7 @@ import org.xml.sax.SAXParseException;
 import com.robbix.mp5.basics.CostMap;
 import com.robbix.mp5.basics.FileFormatException;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Unit;
 
 /**
@@ -442,6 +443,16 @@ public class Utils
 		}
 		
 		return copy;
+	}
+	
+	public static Sprite getTranslucency(Sprite sprite, int hue, float aFactor)
+	{
+		BufferedImage img = (BufferedImage)
+			(hue >= 0 ? sprite.getImage(hue) : sprite.getImage());
+		
+		img = getTranslucency(img, aFactor);
+		
+		return new Sprite(img, hue, sprite.getXOffset(), sprite.getYOffset());
 	}
 	
 	/**

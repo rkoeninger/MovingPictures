@@ -1,11 +1,8 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ResourceType;
@@ -13,22 +10,15 @@ import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.BuildTask;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.ResourceDeposit;
-import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 
 public class BuildStructureOverlay extends InputOverlay
 {
-	private BufferedImage hoverSprite;
-	private int offX, offY;
-	
-	private BufferedImage turretHoverSprite;
-	private int turretOffX, turretOffY;
+	private Sprite unitSprite;
 	
 	private Unit unit;
-	
-	private Position pos = null;
 	
 	private UnitFactory factory;
 	private String type;
@@ -42,7 +32,6 @@ public class BuildStructureOverlay extends InputOverlay
 	{
 		this.factory = factory;
 		this.type = type;
-		
 		this.unit = factory.newUnit(type);
 		this.unit.setActivity("build");
 	}
@@ -50,87 +39,50 @@ public class BuildStructureOverlay extends InputOverlay
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		g.translate(rect.x, rect.y);
-		final int w = rect.width;
 		g.setColor(Color.RED);
-		g.setFont(Font.decode("Arial-12"));
-		g.drawString("Left Click to Place", w / 2 - 35, 30);
-		g.drawString("Right Click to Cancel", w / 2 - 35, 50);
+		g.setFont(OVERLAY_FONT);
+		g.drawString("Left Click to Place", rect.width / 2 - 35, 30);
+		g.drawString("Right Click to Cancel", rect.width / 2 - 35, 50);
 		g.translate(-rect.x, -rect.y);
 		
-		if (pos == null)
-			return;
-		
-		if (hoverSprite == null)
+		if (isCursorOnGrid())
 		{
-			Sprite sprite = getDisplay()
-						   .getSpriteLibrary()
-						   .getDefaultSprite(unit);
+			if (unitSprite == null)
+			{
+				int hue = unit.getOwner().getColorHue();
+				unitSprite = panel.getSpriteLibrary()
+								  .getDefaultSprite(unit);
+				unitSprite = Utils.getTranslucency(unitSprite, hue, 0.5f);
+			}
 			
-			BufferedImage scoutSprite =
-				(BufferedImage) sprite.getImage(unit.getOwner().getColorHue());
-			offX = sprite.getXOffset();
-			offY = sprite.getYOffset();
-			
-			hoverSprite = Utils.getTranslucency(scoutSprite, 0.5f);
-		}
-		
-		if (turretHoverSprite == null && unit.hasTurret())
-		{
-			Sprite sprite =
-				getDisplay().getSpriteLibrary().getSprite(unit.getTurret());
-			
-			BufferedImage scoutSprite =
-				(BufferedImage) sprite.getImage(unit.getOwner().getColorHue());
-			turretOffX = sprite.getXOffset();
-			turretOffY = sprite.getYOffset();
-			
-			turretHoverSprite = Utils.getTranslucency(scoutSprite, 0.5f);
-		}
-		
-		final int tileSize = getDisplay().getMap().getTileSize();
-		
-		g.drawImage(
-			hoverSprite,
-			pos.x * tileSize + offX,
-			pos.y * tileSize + offY,
-			null
-		);
-		
-		if (unit.hasTurret())
-		{
-			g.drawImage(
-				turretHoverSprite,
-				pos.x * tileSize + turretOffX,
-				pos.y * tileSize + turretOffY,
-				null
-			);
+			panel.draw(g, unitSprite, getCursorPosition());
 		}
 	}
 	
 	public void onLeftClick(int x, int y)
 	{
-		final DisplayPanel d = getDisplay();
+		Position pos = panel.getPosition(x, y);
 		
-		if (d.getMap().canPlaceUnit(pos, unit.getFootprint()))
+		if (panel.getMap().canPlaceUnit(pos, unit.getFootprint()))
 		{
 			if (unit.isMine())
 			{
 				ResourceDeposit res =
-					d.getMap().getResourceDeposit(pos.shift(1, 0));
+					panel.getMap().getResourceDeposit(pos.shift(1, 0));
 				
 				if (res == null || res.getType() != ResourceType.COMMON_ORE)
 					return;
 			}
 			
-			int buildTime = d.getSpriteLibrary().getSequenceLength(
+			int buildTime = panel.getSpriteLibrary().getSequenceLength(
 				Utils.getPath(unit.getType().getName(), "build")
 			);
 			
-			d.getMap().putUnit(unit, pos);
+			panel.getMap().putUnit(unit, pos);
 			unit.assignNow(new BuildTask(buildTime, 200));
 			unit.setActivity("build");
 			Mediator.sounds.play("structureBuild");
-			d.refresh();
+			panel.refresh();
 			
 			if (factory != null)
 			{
@@ -138,34 +90,13 @@ public class BuildStructureOverlay extends InputOverlay
 			}
 			else
 			{
-				d.completeOverlay(this);
+				panel.completeOverlay(this);
 			}
 		}
 	}
 	
 	public void onRightClick(int x, int y)
 	{
-		getDisplay().completeOverlay(this);
-	}
-	
-	public void mouseMoved(MouseEvent e)
-	{
-		pos = new Position(
-			e.getX() / getDisplay().getMap().getTileSize(),
-			e.getY() / getDisplay().getMap().getTileSize()
-		);
-	}
-	
-	public void mouseEntered(MouseEvent e)
-	{
-		pos = new Position(
-			e.getX() / getDisplay().getMap().getTileSize(),
-			e.getY() / getDisplay().getMap().getTileSize()
-		);
-	}
-	
-	public void mouseExited(MouseEvent e)
-	{
-		pos = null;
+		panel.completeOverlay(this);
 	}
 }
