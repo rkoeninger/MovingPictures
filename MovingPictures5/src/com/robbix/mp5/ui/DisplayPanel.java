@@ -540,6 +540,26 @@ public class DisplayPanel extends JComponent
 		g.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
 	}
 	
+	public void draw(Graphics g, Region region)
+	{
+		g.drawRect(
+			region.x * tileSize,
+			region.y * tileSize,
+			region.w * tileSize,
+			region.h * tileSize
+		);
+	}
+	
+	public void fill(Graphics g, Region region)
+	{
+		g.fillRect(
+				region.x * tileSize,
+				region.y * tileSize,
+				region.w * tileSize,
+				region.h * tileSize
+			);
+	}
+	
 	public void draw(Graphics g, Rectangle rect)
 	{
 		g.drawRect(rect.x, rect.y, rect.width, rect.height);

@@ -14,8 +14,6 @@ import com.robbix.mp5.unit.Unit;
 
 public class SelectUnitOverlay extends InputOverlay
 {
-	private Rectangle dragArea;
-	
 	public void dispose()
 	{
 		panel.showStatus((Unit)null);
@@ -29,11 +27,11 @@ public class SelectUnitOverlay extends InputOverlay
 		g.drawString("Left Click to Select", rect.width / 2 - 35, 30);
 		g.translate(-rect.x, -rect.y);
 		
-		if (dragArea != null)
+		if (isDragging())
 		{
-			panel.draw(g, dragArea);
+			panel.draw(g, getDragArea());
 			g.setColor(TRANS_RED);
-			panel.fill(g, dragArea);
+			panel.fill(g, getDragArea());
 		}
 	}
 	
@@ -50,19 +48,8 @@ public class SelectUnitOverlay extends InputOverlay
 		}
 	}
 	
-	public void onAreaDragCancelled()
-	{
-		dragArea = null;
-	}
-	
-	public void onAreaDragging(int x, int y, int w, int h)
-	{
-		dragArea = new Rectangle(x, y, w, h);
-	}
-	
 	public void onAreaDragged(int x, int y, int w, int h)
 	{
-		dragArea = null;
 		Set<Unit> selected = panel.getMap().getAllAbsolute(x, y, w, h);
 		
 		if (!selected.isEmpty())

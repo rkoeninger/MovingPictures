@@ -263,11 +263,17 @@ public class Mediator
 		if (path == null)
 			return;
 		
-		Position last = path.get(path.size() - 1);
-		Direction dir = Direction.getMoveDirection(last, pos);
+		if (path.size() > 0)
+		{
+			unit.assignNext(new PathTask(path));
+		}
 		
-		unit.assignNext(new PathTask(path));
-		unit.assignLater(new RotateTask(dir));
+		if (path.size() > 1)
+		{
+			Position last = path.get(path.size() - 1);
+			Direction dir = Direction.getMoveDirection(last, pos);
+			unit.assignLater(new RotateTask(dir));
+		}
 	}
 	
 	public static void doGroupMove(Set<Unit> units, Position pos)

@@ -15,7 +15,6 @@ import com.robbix.mp5.unit.Unit;
 public class BuildTubeOverlay extends InputOverlay
 {
 	private Unit earthworker;
-	private Rectangle dragArea;
 	
 	public BuildTubeOverlay(Unit earthworker)
 	{
@@ -37,14 +36,10 @@ public class BuildTubeOverlay extends InputOverlay
 		{
 			Position pos = getCursorPosition();
 			
-			if (dragArea == null)
+			if (isDragging())
 			{
-				panel.draw(g, pos);
-				g.setColor(TRANS_RED);
-				panel.fill(g, pos);
-			}
-			else
-			{
+				Rectangle dragArea = getDragArea();
+				
 				int tileSize = panel.getTileSize();
 				
 				int xMin = (dragArea.x / tileSize) * tileSize;
@@ -69,6 +64,12 @@ public class BuildTubeOverlay extends InputOverlay
 				g.setColor(TRANS_RED);
 				panel.fill(g, rowArea);
 			}
+			else
+			{
+				panel.draw(g, pos);
+				g.setColor(TRANS_RED);
+				panel.fill(g, pos);
+			}
 		}
 	}
 	
@@ -83,20 +84,8 @@ public class BuildTubeOverlay extends InputOverlay
 		panel.completeOverlay(this);
 	}
 	
-	public void onAreaDragCancelled()
-	{
-		dragArea = null;
-	}
-	
-	public void onAreaDragging(int x, int y, int w, int h)
-	{
-		dragArea = new Rectangle(x, y, w, h);
-	}
-	
 	public void onAreaDragged(int x, int y, int w, int h)
 	{
-		dragArea = null;
-		
 		int tileSize = panel.getTileSize();
 		
 		int xMin = x / tileSize;

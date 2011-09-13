@@ -14,6 +14,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.ui.DisplayPanel;
 
 public abstract class InputOverlay
@@ -23,10 +24,14 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public static final Color TRANS_RED = new Color(255, 0, 0, 127);
 	
 	private static int DRAG_THRESHOLD = 16;
+	private static final int LEFT   = MouseEvent.BUTTON1;
+	private static final int MIDDLE = MouseEvent.BUTTON2;
+	private static final int RIGHT  = MouseEvent.BUTTON3;
 	
 	protected DisplayPanel panel;
 	private Point currentPoint = null;
 	private Point pressedPoint = null;
+	private Rectangle dragArea = null;
 	
 	public void paintOverTerrian(Graphics g, Rectangle rect){}
 	public void paintOverUnits(Graphics g, Rectangle rect){}
@@ -43,7 +48,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public boolean isCursorOnGrid()
 	{
-		return panelContains(currentPoint);
+		return currentPoint != null
+			&& panelContains(currentPoint.x, currentPoint.y);
 	}
 	
 	public Point getCursorPoint()
@@ -54,6 +60,56 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public Position getCursorPosition()
 	{
 		return panel.getPosition(currentPoint);
+	}
+	
+	public boolean isDragging()
+	{
+		return dragArea != null;
+	}
+	
+	public Rectangle getDragArea()
+	{
+		return dragArea;
+	}
+	
+	public Region getDragRegion()
+	{
+		return panel.getRegion(dragArea);
+	}
+	
+	public Region getEnclosedDragRegion()
+	{
+		return panel.getEnclosedRegion(dragArea);
+	}
+	
+	// FIXME: any good?
+	public Region getLinearDragRegion()
+	{
+		Position origin = panel.getPosition(pressedPoint);
+		Region fullRegion = panel.getRegion(dragArea);
+		
+		if (fullRegion.w > fullRegion.h)
+		{
+			if (fullRegion.x < origin.x)
+			{
+				return new Region(origin, new Position(fullRegion.x, origin.y));
+			}
+			else
+			{
+				return new Region(origin, new Position(fullRegion.x + fullRegion.w, origin.y));
+			}
+		}
+		else
+		{
+			if (fullRegion.y < origin.y)
+			{
+				return new Region(origin, new Position(origin.x, fullRegion.y));
+			}
+			else
+			{
+				return new Region(origin, new Position(origin.x, fullRegion.y + fullRegion.h));
+			}
+		}
 	}
 	
 	public void init(){}
@@ -77,76 +133,50 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		if (pressedPoint != null)
 		{
 			if (pressedPoint.distanceSq(e.getPoint()) < DRAG_THRESHOLD)
-			{				
-				switch (e.getButton())
-				{
-					case MouseEvent.BUTTON1:
-						onLeftClick(e.getX(), e.getY());
-						break;
-					case MouseEvent.BUTTON2:
-						onMiddleClick(e.getX(), e.getY());
-						break;
-					case MouseEvent.BUTTON3:
-						onRightClick(e.getX(), e.getY());
-						break;
-				}
+			{
+				if      (e.getButton() == LEFT)   onLeftClick  (e.getX(), e.getY());
+				else if (e.getButton() == MIDDLE) onMiddleClick(e.getX(), e.getY());
+				else if (e.getButton() == RIGHT)  onRightClick (e.getX(), e.getY());
 				
-				onAreaDragCancelled();
+				if (dragArea != null)
+				{
+					onAreaDragCancelled();
+					dragArea = null;
+				}
 			}
 			else
 			{
-				int x = pressedPoint.x;
-				int y = pressedPoint.y;
-				int w = e.getX() - x;
-				int h = e.getY() - y;
-				
-				if (w < 0)
-				{
-					x += w;
-					w = -w;
-				}
-				
-				if (h < 0)
-				{
-					y += h;
-					h = -h;
-				}
-				
-				onAreaDragged(x, y, w, h);
+				prepNormalDragArea(e.getX(), e.getY());
+				onAreaDragged(
+					dragArea.x,
+					dragArea.y,
+					dragArea.width,
+					dragArea.height
+				);
+				dragArea = null;
 			}
 			
 			pressedPoint = null;
 		}
 	}
-
+	
 	public final void mouseDragged(MouseEvent e)
 	{
 		if (pressedPoint != null)
 		{
-			int x = pressedPoint.x;
-			int y = pressedPoint.y;
-			int w = e.getX() - x;
-			int h = e.getY() - y;
-			
-			if (w < 0)
-			{
-				x += w;
-				w = -w;
-			}
-			
-			if (h < 0)
-			{
-				y += h;
-				h = -h;
-			}
-			
-			onAreaDragging(x, y, w, h);
+			prepNormalDragArea(e.getX(), e.getY());
+			onAreaDragging(
+				dragArea.x,
+				dragArea.y,
+				dragArea.width,
+				dragArea.height
+			);
 		}
 	}
 	
 	public final void mouseEntered(MouseEvent e)
 	{
-		currentPoint = panelContains(e.getPoint()) ? e.getPoint() : null;
+		prepCursorPoint(e.getX(), e.getY());
 	}
 	
 	public final void mouseExited(MouseEvent e)
@@ -156,7 +186,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public final void mouseMoved(MouseEvent e)
 	{
-		currentPoint = panelContains(e.getPoint()) ? e.getPoint() : null;
+		prepCursorPoint(e.getX(), e.getY());
 	}
 	
 	public final void mouseClicked(MouseEvent e){}
@@ -165,13 +195,55 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public final void keyPressed(KeyEvent e){}
 	public final void keyReleased(KeyEvent e){}
 	
-	private boolean panelContains(Point p)
+	private boolean panelContains(int x, int y)
 	{
-		return p == null
-			? false
-			:  p.x > 0
-			&& p.y > 0
-			&& p.x < panel.getWidth()
-			&& p.y < panel.getHeight();
+		return x > 0
+			&& y > 0
+			&& x < panel.getWidth()
+			&& y < panel.getHeight();
+	}
+	
+	private void prepCursorPoint(int x, int y)
+	{
+		if (panelContains(x, y))
+		{
+			if (currentPoint == null)
+			{
+				currentPoint = new Point();
+			}
+			
+			currentPoint.x = x;
+			currentPoint.y = y;
+		}
+		else
+		{
+			currentPoint = null;
+		}
+	}
+	
+	private void prepNormalDragArea(int x, int y)
+	{
+		if (dragArea == null)
+		{
+			dragArea = new Rectangle();
+		}
+		
+		dragArea.x = pressedPoint.x;
+		dragArea.y = pressedPoint.y;
+		dragArea.width  = x - dragArea.x;
+		dragArea.height = y - dragArea.y;
+		
+		if (dragArea.width < 0)
+		{
+			dragArea.x += dragArea.width;
+			dragArea.width = -dragArea.width;
+		}
+		
+		if (dragArea.height < 0)
+		{
+			dragArea.y += dragArea.height;
+			dragArea.height = -dragArea.height;
+		}
+		
 	}
 }
