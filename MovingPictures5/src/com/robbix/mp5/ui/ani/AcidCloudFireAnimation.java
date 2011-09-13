@@ -84,7 +84,7 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 		firePoint = new Point(attacker.getAbsX(), attacker.getAbsY());
 		firePoint.translate(hotspot.x, hotspot.y);
 		
-		int tileSize = map.getTileSize();
+		int tileSize = map.getDisplayPanel().getTileSize();
 		int w = target.getWidth();
 		int h = target.getHeight();
 		int xTargetOffset = (tileSize * w / 2) + Utils.randInt(-5, 5);

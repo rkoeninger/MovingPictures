@@ -59,7 +59,7 @@ public class CommandUnitOverlay extends InputOverlay
 	{
 		if (unit.isDead() || unit.isFloating()) return;
 		
-		int tileSize = unit.getMap().getTileSize();
+		int tileSize = unit.getMap().getDisplayPanel().getTileSize();
 		int absWidth = unit.getWidth() * tileSize;
 		int absHeight = unit.getHeight() * tileSize;
 		
@@ -441,8 +441,7 @@ public class CommandUnitOverlay extends InputOverlay
 			return;
 		}
 		
-		final int tileSize = panel.getMap().getTileSize();
-		Position targetPos = new Position(x / tileSize, y / tileSize);
+		Position targetPos = panel.getPosition(x, y);
 		
 		if (attackMode)
 		{

@@ -517,14 +517,14 @@ public class Unit
 	
 	public int getAbsX()
 	{
-		int tileSize = getMap().getTileSize();
+		int tileSize = getMap().getDisplayPanel().getTileSize();
 		
 		return getX() * tileSize + getXOffset();
 	}
 	
 	public int getAbsY()
 	{
-		int tileSize = getMap().getTileSize();
+		int tileSize = getMap().getDisplayPanel().getTileSize();
 		
 		return getY() * tileSize + getYOffset();
 	}

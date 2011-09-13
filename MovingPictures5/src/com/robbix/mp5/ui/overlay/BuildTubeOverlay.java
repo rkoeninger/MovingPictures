@@ -45,7 +45,7 @@ public class BuildTubeOverlay extends InputOverlay
 			}
 			else
 			{
-				int tileSize = panel.getMap().getTileSize();
+				int tileSize = panel.getTileSize();
 				
 				int xMin = (dragArea.x / tileSize) * tileSize;
 				int yMin = (dragArea.y / tileSize) * tileSize;
@@ -97,7 +97,7 @@ public class BuildTubeOverlay extends InputOverlay
 	{
 		dragArea = null;
 		
-		int tileSize = panel.getMap().getTileSize();
+		int tileSize = panel.getTileSize();
 		
 		int xMin = x / tileSize;
 		int yMin = y / tileSize;

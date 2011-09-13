@@ -144,8 +144,8 @@ public class Mediator
 		if (range <= 0 || amount <= 0)
 			return;
 		
-		int absX = pos.x * map.getTileSize();
-		int absY = pos.y * map.getTileSize();
+		int absX = pos.x * panel.getTileSize();
+		int absY = pos.y * panel.getTileSize();
 		
 		int rangeInt = (int)Math.ceil(range);
 		
@@ -169,7 +169,7 @@ public class Mediator
 				
 				double absDist = Math.hypot(unitAbsX - absX, unitAbsY - absY);
 				
-				if (absDist <= (range * map.getTileSize()))
+				if (absDist <= (range * panel.getTileSize()))
 				{
 					affectedUnits.add(unit);
 				}
@@ -177,7 +177,7 @@ public class Mediator
 			
 			double absDist = current.getDistance(pos);
 			
-			if (absDist <= (range * map.getTileSize()))
+			if (absDist <= (range * panel.getTileSize()))
 			{
 				if (map.hasWall(current) || map.hasTube(current))
 				{
@@ -427,7 +427,7 @@ public class Mediator
 				? "aDeath/arachnidKilled"
 				: "aDeath/vehicleKilled";
 			
-			int tileSize = map.getTileSize();
+			int tileSize = panel.getTileSize();
 			Position pos = unit.getPosition();
 			map.remove(unit);
 			panel.cueAnimation(new SpriteSequenceAnimation(
@@ -454,7 +454,7 @@ public class Mediator
 			if (unit.isTurret())
 				unit = unit.getChassis();
 			
-			int tileSize = map.getTileSize();
+			int tileSize = panel.getTileSize();
 			Position pos = unit.getPosition();
 			
 			String path = null;

@@ -113,6 +113,11 @@ public class TileSet
 		plainCount = 0;
 	}
 	
+	public int getTileSize()
+	{
+		return 32;
+	}
+	
 	public Image getTile(String code)
 	{
 		return tiles.get(code);

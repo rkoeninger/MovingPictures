@@ -38,7 +38,7 @@ public class MicrowaveFireAnimation extends WeaponFireAnimation
 		Unit chassis = unit.getChassis();
 		LayeredMap map = chassis.getMap();
 		
-		tileSize = map.getTileSize();
+		tileSize = map.getDisplayPanel().getTileSize();
 		
 		SpriteLibrary lib = map.getDisplayPanel().getSpriteLibrary();
 		

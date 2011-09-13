@@ -25,22 +25,22 @@ public class MoveTask extends Task
 	public MoveTask(Unit unit)
 	{
 		super(false, Task.VEHICLE_ONLY);
-		tileSize = unit.getMap().getTileSize();
-		initAbsX = unit.getPosition().x * tileSize + unit.getXOffset();
-		initAbsY = unit.getPosition().y * tileSize + unit.getYOffset();
+		initAbsX = unit.getAbsX();
+		initAbsY = unit.getAbsY();
 		absX = initAbsX;
 		absY = initAbsY;
+		tileSize = unit.getMap().getSpotSize();
 	}
 	
 	public void step(Unit unit)
 	{
 		if (Double.isNaN(initAbsX))
 		{
-			tileSize = unit.getMap().getTileSize();
-			initAbsX = unit.getPosition().x * tileSize + unit.getXOffset();
-			initAbsY = unit.getPosition().y * tileSize + unit.getYOffset();
+			initAbsX = unit.getAbsX();
+			initAbsY = unit.getAbsY();
 			absX = initAbsX;
 			absY = initAbsY;
+			tileSize = unit.getMap().getSpotSize();
 		}
 		
 		final Direction dir = unit.getDirection();
@@ -121,8 +121,7 @@ public class MoveTask extends Task
 			unit.setXOffset(0);
 			unit.setYOffset(0);
 			unit.completeTask(this);
-			unit.step(); // TODO: might be a temporary fix...
-			             //       why is it necessary?
+			unit.step();
 		}
 	}
 }

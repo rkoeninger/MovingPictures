@@ -38,11 +38,15 @@ public class DisplayPanel extends JComponent
 	private TileSet tiles;
 	private CursorSet cursors;
 	
+	// FIXME: Proper display assumes this is the same as Map.getSpotSize()
 	private int tileSize = 32;
 	
-	private BufferedImage cachedTerrain = null;
-	private BufferedImage cachedCostMapImage = null;
-	private Object cacheLock = new Integer(0);
+	private BufferedImage cachedBackground = null;
+	private Object cacheLock = new Object();
+	
+	private static Font costMapFont = Font.decode("Arial-9");
+	private static Color TRANS_GRAY = new Color(0, 0, 0, 127);
+	private static Color BACKGROUND_BLUE = new Color(127, 127, 255);
 	
 	private UnitStatus unitStatus;
 	private PlayerStatus playerStatus;
@@ -90,13 +94,16 @@ public class DisplayPanel extends JComponent
 		map.setDisplayPanel(this);
 		this.sprites = sprites;
 		this.tiles = tiles;
+		this.tileSize = tiles.getTileSize();
 		this.cursors = cursors;
 		this.overlays = new LinkedList<InputOverlay>();
-		setBackground(new Color(127, 127, 255));
+		setBackground(BACKGROUND_BLUE);
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
-		setPreferredSize(new Dimension(map.getWidth()  * map.getTileSize(),
-		                               map.getHeight() * map.getTileSize()));
+		setPreferredSize(new Dimension(
+			map.getWidth()  * tileSize,
+		    map.getHeight() * tileSize
+		));
 	}
 	
 	public List<String> getOptionNames()
@@ -148,7 +155,7 @@ public class DisplayPanel extends JComponent
 		else if (name.equals("Background"))
 		{
 			showBackground = isSet;
-			repaint();
+			refresh();
 		}
 		else if (name.equals("Unit Layer State"))
 		{
@@ -163,13 +170,11 @@ public class DisplayPanel extends JComponent
 		else if (name.equals("Terrain Cost Values"))
 		{
 			showTerrainCostValues = isSet;
-			cachedCostMapImage = null;
 			refresh();
 		}
 		else if (name.equals("Cost Values as Factors"))
 		{
 			showCostValuesAsFactors = isSet;
-			cachedCostMapImage = null;
 			refresh();
 		}
 		else if (name.equals("Night"))
@@ -182,11 +187,14 @@ public class DisplayPanel extends JComponent
 			throw new IllegalArgumentException("Not an option: " + name);
 		}
 	}
-	
+
 	public void refresh()
 	{
-		cachedCostMapImage = null;
-		cachedTerrain = null;
+		synchronized (cacheLock)
+		{
+			cachedBackground = null;
+		}
+		
 		repaint();
 	}
 	
@@ -386,12 +394,6 @@ public class DisplayPanel extends JComponent
 	public void setShowTerrainCostValues(boolean showTerrainCostValues)
 	{
 		this.showTerrainCostValues = showTerrainCostValues;
-		
-		synchronized (cacheLock)
-		{
-			cachedCostMapImage = null;
-		}
-		
 		refresh();
 	}
 	
@@ -403,12 +405,6 @@ public class DisplayPanel extends JComponent
 	public void setShowCostValuesAsFactors(boolean showCostValuesAsFactors)
 	{
 		this.showCostValuesAsFactors = showCostValuesAsFactors;
-		
-		synchronized (cacheLock)
-		{
-			cachedCostMapImage = null;
-		}
-		
 		refresh();
 	}
 	
@@ -430,26 +426,55 @@ public class DisplayPanel extends JComponent
 		return animations;
 	}
 	
+	/**
+	 * Gets the current size of grid tiles considering the TileSet's
+	 * standard tile size and the current zoom level.
+	 */
 	public int getTileSize()
 	{
 		return tileSize;
 	}
 	
+	/**
+	 * Translates a pixel Point on the panel to a grid Position on the map.
+	 */
 	public Position getPosition(Point point)
 	{
 		return new Position(point.x / tileSize, point.y / tileSize);
 	}
 	
+	/**
+	 * Translates a pair of pixel co-ordinates on the panel
+	 * to a grid Position on the map.
+	 */
 	public Position getPosition(int absX, int absY)
 	{
 		return new Position(absX / tileSize, absY / tileSize);
 	}
 	
+	/**
+	 * Translates a grid Position on the map to a pixel Point on the panel
+	 * that is the upper-left corner of that grid Position as drawn.
+	 */
 	public Point getPoint(Position pos)
 	{
 		return new Point(pos.x * tileSize, pos.y * tileSize);
 	}
+
+	/**
+	 * Translates a grid Position on the map to a pixel Point on the panel
+	 * that is in the center of that grid Position as drawn.
+	 */
+	public Point getCenteredPoint(Position pos)
+	{
+		int half = tileSize / 2;
+		return new Point(pos.x * tileSize + half, pos.y * tileSize + half);
+	}
 	
+	/**
+	 * Translates a pixel Rectangle on the panel to a grid Region,
+	 * including all grid spots the Rectangle intersects.
+	 */
 	public Region getRegion(Rectangle rect)
 	{
 		int minX = (int) Math.floor(rect.x / (double) tileSize);
@@ -460,6 +485,23 @@ public class DisplayPanel extends JComponent
 		return new Region(minX, minY, maxX - minX, maxY - minY);
 	}
 	
+	/**
+	 * Translates a pixel Rectangle on the panel to a grid Region,
+	 * including only grid spots fully enclosed by the Rectangle.
+	 */
+	public Region getEnclosedRegion(Rectangle rect)
+	{
+		int minX = (int) Math.ceil(rect.x / (double) tileSize);
+		int minY = (int) Math.ceil(rect.y / (double) tileSize);
+		int maxX = (int) Math.floor((rect.x + rect.width) / (double) tileSize);
+		int maxY = (int) Math.floor((rect.y + rect.height) / (double) tileSize);
+		
+		return new Region(minX, minY, maxX - minX, maxY - minY);
+	}
+	
+	/**
+	 * Translates a grid Region on the map to a pixel Rectangle on the panel.
+	 */
 	public Rectangle getRectangle(Region region)
 	{
 		return new Rectangle(
@@ -611,18 +653,16 @@ public class DisplayPanel extends JComponent
 		for (ResourceDeposit deposit : map.getResourceDeposits())
 		{
 			Point resPoint = getPoint(deposit.getPosition());
+			resPoint.translate(tileSize / 2, tileSize / 2);
 			
-			if (!rect.contains(resPoint.x + 16, resPoint.y + 16))
+			if (!rect.contains(resPoint))
 				continue;
 			
 			Sprite sprite = deposit.isSurveyedBy(currentPlayer)
 				? sprites.getSprite(deposit)
 				: sprites.getUnknownDepositSprite();
 			
-			resPoint.x += sprite.getXOffset();
-			resPoint.y += sprite.getYOffset();
-			
-			draw(g, sprite.getImage(), resPoint);
+			draw(g, sprite, deposit.getPosition());
 		}
 		
 		/*
@@ -630,7 +670,7 @@ public class DisplayPanel extends JComponent
 		 */
 		if (night)
 		{
-			g.setColor(new Color(0, 0, 0, 127));
+			g.setColor(TRANS_GRAY);
 			fill(g, rect);
 		}
 		
@@ -641,48 +681,32 @@ public class DisplayPanel extends JComponent
 			overlays.getFirst().paintOverUnits(g, rect);
 	}
 	
-	private static Font costMapFont = Font.decode("Arial-9");
-	
 	/**
 	 * Draws terrain (surface or cost map) depending on options using
 	 * Graphics g in the visible rect.
 	 */
 	private void drawTerrain(Graphics g, Rectangle rect)
 	{
-		if (showTerrainCostMap)
+		synchronized (cacheLock)
 		{
-			synchronized (cacheLock)
+			if (cachedBackground == null)
 			{
-				if (cachedCostMapImage == null)
-				{
-					cachedCostMapImage = new BufferedImage(
-						rect.width,
-						rect.height,
-						BufferedImage.TYPE_INT_ARGB
-					);
-					Graphics cg = cachedCostMapImage.getGraphics();
-					drawCostMap(cg, getVisibleRegion());
-					cg.dispose();
-				}
-				
-				g.drawImage(cachedCostMapImage, 0, 0, null);
-			}
-		}
-		else
-		{
-			if (cachedTerrain == null)
-			{
-				cachedTerrain = new BufferedImage(
-					map.getWidth()  * tileSize,
-					map.getHeight() * tileSize,
+				cachedBackground = new BufferedImage(
+					getWidth(),
+					getHeight(),
 					BufferedImage.TYPE_INT_ARGB
 				);
-				Graphics cg = cachedTerrain.getGraphics();
-				drawSurface(cg, getVisibleRegion());
+				Graphics cg = cachedBackground.getGraphics();
+				Region region = getVisibleRegion();
+				region = map.getBounds().getIntersection(region);
+				
+				if (showTerrainCostMap) drawCostMap(cg, region);
+								   else drawSurface(cg, region);
+				
 				cg.dispose();
 			}
 			
-			g.drawImage(cachedTerrain, 0, 0, null);
+			draw(g, cachedBackground, new Point());
 		}
 	}
 	
@@ -732,25 +756,7 @@ public class DisplayPanel extends JComponent
 		for (int x = region.x; x < region.getMaxX(); ++x)
 		{
 			Position pos = new Position(x, y);
-			String tileCode = map.getTileCode(x, y);
-			
-			if (tileCode == null)
-			{
-				g.setColor(Color.YELLOW);
-				fill(g, pos);
-				continue;
-			}
-			
-			Image img = tiles.getTile(tileCode);
-			
-			if (img == null)
-			{
-				g.setColor(Color.YELLOW);
-				fill(g, pos);
-				continue;
-			}
-			
-			draw(g, img, pos);
+			draw(g, tiles.getTile(map.getTileCode(pos)), pos);
 			
 			if (map.hasMinePlatform(pos))
 			{

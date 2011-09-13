@@ -145,7 +145,11 @@ public class LayeredMap
 		return grid.getBounds();
 	}
 	
-	public int getTileSize()
+	/**
+	 * Spot size is the number of atomic increments between positions
+	 * on the map grid.
+	 */
+	public int getSpotSize()
 	{
 		return 32;
 	}
@@ -640,7 +644,7 @@ public class LayeredMap
 	
 	public Unit getUnitAbsolute(int x, int y)
 	{
-		int tileSize = getTileSize();
+		int tileSize = getSpotSize();
 		
 		boolean quadrantUpper = y % tileSize < 0.5;
 		boolean quadrantLeft  = x % tileSize < 0.5;
@@ -700,7 +704,7 @@ public class LayeredMap
 	public Set<Unit> getAllAbsolute(int x, int y, int w, int h)
 	{
 		Set<Unit> selected = new HashSet<Unit>();
-		int tileSize = getTileSize();
+		int tileSize = getSpotSize();
 		
 		Rectangle selectedArea = new Rectangle(x, y, w, h);
 		
@@ -738,6 +742,11 @@ public class LayeredMap
 		
 		Position pos = unit.getPosition();
 		
+		if (unit.isMine())
+		{
+			clearFixture(pos);
+		}
+		
 		for (Position fpPos : unit.getFootprint().iterator(pos))
 		{
 			grid.get(fpPos).occupant = null;
@@ -750,27 +759,23 @@ public class LayeredMap
 			grid.get(rPos).reservant = null;
 		}
 		
-//			unit.setPosition(null);
-//			unit.setContainer(null);
+//		unit.setPosition(null);
+//		unit.setContainer(null);
 		
 		units.remove(unit);
 		assessConnections();
 		
-		if (unit.isMine())
+		if (unit.isStructure())
 		{
-			grid.get(pos).fixture = null;
 			panel.refresh();
 		}
 	}
 	
 	public void clearAllUnits()
 	{
-		Iterator<Unit> unitItr = units.iterator();
-		
-		while (unitItr.hasNext())
+		for (Unit unit : units.toArray(new Unit[0]))
 		{
-			unitItr.next();
-			unitItr.remove();
+			remove(unit);
 		}
 	}
 	

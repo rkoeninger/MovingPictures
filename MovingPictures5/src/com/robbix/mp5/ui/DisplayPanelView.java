@@ -71,7 +71,7 @@ public class DisplayPanelView extends JScrollPane
 		if (!panel.getMap().getBounds().contains(pos))
 			throw new IndexOutOfBoundsException(pos.toString());
 		
-		final int tileSize = panel.getMap().getTileSize();
+		final int tileSize = panel.getTileSize();
 		Rectangle rect = panel.getVisibleRect();
 		setViewPosition(new Point(
 			pos.x * tileSize + tileSize / 2 - rect.width  / 2,
@@ -84,7 +84,7 @@ public class DisplayPanelView extends JScrollPane
 		if (unit.getContainer() != panel.getMap())
 			throw new IllegalArgumentException("unit not on map");
 		
-		final int tileSize = panel.getMap().getTileSize();
+		final int tileSize = panel.getTileSize();
 		Rectangle rect = panel.getVisibleRect();
 		setViewPosition(new Point(
 			unit.getAbsX() + unit.getWidth()  * tileSize / 2 - rect.width  / 2,
@@ -104,7 +104,7 @@ public class DisplayPanelView extends JScrollPane
 		else if (padding < 0)
 			throw new IllegalArgumentException("padding can't be negative");
 		
-		final int tileSize = panel.getMap().getTileSize();
+		final int tileSize = panel.getTileSize();
 		Rectangle rect = panel.getVisibleRect();
 		int x0 = pos.x * tileSize;
 		int y0 = pos.y * tileSize;
@@ -152,7 +152,7 @@ public class DisplayPanelView extends JScrollPane
 		else if (padding < 0)
 			throw new IllegalArgumentException("padding can't be negative");
 		
-		final int tileSize = panel.getMap().getTileSize();
+		final int tileSize = panel.getTileSize();
 		Rectangle rect = panel.getVisibleRect();
 		int x0 = unit.getAbsX();
 		int y0 = unit.getAbsY();
