@@ -9,6 +9,7 @@ import java.util.List;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ai.task.EarthworkerConstructRowTask;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.unit.Unit;
 
@@ -23,6 +24,8 @@ public class BuildTubeOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
+		CommandUnitOverlay.paintSelectedUnitBox(g, earthworker);
+		
 		g.translate(rect.x, rect.y);
 		g.setColor(Color.RED);
 		g.setFont(OVERLAY_FONT);
@@ -30,39 +33,17 @@ public class BuildTubeOverlay extends InputOverlay
 		g.drawString("Right Click to Cancel", rect.width / 2 - 35, 50);
 		g.translate(-rect.x, -rect.y);
 		
-		CommandUnitOverlay.paintSelectedUnitBox(g, earthworker);
-		
 		if (isCursorOnGrid())
 		{
 			Position pos = getCursorPosition();
 			
 			if (isDragging())
 			{
-				Rectangle dragArea = getDragArea();
+				Region dragRegion = getLinearDragRegion();
 				
-				int tileSize = panel.getTileSize();
-				
-				int xMin = (dragArea.x / tileSize) * tileSize;
-				int yMin = (dragArea.y / tileSize) * tileSize;
-				int xMax = (int) Math.ceil((dragArea.x + dragArea.width) / (double) tileSize) * tileSize;
-				int yMax = (int) Math.ceil((dragArea.y + dragArea.height) / (double) tileSize) * tileSize;
-				
-				Rectangle rowArea = new Rectangle(
-					xMin, yMin, xMax - xMin, yMax - yMin
-				);
-				
-				if (rowArea.width < rowArea.height)
-				{
-					rowArea.width = tileSize;
-				}
-				else
-				{
-					rowArea.height = tileSize;
-				}
-				
-				panel.draw(g, rowArea);
+				panel.draw(g, dragRegion);
 				g.setColor(TRANS_RED);
-				panel.fill(g, rowArea);
+				panel.fill(g, dragRegion);
 			}
 			else
 			{
@@ -75,7 +56,7 @@ public class BuildTubeOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Mediator.doEarthworkerBuild(earthworker, getCursorPosition(), Fixture.TUBE);
+		Mediator.doEarthworkerBuild(earthworker, panel.getPosition(x, y), Fixture.TUBE);
 		panel.completeOverlay(this);
 	}
 	
@@ -86,33 +67,11 @@ public class BuildTubeOverlay extends InputOverlay
 	
 	public void onAreaDragged(int x, int y, int w, int h)
 	{
-		int tileSize = panel.getTileSize();
-		
-		int xMin = x / tileSize;
-		int yMin = y / tileSize;
-		int xMax = (int) Math.ceil((x + w) / (double) tileSize);
-		int yMax = (int) Math.ceil((y + h) / (double) tileSize);
-		
-		Rectangle rowArea = new Rectangle(
-			xMin, yMin, xMax - xMin, yMax - yMin
-		);
-		
+		Region dragRegion = getLinearDragRegion();
 		List<Position> row = new ArrayList<Position>();
 		
-		if (rowArea.width < rowArea.height)
-		{
-			for (int ry = yMin; ry < yMax; ++ry)
-			{
-				row.add(new Position(xMin, ry));
-			}
-		}
-		else
-		{
-			for (int rx = xMin; rx < xMax; ++rx)
-			{
-				row.add(new Position(rx, yMin));
-			}
-		}
+		for (Position rowPos : dragRegion)
+			row.add(rowPos);
 		
 		earthworker.assignNow(new EarthworkerConstructRowTask(row, Fixture.TUBE));
 		panel.completeOverlay(this);

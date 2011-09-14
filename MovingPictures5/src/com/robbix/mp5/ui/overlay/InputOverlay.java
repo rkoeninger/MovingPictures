@@ -82,34 +82,29 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		return panel.getEnclosedRegion(dragArea);
 	}
 	
-	// FIXME: any good?
 	public Region getLinearDragRegion()
 	{
 		Position origin = panel.getPosition(pressedPoint);
 		Region fullRegion = panel.getRegion(dragArea);
+		int endX = origin.x;
+		int endY = origin.y;
 		
 		if (fullRegion.w > fullRegion.h)
 		{
-			if (fullRegion.x < origin.x)
-			{
-				return new Region(origin, new Position(fullRegion.x, origin.y));
-			}
-			else
-			{
-				return new Region(origin, new Position(fullRegion.x + fullRegion.w, origin.y));
-			}
+			endX = fullRegion.x < origin.x
+					? fullRegion.getX()
+					: fullRegion.getMaxX() - 1;
+			endY = origin.y;
 		}
 		else
 		{
-			if (fullRegion.y < origin.y)
-			{
-				return new Region(origin, new Position(origin.x, fullRegion.y));
-			}
-			else
-			{
-				return new Region(origin, new Position(origin.x, fullRegion.y + fullRegion.h));
-			}
+			endX = origin.x;
+			endY = fullRegion.y < origin.y
+				? fullRegion.getY()
+				: fullRegion.getMaxY() - 1;
 		}
+		
+		return new Region(origin, new Position(endX, endY));
 	}
 	
 	public void init(){}
