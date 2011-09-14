@@ -228,6 +228,7 @@ public class SpriteLibrary
 		return spriteList;
 	}
 	
+	// TODO: experienced problems with this method in PlaceUnitOverlay
 	public synchronized Sprite getDefaultSprite(Unit unit)
 	{
 		if (unit.isStructure())

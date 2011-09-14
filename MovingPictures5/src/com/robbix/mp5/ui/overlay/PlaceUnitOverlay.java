@@ -48,17 +48,16 @@ public class PlaceUnitOverlay extends InputOverlay
 			if (unitSprite == null)
 			{
 				int hue = unit.getOwner().getColorHue();
-				unitSprite = panel.getSpriteLibrary()
-								  .getDefaultSprite(unit);
+				unitSprite = panel.getSpriteLibrary().getSprite(unit);
 				unitSprite = Utils.getTranslucency(unitSprite, hue, 0.5f);
 			}
 			
 			if (turretSprite == null && unit.hasTurret())
 			{
+				Unit turret = unit.getTurret();
 				int hue = unit.getOwner().getColorHue();
-				unitSprite = panel.getSpriteLibrary()
-								  .getDefaultSprite(unit.getTurret());
-				unitSprite = Utils.getTranslucency(unitSprite, hue, 0.5f);
+				turretSprite = panel.getSpriteLibrary().getSprite(turret);
+				turretSprite = Utils.getTranslucency(turretSprite, hue, 0.5f);
 			}
 			
 			Position pos = getCursorPosition();
