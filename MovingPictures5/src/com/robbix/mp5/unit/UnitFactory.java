@@ -68,6 +68,21 @@ public class UnitFactory
 		return vehicleTypes;
 	}
 	
+	public List<UnitType> getStructureTypes()
+	{
+		List<UnitType> structTypes = new ArrayList<UnitType>();
+		
+		for (UnitType type : types.values())
+		{
+			if (type.isStructureType() || type.isGuardPostType())
+			{
+				structTypes.add(type);
+			}
+		}
+		
+		return structTypes;
+	}
+	
 	public UnitType getType(String name)
 	{
 		return types.get(name);

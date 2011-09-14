@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -30,8 +29,6 @@ import com.robbix.mp5.unit.UnitType;
 public class CommandUnitOverlay extends InputOverlay
 {
 	private Unit unit;
-	
-	private boolean attackMode = false;
 	
 	public CommandUnitOverlay(Unit unit)
 	{
@@ -192,8 +189,7 @@ public class CommandUnitOverlay extends InputOverlay
 	{
 		if (command.equals("attack"))
 		{
-			panel.setAnimatedCursor("attack");
-			attackMode = true;
+			panel.pushOverlay(new SelectAttackTargetOverlay(unit.getTurret()));
 		}
 		else if (command.equals("stop"))
 		{
@@ -360,8 +356,7 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			if (edge == 2)
 			{
-				panel.setAnimatedCursor("attack");
-				attackMode = true;
+				panel.pushOverlay(new SelectAttackTargetOverlay(unit.getTurret()));
 			}
 		}
 		else if (unit.isMiner())
@@ -412,7 +407,7 @@ public class CommandUnitOverlay extends InputOverlay
 				owner.spend(type.getCost());
 				Unit newVehicle = Mediator.factory.newUnit(type, owner);
 				
-				for (Position exitPos : getFactoryExits(unit.getPosition()))
+				for (Position exitPos : unit.getFootprint().getFactoryExits(unit.getPosition()))
 				{
 					if (panel.getMap().canPlaceUnit(exitPos))
 					{
@@ -441,50 +436,7 @@ public class CommandUnitOverlay extends InputOverlay
 			return;
 		}
 		
-		Position targetPos = panel.getPosition(x, y);
-		
-		if (attackMode)
-		{
-			final Unit target = unit.getMap().getUnit(targetPos);
-			
-			if (target == null)
-				return;
-			
-			Mediator.doAttack(unit.getTurret(), target);
-			attackMode = false;
-			panel.setAnimatedCursor("move");
-		}
-		else
-		{
-			Mediator.doMove(unit, targetPos);
-		}
-		
+		Mediator.doMove(unit, panel.getPosition(x, y));
 		Mediator.sounds.play("beep2");
-	}
-	
-	private static List<Position> getFactoryExits(Position factoryPos)
-	{
-		List<Position> posList = new ArrayList<Position>();
-		
-		posList.add(factoryPos.shift(4, 1));
-		posList.add(factoryPos.shift(4, 0));
-		posList.add(factoryPos.shift(4, -1));
-		posList.add(factoryPos.shift(3, -1));
-		posList.add(factoryPos.shift(2, -1));
-		posList.add(factoryPos.shift(1, -1));
-		posList.add(factoryPos.shift(0, -1));
-		posList.add(factoryPos.shift(-1, -1));
-		posList.add(factoryPos.shift(-1, 0));
-		posList.add(factoryPos.shift(-1, 1));
-		posList.add(factoryPos.shift(-1, 2));
-		posList.add(factoryPos.shift(-1, 3));
-		posList.add(factoryPos.shift(0, 3));
-		posList.add(factoryPos.shift(1, 3));
-		posList.add(factoryPos.shift(2, 3));
-		posList.add(factoryPos.shift(3, 3));
-		posList.add(factoryPos.shift(4, 3));
-		posList.add(factoryPos.shift(4, 2));
-		
-		return posList;
 	}
 }

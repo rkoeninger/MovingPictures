@@ -1,6 +1,8 @@
 package com.robbix.mp5.unit;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -247,5 +249,36 @@ public class Footprint implements Iterable<Position>
 			origin.x,
 			origin.y
 		);
+	}
+	
+	public List<Position> getFactoryExits(Position origin)
+	{
+		if (inner.w == 4 && inner.h == 3)
+		{
+			List<Position> posList = new ArrayList<Position>();
+			
+			posList.add(origin.shift(4, 1));
+			posList.add(origin.shift(4, 0));
+			posList.add(origin.shift(4, -1));
+			posList.add(origin.shift(3, -1));
+			posList.add(origin.shift(2, -1));
+			posList.add(origin.shift(1, -1));
+			posList.add(origin.shift(0, -1));
+			posList.add(origin.shift(-1, -1));
+			posList.add(origin.shift(-1, 0));
+			posList.add(origin.shift(-1, 1));
+			posList.add(origin.shift(-1, 2));
+			posList.add(origin.shift(-1, 3));
+			posList.add(origin.shift(0, 3));
+			posList.add(origin.shift(1, 3));
+			posList.add(origin.shift(2, 3));
+			posList.add(origin.shift(3, 3));
+			posList.add(origin.shift(4, 3));
+			posList.add(origin.shift(4, 2));
+			
+			return posList;
+		}
+		
+		throw new UnsupportedOperationException("not a factory footprint");
 	}
 }
