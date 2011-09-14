@@ -60,6 +60,7 @@ public class Unit
 	
 	private UnitType type;
 	
+	private String kit;
 	private Cargo cargo;
 	private int hp;
 	private int charge = 1024;
@@ -268,6 +269,16 @@ public class Unit
 	public void setYOffset(int offY)
 	{
 		this.offY = offY;
+	}
+	
+	public String getStructureKit()
+	{
+		return kit;
+	}
+	
+	public void setStructureKit(String kit)
+	{
+		this.kit = kit;
 	}
 	
 	public void setCargo(Cargo cargo)

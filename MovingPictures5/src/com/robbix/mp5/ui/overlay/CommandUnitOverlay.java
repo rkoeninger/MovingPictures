@@ -338,12 +338,11 @@ public class CommandUnitOverlay extends InputOverlay
 				&& !sFactory.isDead()
 				&& !sFactory.isDisabled())
 					{
-						unit.assignNow(new DockTask(
-							sFactory,
-							unit.getCargo() == Cargo.EMPTY
-								? Cargo.newConVecCargo("pMicrowaveGuardPost")
-								: Cargo.EMPTY
-						));
+						String kit = sFactory.getStructureKit();
+						Cargo cargo = kit != null
+							? Cargo.newConVecCargo(kit)
+							: Cargo.EMPTY;
+						unit.assignNow(new DockTask(sFactory, cargo));
 					}
 				}
 			}
@@ -423,7 +422,33 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			if (edge == 2)
 			{
-				JOptionPane.showMessageDialog(panel, "not implemented");
+				List<UnitType> structTypes = Mediator.factory.getStructureTypes();
+				Object option = JListDialog.showDialog(structTypes.toArray());
+				
+				if (option == null)
+					return;
+				
+				UnitType type = (UnitType) option;
+				Player owner = unit.getOwner();
+				
+				if (type.getCost() == null)
+					return;
+				
+				if (!owner.canAfford(type.getCost()))
+				{
+					JOptionPane.showMessageDialog(
+						panel,
+						"can't afford it",
+						"not enough monies",
+						JOptionPane.ERROR_MESSAGE
+					);
+					
+					return;
+				}
+				
+				owner.spend(type.getCost());
+				Unit newVehicle = Mediator.factory.newUnit(type, owner);
+				unit.setStructureKit(newVehicle.getType().getName());
 			}
 		}
 	}
