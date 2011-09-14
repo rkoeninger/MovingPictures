@@ -378,7 +378,7 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			if (edge == 2)
 			{
-				unit.assignNext(new BulldozeTask(19 * 4)); // Four strokes
+				panel.pushOverlay(new SelectBulldozeOverlay(unit));
 			}
 		}
 		else if (unit.getType().getName().contains("VehicleFactory"))

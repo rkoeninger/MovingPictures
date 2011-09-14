@@ -26,6 +26,7 @@ public class SteerTask extends Task
 			return;
 		}
 		
+		unit.setActivity("move");
 		Position pos = unit.getPosition();
 		Direction dir = Direction.getMoveDirection(pos, destination);
 		Position next = dir.apply(pos);
