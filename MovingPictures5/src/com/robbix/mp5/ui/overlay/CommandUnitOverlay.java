@@ -339,6 +339,7 @@ public class CommandUnitOverlay extends InputOverlay
 				&& !sFactory.isDisabled())
 					{
 						String kit = sFactory.getStructureKit();
+						sFactory.setStructureKit(null);
 						Cargo cargo = kit != null
 							? Cargo.newConVecCargo(kit)
 							: Cargo.EMPTY;
@@ -447,8 +448,7 @@ public class CommandUnitOverlay extends InputOverlay
 				}
 				
 				owner.spend(type.getCost());
-				Unit newVehicle = Mediator.factory.newUnit(type, owner);
-				unit.setStructureKit(newVehicle.getType().getName());
+				unit.setStructureKit(type.getName());
 			}
 		}
 	}
