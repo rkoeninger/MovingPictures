@@ -38,6 +38,7 @@ import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.ai.task.SteerTask;
 import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.player.Player;
@@ -80,6 +81,11 @@ public class TestMP5
 	private static JFrame frame;
 	private static Map<Integer, JMenuItem> playerMenuItems =
 		new HashMap<Integer, JMenuItem>();
+	
+	// References moved here so they can be called by addPlayer(int)
+	private static JMenu playerMenu;
+	private static ButtonGroup playerSelectButtonGroup;
+	private static ActionListener playerSelectListener;
 	
 	public static void main(String[] args) throws IOException
 	{
@@ -257,6 +263,7 @@ public class TestMP5
 							{
 								playerStatusLabel.setText(
 									myPlayer.getStatusString());
+								selectPlayer(myPlayer.getID());
 							}
 							else
 							{
@@ -345,7 +352,7 @@ public class TestMP5
 		final JMenu displayMenu = new JMenu("Display");
 		final JMenu terrainMenu = new JMenu("Terrain");
 		final JMenu unitMenu = new JMenu("Units");
-		final JMenu playerMenu = new JMenu("Players");
+		playerMenu = new JMenu("Players");
 		final JMenuItem pauseMenuItem = new JMenuItem("Pause");
 		final JMenuItem stepMenuItem = new JMenuItem("Step Once");
 		stepMenuItem.setEnabled(false);
@@ -382,9 +389,9 @@ public class TestMP5
 		/*-------------------------------------------------------------------*
 		 * Add player select menu items
 		 */
-		final ButtonGroup playerSelectButtonGroup = new ButtonGroup();
+		playerSelectButtonGroup = new ButtonGroup();
 		
-		final ActionListener playerSelectListener = new ActionListener()
+		playerSelectListener = new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -859,6 +866,7 @@ public class TestMP5
 		frame.setVisible(true);
 	}
 	
+	// Call after Game.addPlayer() to sync with sandbox UI
 	private static void selectPlayer(int playerID)
 	{
 		Player player = game.getPlayer(playerID);
@@ -869,6 +877,20 @@ public class TestMP5
 		
 		if (menuItem != null)
 			menuItem.setSelected(true);
+	}
+	
+	// Call after Game.addPlayer() to sync with sandbox UI
+	private static void addPlayer(int playerID)
+	{
+		Player newPlayer = game.getPlayer(playerID);
+		String name = newPlayer.getName();
+		JMenuItem playerSelectMenuItem = new JRadioButtonMenuItem(name);
+		playerSelectButtonGroup.add(playerSelectMenuItem);
+		playerSelectMenuItem.setActionCommand(String.valueOf(playerID));
+		playerMenu.add(playerSelectMenuItem);
+		playerSelectMenuItem.addActionListener(playerSelectListener);
+		playerSelectMenuItem.setSelected(true);
+		playerMenuItems.put(playerID, playerSelectMenuItem);
 	}
 	
 	public static List<String> getAvailableTileSets()
@@ -975,6 +997,7 @@ public class TestMP5
 		
 		Player player1 = new Player(1, "Targets", 45);
 		game.addPlayer(player1);
+		addPlayer(1);
 		selectPlayer(1);
 		factory.setDefaultOwner(player1);
 		
@@ -1034,6 +1057,7 @@ public class TestMP5
 		
 		Player player1 = new Player(1, "Factories", 275);
 		game.addPlayer(player1);
+		addPlayer(1);
 		selectPlayer(1);
 		factory.setDefaultOwner(player1);
 		
@@ -1046,6 +1070,7 @@ public class TestMP5
 		Unit convec3     = factory.newUnit("eConVec");
 		Unit convec4     = factory.newUnit("eConVec");
 		Unit earthworker = factory.newUnit("eEarthworker");
+		Unit dozer       = factory.newUnit("pRoboDozer");
 		
 		convec1.setCargo(Cargo.newConVecCargo("eVehicleFactory"));
 		convec2.setCargo(Cargo.newConVecCargo("eStructureFactory"));
@@ -1057,6 +1082,7 @@ public class TestMP5
 		map.putUnit(convec3,     new Position(11, 7));
 		map.putUnit(convec4,     new Position(12, 7));
 		map.putUnit(earthworker, new Position(10, 9));
+		map.putUnit(dozer,       new Position(11, 9));
 	}
 	
 	public static String mapMineRouteDemo()
@@ -1071,6 +1097,7 @@ public class TestMP5
 		
 		Player player1 = new Player(1, "Mining Operation", 200);
 		game.addPlayer(player1);
+		addPlayer(1);
 		selectPlayer(1);
 		
 		List<Unit> mines    = new ArrayList<Unit>();
@@ -1151,23 +1178,24 @@ public class TestMP5
 	{
 		LayeredMap map = game.getMap();
 		UnitFactory factory = game.getUnitFactory();
-		
-		Position center = new Position(
-			map.getWidth() / 2,
-			map.getHeight() / 2
-		);
-		
+		Region bounds = map.getBounds();
+		Position center = new Position(bounds.w / 2, bounds.h / 2);
 		Player player1 = new Player(1, "Axen", 320);
 		Player player2 = new Player(2, "Emma", 200);
 		Player player3 = new Player(3, "Nguyen", 40);
 		Player player4 = new Player(4, "Frost", 160);
 		Player player5 = new Player(5, "Brook", 95);
-		
 		game.addPlayer(player1);
 		game.addPlayer(player2);
 		game.addPlayer(player3);
 		game.addPlayer(player4);
 		game.addPlayer(player5);
+		addPlayer(1);
+		addPlayer(2);
+		addPlayer(3);
+		addPlayer(4);
+		addPlayer(5);
+		selectPlayer(5);
 		
 		for (int x = 1; x <= 15; ++x)
 		for (int y = 1; y <= 11; ++y)
