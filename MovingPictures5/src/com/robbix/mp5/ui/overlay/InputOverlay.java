@@ -13,9 +13,12 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.ui.DisplayPanel;
+import com.robbix.mp5.unit.HealthBracket;
+import com.robbix.mp5.unit.Unit;
 
 public abstract class InputOverlay
 implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
@@ -105,6 +108,23 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		}
 		
 		return new Region(origin, new Position(endX, endY));
+	}
+	
+	public static enum Edge {NW,N,NE,W,C,E,SW,S,SE;}
+	
+	public Edge getPointEdge(int x, int y)
+	{
+		int w = panel.getVisibleRect().width;
+		int h = panel.getVisibleRect().height;
+		int x0 = panel.getVisibleRect().x;
+		int y0 = panel.getVisibleRect().y;
+		
+		return Edge.values()[((x - x0) / (w / 3)) + (((y - y0) / (h / 3)) * 3)];
+	}
+	
+	public void complete()
+	{
+		panel.completeOverlay(this);
 	}
 	
 	public void init(){}
@@ -240,5 +260,75 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			dragArea.height = -dragArea.height;
 		}
 		
+	}
+	
+	public static void paintSelectedUnitBox(Graphics g, Unit unit)
+	{
+		if (unit.isDead() || unit.isFloating()) return;
+		
+		int tileSize = unit.getMap().getDisplayPanel().getTileSize();
+		int absWidth = unit.getWidth() * tileSize;
+		int absHeight = unit.getHeight() * tileSize;
+		
+		/*
+		 * Draw borders
+		 */
+		int nwCornerX = unit.getAbsX();
+		int nwCornerY = unit.getAbsY();
+		int neCornerX = nwCornerX + absWidth;
+		int neCornerY = nwCornerY;
+		int swCornerX = nwCornerX;
+		int swCornerY = nwCornerY + absHeight;
+		int seCornerX = nwCornerX + absWidth;
+		int seCornerY = nwCornerY + absHeight;
+		
+		g.setColor(Color.WHITE);
+		g.drawLine(nwCornerX, nwCornerY, nwCornerX + 4, nwCornerY);
+		g.drawLine(nwCornerX, nwCornerY, nwCornerX,     nwCornerY + 4);
+		g.drawLine(neCornerX, neCornerY, neCornerX - 4, neCornerY);
+		g.drawLine(neCornerX, neCornerY, neCornerX,     neCornerY + 4);
+		g.drawLine(swCornerX, swCornerY, swCornerX + 4, swCornerY);
+		g.drawLine(swCornerX, swCornerY, swCornerX,     swCornerY - 4);
+		g.drawLine(seCornerX, seCornerY, seCornerX - 4, seCornerY);
+		g.drawLine(seCornerX, seCornerY, seCornerX,     seCornerY - 4);
+		
+		/*
+		 * Draw health bar
+		 */
+		double hpFactor = unit.getHP() / (double) unit.getType().getMaxHP();
+		hpFactor = Math.min(hpFactor, 1.0f);
+		hpFactor = Math.max(hpFactor, 0.0f);
+		
+		boolean isRed = unit.getHealthBracket() == HealthBracket.RED;
+		
+		int hpBarLength = absWidth - 14;
+		int hpLength = (int) (hpBarLength * hpFactor);
+		
+		double hpHue = 1.0 - hpFactor;
+		hpHue *= 0.333;
+		hpHue = 0.333 - hpHue;
+		
+		double hpAlpha = 2.0 - hpFactor;
+		hpAlpha *= 127.0;
+		
+		Color hpColor = Color.getHSBColor((float) hpHue, 1.0f, 1.0f);
+		hpColor = new Color(
+			hpColor.getRed(),
+			hpColor.getGreen(),
+			hpColor.getBlue(),
+			(int) hpAlpha
+		);
+		
+		g.setColor(Color.BLACK);
+		g.fillRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);
+		
+		if (Utils.getTimeBasedSwitch(300, 2) || !isRed)
+		{
+			g.setColor(hpColor);
+			g.fillRect(nwCornerX + 8, nwCornerY - 1, hpLength - 1, 3);
+		}
+		
+		g.setColor(Color.WHITE);
+		g.drawRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);
 	}
 }

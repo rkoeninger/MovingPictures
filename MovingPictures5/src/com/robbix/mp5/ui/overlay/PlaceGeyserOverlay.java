@@ -49,6 +49,6 @@ public class PlaceGeyserOverlay extends InputOverlay
 	
 	public void onRightClick(int x, int y)
 	{
-		panel.completeOverlay(this);
+		complete();
 	}
 }

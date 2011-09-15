@@ -61,7 +61,11 @@ public class SelectUnitOverlay extends InputOverlay
 				filterNonStructure(selected);
 				Unit leadUnit = getLeadUnit(selected);
 				Mediator.sounds.play(leadUnit.getType().getAcknowledgement());
-				panel.pushOverlay(new CommandGroupOverlay(selected));
+				panel.pushOverlay(
+					areAllTrucks(selected)
+					? new CommandTruckOverlay(selected)
+					: new CommandGroupOverlay(selected)
+				);
 				panel.showStatus((Unit)null);
 				panel.showStatus(focusedPlayer);
 			}
@@ -145,5 +149,14 @@ public class SelectUnitOverlay extends InputOverlay
 		}
 		
 		return focusedPlayer;
+	}
+	
+	private static boolean areAllTrucks(Set<Unit> units)
+	{
+		for (Unit unit : units)
+			if (!unit.isTruck())
+				return false;
+		
+		return true;
 	}
 }

@@ -334,6 +334,8 @@ public class DisplayPanel extends JComponent
 			removeMouseWheelListener(overlay);
 			removeKeyListener(overlay);
 		}
+		
+		setAnimatedCursor(null);
 	}
 	
 	public void completeOverlay(InputOverlay overlay)
@@ -344,6 +346,7 @@ public class DisplayPanel extends JComponent
 		overlays.removeFirst();
 		overlay.dispose();
 		overlay.setDisplay(null);
+		setAnimatedCursor(null);
 		removeMouseListener(overlay);
 		removeMouseMotionListener(overlay);
 		removeMouseWheelListener(overlay);
@@ -352,6 +355,7 @@ public class DisplayPanel extends JComponent
 		if (!overlays.isEmpty())
 		{
 			InputOverlay oldOverlay = overlays.getFirst();
+			oldOverlay.init();
 			addMouseListener(oldOverlay);
 			addMouseMotionListener(oldOverlay);
 			addMouseWheelListener(oldOverlay);

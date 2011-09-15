@@ -90,13 +90,13 @@ public class BuildStructureOverlay extends InputOverlay
 			}
 			else
 			{
-				panel.completeOverlay(this);
+				complete();
 			}
 		}
 	}
 	
 	public void onRightClick(int x, int y)
 	{
-		panel.completeOverlay(this);
+		complete();
 	}
 }

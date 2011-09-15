@@ -21,14 +21,9 @@ public class SelectAttackTargetOverlay extends InputOverlay
 		panel.setAnimatedCursor("attack");
 	}
 	
-	public void dispose()
-	{
-		panel.setAnimatedCursor(null);
-	}
-	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		CommandUnitOverlay.paintSelectedUnitBox(g, unit.getChassis());
+		InputOverlay.paintSelectedUnitBox(g, unit.getChassis());
 		
 		g.translate(rect.x, rect.y);
 		g.setColor(Color.RED);
@@ -45,12 +40,12 @@ public class SelectAttackTargetOverlay extends InputOverlay
 		if (target != null && !target.isAt(unit.getPosition()))
 		{
 			Mediator.doAttack(unit, target);
-			panel.completeOverlay(this);
+			complete();
 		}
 	}
 	
 	public void onRightClick(int x, int y)
 	{
-		panel.completeOverlay(this);
+		complete();
 	}
 }

@@ -31,7 +31,6 @@ public class PlaceBulldozeOverlay extends InputOverlay
 		
 		if (isCursorOnGrid())
 		{
-			panel.getMap().clearFixture(pos);
 			panel.getMap().bulldoze(pos);
 			panel.refresh();
 		}
@@ -39,6 +38,6 @@ public class PlaceBulldozeOverlay extends InputOverlay
 	
 	public void onRightClick(int x, int y)
 	{
-		panel.completeOverlay(this);
+		complete();
 	}
 }

@@ -13,11 +13,6 @@ public class SpawnMeteorOverlay extends InputOverlay
 		panel.setAnimatedCursor("attack");
 	}
 	
-	public void dispose()
-	{
-		panel.setAnimatedCursor(null);
-	}
-	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		g.translate(rect.x, rect.y);
@@ -30,11 +25,10 @@ public class SpawnMeteorOverlay extends InputOverlay
 	public void onLeftClick(int x, int y)
 	{
 		Mediator.doSpawnMeteor(panel.getPosition(x, y));
-		panel.refresh();
 	}
 	
 	public void onRightClick(int x, int y)
 	{
-		panel.completeOverlay(this);
+		complete();
 	}
 }

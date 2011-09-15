@@ -28,7 +28,7 @@ public class SelectBulldozeOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		CommandUnitOverlay.paintSelectedUnitBox(g, dozer);
+		InputOverlay.paintSelectedUnitBox(g, dozer);
 		
 		g.translate(rect.x, rect.y);
 		g.setColor(Color.RED);
@@ -62,12 +62,12 @@ public class SelectBulldozeOverlay extends InputOverlay
 	{
 		Position pos = panel.getPosition(x, y);
 		dozer.assignNow(new BulldozeRegionTask(Arrays.asList(pos)));
-		panel.completeOverlay(this);
+		complete();
 	}
 	
 	public void onRightClick(int x, int y)
 	{
-		panel.completeOverlay(this);
+		complete();
 	}
 	
 	public void onAreaDragged(int x, int y, int w, int h)
@@ -80,6 +80,6 @@ public class SelectBulldozeOverlay extends InputOverlay
 				dozeArea.add(areaPos);
 		
 		dozer.assignNow(new BulldozeRegionTask(dozeArea));
-		panel.completeOverlay(this);
+		complete();
 	}
 }

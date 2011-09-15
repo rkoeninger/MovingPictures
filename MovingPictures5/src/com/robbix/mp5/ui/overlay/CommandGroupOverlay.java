@@ -39,7 +39,6 @@ public class CommandGroupOverlay extends InputOverlay
 	public void dispose()
 	{
 		panel.showStatus((Unit)null);
-		panel.setAnimatedCursor(null);
 	}
 	
 	public void onRightClick(int x, int y)
@@ -51,7 +50,7 @@ public class CommandGroupOverlay extends InputOverlay
 	{
 		for (Unit unit : units)
 		{
-			CommandUnitOverlay.paintSelectedUnitBox(g, unit);
+			InputOverlay.paintSelectedUnitBox(g, unit);
 		}
 		
 		g.translate(rect.x, rect.y);
