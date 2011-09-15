@@ -109,16 +109,6 @@ public class MeteorAnimation extends AmbientAnimation
 		}
 	}
 	
-	public boolean hasCallback()
-	{
-		return true;
-	}
-	
-	public void step()
-	{
-		throw new Error("should call step(AtomicReference)");
-	}
-	
 	public void step(AtomicReference<Runnable> ref)
 	{
 		if (frame > frameCount - 9)

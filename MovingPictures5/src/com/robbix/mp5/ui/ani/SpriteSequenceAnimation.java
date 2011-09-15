@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.ui.Sprite;
 
@@ -52,7 +53,7 @@ public class SpriteSequenceAnimation extends AmbientAnimation
 		return new Rectangle(x, y, w, h);
 	}
 	
-	public void step()
+	public void step(AtomicReference<Runnable> ref)
 	{
 		frame++;
 	}

@@ -5,91 +5,28 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.Direction;
-import com.robbix.mp5.map.LayeredMap;
-import com.robbix.mp5.ui.Sprite;
-import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
 public class MicrowaveFireAnimation extends WeaponFireAnimation
 {
-	private Unit unit, target;
-	private Point hotspot;
-	private int xSpriteOffset, ySpriteOffset;
-	private int xTargetOffset, yTargetOffset;
-	
-	private Rectangle bounds;
+	private Point attackerStart;
+	private Point targetStart;
 	
 	private int frame = 0;
-	private int tileSize;
 	private final int frameLength = 20;
 	
-	public MicrowaveFireAnimation(Unit unit, Unit target)
+	public MicrowaveFireAnimation(Unit attacker, Unit target)
 	{
-		super(unit, target);
-		
-		Unit turret = unit;
-		Unit chassis = unit.getChassis();
-		LayeredMap map = chassis.getMap();
-		
-		tileSize = map.getDisplayPanel().getTileSize();
-		
-		SpriteLibrary lib = map.getDisplayPanel().getSpriteLibrary();
-		
-		hotspot = lib.getHotspot(turret, Direction.getDirection(
-			unit.getPosition(), target.getPosition()));
-		
-		this.unit = turret;
-		this.target = target;
-		
-		Sprite turretSprite = lib.getSprite(turret);
-		
-		xSpriteOffset = turretSprite.getXOffset() + hotspot.x;
-		ySpriteOffset = turretSprite.getYOffset() + hotspot.y;
-		
-		int startX = unit.getAbsX() + xSpriteOffset;
-		int startY = unit.getAbsY() + ySpriteOffset;
-		
-		int w = target.getWidth();
-		int h = target.getHeight();
-		
-		xTargetOffset = (tileSize * w / 2) + Utils.randInt(-5, 5);
-		yTargetOffset = (tileSize * h / 2) + Utils.randInt(-5, 5);
-		
-		int endX = target.getAbsX() + xTargetOffset;
-		int endY = target.getAbsY() + yTargetOffset;
-		
-		bounds = new Rectangle(
-			startX,
-			startY,
-			endX - startX,
-			endY - startY
-		);
-		
-		if (bounds.width < 0)
-		{
-			bounds.x += bounds.width;
-			bounds.width = -bounds.width;
-		}
-		
-		if (bounds.height < 0)
-		{
-			bounds.y += bounds.height;
-			bounds.height = -bounds.height;
-		}
+		super(attacker, target);
+		attackerStart = new Point(attacker.getAbsX(), attacker.getAbsY());
+		targetStart = new Point(target.getAbsX(), target.getAbsY());
 	}
 	
-	public Rectangle getBounds()
-	{
-		return bounds;
-	}
-
 	private static final Stroke stroke = new BasicStroke(
 		2,
 		BasicStroke.CAP_ROUND,
@@ -104,22 +41,15 @@ public class MicrowaveFireAnimation extends WeaponFireAnimation
 		g.setColor(Utils.getTranslucency(Color.WHITE, 193));
 		Stroke oldStroke = ((Graphics2D) g).getStroke();
 		((Graphics2D) g).setStroke(stroke);
+		Point attackerCurrent = new Point(getAttacker().getAbsX(), getAttacker().getAbsY());
+		Point targetCurrent = new Point(getTarget().getAbsX(), getTarget().getAbsY());
 		g.drawLine(
-			unit.getAbsX() + xSpriteOffset,
-			unit.getAbsY() + ySpriteOffset,
-			target.getAbsX() + xTargetOffset,
-			target.getAbsY() + yTargetOffset);
+			getFireOrigin().x - attackerStart.x + attackerCurrent.x,
+			getFireOrigin().y - attackerStart.y + attackerCurrent.y,
+			getFireImpact().x - targetStart.x + targetCurrent.x,
+			getFireImpact().y - targetStart.y + targetCurrent.y
+		);
 		((Graphics2D) g).setStroke(oldStroke);
-	}
-
-	public boolean hasCallback()
-	{
-		return true;
-	}
-	
-	public void step()
-	{
-		throw new Error();
 	}
 	
 	public void step(AtomicReference<Runnable> callback)

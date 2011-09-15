@@ -195,20 +195,12 @@ public class Engine
 					while (animationItr.hasNext())
 					{
 						AmbientAnimation animation = animationItr.next();
-						
-						if (animation.hasCallback())
-						{
-							animation.step(returnValue);
+						animation.step(returnValue);
 							
-							if (returnValue.get() != null)
-							{
-								callbacks.add(returnValue.get());
-								returnValue.set(null);
-							}
-						}
-						else
+						if (returnValue.get() != null)
 						{
-							animation.step();
+							callbacks.add(returnValue.get());
+							returnValue.set(null);
 						}
 						
 						if (animation.isDone())

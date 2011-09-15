@@ -108,16 +108,6 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 		return frame >= frameCount && rings.isEmpty();
 	}
 	
-	public boolean hasCallback()
-	{
-		return true;
-	}
-	
-	public void step()
-	{
-		throw new Error("should call step(AtomicReference)");
-	}
-	
 	public void step(AtomicReference<Runnable> ref)
 	{
 		if (frame == 0)

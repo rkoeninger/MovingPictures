@@ -15,18 +15,8 @@ public abstract class AmbientAnimation
      * Graphics object is translated to the bounding rectangle
      */
     public abstract void paint(Graphics g);
-
-    public abstract void step();
     
-    public void step(AtomicReference<Runnable> ref)
-    {
-    	throw new UnsupportedOperationException("not impl, call step()");
-    }
-    
-    public boolean hasCallback()
-    {
-    	return false;
-    }
+    public abstract void step(AtomicReference<Runnable> ref);
     
     /**
      * Returns true if this animation is done - it is no longer

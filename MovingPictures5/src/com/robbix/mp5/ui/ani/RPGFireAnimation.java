@@ -116,16 +116,6 @@ public class RPGFireAnimation extends WeaponFireAnimation
 		return frame >= totalFrameCount;
 	}
 	
-	public boolean hasCallback()
-	{
-		return true;
-	}
-	
-	public void step()
-	{
-		throw new Error("should call step(AtomicReference)");
-	}
-	
 	public void step(AtomicReference<Runnable> ref)
 	{
 		if (frame == 0)
@@ -170,11 +160,6 @@ public class RPGFireAnimation extends WeaponFireAnimation
 		}
 		
 		frame++;
-	}
-	
-	public Rectangle getBounds()
-	{
-		return bounds;
 	}
 	
 	public void paint(Graphics g)

@@ -126,16 +126,6 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 		return frame >= totalFrameCount;
 	}
 	
-	public boolean hasCallback()
-	{
-		return true;
-	}
-	
-	public void step()
-	{
-		throw new Error("should call step(AtomicReference)");
-	}
-	
 	public void step(AtomicReference<Runnable> ref)
 	{
 		if (frame == 0)
