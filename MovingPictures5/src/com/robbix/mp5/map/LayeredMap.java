@@ -237,7 +237,7 @@ public class LayeredMap
 		if (grid.getBounds().contains(e) && hasWall(e))
 			grid.get(e).tileCode = tileSet.getWallTile(getWallNeighbors(e));
 		
-		panel.refresh();
+		refreshPanel();
 	}
 	
 	public void putTube(Position pos)
@@ -271,7 +271,7 @@ public class LayeredMap
 			branchConnections(pos);
 		}
 		
-		panel.refresh();
+		refreshPanel();
 	}
 	
 	public void putGeyser(Position pos)
@@ -284,7 +284,7 @@ public class LayeredMap
 		spot.fixture = Fixture.GEYSER;
 		costMap.setInfinite(pos);
 		
-		panel.refresh();
+		refreshPanel();
 	}
 	
 	public boolean isAlive(Position pos)
@@ -338,7 +338,7 @@ public class LayeredMap
 		clearFixture(pos);
 		costMap.setZero(pos);
 		grid.get(pos).tileCode = tileSet.getBulldozedTile();
-		panel.refresh();
+		refreshPanel();
 	}
 	
 	public void clearFixture(Position pos)
@@ -611,7 +611,7 @@ public class LayeredMap
 		if (unit.isMine())
 		{
 			grid.get(pos).fixture = Fixture.MINE_PLATFORM;
-			panel.refresh();
+			refreshPanel();
 		}
 	}
 	
@@ -767,7 +767,7 @@ public class LayeredMap
 		
 		if (unit.isStructure())
 		{
-			panel.refresh();
+			refreshPanel();
 		}
 	}
 	
@@ -923,5 +923,11 @@ public class LayeredMap
 		
 		copy.addAll(units);
 		return IterableIterator.iterate(copy);
+	}
+	
+	private void refreshPanel()
+	{
+		if (panel != null)
+			panel.refresh();
 	}
 }

@@ -76,4 +76,32 @@ public abstract class Filter<T>
 			}
 		};
 	}
+
+	/**
+	 * Allows only true.
+	 */
+	public static Filter<Boolean> getTrueFilter()
+	{
+		return new Filter<Boolean>()
+		{
+			public boolean accept(Boolean arg)
+			{
+				return arg;
+			}
+		};
+	}
+
+	/**
+	 * Allows only false.
+	 */
+	public static Filter<Boolean> getFalseFilter()
+	{
+		return new Filter<Boolean>()
+		{
+			public boolean accept(Boolean arg)
+			{
+				return !arg;
+			}
+		};
+	}
 }

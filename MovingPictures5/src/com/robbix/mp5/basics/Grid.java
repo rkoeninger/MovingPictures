@@ -92,6 +92,23 @@ public class Grid<T> implements Iterable<T>
 	}
 	
 	/**
+	 * Creates a Grid with dimensions of region.
+	 */
+	public Grid(Region region)
+	{
+		this(region.w, region.h);
+	}
+	
+	/**
+	 * Creates a Grid with dimensions of region
+	 * with all values set to initValue.
+	 */
+	public Grid(Region region, T initValue)
+	{
+		this(region.w, region.h, initValue);
+	}
+	
+	/**
 	 * Creates a new Grid of the same dimensions and containing the same
 	 * elements in the same Positions as the given Grid.
 	 * 
@@ -220,7 +237,7 @@ public class Grid<T> implements Iterable<T>
 		
 		return null;
 	}
-
+	
 	/**
 	 * Returns the Positions of all occurances of the given value. Returned
 	 * list will be empty if this Grid does not contain the given value.
@@ -238,7 +255,31 @@ public class Grid<T> implements Iterable<T>
 		
 		return indicies;
 	}
-
+	
+	/**
+	 * Returns the Positions of all occurances of the given value in the
+	 * specified Region. Returned list will be empty if this Grid does not
+	 * contain the given value within the specified Region.
+	 */
+	public List<Position> findAll(T value, Region region)
+	{
+		if (!bounds.contains(region))
+			throw new IndexOutOfBoundsException(region.toString());
+		
+		List<Position> indicies = new ArrayList<Position>();
+		
+		for (int x = region.x; x < region.getMaxX(); ++x)
+		for (int y = region.y; y < region.getMaxY(); ++y)
+		{
+			T current = cells[y * w + x];
+			
+			if (current != null && current.equals(value))
+				indicies.add(new Position(x, y));
+		}
+		
+		return indicies;
+	}
+	
 	/**
 	 * Returns the Position of an element whose distance from the given
 	 * Position is minimum.
@@ -316,7 +357,7 @@ public class Grid<T> implements Iterable<T>
 		
 		return null;
 	}
-
+	
 	/**
 	 * Returns the Positions of all occurances of elements that are acceptable
 	 * by the given Filter. Returned list will be empty if this Grid does not
@@ -332,6 +373,30 @@ public class Grid<T> implements Iterable<T>
 		for (int i = 0; i < bounds.a; ++i)
 			if (cells[i] != null && cond.accept(cells[i]))
 				indicies.add(new Position(i % w, i / w));
+		
+		return indicies;
+	}
+	
+	/**
+	 * Returns the Positions of all occurances of elements that are acceptable
+	 * by the given Filter and within the given Region. Returned list will
+	 * be empty if the Region does not contain any such elements.
+	 */
+	public List<Position> findAll(Filter<T> cond, Region region)
+	{
+		if (!bounds.contains(region))
+			throw new IndexOutOfBoundsException(region.toString());
+		
+		List<Position> indicies = new ArrayList<Position>();
+		
+		for (int x = region.x; x < region.getMaxX(); ++x)
+		for (int y = region.y; y < region.getMaxY(); ++y)
+		{
+			T current = cells[y * w + x];
+			
+			if (current != null && cond.accept(current))
+				indicies.add(new Position(x, y));
+		}
 		
 		return indicies;
 	}

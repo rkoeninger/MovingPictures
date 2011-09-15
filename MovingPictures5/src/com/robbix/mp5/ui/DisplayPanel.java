@@ -20,6 +20,8 @@ import javax.swing.Timer;
 
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.CostMap;
+import com.robbix.mp5.basics.Filter;
+import com.robbix.mp5.basics.Grid;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
@@ -37,6 +39,9 @@ public class DisplayPanel extends JComponent
 	private SpriteLibrary sprites;
 	private TileSet tiles;
 	private CursorSet cursors;
+	
+	private Grid<Boolean> dirty;
+	private Filter<Boolean> trueFilter = Filter.getTrueFilter();
 	
 	// FIXME: Proper display assumes this is the same as Map.getSpotSize()
 	private int tileSize = 32;
@@ -92,6 +97,7 @@ public class DisplayPanel extends JComponent
 		
 		this.map = map;
 		map.setDisplayPanel(this);
+		dirty = new Grid<Boolean>(map.getBounds(), true);
 		this.sprites = sprites;
 		this.tiles = tiles;
 		this.tileSize = tiles.getTileSize();
@@ -100,10 +106,16 @@ public class DisplayPanel extends JComponent
 		setBackground(BACKGROUND_BLUE);
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
-		setPreferredSize(new Dimension(
+		Dimension size = new Dimension(
 			map.getWidth()  * tileSize,
-		    map.getHeight() * tileSize
-		));
+			map.getHeight() * tileSize
+		);
+		setPreferredSize(size);
+		this.cachedBackground = new BufferedImage(
+			size.width,
+			size.height,
+			BufferedImage.TYPE_INT_RGB
+		);
 	}
 	
 	public List<String> getOptionNames()
@@ -192,7 +204,7 @@ public class DisplayPanel extends JComponent
 	{
 		synchronized (cacheLock)
 		{
-			cachedBackground = null;
+			dirty.fill(true);
 		}
 		
 		repaint();
@@ -575,6 +587,16 @@ public class DisplayPanel extends JComponent
 		g.drawImage(img, point.x, point.y, null);
 	}
 	
+	public void draw(Graphics g, Image img, Rectangle rect)
+	{
+		g.drawImage(
+			img,
+			rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
+			rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
+			null
+		);
+	}
+	
 	public void draw(Graphics g, Image img, Position pos)
 	{
 		g.drawImage(img, pos.x * tileSize, pos.y * tileSize, null);
@@ -709,73 +731,61 @@ public class DisplayPanel extends JComponent
 	{
 		synchronized (cacheLock)
 		{
-			if (cachedBackground == null)
-			{
-				cachedBackground = new BufferedImage(
-					getWidth(),
-					getHeight(),
-					BufferedImage.TYPE_INT_ARGB
-				);
-				Graphics cg = cachedBackground.getGraphics();
-				Region region = getVisibleRegion();
-				region = map.getBounds().getIntersection(region);
-				
-				if (showTerrainCostMap) drawCostMap(cg, region);
-								   else drawSurface(cg, region);
-				
-				cg.dispose();
-			}
+			Region region = getVisibleRegion();
+			region = map.getBounds().getIntersection(region);
+			List<Position> dirtySpots = dirty.findAll(trueFilter, region);
 			
-			draw(g, cachedBackground, new Point());
+			Graphics cg = cachedBackground.getGraphics();
+			
+			if (showTerrainCostMap) drawCostMap(cg, dirtySpots);
+							   else drawSurface(cg, dirtySpots);
+			
+			cg.dispose();
+			draw(g, cachedBackground, rect);
 		}
 	}
 	
 	/**
 	 * Draws the terrain costmap using Graphics g with in given visible Region.
 	 */
-	private void drawCostMap(Graphics g, Region region)
+	private void drawCostMap(Graphics g, List<Position> dirtySpots)
 	{
 		CostMap terrainCost = map.getTerrainCostMap();
 		g.setFont(costMapFont);
 		
-		for (int y = region.y; y < region.getMaxY(); ++y)
-		for (int x = region.x; x < region.getMaxX(); ++x)
+		for (Position pos : dirtySpots)
 		{
-			g.setColor(Utils.getGrayscale(
-				terrainCost.getScaleFactor(x, y)
-			));
-			fillPosition(g, x, y);
+			g.setColor(Utils.getGrayscale(terrainCost.getScaleFactor(pos)));
+			fill(g, pos);
 			
 			if (showTerrainCostValues)
 			{
-				g.setColor(Utils.getBlackWhiteComplement(
-					g.getColor()
-				));
+				g.setColor(Utils.getBlackWhiteComplement(g.getColor()));
 				
 				double cost = showCostValuesAsFactors
-					? terrainCost.getScaleFactor(x, y)
-					: terrainCost.get(x, y);
+					? terrainCost.getScaleFactor(pos)
+					: terrainCost.get(pos);
 				
 				g.drawString(
 					Double.isInfinite(cost)
 						? "Inf"
 						: String.format("%.2f", cost),
-					x * tileSize + 3,
-					y * tileSize + 11
+					pos.x * tileSize + 3,
+					pos.y * tileSize + 11
 				);
 			}
+			
+			dirty.set(pos, false);
 		}
 	}
 	
 	/**
 	 * Draws the terrain surface image using Graphics g in the visible Region.
 	 */
-	private void drawSurface(Graphics g, Region region)
+	private void drawSurface(Graphics g, List<Position> dirtySpots)
 	{
-		for (int y = region.y; y < region.getMaxY(); ++y)
-		for (int x = region.x; x < region.getMaxX(); ++x)
+		for (Position pos : dirtySpots)
 		{
-			Position pos = new Position(x, y);
 			draw(g, tiles.getTile(map.getTileCode(pos)), pos);
 			
 			if (map.hasMinePlatform(pos))
@@ -786,6 +796,8 @@ public class DisplayPanel extends JComponent
 			{
 				draw(g, sprites.getSprite("aGeyser/geyser"), pos);
 			}
+			
+			dirty.set(pos, false);
 		}
 	}
 	
