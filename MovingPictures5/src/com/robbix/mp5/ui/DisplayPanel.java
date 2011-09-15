@@ -199,12 +199,32 @@ public class DisplayPanel extends JComponent
 			throw new IllegalArgumentException("Not an option: " + name);
 		}
 	}
-
+	
 	public void refresh()
 	{
 		synchronized (cacheLock)
 		{
 			dirty.fill(true);
+		}
+		
+		repaint();
+	}
+	
+	public void refresh(Position pos)
+	{
+		synchronized (cacheLock)
+		{
+			dirty.set(pos, true);
+		}
+		
+		repaint();
+	}
+	
+	public void refresh(Region region)
+	{
+		synchronized (cacheLock)
+		{
+			dirty.fill(map.getBounds().getIntersection(region), true);
 		}
 		
 		repaint();

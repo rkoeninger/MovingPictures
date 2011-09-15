@@ -107,6 +107,18 @@ public class Region implements Iterable<Position>
 	}
 	
 	/**
+	 * Creates a region that contains only the given Position.
+	 */
+	public Region(Position pos)
+	{
+		this.x = pos.x;
+		this.y = pos.y;
+		this.w = 1;
+		this.h = 1;
+		this.a = 1;
+	}
+	
+	/**
 	 * Gets a position representing the upper- and left-most Position
 	 * contained by this Region.
 	 * 
@@ -158,7 +170,28 @@ public class Region implements Iterable<Position>
 	{
 		return new Region(x + dx, y + dy, w, h);
 	}
-
+	
+	/**
+	 * Streches Region in all four directions by d
+	 */
+	public Region stretch(int d)
+	{
+		return new Region(x - d, y - d, w + 2 * d, h + 2 * d);
+	}
+	
+	/**
+	 * Shrinks Region in all four directions by d
+	 */
+	public Region shrink(int d)
+	{
+		return new Region(
+			Math.min(x + d, x + w / 2),
+			Math.min(y + d, y + h / 2),
+			Math.max(w - 2 * d, 0),
+			Math.max(h - 2 * d, 0)
+		);
+	}
+	
 	/**
 	 * Returns a new Region whose upper-left corner is the given Position.
 	 */

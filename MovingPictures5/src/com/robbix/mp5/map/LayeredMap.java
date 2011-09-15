@@ -237,7 +237,7 @@ public class LayeredMap
 		if (grid.getBounds().contains(e) && hasWall(e))
 			grid.get(e).tileCode = tileSet.getWallTile(getWallNeighbors(e));
 		
-		refreshPanel();
+		refreshPanel(new Region(pos).stretch(1));
 	}
 	
 	public void putTube(Position pos)
@@ -271,7 +271,7 @@ public class LayeredMap
 			branchConnections(pos);
 		}
 		
-		refreshPanel();
+		refreshPanel(new Region(pos).stretch(1));
 	}
 	
 	public void putGeyser(Position pos)
@@ -284,7 +284,7 @@ public class LayeredMap
 		spot.fixture = Fixture.GEYSER;
 		costMap.setInfinite(pos);
 		
-		refreshPanel();
+		refreshPanel(new Region(pos).stretch(1));
 	}
 	
 	public boolean isAlive(Position pos)
@@ -338,7 +338,7 @@ public class LayeredMap
 		clearFixture(pos);
 		costMap.setZero(pos);
 		grid.get(pos).tileCode = tileSet.getBulldozedTile();
-		refreshPanel();
+		refreshPanel(new Region(pos).stretch(1));
 	}
 	
 	public void clearFixture(Position pos)
@@ -574,15 +574,12 @@ public class LayeredMap
 		
 		if (unit.isStructure() || unit.getType().isGuardPostType())
 		{
-			Region outer = unit.getFootprint().getInnerRegion();
-			outer = new Region(
-				outer.x - 1,
-				outer.y - 1,
-				outer.w + 2,
-				outer.h + 2
-			);
+			Region outer = unit.getFootprint()
+							   .getInnerRegion()
+							   .move(pos)
+							   .stretch(1);
 			
-			for (Position bullPos : outer.iterator(unit.getPosition()))
+			for (Position bullPos : outer)
 			{
 				boolean contained = getBounds().contains(bullPos);
 				
@@ -611,7 +608,7 @@ public class LayeredMap
 		if (unit.isMine())
 		{
 			grid.get(pos).fixture = Fixture.MINE_PLATFORM;
-			refreshPanel();
+			refreshPanel(pos);
 		}
 	}
 	
@@ -767,7 +764,11 @@ public class LayeredMap
 		
 		if (unit.isStructure())
 		{
-			refreshPanel();
+			Region outer = unit.getFootprint()
+							   .getInnerRegion()
+							   .move(pos)
+							   .stretch(1);
+			refreshPanel(outer);
 		}
 	}
 	
@@ -925,9 +926,23 @@ public class LayeredMap
 		return IterableIterator.iterate(copy);
 	}
 	
+	// unused - as it should be for optimality's sake
+	@SuppressWarnings("unused")
 	private void refreshPanel()
 	{
 		if (panel != null)
 			panel.refresh();
+	}
+
+	private void refreshPanel(Position pos)
+	{
+		if (panel != null)
+			panel.refresh(pos);
+	}
+
+	private void refreshPanel(Region region)
+	{
+		if (panel != null)
+			panel.refresh(region);
 	}
 }
