@@ -65,6 +65,9 @@ public class Mediator
 	{
 		if (attacker.getCharge() < attacker.getType().getWeaponChargeCost())
 			return;
+		else if (attacker.getPosition().getDistance(target.getPosition())
+				> attacker.getType().getAttackRange())
+			return;
 		
 		attacker.discharge();
 		
