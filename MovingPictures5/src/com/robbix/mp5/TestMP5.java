@@ -346,6 +346,7 @@ public class TestMP5
 		panel.setShowTerrainCostValues(true);
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
+		game.getView().showScrollbars(false);
 		
 		final JMenuBar menuBar = new JMenuBar();
 		final JMenu engineMenu = new JMenu("Engine");
