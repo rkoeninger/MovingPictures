@@ -700,7 +700,7 @@ public class DisplayPanel extends JComponent
 		 * Units are returned by UnitLayer iterator already in z-order.
 		 */
 		for (Unit unit : map.getUnitIterator(true))
-			if (region.intersects(unit.getFootprint().getInnerRegion()))
+			if (region.intersects(unit.getOccupiedBounds()))
 				drawUnit(g, unit);
 		
 		/*

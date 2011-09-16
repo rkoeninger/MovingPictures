@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.Sprite;
@@ -590,6 +591,11 @@ public class Unit
 	public int getHeight()
 	{
 		return getType().getFootprint().getInnerRegion().h;
+	}
+	
+	public Region getOccupiedBounds()
+	{
+		return type.getFootprint().getInnerRegion().move(pos);
 	}
 	
 	public boolean isIdle()
