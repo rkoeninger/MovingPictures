@@ -62,7 +62,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public Position getCursorPosition()
 	{
-		return panel.getPosition(currentPoint);
+		return currentPoint == null ? null : panel.getPosition(currentPoint);
 	}
 	
 	public boolean isDragging()
@@ -77,12 +77,12 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public Region getDragRegion()
 	{
-		return panel.getRegion(dragArea);
+		return dragArea == null ? null : panel.getRegion(dragArea);
 	}
 	
 	public Region getEnclosedDragRegion()
 	{
-		return panel.getEnclosedRegion(dragArea);
+		return dragArea == null ? null : panel.getEnclosedRegion(dragArea);
 	}
 	
 	public Region getLinearDragRegion()
@@ -114,10 +114,10 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public Edge getPointEdge(int x, int y)
 	{
-		int w = panel.getVisibleRect().width;
-		int h = panel.getVisibleRect().height;
-		int x0 = panel.getVisibleRect().x;
-		int y0 = panel.getVisibleRect().y;
+		int w  = panel.getWidth();
+		int h  = panel.getHeight();
+		int x0 = 0;
+		int y0 = 0;
 		
 		return Edge.values()[((x - x0) / (w / 3)) + (((y - y0) / (h / 3)) * 3)];
 	}
@@ -138,40 +138,54 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public void onAreaDragCancelled(){}
 	public void onCommand(String command){}
 	
+	public final void keyPressed(KeyEvent e)
+	{
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+		{
+			complete();
+		}
+	}
+	
 	public final void mousePressed(MouseEvent e)
 	{
 		pressedPoint = e.getPoint();
+		panel.addViewOffset(pressedPoint);
 	}
 	
 	public final void mouseReleased(MouseEvent e)
 	{
+		Point mousePoint = panel.addViewOffset(e.getPoint());
+		
 		if (pressedPoint != null)
 		{
-			if (pressedPoint.distanceSq(e.getPoint()) < DRAG_THRESHOLD)
+			if (pressedPoint.distanceSq(mousePoint) < DRAG_THRESHOLD)
 			{
-				if      (e.getButton() == LEFT)   onLeftClick  (e.getX(), e.getY());
-				else if (e.getButton() == MIDDLE) onMiddleClick(e.getX(), e.getY());
-				else if (e.getButton() == RIGHT)  onRightClick (e.getX(), e.getY());
+				if      (e.getButton() == LEFT)   onLeftClick  (pressedPoint.x, pressedPoint.y);
+				else if (e.getButton() == MIDDLE) onMiddleClick(pressedPoint.x, pressedPoint.y);
+				else if (e.getButton() == RIGHT)  onRightClick (pressedPoint.x, pressedPoint.y);
 				
 				if (dragArea != null)
 				{
 					onAreaDragCancelled();
-					dragArea = null;
 				}
 			}
 			else
 			{
 				prepNormalDragArea(e.getX(), e.getY());
-				onAreaDragged(
-					dragArea.x,
-					dragArea.y,
-					dragArea.width,
-					dragArea.height
-				);
-				dragArea = null;
+				
+				if (dragArea != null)
+				{
+					onAreaDragged(
+						dragArea.x,
+						dragArea.y,
+						dragArea.width,
+						dragArea.height
+					);
+				}
 			}
 			
 			pressedPoint = null;
+			dragArea = null;
 		}
 	}
 	
@@ -207,18 +221,24 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public final void mouseClicked(MouseEvent e){}
 	public final void mouseWheelMoved(MouseWheelEvent e){}
 	public final void keyTyped(KeyEvent e){}
-	public final void keyPressed(KeyEvent e){}
 	public final void keyReleased(KeyEvent e){}
 	
-	private boolean panelContains(int x, int y)
+	private boolean panelContains(int x, int y) // in terms of relative co-ords
 	{
-		return x > 0
-			&& y > 0
-			&& x < panel.getWidth()
-			&& y < panel.getHeight();
+		Point p = new Point(x, y);
+		panel.addViewOffset(p);
+		
+//		int hSpace = panel.getHorizontalLetterBoxSpace();
+//		int vSpace = panel.getVerticalLetterBoxSpace();
+//		
+//		return p.x >= hSpace
+//			&& p.y >= vSpace
+//			&& p.x <  panel.getWidth()  - hSpace
+//			&& p.y <  panel.getHeight() - vSpace;
+		return panel.getDisplayRect().contains(p);
 	}
 	
-	private void prepCursorPoint(int x, int y)
+	private void prepCursorPoint(int x, int y) // in terms of relative co-ords
 	{
 		if (panelContains(x, y))
 		{
@@ -229,6 +249,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			
 			currentPoint.x = x;
 			currentPoint.y = y;
+			panel.addViewOffset(currentPoint);
 		}
 		else
 		{
@@ -236,8 +257,15 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		}
 	}
 	
-	private void prepNormalDragArea(int x, int y)
+	private void prepNormalDragArea(int x, int y) // in terms of relative co-ords
 	{
+		prepCursorPoint(x, y);
+		
+		if (currentPoint == null)
+		{
+			return;
+		}
+		
 		if (dragArea == null)
 		{
 			dragArea = new Rectangle();
@@ -245,8 +273,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		
 		dragArea.x = pressedPoint.x;
 		dragArea.y = pressedPoint.y;
-		dragArea.width  = x - dragArea.x;
-		dragArea.height = y - dragArea.y;
+		dragArea.width  = currentPoint.x - dragArea.x;
+		dragArea.height = currentPoint.y - dragArea.y;
 		
 		if (dragArea.width < 0)
 		{

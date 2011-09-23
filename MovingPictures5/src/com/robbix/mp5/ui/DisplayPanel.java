@@ -10,10 +10,20 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+
+import static java.awt.event.KeyEvent.*;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.Timer;
@@ -44,9 +54,10 @@ public class DisplayPanel extends JComponent
 	private Filter<Boolean> trueFilter = Filter.getTrueFilter();
 	
 	// FIXME: Proper display assumes this is the same as Map.getSpotSize()
+	private Point scrollPoint = new Point();
 	private int tileSize = 32;
 	
-	private BufferedImage cachedBackground = null;
+	private Map<Integer, BufferedImage> cachedBackgrounds = null;
 	private Object cacheLock = new Object();
 	
 	private static Font costMapFont = Font.decode("Arial-9");
@@ -111,11 +122,12 @@ public class DisplayPanel extends JComponent
 			map.getHeight() * tileSize
 		);
 		setPreferredSize(size);
-		this.cachedBackground = new BufferedImage(
-			size.width,
-			size.height,
-			BufferedImage.TYPE_INT_RGB
-		);
+		this.cachedBackgrounds = new HashMap<Integer, BufferedImage>();
+		addKeyListener(new KeyEvents());
+		MouseEvents mouseEvents = new MouseEvents();
+		addMouseWheelListener(mouseEvents);
+		addMouseMotionListener(mouseEvents);
+		addMouseListener(mouseEvents);
 	}
 	
 	public List<String> getOptionNames()
@@ -462,6 +474,289 @@ public class DisplayPanel extends JComponent
 		return animations;
 	}
 	
+	private class KeyEvents extends KeyAdapter
+	{
+		public void keyPressed(KeyEvent e)
+		{
+			switch (e.getKeyCode())
+			{
+			case VK_UP:     scrollUp();    break;
+			case VK_DOWN:   scrollDown();  break;
+			case VK_LEFT:   scrollLeft();  break;
+			case VK_RIGHT:  scrollRight(); break;
+			case VK_MINUS:  zoomOut();     break;
+			case VK_EQUALS: zoomIn();      break;
+			}
+			
+			repaint();
+		}
+	}
+	
+	private class MouseEvents extends MouseAdapter
+	{
+		public void mouseWheelMoved(MouseWheelEvent e)
+		{
+			if (e.isControlDown())
+			{
+				Point zoomPoint = e.getPoint();
+				zoomPoint.x -= scrollPoint.x;
+				zoomPoint.y -= scrollPoint.y;
+				
+				if (e.getWheelRotation() > 0) zoomIn(zoomPoint);
+				else                          zoomOut(zoomPoint);
+			}
+		}
+		
+		public void mouseClicked(MouseEvent e)
+		{
+			if (e.isControlDown() && e.getButton() == MouseEvent.BUTTON2)
+			{
+				if (tileSize == tiles.getTileSize())
+				{
+					zoomGlobal();
+				}
+				else
+				{
+					Point zoomPoint = e.getPoint();
+					zoomPoint.x -= scrollPoint.x;
+					zoomPoint.y -= scrollPoint.y;
+					zoomNormal(zoomPoint);
+				}
+			}
+		}
+	}
+	
+	public int getTotalWidth()
+	{
+		return map.getWidth() * tileSize;
+	}
+	
+	public int getTotalHeight()
+	{
+		return map.getHeight() * tileSize;
+	}
+	
+	public int getVerticalLetterBoxSpace()
+	{
+		return Math.max(0, (getHeight() - getTotalHeight()) / 2);
+	}
+	
+	public int getHorizontalLetterBoxSpace()
+	{
+		return Math.max(0, (getWidth() - getTotalWidth()) / 2);
+	}
+	
+	public Point getViewPosition()
+	{
+		return new Point(scrollPoint);
+	}
+	
+	public Point getViewCenterPosition()
+	{
+		return new Point(
+			 (getWidth()  / 2) - scrollPoint.x,
+			 (getHeight() / 2) - scrollPoint.y
+		);
+	}
+	
+	public int getViewX()
+	{
+		return scrollPoint.x;
+	}
+	
+	public int getViewY()
+	{
+		return scrollPoint.y;
+	}
+	
+	public Point addViewOffset(Point p)
+	{
+		p.translate(-scrollPoint.x, -scrollPoint.y);
+		return p;
+	}
+	
+	public Point subtractViewOffset(Point p)
+	{
+		p.translate(scrollPoint.x, scrollPoint.y);
+		return p;
+	}
+	
+	public void setViewPosition(int x, int y)
+	{
+		scrollPoint.x = x;
+		scrollPoint.y = y;
+		centerAsNeeded();
+		refresh(getDisplayRegion());
+	}
+	
+	public void shiftViewPosition(int dx, int dy)
+	{
+		scrollPoint.x += dx;
+		scrollPoint.y += dy;
+		centerAsNeeded();
+		refresh(getDisplayRegion());
+	}
+	
+	public void setViewCenterPosition(int x, int y)
+	{
+		setViewPosition(
+			(getWidth()  / 2) - x,
+			(getHeight() / 2) - y
+		);
+	}
+	
+	private void centerAsNeeded()
+	{
+		int diffWidth  = getWidth()  - getTotalWidth();
+		int diffHeight = getHeight() - getTotalHeight();
+		
+		scrollPoint.x = (diffWidth > 0)
+			? diffWidth / 2
+			: Math.max(Math.min(scrollPoint.x, 0), diffWidth);
+		
+		scrollPoint.y = (diffHeight > 0)
+			? diffHeight / 2
+			: Math.max(Math.min(scrollPoint.y, 0), diffHeight);
+		
+		refresh(getDisplayRegion());
+	}
+	
+	public void scrollUp()
+	{
+		if (getTotalHeight() > getHeight())
+		{
+			scrollPoint.y += Math.max(1, tileSize / 2);
+			scrollPoint.y = Math.min(scrollPoint.y, 0);
+			refresh(getDisplayRegion());
+		}
+	}
+	
+	public void scrollDown()
+	{
+		if (getTotalHeight() > getHeight())
+		{
+			scrollPoint.y -= Math.max(1, tileSize / 2);
+			scrollPoint.y = Math.max(scrollPoint.y, getHeight() - getTotalHeight());
+			refresh(getDisplayRegion());
+		}
+	}
+	
+	public void scrollLeft()
+	{
+		if (getTotalWidth() > getWidth())
+		{
+			scrollPoint.x += Math.max(1, tileSize / 2);
+			scrollPoint.x = Math.min(scrollPoint.x, 0);
+			refresh(getDisplayRegion());
+		}
+	}
+	
+	public void scrollRight()
+	{
+		if (getTotalWidth() > getWidth())
+		{
+			scrollPoint.x -= Math.max(1, tileSize / 2);
+			scrollPoint.x = Math.max(scrollPoint.x, getWidth() - getTotalWidth());
+			refresh(getDisplayRegion());
+		}
+	}
+	
+	public void zoomIn()
+	{
+		zoomIn(getViewCenterPosition());
+	}
+	
+	public void zoomOut()
+	{
+		zoomOut(getViewCenterPosition());
+	}
+	
+	public void zoomNormal()
+	{
+		zoomNormal(getViewCenterPosition());
+	}
+	
+	public void zoomGlobal()
+	{
+		tileSize = 1;
+		setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
+		setViewCenterPosition(getWidth() / 2, getHeight() / 2);
+		refresh();
+	}
+	
+	public void zoomIn(Position pos)
+	{
+		zoomIn(getPoint(pos));
+	}
+	
+	public void zoomOut(Position pos)
+	{
+		zoomOut(getPoint(pos));
+	}
+	
+	public void zoomNormal(Position pos)
+	{
+		zoomNormal(getPoint(pos));
+	}
+	
+	public void zoomIn(Point center)
+	{
+		if (tileSize < 32)
+		{
+			double xFraction = center.x / (double) getTotalWidth();
+			double yFraction = center.y / (double) getTotalHeight();
+			tileSize *= 2;
+			setPreferredSize(new Dimension(map.getWidth() * tileSize, map.getHeight() * tileSize));
+			setViewCenterPosition(
+				(int) (xFraction * getTotalWidth()),
+				(int) (yFraction * getTotalHeight())
+			);
+			refresh(getDisplayRegion());
+		}
+	}
+	
+	public void zoomOut(Point center)
+	{
+		if (tileSize > 1)
+		{
+			double xFraction = center.x / (double) getTotalWidth();
+			double yFraction = center.y / (double) getTotalHeight();
+			tileSize /= 2;
+			setPreferredSize(new Dimension(map.getWidth() * tileSize, map.getHeight() * tileSize));
+			setViewCenterPosition(
+				(int) (xFraction * getTotalWidth()),
+				(int) (yFraction * getTotalHeight())
+			);
+			refresh(getDisplayRegion());
+		}
+	}
+	
+	public void zoomNormal(Point center)
+	{
+		if (tileSize != tiles.getTileSize())
+		{
+			double xFraction = center.x / (double) getTotalWidth();
+			double yFraction = center.y / (double) getTotalHeight();
+			tileSize = tiles.getTileSize();;
+			setPreferredSize(new Dimension(map.getWidth() * tileSize, map.getHeight() * tileSize));
+			setViewCenterPosition(
+				(int) (xFraction * getTotalWidth()),
+				(int) (yFraction * getTotalHeight())
+			);
+			refresh(getDisplayRegion());
+		}
+	}
+	
+	/**
+	 * Should be the root of methods: setSize, setBounds, resize.
+	 */
+	@SuppressWarnings("deprecation")
+	public void reshape(int x, int y, int width, int height)
+	{
+		super.reshape(x, y, width, height);
+		centerAsNeeded();
+	}
+	
 	/**
 	 * Gets the current size of grid tiles considering the TileSet's
 	 * standard tile size and the current zoom level.
@@ -547,13 +842,26 @@ public class DisplayPanel extends JComponent
 			region.h * tileSize
 		);
 	}
+
+	/**
+	 * Gets the region of pixels currently visible on this display.
+	 */
+	public Rectangle getDisplayRect()
+	{
+		return new Rectangle(
+			-scrollPoint.x,
+			-scrollPoint.y,
+			getWidth(),
+			getHeight()
+		);
+	}
 	
 	/**
 	 * Gets the region of positions currently visible on this display.
 	 */
-	public Region getVisibleRegion()
+	public Region getDisplayRegion()
 	{
-		return getRegion(getVisibleRect());
+		return getRegion(getDisplayRect());
 	}
 	
 	public void draw(Graphics g, Position pos)
@@ -648,14 +956,33 @@ public class DisplayPanel extends JComponent
 		);
 	}
 	
+	public void translate(Graphics g, int dx, int dy)
+	{
+		Rectangle bounds = g.getClipBounds();
+		g.translate(bounds.x + dx, bounds.y + dy);
+	}
+	
 	/**
 	 * Paints the visible rect of the map, including terrain, units and
 	 * overlays.
 	 */
 	public void paintComponent(Graphics g)
 	{
-		final Rectangle rect = getVisibleRect();
-		final Region region = getRegion(rect);
+		/*
+		 * Draw letter-box around display when panel is bigger
+		 * than visible area.
+		 */
+		g.setColor(Color.BLACK);
+		int hEdgeSpace = getHorizontalLetterBoxSpace();
+		int vEdgeSpace = getVerticalLetterBoxSpace();
+		g.fillRect(0, 0, hEdgeSpace, getHeight());
+		g.fillRect(getWidth() - hEdgeSpace, 0, hEdgeSpace, getHeight());
+		g.fillRect(0, 0, getWidth(), vEdgeSpace);
+		g.fillRect(0, getHeight() - vEdgeSpace, getWidth(), vEdgeSpace);
+		
+		Rectangle rect = getDisplayRect();
+		Region region = getRegion(rect);
+		translate(g, scrollPoint.x, scrollPoint.y);
 		
 		/*
 		 * Draw terrian.
@@ -675,11 +1002,11 @@ public class DisplayPanel extends JComponent
 		/*
 		 * Draw grid
 		 */
-		if (showGrid)
+		if (showGrid && tileSize >= 8)
 		{
 			g.setColor(Color.BLACK);
-			int w = getWidth();
-			int h = getHeight();
+			int w = getTotalWidth();
+			int h = getTotalHeight();
 			
 			for (int x = region.x; x < region.getMaxX(); ++x)
 				g.drawLine(x * tileSize, 0, x * tileSize, h);
@@ -745,6 +1072,8 @@ public class DisplayPanel extends JComponent
 		 */
 		if (! overlays.isEmpty())
 			overlays.getFirst().paintOverUnits(g, rect);
+		
+		translate(g, -scrollPoint.x, -scrollPoint.y);
 	}
 	
 	/**
@@ -755,9 +1084,22 @@ public class DisplayPanel extends JComponent
 	{
 		synchronized (cacheLock)
 		{
-			Region region = getVisibleRegion();
+			Region region = getDisplayRegion();
 			region = map.getBounds().getIntersection(region);
 			List<Position> dirtySpots = dirty.findAll(trueFilter, region);
+			
+			BufferedImage cachedBackground = cachedBackgrounds.get(tileSize);
+			
+			if (cachedBackground == null)
+			{
+				cachedBackground = new BufferedImage(
+					map.getWidth() * tileSize,
+					map.getHeight() * tileSize,
+					BufferedImage.TYPE_INT_RGB
+				);
+				
+				cachedBackgrounds.put(tileSize, cachedBackground);
+			}
 			
 			Graphics cg = cachedBackground.getGraphics();
 			

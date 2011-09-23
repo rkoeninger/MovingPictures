@@ -44,7 +44,6 @@ import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.CommandButton;
 import com.robbix.mp5.ui.DisplayPanel;
-import com.robbix.mp5.ui.DisplayPanelView;
 import com.robbix.mp5.ui.PlayerStatus;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.TitleBar;
@@ -346,7 +345,6 @@ public class TestMP5
 		panel.setShowTerrainCostValues(true);
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
-		game.getView().showScrollbars(false);
 		
 		final JMenuBar menuBar = new JMenuBar();
 		final JMenu engineMenu = new JMenu("Engine");
@@ -579,16 +577,25 @@ public class TestMP5
 		frame.setJMenuBar(menuBar);
 		frame.setLayout(new BorderLayout());
 //		frame.add(commandBar, BorderLayout.EAST);
-		frame.add(game.getView(), BorderLayout.CENTER);
+		frame.add(panel, BorderLayout.CENTER);
 		frame.add(statusesPanel, BorderLayout.SOUTH);
-//		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 		frame.pack();
-		frame.setSize(
-			Math.min(frame.getWidth(),  windowBounds.width),
-			Math.min(frame.getHeight(), windowBounds.height)
-		);
+		
+		if (frame.getWidth()  > windowBounds.width
+		 && frame.getHeight() > windowBounds.height)
+		{
+			frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		}
+		else
+		{
+			frame.setSize(
+				Math.min(frame.getWidth(),  windowBounds.width),
+				Math.min(frame.getHeight(), windowBounds.height)
+			);
+		}
+		
 		frame.setLocation(
 			windowBounds.x + (windowBounds.width  - frame.getWidth())  / 2,
 			windowBounds.y + (windowBounds.height - frame.getHeight()) / 2
@@ -598,8 +605,7 @@ public class TestMP5
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				DisplayPanelView view = game.getView();
-				view.showScrollbars(! view.areScrollBarsVisible());
+				// TODO: show/hide scroll bars
 			}
 		});
 		
@@ -1167,7 +1173,7 @@ public class TestMP5
 			ioe.printStackTrace();
 		}
 		
-		game.getView().center(new Position(24, 26));
+//		game.getView().center(new Position(24, 26));
 	}
 	
 	public static String mapCombatDemo()
@@ -1264,7 +1270,7 @@ public class TestMP5
 			ioe.printStackTrace();
 		}
 		
-		game.getView().center(center);
+//		game.getView().center(center);
 	}
 	
 	public static class NotMyTeamFilter extends Filter<Unit>

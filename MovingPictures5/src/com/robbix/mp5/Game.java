@@ -14,7 +14,6 @@ import com.robbix.mp5.map.TileSet;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.CursorSet;
 import com.robbix.mp5.ui.DisplayPanel;
-import com.robbix.mp5.ui.DisplayPanelView;
 import com.robbix.mp5.ui.SoundBank;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.UnitFactory;
@@ -49,7 +48,6 @@ public class Game
 			game.tileSet,
 			game.cursorSet
 		);
-		game.view = new DisplayPanelView(game.panel);
 		
 		return game;
 	}
@@ -58,7 +56,6 @@ public class Game
 	private Player defaultPlayer;
 	
 	private DisplayPanel panel;
-	private DisplayPanelView view;
 	private LayeredMap map;
 	private SpriteLibrary spriteLib;
 	private SoundBank sounds;
@@ -88,11 +85,6 @@ public class Game
 	public DisplayPanel getDisplay()
 	{
 		return panel;
-	}
-	
-	public DisplayPanelView getView()
-	{
-		return view;
 	}
 	
 	public SpriteLibrary getSpriteLibrary()

@@ -3,6 +3,7 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.List;
 
@@ -122,7 +123,8 @@ public class CommandUnitOverlay extends InputOverlay
 	
 	public void onMiddleClick(int x, int y)
 	{
-		Edge edge = getPointEdge(x, y);
+		Point p = panel.subtractViewOffset(new Point(x, y));
+		Edge edge = getPointEdge(p.x, p.y);
 		
 		if (edge == Edge.SW)
 		{
