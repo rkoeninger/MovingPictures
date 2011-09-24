@@ -147,8 +147,10 @@ public class Mediator
 		if (range <= 0 || amount <= 0)
 			return;
 		
-		int absX = pos.x * panel.getTileSize();
-		int absY = pos.y * panel.getTileSize();
+		int spotSize = map.getSpotSize();
+		
+		int absX = pos.x * spotSize;
+		int absY = pos.y * spotSize;
 		
 		int rangeInt = (int)Math.ceil(range);
 		
@@ -167,12 +169,12 @@ public class Mediator
 			
 			if (unit != null)
 			{
-				int unitAbsX = unit.getAbsX();
-				int unitAbsY = unit.getAbsY();
+				int unitAbsX = unit.getX() * spotSize + unit.getXOffset();
+				int unitAbsY = unit.getY() * spotSize + unit.getYOffset();
 				
 				double absDist = Math.hypot(unitAbsX - absX, unitAbsY - absY);
 				
-				if (absDist <= (range * panel.getTileSize()))
+				if (absDist <= (range * spotSize))
 				{
 					affectedUnits.add(unit);
 				}
@@ -180,7 +182,7 @@ public class Mediator
 			
 			double absDist = current.getDistance(pos);
 			
-			if (absDist <= (range * panel.getTileSize()))
+			if (absDist <= (range * spotSize))
 			{
 				if (map.hasWall(current) || map.hasTube(current))
 				{
@@ -436,14 +438,10 @@ public class Mediator
 				? "aDeath/arachnidKilled"
 				: "aDeath/vehicleKilled";
 			
-			int tileSize = panel.getTileSize();
-			Position pos = unit.getPosition();
 			map.remove(unit);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				panel.getSpriteLibrary().getSequence(seq),
-				new Point(
-					pos.x * tileSize + unit.getXOffset(),
-					pos.y * tileSize + unit.getYOffset()),
+				new Point(unit.getAbsX(), unit.getAbsY()),
 				2
 			));
 			sounds.play("smallExplosion1");
@@ -463,7 +461,6 @@ public class Mediator
 			if (unit.isTurret())
 				unit = unit.getChassis();
 			
-			int tileSize = panel.getTileSize();
 			Position pos = unit.getPosition();
 			
 			String path = null;
@@ -495,9 +492,7 @@ public class Mediator
 			map.remove(unit);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				panel.getSpriteLibrary().getSequence(path),
-				new Point(
-					pos.x * tileSize + unit.getXOffset(),
-					pos.y * tileSize + unit.getYOffset()),
+				new Point(unit.getAbsX(), unit.getAbsY()),
 				2
 			));
 			doSplashDamage(pos, damage, range);

@@ -53,7 +53,6 @@ public class DisplayPanel extends JComponent
 	private Grid<Boolean> dirty;
 	private Filter<Boolean> trueFilter = Filter.getTrueFilter();
 	
-	// FIXME: Proper display assumes this is the same as Map.getSpotSize()
 	private Point scrollPoint = new Point();
 	private int tileSize = 32;
 	

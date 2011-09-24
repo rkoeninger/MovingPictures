@@ -9,7 +9,7 @@ import com.robbix.mp5.unit.Unit;
  */
 public class MoveTask extends Task
 {
-	private int tileSize;
+	private int spotSize;
 	
 	private double absX;
 	private double absY;
@@ -25,22 +25,22 @@ public class MoveTask extends Task
 	public MoveTask(Unit unit)
 	{
 		super(false, Task.VEHICLE_ONLY);
-		initAbsX = unit.getAbsX();
-		initAbsY = unit.getAbsY();
+		spotSize = unit.getMap().getSpotSize();
+		initAbsX = unit.getX() * spotSize + unit.getXOffset();
+		initAbsY = unit.getY() * spotSize + unit.getYOffset();
 		absX = initAbsX;
 		absY = initAbsY;
-		tileSize = unit.getMap().getSpotSize();
 	}
 	
 	public void step(Unit unit)
 	{
 		if (Double.isNaN(initAbsX))
 		{
-			initAbsX = unit.getAbsX();
-			initAbsY = unit.getAbsY();
+			spotSize = unit.getMap().getSpotSize();
+			initAbsX = unit.getX() * spotSize + unit.getXOffset();
+			initAbsY = unit.getY() * spotSize + unit.getYOffset();
 			absX = initAbsX;
 			absY = initAbsY;
-			tileSize = unit.getMap().getSpotSize();
 		}
 		
 		final Direction dir = unit.getDirection();
@@ -48,8 +48,8 @@ public class MoveTask extends Task
 		absX += unit.getSpeed() * dir.cos();
 		absY += unit.getSpeed() * dir.sin();
 		
-		final int xOff = ((int) Math.round(absX)) - unit.getX() * tileSize;
-		final int yOff = ((int) Math.round(absY)) - unit.getY() * tileSize;
+		final int xOff = ((int) Math.round(absX)) - unit.getX() * spotSize;
+		final int yOff = ((int) Math.round(absY)) - unit.getY() * spotSize;
 		
 		final int frameIncrement =
 			Math.max(Math.abs(xOff - unit.getXOffset()),
@@ -69,14 +69,14 @@ public class MoveTask extends Task
 		 * current cell and next cell (on the x-axis),
 		 * set marker to shift position on the grid.
 		 */
-		if (dir.getDX() > 0 && unit.getXOffset() > (tileSize / 2))
+		if (dir.getDX() > 0 && unit.getXOffset() > (spotSize / 2))
 		{
-			unit.shiftXOffset(-tileSize);
+			unit.shiftXOffset(-spotSize);
 			xGridShift = 1;
 		}
-		else if (dir.getDX() < 0 && unit.getXOffset() < -(tileSize / 2))
+		else if (dir.getDX() < 0 && unit.getXOffset() < -(spotSize / 2))
 		{
-			unit.shiftXOffset(tileSize);
+			unit.shiftXOffset(spotSize);
 			xGridShift = -1;
 		}
 
@@ -85,14 +85,14 @@ public class MoveTask extends Task
 		 * current cell and next cell (on the y-axis),
 		 * set marker to shift position on the grid.
 		 */
-		if (dir.getDY() > 0 && unit.getYOffset() > (tileSize / 2))
+		if (dir.getDY() > 0 && unit.getYOffset() > (spotSize / 2))
 		{
-			unit.shiftYOffset(-tileSize);
+			unit.shiftYOffset(-spotSize);
 			yGridShift = 1;
 		}
-		else if (dir.getDY() < 0 && unit.getYOffset() < -(tileSize / 2))
+		else if (dir.getDY() < 0 && unit.getYOffset() < -(spotSize / 2))
 		{
-			unit.shiftYOffset(tileSize);
+			unit.shiftYOffset(spotSize);
 			yGridShift = -1;
 		}
 		
@@ -113,10 +113,10 @@ public class MoveTask extends Task
 		 * If unit has reached (or surpassed) the center of the next cell,
 		 * recenter unit and end task.
 		 */
-		if ((dir.getDX() > 0 && absX - initAbsX >=  tileSize)
-		||  (dir.getDX() < 0 && absX - initAbsX <= -tileSize)
-		||	(dir.getDY() > 0 && absY - initAbsY >=  tileSize)
-		||  (dir.getDY() < 0 && absY - initAbsY <= -tileSize))
+		if ((dir.getDX() > 0 && absX - initAbsX >=  spotSize)
+		||  (dir.getDX() < 0 && absX - initAbsX <= -spotSize)
+		||	(dir.getDY() > 0 && absY - initAbsY >=  spotSize)
+		||  (dir.getDY() < 0 && absY - initAbsY <= -spotSize))
 		{
 			unit.setXOffset(0);
 			unit.setYOffset(0);

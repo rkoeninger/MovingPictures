@@ -583,17 +583,22 @@ public class TestMP5
 		frame.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 		frame.pack();
 		
+		boolean maximize = false;
+		
 		if (frame.getWidth()  > windowBounds.width
 		 && frame.getHeight() > windowBounds.height)
 		{
-			frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+			maximize = true;
 		}
-		else
+		
+		frame.setSize(
+			Math.min(frame.getWidth(),  windowBounds.width),
+			Math.min(frame.getHeight(), windowBounds.height)
+		);
+		
+		if (maximize)
 		{
-			frame.setSize(
-				Math.min(frame.getWidth(),  windowBounds.width),
-				Math.min(frame.getHeight(), windowBounds.height)
-			);
+			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		}
 		
 		frame.setLocation(

@@ -175,14 +175,30 @@ public class Unit
 		return type.isGuardPostType() ? this : turret;
 	}
 	
+	/**
+	 * Gets x offset in terms of map.getSpotSize().
+	 */
 	public int getXOffset()
 	{
 		return chassis == null ? offX : chassis.offX;
 	}
 	
+	/**
+	 * Gets y offset in terms of map.getSpotSize().
+	 */
 	public int getYOffset()
 	{
 		return chassis == null ? offY : chassis.offY;
+	}
+	
+	public void setXOffset(int offX)
+	{
+		this.offX = offX;
+	}
+
+	public void setYOffset(int offY)
+	{
+		this.offY = offY;
 	}
 	
 	public void shiftXOffset(int dx)
@@ -260,16 +276,6 @@ public class Unit
 	public int getPriority()
 	{
 		return priority;
-	}
-	
-	public void setXOffset(int offX)
-	{
-		this.offX = offX;
-	}
-
-	public void setYOffset(int offY)
-	{
-		this.offY = offY;
 	}
 	
 	public String getStructureKit()
@@ -527,18 +533,30 @@ public class Unit
 		}
 	}
 	
+	/**
+	 * Get absolute pixel position (x) on DisplayPanel.
+	 */
 	public int getAbsX()
 	{
+		int spotSize = getMap().getSpotSize();
 		int tileSize = getMap().getDisplayPanel().getTileSize();
 		
-		return getX() * tileSize + getXOffset();
+		double absX = getX() + getXOffset() / (double) spotSize;
+		
+		return (int) (absX * tileSize);
 	}
 	
+	/**
+	 * Get absolute pixel position (y) on DisplayPanel.
+	 */
 	public int getAbsY()
 	{
+		int spotSize = getMap().getSpotSize();
 		int tileSize = getMap().getDisplayPanel().getTileSize();
 		
-		return getY() * tileSize + getYOffset();
+		double absY = getY() + getYOffset() / (double) spotSize;
+		
+		return (int) (absY * tileSize);
 	}
 	
 	/**
