@@ -85,6 +85,7 @@ public class TestMP5
 	private static JMenu playerMenu;
 	private static ButtonGroup playerSelectButtonGroup;
 	private static ActionListener playerSelectListener;
+	private static boolean showFrameRate = false;
 	
 	public static void main(String[] args) throws IOException
 	{
@@ -286,11 +287,14 @@ public class TestMP5
 		{
 			public void showFrameNumber(int frameNumber, double frameRate)
 			{
-				frame.setTitle(String.format(
-					"Moving Pictures - [%1$d] %2$.2f fps",
-					frameNumber,
-					frameRate
-				));
+				if (showFrameRate)
+				{
+					frame.setTitle(String.format(
+						"Moving Pictures - [%1$d] %2$.2f fps",
+						frameNumber,
+						frameRate
+					));
+				}
 			}
 		};
 		
@@ -359,6 +363,7 @@ public class TestMP5
 		throttleMenuItem.setEnabled(engine.isThrottled());
 		final JMenuItem exitMenuItem = new JMenuItem("Exit");
 		final JMenuItem scrollBarsMenuItem = new JMenuItem("Scroll Bars");
+		final JMenuItem frameRateMenuItem = new JMenuItem("Frame Rate");
 		final JMenu disastersMenu = new JMenu("Disasters");
 		final JMenuItem spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
 		final JMenuItem meteorShowerMenuItem = new JMenuItem("Meteor Shower");
@@ -521,6 +526,7 @@ public class TestMP5
 		}
 		
 		displayMenu.add(scrollBarsMenuItem);
+		displayMenu.add(frameRateMenuItem);
 		
 		pauseMenuItem.setAccelerator(
 			KeyStroke.getKeyStroke(KeyEvent.VK_PAUSE, 0)
@@ -611,6 +617,19 @@ public class TestMP5
 			public void actionPerformed(ActionEvent e)
 			{
 				// TODO: show/hide scroll bars
+			}
+		});
+		
+		frameRateMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				showFrameRate = !showFrameRate;
+				
+				if (!showFrameRate)
+				{
+					frame.setTitle("Moving Pictures");
+				}
 			}
 		});
 		
@@ -1178,7 +1197,7 @@ public class TestMP5
 			ioe.printStackTrace();
 		}
 		
-//		game.getView().center(new Position(24, 26));
+		game.getDisplay().setViewCenterPosition(new Position(24, 26));
 	}
 	
 	public static String mapCombatDemo()
@@ -1275,7 +1294,7 @@ public class TestMP5
 			ioe.printStackTrace();
 		}
 		
-//		game.getView().center(center);
+		game.getDisplay().setViewCenterPosition(center);
 	}
 	
 	public static class NotMyTeamFilter extends Filter<Unit>

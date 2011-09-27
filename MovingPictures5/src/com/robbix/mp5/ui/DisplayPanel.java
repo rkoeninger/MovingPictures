@@ -604,6 +604,14 @@ public class DisplayPanel extends JComponent
 		);
 	}
 	
+	public void setViewCenterPosition(Position pos)
+	{
+		setViewPosition(
+			(getWidth()  / 2) - (pos.x * tileSize + tileSize / 2),
+			(getHeight() / 2) - (pos.y * tileSize + tileSize / 2)
+		);
+	}
+	
 	private void centerAsNeeded()
 	{
 		int diffWidth  = getWidth()  - getTotalWidth();
