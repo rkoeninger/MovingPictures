@@ -1,18 +1,20 @@
 package com.robbix.mp5.ui;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.robbix.mp5.Utils;
+import com.robbix.mp5.basics.Tuple;
 
 public class Sprite
 {
 	private int xOff;
 	private int yOff;
 	private int baseHue;
-	private Map<Integer, Image> hueMap;
+	private Map<HSTuple, Image> hueScaleMap;
+	private HSTuple baseTuple;
 	
 	public Sprite(Image image, int xOff, int yOff)
 	{
@@ -24,29 +26,56 @@ public class Sprite
 		this.baseHue = baseHue;
 		this.xOff = xOff;
 		this.yOff = yOff;
-		this.hueMap = new HashMap<Integer, Image>();
-		
-		hueMap.put(baseHue, image);
+		this.hueScaleMap = new HashMap<HSTuple, Image>();
+		this.baseTuple = new HSTuple(baseHue, 0);
+		hueScaleMap.put(baseTuple, image);
 	}
 	
 	public Image getImage()
 	{
-		return hueMap.get(baseHue);
+		return hueScaleMap.get(new HSTuple(baseHue, 0));
 	}
 	
 	public Image getImage(int hue)
 	{
-		if (baseHue == -1)
-			return getImage();
+		HSTuple tuple = new HSTuple(baseHue == -1 ? -1 : hue, 0);
+		BufferedImage image = (BufferedImage) hueScaleMap.get(tuple);
 		
-		BufferedImage image = (BufferedImage) hueMap.get(hue);
-		
-		synchronized(this)
+		if (image == null)
 		{
-			if (image == null)
+			image = (BufferedImage) hueScaleMap.get(new HSTuple(baseHue, 0));
+			image = Utils.recolorUnit(image, baseHue, hue);
+			hueScaleMap.put(tuple, image);
+		}
+		
+		return image;
+	}
+	
+	public Image getImage(int hue, int scale)
+	{
+		HSTuple tuple = new HSTuple(baseHue == -1 ? -1 : hue, scale);
+		BufferedImage image = (BufferedImage) hueScaleMap.get(tuple);
+		
+		if (image == null)
+		{
+			image = (BufferedImage) hueScaleMap.get(baseTuple);
+			image = Utils.recolorUnit(image, baseHue, hue);
+			
+			if (scale < 0)
 			{
-				image = recolor((BufferedImage) hueMap.get(baseHue), baseHue, hue);
-				hueMap.put(hue, image);
+				for (int s = -1; s >= scale; s--)
+				{
+					image = Utils.shrink(image);
+					hueScaleMap.put(new HSTuple(hue, s), image);
+				}
+			}
+			else
+			{
+				for (int s = 1; s <= scale; s++)
+				{
+					image = Utils.stretch(image);
+					hueScaleMap.put(new HSTuple(hue, s), image);
+				}
 			}
 		}
 		
@@ -63,45 +92,21 @@ public class Sprite
 		return yOff;
 	}
 	
-	private static BufferedImage recolor(
-		BufferedImage baseImage,
-		int baseHue,
-		int hue)
+	public int getXOffset(int scale)
 	{
-		WritableRaster baseRaster = baseImage.getRaster();
-		
-		int w = baseRaster.getWidth();
-		int h = baseRaster.getHeight();
-		
-		BufferedImage newImage = new BufferedImage(w, h, baseImage.getType());
-		WritableRaster newRaster = newImage.getRaster();
-		
-		int[] rgb = new int[]{0, 0, 0, 255};
-		float[] hsb = new float[4];
-		
-		for (int x = 0; x < w; ++x)
-		for (int y = 0; y < h; ++y)
+		return scale < 0 ? xOff >> -scale : xOff << scale;
+	}
+	
+	public int getYOffset(int scale)
+	{
+		return scale < 0 ? yOff >> -scale : yOff << scale;
+	}
+	
+	private static class HSTuple extends Tuple<Integer, Integer>
+	{
+		public HSTuple(Integer hue, Integer scale)
 		{
-			baseRaster.getPixel(x, y, rgb);
-			
-			if (rgb[3] > 0)
-			{
-				Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
-				
-				if (Math.abs((int) (hsb[0] * 360) - baseHue) <= 5)
-				{
-					hsb[0] = hue / 360.0f;
-					int rgbInt = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-					
-					rgb[0] = (rgbInt >> 0x10) & 0xff;
-					rgb[1] = (rgbInt >> 0x08) & 0xff;
-					rgb[2] = (rgbInt >> 0x00) & 0xff;
-				}
-			}
-			
-			newRaster.setPixel(x, y, rgb);
+			super(hue, scale);
 		}
-		
-		return newImage;
 	}
 }

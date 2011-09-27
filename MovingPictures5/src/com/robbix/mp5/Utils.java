@@ -1,7 +1,9 @@
 package com.robbix.mp5;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -66,6 +68,15 @@ public class Utils
 	 * Regular expression specifying zero or more word characters.
 	 */
 	public static final String REGEX_ANY = "\\w*";
+	
+	public static int log2(long i)
+	{
+		for (int b = 0; b < 64; ++b)
+			if (((i >> b) & 1) != 0)
+				return b;
+		
+		throw new ArithmeticException();
+	}
 	
 	public static boolean getTimeBasedSwitch(int delay, int prob)
 	{
@@ -541,46 +552,99 @@ public class Utils
 				
 		return img;
 	}
-
-	/**
-	 * Scales a BufferedImage down by 1/2.
-	 */
-	public static BufferedImage shrink(BufferedImage img)
+	
+	public static BufferedImage shrink(Image img)
 	{
-		BufferedImage copy = new BufferedImage(
-			img.getWidth() / 2,
-			img.getHeight() / 2,
-			BufferedImage.TYPE_INT_RGB
+		return shrink(img, true);
+	}
+	
+	public static BufferedImage shrink(Image img, boolean alpha)
+	{
+		int sWidth = img.getWidth(null);
+		int sHeight = img.getHeight(null);
+		int dWidth = sWidth / 2;
+		int dHeight = sHeight / 2;
+		BufferedImage newImg = new BufferedImage(dWidth, dHeight, alpha
+			? BufferedImage.TYPE_INT_ARGB
+			: BufferedImage.TYPE_INT_RGB
 		);
+		Graphics g = newImg.getGraphics();
+		g.drawImage(
+			img,
+			0, 0, dWidth, dHeight,
+			0, 0, sWidth, sHeight,
+			null
+		);
+		g.dispose();
+		return newImg;
+	}
+	
+	public static BufferedImage stretch(Image img)
+	{
+		return stretch(img, true);
+	}
+	
+	public static BufferedImage stretch(Image img, boolean alpha)
+	{
+		int sWidth = img.getWidth(null);
+		int sHeight = img.getHeight(null);
+		int dWidth = sWidth * 2;
+		int dHeight = sHeight * 2;
+		BufferedImage newImg = new BufferedImage(dWidth, dHeight, alpha
+			? BufferedImage.TYPE_INT_ARGB
+			: BufferedImage.TYPE_INT_RGB
+		);
+		Graphics g = newImg.getGraphics();
+		g.drawImage(
+			img,
+			0, 0, dWidth, dHeight,
+			0, 0, sWidth, sHeight,
+			null
+		);
+		g.dispose();
+		return newImg;
+	}
+	
+	public static BufferedImage recolorUnit(
+		BufferedImage baseImage,
+		int baseHue,
+		int hue)
+	{
+		WritableRaster baseRaster = baseImage.getRaster();
 		
-		int[] pixel1 = new int[3];
-		int[] pixel2 = new int[3];
-		int[] pixel3 = new int[3];
-		int[] pixel4 = new int[3];
+		int w = baseRaster.getWidth();
+		int h = baseRaster.getHeight();
 		
-		WritableRaster src = img.getRaster();
-		WritableRaster out = copy.getRaster();
+		BufferedImage newImage = new BufferedImage(w, h, baseImage.getType());
+		WritableRaster newRaster = newImage.getRaster();
 		
-		for (int x = 0; x < copy.getWidth();  ++x)
-		for (int y = 0; y < copy.getHeight(); ++y)
+		int[] rgb = new int[]{0, 0, 0, 255};
+		float[] hsb = new float[4];
+		
+		for (int x = 0; x < w; ++x)
+		for (int y = 0; y < h; ++y)
 		{
-			src.getPixel(x * 2,     y * 2,     pixel1);
-			src.getPixel(x * 2 + 1, y * 2,     pixel2);
-			src.getPixel(x * 2,     y * 2 + 1, pixel3);
-			src.getPixel(x * 2 + 1, y * 2 + 1, pixel4);
+			baseRaster.getPixel(x, y, rgb);
 			
-			pixel1[0] += pixel2[0] + pixel3[0] + pixel4[0];
-			pixel1[1] += pixel2[1] + pixel3[1] + pixel4[1];
-			pixel1[2] += pixel2[2] + pixel3[2] + pixel4[2];
+			if (rgb[3] > 0)
+			{
+				Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
+				
+				if (Math.abs((int) (hsb[0] * 360) - baseHue) <= 5)
+				{
+					hsb[0] = hue / 360.0f;
+					int rgbInt = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+					
+					rgb[0] = (rgbInt >> 0x10) & 0xff;
+					rgb[1] = (rgbInt >> 0x08) & 0xff;
+					rgb[2] = (rgbInt >> 0x00) & 0xff;
+				}
+			}
 			
-			pixel1[0] /= 4;
-			pixel1[1] /= 4;
-			pixel1[2] /= 4;
-			
-			out.setPixel(x, y, pixel1);
+			newRaster.setPixel(x, y, rgb);
 		}
 		
-		return copy;
+		return newImage;
 	}
 	
 	/**

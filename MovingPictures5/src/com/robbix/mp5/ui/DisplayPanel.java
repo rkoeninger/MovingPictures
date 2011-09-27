@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
+import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.CostMap;
 import com.robbix.mp5.basics.Filter;
@@ -55,6 +56,8 @@ public class DisplayPanel extends JComponent
 	
 	private Point scrollPoint = new Point();
 	private int tileSize = 32;
+	private int scale = 0;
+	private final int minScale, maxScale;
 	
 	private Map<Integer, BufferedImage> cachedBackgrounds = null;
 	private Object cacheLock = new Object();
@@ -111,6 +114,8 @@ public class DisplayPanel extends JComponent
 		this.sprites = sprites;
 		this.tiles = tiles;
 		this.tileSize = tiles.getTileSize();
+		this.maxScale = 0;
+		this.minScale = -Utils.log2(tileSize);
 		this.cursors = cursors;
 		this.overlays = new LinkedList<InputOverlay>();
 		setBackground(BACKGROUND_BLUE);
@@ -685,8 +690,7 @@ public class DisplayPanel extends JComponent
 	
 	public void zoomGlobal()
 	{
-		tileSize = 1;
-		setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
+		setScale(minScale);
 		setViewCenterPosition(getWidth() / 2, getHeight() / 2);
 		refresh();
 	}
@@ -708,48 +712,27 @@ public class DisplayPanel extends JComponent
 	
 	public void zoomIn(Point center)
 	{
-		if (tileSize < 32)
+		if (scale < maxScale)
 		{
-			double xFraction = center.x / (double) getTotalWidth();
-			double yFraction = center.y / (double) getTotalHeight();
-			tileSize *= 2;
-			setPreferredSize(new Dimension(map.getWidth() * tileSize, map.getHeight() * tileSize));
-			setViewCenterPosition(
-				(int) (xFraction * getTotalWidth()),
-				(int) (yFraction * getTotalHeight())
-			);
+			setScaleCentered(scale + 1, center);
 			refresh(getDisplayRegion());
 		}
 	}
 	
 	public void zoomOut(Point center)
 	{
-		if (tileSize > 1)
+		if (scale > minScale)
 		{
-			double xFraction = center.x / (double) getTotalWidth();
-			double yFraction = center.y / (double) getTotalHeight();
-			tileSize /= 2;
-			setPreferredSize(new Dimension(map.getWidth() * tileSize, map.getHeight() * tileSize));
-			setViewCenterPosition(
-				(int) (xFraction * getTotalWidth()),
-				(int) (yFraction * getTotalHeight())
-			);
+			setScaleCentered(scale - 1, center);
 			refresh(getDisplayRegion());
 		}
 	}
 	
 	public void zoomNormal(Point center)
 	{
-		if (tileSize != tiles.getTileSize())
+		if (scale != 0)
 		{
-			double xFraction = center.x / (double) getTotalWidth();
-			double yFraction = center.y / (double) getTotalHeight();
-			tileSize = tiles.getTileSize();;
-			setPreferredSize(new Dimension(map.getWidth() * tileSize, map.getHeight() * tileSize));
-			setViewCenterPosition(
-				(int) (xFraction * getTotalWidth()),
-				(int) (yFraction * getTotalHeight())
-			);
+			setScaleCentered(0, center);
 			refresh(getDisplayRegion());
 		}
 	}
@@ -771,6 +754,53 @@ public class DisplayPanel extends JComponent
 	public int getTileSize()
 	{
 		return tileSize;
+	}
+	
+	/**
+	 * Gets the current zoom scale.
+	 * 0 is normal,
+	 * negative values are zoomed out,
+	 * positive values are zoomed in.
+	 * 
+	 * tileSize = baseTileSize * 2^scale
+	 */
+	public int getScale()
+	{
+		return scale;
+	}
+	
+	/**
+	 * Sets the zoom scale and sets tileSize accordingly.
+	 * 
+	 * tileSize = baseTileSize * 2^scale
+	 */
+	public void setScale(int scale)
+	{
+		int normalTileSize = tiles.getTileSize();
+		int newTileSize = scale < 0
+			? normalTileSize >> -scale
+			: normalTileSize << scale;
+		
+		if (newTileSize < 1 || newTileSize > 32)
+			throw new IllegalArgumentException("scale " + scale + " out of range");
+		
+		this.tileSize = newTileSize;
+		this.scale = scale;
+		setPreferredSize(new Dimension(
+			map.getWidth()  * tileSize,
+			map.getHeight() * tileSize
+		));
+	}
+	
+	public void setScaleCentered(int scale, Point center)
+	{
+		double xFraction = center.x / (double) getTotalWidth();
+		double yFraction = center.y / (double) getTotalHeight();
+		setScale(scale);
+		setViewCenterPosition(
+			(int) (xFraction * getTotalWidth()),
+			(int) (yFraction * getTotalHeight())
+		);
 	}
 	
 	/**
@@ -945,8 +975,8 @@ public class DisplayPanel extends JComponent
 	{
 		g.drawImage(
 			sprite.getImage(),
-			pos.x * tileSize + sprite.getXOffset(),
-			pos.y * tileSize + sprite.getYOffset(),
+			pos.x * tileSize + sprite.getXOffset(scale),
+			pos.y * tileSize + sprite.getYOffset(scale),
 			null
 		);
 	}
@@ -954,11 +984,9 @@ public class DisplayPanel extends JComponent
 	public void draw(Graphics g, Sprite sprite, Point point, Player owner)
 	{
 		g.drawImage(
-			owner == null
-				? sprite.getImage()
-				: sprite.getImage(owner.getColorHue()),
-			point.x + sprite.getXOffset(),
-			point.y + sprite.getYOffset(),
+			sprite.getImage(owner == null ? -1 : owner.getColorHue(), scale),
+			point.x + sprite.getXOffset(scale),
+			point.y + sprite.getYOffset(scale),
 			null
 		);
 	}
@@ -1008,7 +1036,7 @@ public class DisplayPanel extends JComponent
 		}
 		else
 		{
-			g.setColor(getBackground());
+			g.setColor(Color.BLACK);
 			fill(g, rect);
 		}
 		
@@ -1063,6 +1091,15 @@ public class DisplayPanel extends JComponent
 			
 			if (!rect.contains(resPoint))
 				continue;
+			
+			if (scale < -2)
+			{
+				g.setColor(deposit.getType() == ResourceType.COMMON_ORE
+					? new Color(255, 92, 0)
+					: new Color(255, 255, 106));
+				fill(g, deposit.getPosition());
+				continue;
+			}
 			
 			Sprite sprite = deposit.isSurveyedBy(currentPlayer)
 				? sprites.getSprite(deposit)
@@ -1165,7 +1202,7 @@ public class DisplayPanel extends JComponent
 	{
 		for (Position pos : dirtySpots)
 		{
-			draw(g, tiles.getTile(map.getTileCode(pos)), pos);
+			draw(g, tiles.getTile(map.getTileCode(pos)).getImage(scale), pos);
 			
 			if (map.hasMinePlatform(pos))
 			{
@@ -1189,6 +1226,13 @@ public class DisplayPanel extends JComponent
 		if (!unit.hasAnimationSequence())
 		{
 			unit.setAnimationSequence(sprites);
+		}
+		
+		if (!unit.isTurret() && scale < -2)
+		{
+			g.setColor(unit.getOwner().getColor());
+			fill(g, unit.getOccupiedBounds());
+			return;
 		}
 		
 		List<Sprite> seq = unit.getAnimationSequence();

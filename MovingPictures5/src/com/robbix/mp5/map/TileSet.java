@@ -30,7 +30,8 @@ public class TileSet
 		
 		for (int x = 0; x < plains.length; ++x)
 		{
-			set.tiles.put("plain/" + x, ImageIO.read(plains[x]));
+			Tile pTile = new Tile(ImageIO.read(plains[x]));
+			set.tiles.put("plain/" + x, pTile);
 			set.plainCount++;
 		}
 		
@@ -38,7 +39,8 @@ public class TileSet
 		
 		for (int x = 0; x < bulldozed.length; ++x)
 		{
-			set.tiles.put("bulldozed/" + x, ImageIO.read(bulldozed[x]));
+			Tile bTile = new Tile(ImageIO.read(bulldozed[x]));
+			set.tiles.put("bulldozed/" + x, bTile);
 			set.bulldozedCount++;
 		}
 		
@@ -79,10 +81,15 @@ public class TileSet
 			Image wallRed    = ImageIO.read(wallsR[x]);
 			Image tube       = ImageIO.read(tubes[x]);
 			
-			set.tiles.put("wall/green/"  + tileOrder2[x], wallGreen);
-			set.tiles.put("wall/yellow/" + tileOrder2[x], wallYellow);
-			set.tiles.put("wall/red/"    + tileOrder2[x], wallRed);
-			set.tiles.put("tube/"        + tileOrder2[x], tube);
+			Tile wgTile = new Tile(wallGreen);
+			Tile wyTile = new Tile(wallYellow);
+			Tile wrTile = new Tile(wallRed);
+			Tile tuTile = new Tile(tube);
+			
+			set.tiles.put("wall/green/"  + tileOrder2[x], wgTile);
+			set.tiles.put("wall/yellow/" + tileOrder2[x], wyTile);
+			set.tiles.put("wall/red/"    + tileOrder2[x], wrTile);
+			set.tiles.put("tube/"        + tileOrder2[x], tuTile);
 		}
 		
 		return set;
@@ -99,7 +106,7 @@ public class TileSet
 		});
 	}
 	
-	private Map<String, Image> tiles;
+	private Map<String, Tile> tiles;
 	private Random rand;
 	
 	private int bulldozedCount;
@@ -107,7 +114,7 @@ public class TileSet
 	
 	public TileSet()
 	{
-		tiles = new HashMap<String, Image>();
+		tiles = new HashMap<String, Tile>();
 		rand = new Random();
 		bulldozedCount = 0;
 		plainCount = 0;
@@ -118,7 +125,7 @@ public class TileSet
 		return 32;
 	}
 	
-	public Image getTile(String code)
+	public Tile getTile(String code)
 	{
 		return tiles.get(code);
 	}
