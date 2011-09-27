@@ -849,17 +849,17 @@ public class DisplayPanel extends JComponent
 			region.h * tileSize
 		);
 	}
-
+	
 	/**
 	 * Gets the region of pixels currently visible on this display.
 	 */
 	public Rectangle getDisplayRect()
 	{
 		return new Rectangle(
-			-scrollPoint.x,
-			-scrollPoint.y,
-			getWidth(),
-			getHeight()
+			Math.max(0, -scrollPoint.x),
+			Math.max(0, -scrollPoint.y),
+			Math.min(getTotalWidth(),  getWidth()),
+			Math.min(getTotalHeight(), getHeight())
 		);
 	}
 	
@@ -979,14 +979,20 @@ public class DisplayPanel extends JComponent
 		 * Draw letter-box around display when panel is bigger
 		 * than visible area.
 		 */
-		g.setColor(Color.BLACK);
+		g.setColor(getBackground());
 		int hEdgeSpace = getHorizontalLetterBoxSpace();
 		int vEdgeSpace = getVerticalLetterBoxSpace();
 		g.fillRect(0, 0, hEdgeSpace, getHeight());
-		g.fillRect(getWidth() - hEdgeSpace, 0, hEdgeSpace, getHeight());
+		g.fillRect(getWidth() - 1 - hEdgeSpace, 0, hEdgeSpace, getHeight());
 		g.fillRect(0, 0, getWidth(), vEdgeSpace);
-		g.fillRect(0, getHeight() - vEdgeSpace, getWidth(), vEdgeSpace);
+		g.fillRect(0, getHeight() - 1 - vEdgeSpace, getWidth(), vEdgeSpace);
 		
+		Rectangle overlayRect = new Rectangle(
+			-scrollPoint.x,
+			-scrollPoint.y,
+			getWidth(),
+			getHeight()
+		);
 		Rectangle rect = getDisplayRect();
 		Region region = getRegion(rect);
 		translate(g, scrollPoint.x, scrollPoint.y);
@@ -1015,18 +1021,18 @@ public class DisplayPanel extends JComponent
 			int w = getTotalWidth();
 			int h = getTotalHeight();
 			
-			for (int x = region.x; x < region.getMaxX(); ++x)
-				g.drawLine(x * tileSize, 0, x * tileSize, h);
+			for (int x = Math.max(1, region.x); x < region.getMaxX(); ++x)
+				g.drawLine(x * tileSize, 0, x * tileSize, h - 1);
 			
-			for (int y = region.y; y < region.getMaxY(); ++y)
-				g.drawLine(0, y * tileSize, w, y * tileSize);
+			for (int y = Math.max(1, region.y); y < region.getMaxY(); ++y)
+				g.drawLine(0, y * tileSize, w - 1, y * tileSize);
 		}
 		
 		/*
 		 * Draw input overlay
 		 */
 		if (! overlays.isEmpty())
-			overlays.getFirst().paintOverTerrian(g, rect);
+			overlays.getFirst().paintOverTerrian(g, overlayRect);
 		
 		/*
 		 * Draw units.
@@ -1078,7 +1084,7 @@ public class DisplayPanel extends JComponent
 		 * Draw input overlay
 		 */
 		if (! overlays.isEmpty())
-			overlays.getFirst().paintOverUnits(g, rect);
+			overlays.getFirst().paintOverUnits(g, overlayRect);
 		
 		translate(g, -scrollPoint.x, -scrollPoint.y);
 	}
