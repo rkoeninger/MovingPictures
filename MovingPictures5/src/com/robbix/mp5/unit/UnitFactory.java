@@ -8,12 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
 import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.TestMP5;
-import com.robbix.mp5.Utils;
+import com.robbix.mp5.XNode;
 import com.robbix.mp5.ai.task.SelfDestructAttackTask;
 import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.ai.task.TurretTask;
@@ -174,18 +171,17 @@ public class UnitFactory
 	
 	public void loadXml(File xmlFile) throws IOException
 	{
-		Document doc = Utils.loadXML(xmlFile, false);
-		Node rootNode = Utils.getNode(doc, "UnitType");
-		String displayName = Utils.getValue(rootNode, "DisplayName");
-		String civ = Utils.getAttribute(rootNode, "civ");
-		String unitType = Utils.getAttribute(rootNode, "unitType");
-		String type = Utils.getAttribute(rootNode, "type");
+		XNode rootNode = new XNode(xmlFile, false).getNode("UnitType");
+		String displayName = rootNode.getValue("DisplayName");
+		String civ         = rootNode.getAttribute("civ");
+		String unitType    = rootNode.getAttribute("unitType");
+		String type        = rootNode.getAttribute("type");
 		
 		String ack = null;
 		
 		try
 		{
-			ack = Utils.getValue(rootNode, "Acknowledgement");
+			ack = rootNode.getValue("Acknowledgement");
 		}
 		catch (Exception e)
 		{
@@ -194,9 +190,9 @@ public class UnitFactory
 		
 		if (type.equals("tank"))
 		{
-			String chassisTypeName = Utils.getValue(rootNode, "Chassis");
-			String turretTypeName = Utils.getValue(rootNode, "Turret");
-			Cost cost = getCost(Utils.getNode(rootNode, "Cost"), xmlFile);
+			String chassisTypeName = rootNode.getValue("Chassis");
+			String turretTypeName = rootNode.getValue("Turret");
+			Cost cost = getCost(rootNode.getNode("Cost"), xmlFile);
 			
 			names.add(civ + " " + displayName);
 			typeList.add(unitType);
@@ -211,10 +207,10 @@ public class UnitFactory
 		}
 		else if (type.equals("turret"))
 		{
-			Node statsNode = Utils.getNode(rootNode, "Stats");
-			double damage = Utils.getFloatAttribute(statsNode, "damage");
-			int reloadDelay = Utils.getIntAttribute(statsNode, "reloadDelay");
-			double attackRange = Utils.getFloatAttribute(statsNode, "attackRange");
+			XNode statsNode    = rootNode.getNode("Stats");
+			double damage      = statsNode.getFloatAttribute("damage");
+			int reloadDelay    = statsNode.getIntAttribute("reloadDelay");
+			double attackRange = statsNode.getFloatAttribute("attackRange");
 			
 			types.put(unitType, UnitType.newTurretType(
 				unitType,
@@ -227,13 +223,13 @@ public class UnitFactory
 		}
 		else if (type.equals("chassis"))
 		{
-			Node statsNode = Utils.getNode(rootNode, "Stats");
-			int maxHP = Utils.getIntAttribute(statsNode, "hp");
-			double speed = Utils.getFloatAttribute(statsNode, "speed");
-			double sightRange = Utils.getFloatAttribute(statsNode, "sightRange");
-			int rotationSpeed = Utils.getIntAttribute(statsNode, "rotationSpeed");
-			int rotationDegree = Utils.getIntAttribute(statsNode, "rotationDegree");
-			String armorString = Utils.getAttribute(statsNode, "armor");
+			XNode statsNode    = rootNode.getNode("Stats");
+			int maxHP          = statsNode.getIntAttribute("hp");
+			double speed       = statsNode.getFloatAttribute("speed");
+			double sightRange  = statsNode.getFloatAttribute("sightRange");
+			int rotationSpeed  = statsNode.getIntAttribute("rotationSpeed");
+			int rotationDegree = statsNode.getIntAttribute("rotationDegree");
+			String armorString = statsNode.getAttribute("armor");
 			Armor armor = getArmor(armorString, xmlFile);
 			
 			types.put(unitType, UnitType.newChassisType(
@@ -251,15 +247,15 @@ public class UnitFactory
 		}
 		else if (type.equals("vehicle"))
 		{
-			Node statsNode = Utils.getNode(rootNode, "Stats");
-			int maxHP = Utils.getIntAttribute(statsNode, "hp");
-			double speed = Utils.getFloatAttribute(statsNode, "speed");
-			double sightRange = Utils.getFloatAttribute(statsNode, "sightRange");
-			int rotationSpeed = Utils.getIntAttribute(statsNode, "rotationSpeed");
-			int rotationDegree = Utils.getIntAttribute(statsNode, "rotationDegree");
-			String armorString = Utils.getAttribute(statsNode, "armor");
-			Armor armor = getArmor(armorString, xmlFile);
-			Cost cost = getCost(Utils.getNode(rootNode, "Cost"), xmlFile);
+			XNode statsNode    = rootNode.getNode("Stats");
+			int maxHP          = statsNode.getIntAttribute("hp");
+			double speed       = statsNode.getFloatAttribute("speed");
+			double sightRange  = statsNode.getFloatAttribute("sightRange");
+			int rotationSpeed  = statsNode.getIntAttribute("rotationSpeed");
+			int rotationDegree = statsNode.getIntAttribute("rotationDegree");
+			String armorString = statsNode.getAttribute("armor");
+			Armor armor        = getArmor(armorString, xmlFile);
+			Cost cost          = getCost(rootNode.getNode("Cost"), xmlFile);
 			
 			names.add(civ + " " + displayName);
 			typeList.add(unitType);
@@ -279,16 +275,16 @@ public class UnitFactory
 		}
 		else if (type.equals("structure"))
 		{
-			Node statsNode = Utils.getNode(rootNode, "Stats");
-			int maxHP = Utils.getIntAttribute(statsNode, "hp");
-			double sightRange = Utils.getFloatAttribute(statsNode, "sightRange");
-			String armorString = Utils.getAttribute(statsNode, "armor");
-			Armor armor = getArmor(armorString, xmlFile);
-			String footprintString = Utils.getValue(rootNode, "Footprint");
-			Footprint footprint = getFootprint(footprintString, xmlFile);
-			Cost cost = getCost(Utils.getNode(rootNode, "Cost"), xmlFile);
-			boolean source = Utils.getBooleanAttribute(statsNode, "connectionSource", false);
-			boolean needsConnection = Utils.getBooleanAttribute(statsNode, "needsConnection", false);
+			XNode statsNode         = rootNode.getNode("Stats");
+			int maxHP               = statsNode.getIntAttribute("hp");
+			double sightRange       = statsNode.getFloatAttribute("sightRange");
+			String armorString      = statsNode.getAttribute("armor");
+			Armor armor             = getArmor(armorString, xmlFile);
+			String footprintString  = rootNode.getValue("Footprint");
+			Footprint footprint     = getFootprint(footprintString, xmlFile);
+			Cost cost               = getCost(rootNode.getNode("Cost"), xmlFile);
+			boolean source          = statsNode.getBooleanAttribute("connectionSource", false);
+			boolean needsConnection = statsNode.getBooleanAttribute("needsConnection", false);
 			
 			names.add(civ + " " + displayName);
 			typeList.add(unitType);
@@ -308,15 +304,15 @@ public class UnitFactory
 		}
 		else if (type.equals("guardPost"))
 		{
-			Node statsNode = Utils.getNode(rootNode, "Stats");
-			int maxHP = Utils.getIntAttribute(statsNode, "hp");
-			double sightRange = Utils.getFloatAttribute(statsNode, "sightRange");
-			String armorString = Utils.getAttribute(statsNode, "armor");
-			Armor armor = getArmor(armorString, xmlFile);
-			double damage = Utils.getFloatAttribute(statsNode, "damage");
-			int reloadDelay = Utils.getIntAttribute(statsNode, "reloadDelay");
-			Cost cost = getCost(Utils.getNode(rootNode, "Cost"), xmlFile);
-			double attackRange = Utils.getFloatAttribute(statsNode, "attackRange");
+			XNode statsNode    = rootNode.getNode("Stats");
+			int maxHP          = statsNode.getIntAttribute("hp");
+			double sightRange  = statsNode.getFloatAttribute("sightRange");
+			String armorString = statsNode.getAttribute("armor");
+			Armor armor        = getArmor(armorString, xmlFile);
+			double damage      = statsNode.getFloatAttribute("damage");
+			int reloadDelay    = statsNode.getIntAttribute("reloadDelay");
+			Cost cost          = getCost(rootNode.getNode("Cost"), xmlFile);
+			double attackRange = statsNode.getFloatAttribute("attackRange");
 			
 			names.add(civ + " " + displayName);
 			typeList.add(unitType);
@@ -336,20 +332,20 @@ public class UnitFactory
 		}
 	}
 	
-	private static Cost getCost(Node costNode, File xmlFile)
+	private static Cost getCost(XNode costNode, File xmlFile)
 	throws FileFormatException
 	{
-		List<Node> costResources = Utils.getNodes(costNode, "Resource");
+		List<XNode> costResources = costNode.getNodes("Resource");
 		
 		Map<ResourceType, Integer> resourceMap =
 			new HashMap<ResourceType, Integer>();
 		
 		for (int n = 0; n < costResources.size(); ++n)
 		{
-			Node resNode = costResources.get(n);
+			XNode resNode = costResources.get(n);
 			resourceMap.put(
-				getResourceType(Utils.getAttribute(resNode, "type"), xmlFile),
-				Utils.getIntAttribute(resNode, "amount"));
+				getResourceType(resNode.getAttribute("type"), xmlFile),
+				resNode.getIntAttribute("amount"));
 		}
 		
 		return new Cost(resourceMap);

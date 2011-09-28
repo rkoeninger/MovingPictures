@@ -12,9 +12,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
+import com.robbix.mp5.XNode;
 import com.robbix.mp5.Utils;
 
 public class AnimatedCursor
@@ -33,17 +31,16 @@ public class AnimatedCursor
 			parent = xmlFile.getParentFile();
 		}
 		
-		Document doc = Utils.loadXML(xmlFile, false);
-		Node rootNode = Utils.getNode(doc, "AnimatedCursor");
+		XNode rootNode = new XNode(xmlFile, false).getNode("AnimatedCursor");
 		
-		String name = Utils.getAttribute(rootNode, "name");
-		Color bgColor = Color.decode(Utils.getAttribute(rootNode, "bgcolor"));
+		String name = rootNode.getAttribute("name");
+		Color bgColor = Color.decode(rootNode.getAttribute("bgcolor"));
 		
-		int totalDuration = Utils.getIntAttribute(rootNode, "duration", -1);
-		int totalHotspotX = Utils.getIntAttribute(rootNode, "hotspotX", -1);
-		int totalHotspotY = Utils.getIntAttribute(rootNode, "hotspotY", -1);
-
-		List<Node> frameNodes = Utils.getNodes(rootNode, "Frame");
+		int totalDuration = rootNode.getIntAttribute("duration", -1);
+		int totalHotspotX = rootNode.getIntAttribute("hotspotX", -1);
+		int totalHotspotY = rootNode.getIntAttribute("hotspotY", -1);
+		
+		List<XNode> frameNodes = rootNode.getNodes("Frame");
 		
 		if (frameNodes.isEmpty())
 			throw new IOException("Expected 1 or more <Frame> tags");
@@ -51,12 +48,12 @@ public class AnimatedCursor
 		AnimatedCursor aCur = new AnimatedCursor(name, frameNodes.size());
 		int frameIndex = 0;
 		
-		for (Node frameNode : frameNodes)
+		for (XNode frameNode : frameNodes)
 		{
-			String path = Utils.getAttribute(frameNode, "image");
-			String durationString = Utils.getAttribute(frameNode, "duration", null);
-			String hotspotXString = Utils.getAttribute(frameNode, "hotspotX", null);
-			String hotspotYString = Utils.getAttribute(frameNode, "hotspotY", null);
+			String path           = frameNode.getAttribute("image");
+			String durationString = frameNode.getAttribute("duration", null);
+			String hotspotXString = frameNode.getAttribute("hotspotX", null);
+			String hotspotYString = frameNode.getAttribute("hotspotY", null);
 			
 			try
 			{
