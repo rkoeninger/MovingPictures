@@ -94,8 +94,8 @@ public class TestMP5
 		/*-------------------------------------------------------------------*
 		 * Parse command-line arguments
 		 */
-		boolean lazyLoadSprites = false;
-		boolean lazyLoadSounds  = false;
+		boolean lazyLoadSprites = true;
+		boolean lazyLoadSounds  = true;
 		boolean soundOn         = false;
 		boolean musicOn         = false;
 		String demoName         = null;
