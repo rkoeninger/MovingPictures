@@ -33,7 +33,7 @@ public class LayeredMap
 	{
 		LayeredMap map = new LayeredMap();
 		
-		map.costMap = Utils.loadCostMap(new File(rootDir, mapName + ".bmp"));
+		map.costMap = CostMap.loadBitmap(new File(rootDir, mapName + ".bmp"));
 		
 		int w = map.costMap.w;
 		int h = map.costMap.h;

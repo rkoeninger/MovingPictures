@@ -1,5 +1,12 @@
 package com.robbix.mp5.basics;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 
 /**
  * Cost values should be in the range [0 ... Infinity].
@@ -18,24 +25,49 @@ package com.robbix.mp5.basics;
  */
 public class CostMap extends Grid<Double>
 {
-	public static CostMap add(CostMap mapA, double weightA,
-							  CostMap mapB, double weightB)
+	/**
+	 * Loads a CostMap from a bitmap image. The CostMap will be the
+	 * same size as the bitmap is in pixels. The value at each position
+	 * in the CostMap will be the average of the three color components
+	 * of each pixel in the bitmap.
+	 * 
+	 * @throws IOException If there is any problem reading from file.
+	 */
+	public static CostMap loadBitmap(File file) throws IOException
 	{
-		if (mapA.w != mapB.w || mapA.h != mapB.h)
-			throw new IllegalArgumentException(NOT_SAME_DIMS);
-		if (weightA < 0.0 || weightB < 0.0)
-			throw new IllegalArgumentException(NEGATIVE_WEIGHT);
+		BufferedImage bitmap = (BufferedImage) ImageIO.read(file);
+		WritableRaster raster = bitmap.getRaster();
+		CostMap costMap = new CostMap(bitmap.getWidth(), bitmap.getHeight());
+		float[] pixel = new float[4];
+		double div = 3 * 255;
 		
-		CostMap sum = new CostMap(mapA.w, mapA.h);
+		for (int y = 0; y < costMap.getHeight(); ++y)
+		for (int x = 0; x < costMap.getWidth();  ++x)
+		{
+			raster.getPixel(x, y, pixel);
+			double gray = (pixel[0] + pixel[1] + pixel[2]) / div;
+			costMap.setScaleFactor(x, y, gray);
+		}
 		
-		for (int y = 0; y < sum.h; ++y)
-		for (int x = 0; x < sum.w; ++x)
-			sum.set(x, y, mapA.get(x, y) * weightA
-						+ mapB.get(x, y) * weightB);
-		
-		return sum;
+		return costMap;
 	}
-
+	
+	public void saveBitmap(File file) throws IOException
+	{
+		BufferedImage bitmap = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		WritableRaster raster = bitmap.getRaster();
+		float[] pixel = new float[4];
+		
+		for (int y = 0; y < h; ++y)
+		for (int x = 0; x < w; ++x)
+		{
+			pixel[0] = pixel[1] = pixel[2] = (float) getScaleFactor(x, y);
+			raster.setPixel(x, y, pixel);
+		}
+		
+		ImageIO.write(bitmap, "bmp", file);
+	}
+	
 	/**
 	 * Creates a "free" costmap where all cells contain a cost of zero.
 	 */
@@ -162,7 +194,25 @@ public class CostMap extends Grid<Double>
 		for (int x = 0; x < w; ++x)
 			set(x, y, get(x, y) + that.get(x, y) * weight);
 	}
-
+	
+	public static CostMap add(CostMap mapA, double weightA,
+							  CostMap mapB, double weightB)
+	{
+		if (mapA.w != mapB.w || mapA.h != mapB.h)
+			throw new IllegalArgumentException(NOT_SAME_DIMS);
+		if (weightA < 0.0 || weightB < 0.0)
+			throw new IllegalArgumentException(NEGATIVE_WEIGHT);
+		
+		CostMap sum = new CostMap(mapA.w, mapA.h);
+		
+		for (int y = 0; y < sum.h; ++y)
+		for (int x = 0; x < sum.w; ++x)
+			sum.set(x, y, mapA.get(x, y) * weightA
+						+ mapB.get(x, y) * weightB);
+		
+		return sum;
+	}
+	
 	private static final String NOT_SAME_DIMS =
 		"Maps must be of the same dimensions";
 	
