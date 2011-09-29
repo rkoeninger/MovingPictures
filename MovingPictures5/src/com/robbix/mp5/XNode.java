@@ -19,6 +19,7 @@ import org.xml.sax.SAXParseException;
 
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.FileFormatException;
+import com.robbix.mp5.basics.Offset;
 
 /**
  * This class represents a node in an XML document. It can be searched
@@ -277,7 +278,7 @@ public class XNode
 		Node attr = attrs.getNamedItem(name);
 		
 		if (attr == null)
-			throw new IllegalArgumentException(String.format(
+			throw new FileFormatException(String.format(
 				"Attribute \"%1$s\" expected on <%2$s>",
 				name,
 				root.getNodeName()
@@ -477,6 +478,39 @@ public class XNode
 			return defaultValue;
 		
 		return Color.decode(attrString);
+	}
+	
+	private static String[][] namePairs = {
+		{"offsetX", "offsetY"},
+		{"x", "y"}
+	};
+	
+	/**
+	 * Gets the values of Sprite offsets from typical attribute names.
+	 * 
+	 * e.g. "offsetX" and "offsetY"
+	 *      "x" and "y"
+	 * 
+	 * @throws FileFormatException If no such attributes are present
+	 */
+	public Offset getOffsetAttributes() throws FileFormatException
+	{
+		for (String[] pair : namePairs)
+		{
+			try
+			{
+				return new Offset(
+					getIntAttribute(pair[0]),
+					getIntAttribute(pair[1])
+				);
+			}
+			catch (FileFormatException e)
+			{
+				continue;
+			}
+		}
+		
+		throw new FileFormatException("Offset attributes not present");
 	}
 	
 	/**
