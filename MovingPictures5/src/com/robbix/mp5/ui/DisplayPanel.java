@@ -974,7 +974,7 @@ public class DisplayPanel extends JComponent
 	public void draw(Graphics g, Sprite sprite, Position pos)
 	{
 		g.drawImage(
-			sprite.getImage(),
+			sprite.getImage(-1, scale),
 			pos.x * tileSize + sprite.getXOffset(scale),
 			pos.y * tileSize + sprite.getYOffset(scale),
 			null
@@ -1092,7 +1092,7 @@ public class DisplayPanel extends JComponent
 			if (!rect.contains(resPoint))
 				continue;
 			
-			if (scale < -2)
+			if (scale < -1)
 			{
 				g.setColor(deposit.getType() == ResourceType.COMMON_ORE
 					? new Color(255, 92, 0)
