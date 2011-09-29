@@ -400,6 +400,15 @@ public class Direction
 	}
 	
 	/**
+	 * Gets the step index of this Direction - i.e. the number of
+	 * sixteenth-turn steps from East this Direction is.
+	 */
+	public int getStepIndex()
+	{
+		return steps;
+	}
+	
+	/**
 	 * Gets the displacement in sixteenth-turn steps.
 	 */
 	public int getDisplacement(Direction that)
