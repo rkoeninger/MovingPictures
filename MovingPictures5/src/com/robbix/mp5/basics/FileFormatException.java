@@ -12,6 +12,12 @@ public class FileFormatException extends IOException
 	public FileFormatException(File file, String message)
 	{
 		super(message);
+		this.file = file;
+	}
+	
+	public FileFormatException(String message)
+	{
+		super(message);
 	}
 	
 	public File getFile()

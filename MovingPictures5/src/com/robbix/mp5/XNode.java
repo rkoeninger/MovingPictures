@@ -1,5 +1,6 @@
 package com.robbix.mp5;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.FileFormatException;
 
 /**
@@ -152,8 +154,8 @@ public class XNode
 		if (xnode == null)
 			return null;
 		
-//		if (xnode.root.hasChildNodes())
-//			throw new FileFormatException("Node has children");
+		if (!isTextNode(xnode.root))
+			throw new FileFormatException("Node has child element");
 		
 		return xnode.root.getTextContent().trim();
 	}
@@ -212,8 +214,7 @@ public class XNode
 	 * Returns a list of values of the nodes that match the given path from
 	 * the given root node. Returns empty list if none do.
 	 */
-	public List<String> getValues(String... path)
-	throws FileFormatException
+	public List<String> getValues(String... path) throws FileFormatException
 	{
 		ArrayList<String> results = new ArrayList<String>();
 		Node currentNode = root;
@@ -248,8 +249,8 @@ public class XNode
 			
 			if (child.getNodeName().matches(path[path.length - 1]))
 			{
-				if (child.hasChildNodes())
-					throw new IllegalArgumentException("Node has children");
+				if (!isTextNode(child))
+					throw new FileFormatException("Node has child element");
 				
 				results.add(child.getTextContent().trim());
 			}
@@ -321,30 +322,7 @@ public class XNode
 	 */
 	public int getIntAttribute(String name) throws FileFormatException
 	{
-		NamedNodeMap attrs = root.getAttributes();
-		
-		if (attrs == null)
-			throw new IllegalArgumentException("node not an element");
-		
-		Node attr = attrs.getNamedItem(name);
-		
-		if (attr == null)
-			throw new IllegalArgumentException(String.format(
-				"Attribute \"%1$s\" expected on <%2$s>",
-				name,
-				root.getNodeName()
-			));
-		
-		String text = attr.getTextContent();
-		
-		if (text == null || text.isEmpty())
-			throw new IllegalArgumentException(String.format(
-				"Attribute \"%1$s\" expected on <%2$s>",
-				name,
-				root.getNodeName()
-			));
-			
-		return Integer.parseInt(text);
+		return Integer.parseInt(getAttribute(name));
 	}
 
 	/**
@@ -358,17 +336,7 @@ public class XNode
 	 */
 	public int getIntAttribute(String name, int defaultValue)
 	{
-		NamedNodeMap attrs = root.getAttributes();
-		
-		if (attrs == null)
-			throw new IllegalArgumentException("node not an element");
-		
-		Node attr = attrs.getNamedItem(name);
-		
-		if (attr == null)
-			return defaultValue;
-		
-		String attrString = attr.getTextContent();
+		String attrString = getAttribute(name, null);
 		
 		if (attrString == null || attrString.isEmpty())
 			return defaultValue;
@@ -380,37 +348,12 @@ public class XNode
 	 * Gets the value of the attribute by the given name for the specified
 	 * node.
 	 * 
-	 * Returns defaultValue if attribute is not present or is empty.
-	 * 
 	 * @throws NumberFormatException If attribute is defined and has a value,
 	 *                               but value is not a double.
 	 */
 	public double getFloatAttribute(String name) throws FileFormatException
 	{
-		NamedNodeMap attrs = root.getAttributes();
-		
-		if (attrs == null)
-			throw new IllegalArgumentException("node not an element");
-		
-		Node attr = attrs.getNamedItem(name);
-		
-		if (attr == null)
-			throw new IllegalArgumentException(String.format(
-				"Attribute \"%1$s\" expected on <%2$s>",
-				name,
-				root.getNodeName()
-			));
-		
-		String text = attr.getTextContent();
-		
-		if (text == null || text.isEmpty())
-			throw new IllegalArgumentException(String.format(
-				"Attribute \"%1$s\" expected on <%2$s>",
-				name,
-				root.getNodeName()
-			));
-		
-		return Double.parseDouble(text);
+		return Double.parseDouble(getAttribute(name));
 	}
 	
 	/**
@@ -424,17 +367,7 @@ public class XNode
 	 */
 	public double getFloatAttribute(String name, double defaultValue)
 	{
-		NamedNodeMap attrs = root.getAttributes();
-		
-		if (attrs == null)
-			throw new IllegalArgumentException("node not an element");
-		
-		Node attr = attrs.getNamedItem(name);
-		
-		if (attr == null)
-			return defaultValue;
-		
-		String attrString = attr.getTextContent();
+		String attrString = getAttribute(name, null);
 		
 		if (attrString == null || attrString.isEmpty())
 			return defaultValue;
@@ -446,37 +379,12 @@ public class XNode
 	 * Gets the value of the attribute by the given name for the specified
 	 * node.
 	 * 
-	 * Returns defaultValue if attribute is not present or is empty.
-	 * 
 	 * @throws NumberFormatException If attribute is defined and has a value,
-	 *                               but value is not a double.
+	 *                               but value is not a boolean.
 	 */
 	public boolean getBooleanAttribute(String name) throws FileFormatException
 	{
-		NamedNodeMap attrs = root.getAttributes();
-		
-		if (attrs == null)
-			throw new IllegalArgumentException("node not an element");
-		
-		Node attr = attrs.getNamedItem(name);
-		
-		if (attr == null)
-			throw new IllegalArgumentException(String.format(
-				"Attribute \"%1$s\" expected on <%2$s>",
-				name,
-				root.getNodeName()
-			));
-		
-		String text = attr.getTextContent();
-		
-		if (text == null || text.isEmpty())
-			throw new IllegalArgumentException(String.format(
-				"Attribute \"%1$s\" expected on <%2$s>",
-				name,
-				root.getNodeName()
-			));
-		
-		return Boolean.parseBoolean(text);
+		return Boolean.parseBoolean(getAttribute(name));
 	}
 	
 	/**
@@ -486,25 +394,102 @@ public class XNode
 	 * Returns defaultValue if attribute is not present or is empty.
 	 * 
 	 * @throws NumberFormatException If attribute is defined and has a value,
-	 *                               but value is not a double.
+	 *                               but value is not a boolean.
 	 */
 	public boolean getBooleanAttribute(String name, boolean defaultValue)
 	{
-		NamedNodeMap attrs = root.getAttributes();
-		
-		if (attrs == null)
-			throw new IllegalArgumentException("node not an element");
-		
-		Node attr = attrs.getNamedItem(name);
-		
-		if (attr == null)
-			return defaultValue;
-		
-		String attrString = attr.getTextContent();
+		String attrString = getAttribute(name, null);
 		
 		if (attrString == null || attrString.isEmpty())
 			return defaultValue;
 		
 		return Boolean.parseBoolean(attrString);
+	}
+	
+	/**
+	 * Gets the value of the attribute by the given name for the specified
+	 * node.
+	 * 
+	 * @throws NumberFormatException If attribute is defined and has a value,
+	 *                               but value is not a Direction.
+	 */
+	public Direction getDirectionAttribute(String name) throws FileFormatException
+	{
+		String text = getAttribute(name);
+		Direction dir = Direction.getDirection(text);
+		
+		if (dir == null)
+			throw new FileFormatException(text + " is not a valid direction");
+		
+		return dir;
+	}
+	
+	/**
+	 * Gets the value of the attribute by the given name for the specified
+	 * node.
+	 * 
+	 * Returns defaultValue if attribute is not present or is empty.
+	 * 
+	 * @throws NumberFormatException If attribute is defined and has a value,
+	 *                               but value is not a Direction.
+	 */
+	public Direction getDirectionAttribute(String name, Direction defaultValue)
+	{
+		String attrString = getAttribute(name, null);
+		Direction dir = Direction.getDirection(attrString);
+		
+		if (dir == null)
+			return defaultValue;
+		
+		return dir;
+	}
+	
+	/**
+	 * Gets the value of the attribute by the given name for the specified
+	 * node.
+	 * 
+	 * Color format is like HTML color codes: #RRGGBB, in hexidecimal.
+	 * 
+	 * @throws NumberFormatException If attribute is defined and has a value,
+	 *                               but value is not a Color.
+	 */
+	public Color getColorAttribute(String name) throws FileFormatException
+	{
+		return Color.decode(getAttribute(name));
+	}
+	
+	/**
+	 * Gets the value of the attribute by the given name for the specified
+	 * node.
+	 * 
+	 * Color format is like HTML color codes: #RRGGBB, in hexidecimal.
+	 * 
+	 * Returns defaultValue if attribute is not present or is empty.
+	 * 
+	 * @throws NumberFormatException If attribute is defined and has a value,
+	 *                               but value is not a Color.
+	 */
+	public Color getColorAttribute(String name, Color defaultValue)
+	{
+		String attrString = getAttribute(name, null);
+		
+		if (attrString == null || attrString.isEmpty())
+			return defaultValue;
+		
+		return Color.decode(attrString);
+	}
+	
+	/**
+	 * Returns true if this node has no child elements.
+	 */
+	private static boolean isTextNode(Node root)
+	{
+		NodeList children = root.getChildNodes();
+		
+		for (int c = 0; c < children.getLength(); ++c)
+			if (children.item(c).getNodeType() == Node.ELEMENT_NODE)
+				return false;
+		
+		return true;
 	}
 }

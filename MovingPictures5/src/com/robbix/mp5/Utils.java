@@ -609,4 +609,11 @@ public class Utils
 		
 		return newImage;
 	}
+	
+	public static int getHueInt(Color color)
+	{
+		float[] hsb = new float[4];
+		Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
+		return (int) (hsb[0] * 360);
+	}
 }

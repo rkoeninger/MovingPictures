@@ -53,7 +53,10 @@ public class Sprite
 	
 	public Image getImage(int hue, int scale)
 	{
-		HSTuple tuple = new HSTuple(baseHue == -1 ? -1 : hue, scale);
+		if (hue == -1 || baseHue == -1)
+			hue = baseHue;
+		
+		HSTuple tuple = new HSTuple(hue, scale);
 		BufferedImage image = (BufferedImage) hueScaleMap.get(tuple);
 		
 		if (image == null)

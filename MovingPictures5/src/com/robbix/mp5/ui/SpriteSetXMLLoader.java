@@ -59,28 +59,21 @@ class SpriteSetXMLLoader
 			throw new FileFormatException(xmlFile, "Not a valid SpriteSet type");
 		}
 	}
-
+	
 	/**
 	 * Loads vehicle activities/frames.
 	 */
 	public void loadVehicle(File dir, XNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
+		Color color = rootNode.getColorAttribute("color");
+		int playerColorHue = Utils.getHueInt(color);
 		
-		Color color = Color.decode(rootNode.getAttribute("color"));
-		float[] hsb = new float[4];
-		Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
-		int playerColorHue = (int) (hsb[0] * 360);
-		
-		boolean truck = unitType.contains("Truck");
-		
-		List<XNode> activityNodes = rootNode.getNodes("Activity");
-		
-		for (XNode activityNode : activityNodes)
+		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
 			String activityName = activityNode.getAttribute("name");
 			String path = activityNode.getAttribute("path", ".");
-
+			
 			File activityDir = new File(dir, path);
 			
 			int activityOffsetX = activityNode.getIntAttribute("offsetX", 0);
@@ -94,18 +87,16 @@ class SpriteSetXMLLoader
 				
 				String cargo = activityNode.getAttribute("cargo", null);
 				
-				if (truck && cargo == null)
-					throw new FileFormatException(xmlFile,
-						"Cargo type not marked for Truck"
-					);
+				if (unitType.contains("Truck") && cargo == null)
+					throw new FileFormatException(xmlFile, "Cargo type not marked for Truck");
 				
 				List<XNode> directionNodes = getOffsetFrames(activityNode);
 				
 				for (XNode directionNode : directionNodes)
 				{
-					Direction direction = Direction.getDirection(directionNode.getAttribute("name"));
-					int dirOffsetX = directionNode.getIntAttribute("offsetX", 0);
-					int dirOffsetY = directionNode.getIntAttribute("offsetY", 0);
+					Direction direction = directionNode.getDirectionAttribute("name");
+					int dirOffsetX      = directionNode.getIntAttribute("offsetX", 0);
+					int dirOffsetY      = directionNode.getIntAttribute("offsetY", 0);
 					
 					dirOffsetX += activityOffsetX;
 					dirOffsetY += activityOffsetY;
@@ -114,13 +105,12 @@ class SpriteSetXMLLoader
 						? minorTurnFrameCount
 						: majorTurnFrameCount;
 					
-					String parentSpritePath =
-						Utils.getPath(
-							unitType,
-							activityName,
-							cargo,
-							direction.getShortName()
-						);
+					String parentSpritePath = Utils.getPath(
+						unitType,
+						activityName,
+						cargo,
+						direction.getShortName()
+					);
 					
 					metadata.put(parentSpritePath, frameCount);
 					
@@ -145,7 +135,7 @@ class SpriteSetXMLLoader
 				int perTurnFrameCount = activityNode.getIntAttribute("perTurnFrameCount");
 				String cargo = activityNode.getAttribute("cargo");
 
-				if (truck && cargo == null)
+				if (unitType.contains("Truck") && cargo == null)
 					throw new FileFormatException(xmlFile,
 						"Cargo type not marked for Truck"
 					);
@@ -154,20 +144,19 @@ class SpriteSetXMLLoader
 				
 				for (XNode directionNode : directionNodes)
 				{
-					Direction direction = Direction.getDirection(directionNode.getAttribute("name"));
+					Direction direction = directionNode.getDirectionAttribute("name");
 					int dirOffsetX      = directionNode.getIntAttribute("offsetX", 0);
 					int dirOffsetY      = directionNode.getIntAttribute("offsetY", 0);
 					
 					dirOffsetX += activityOffsetX;
 					dirOffsetY += activityOffsetY;
 					
-					String parentSpritePath =
-						Utils.getPath(
-							unitType,
-							activityName,
-							cargo,
-							direction.getShortName()
-						);
+					String parentSpritePath = Utils.getPath(
+						unitType,
+						activityName,
+						cargo,
+						direction.getShortName()
+					);
 					
 					metadata.put(parentSpritePath, perTurnFrameCount);
 					
@@ -203,7 +192,7 @@ class SpriteSetXMLLoader
 					cargo = null;
 				}
 
-				if (truck && cargo == null)
+				if (unitType.contains("Truck") && cargo == null)
 					throw new FileFormatException(xmlFile,
 						"Cargo type not marked for Truck"
 					);
@@ -252,19 +241,18 @@ class SpriteSetXMLLoader
 				
 				for (XNode directionNode : directionNodes)
 				{
-					Direction direction = Direction.getDirection(directionNode.getAttribute("name"));
+					Direction direction = directionNode.getDirectionAttribute("name");
 					int dirOffsetX      = directionNode.getIntAttribute("offsetX", 0);
 					int dirOffsetY      = directionNode.getIntAttribute("offsetY", 0);
 					
 					dirOffsetX += activityOffsetX;
 					dirOffsetY += activityOffsetY;
 					
-					String parentSpritePath =
-						Utils.getPath(
-							unitType,
-							activityName,
-							direction.getShortName()
-						);
+					String parentSpritePath = Utils.getPath(
+						unitType,
+						activityName,
+						direction.getShortName()
+					);
 					
 					metadata.put(parentSpritePath, perTurnFrameCount);
 					
@@ -340,15 +328,10 @@ class SpriteSetXMLLoader
 	public void loadStructure(File dir, XNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
+		Color color = rootNode.getColorAttribute("color");
+		int playerColorHue = Utils.getHueInt(color);
 		
-		Color color = Color.decode(rootNode.getAttribute("color"));
-		float[] hsb = new float[4];
-		Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
-		int playerColorHue = (int) (hsb[0] * 360);
-		
-		List<XNode> activityNodes = rootNode.getNodes("Activity");
-		
-		for (XNode activityNode : activityNodes)
+		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
 			String activityName = activityNode.getAttribute("name");
 			String path = activityNode.getAttribute("path", ".");
@@ -475,10 +458,8 @@ class SpriteSetXMLLoader
 	{
 		String unitType = rootNode.getAttribute("unitType");
 
-		Color color = Color.decode(rootNode.getAttribute("color"));
-		float[] hsb = new float[4];
-		Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
-		int playerColorHue = (int) (hsb[0] * 360);
+		Color color = rootNode.getColorAttribute("color");
+		int playerColorHue = Utils.getHueInt(color);
 		
 		XNode activityNode = rootNode.getNode("Activity");
 		
@@ -488,9 +469,7 @@ class SpriteSetXMLLoader
 		String activityName = activityNode.getAttribute("name");
 		
 		if (! activityName.equals("turret"))
-			throw new IOException(
-				"Only \"turret\" activity valid for turrets"
-			);
+			throw new IOException("Only \"turret\" activity valid for turrets");
 		
 		String path = activityNode.getAttribute("path", ".");
 
@@ -498,21 +477,16 @@ class SpriteSetXMLLoader
 
 		int activityOffsetX = activityNode.getIntAttribute("offsetX", 0);
 		int activityOffsetY = activityNode.getIntAttribute("offsetY", 0);
-		int fileNumber = activityNode.getIntAttribute("fileNumber");
+		int fileNumber      = activityNode.getIntAttribute("fileNumber");
 		
-		List<XNode> directionNodes = activityNode.getNodes("Direction");
-		
-		for (XNode directionNode : directionNodes)
+		for (XNode directionNode : activityNode.getNodes("Direction"))
 		{
-			Direction direction = Direction.getDirection(directionNode.getAttribute("name"));
-			
-			int dirOffsetX = directionNode.getIntAttribute("offsetX", 0);
-			int dirOffsetY = directionNode.getIntAttribute("offsetY", 0);
+			Direction direction = directionNode.getDirectionAttribute("name");
+			int dirOffsetX      = directionNode.getIntAttribute("offsetX", 0);
+			int dirOffsetY      = directionNode.getIntAttribute("offsetY", 0);
 			
 			dirOffsetX += activityOffsetX;
 			dirOffsetY += activityOffsetY;
-			
-			List<XNode> hotspotNodes = directionNode.getNodes("Hotspot");
 			
 			String parentSpritePath = Utils.getPath(
 				unitType,
@@ -524,17 +498,14 @@ class SpriteSetXMLLoader
 			
 			int h = 0;
 			
-			for (XNode hotspotNode : hotspotNodes)
+			for (XNode hotspotNode : directionNode.getNodes("Hotspot"))
 			{
-				int hotspotX = hotspotNode.getIntAttribute("x");
-				int hotspotY = hotspotNode.getIntAttribute("y");
-				
 				metadata.put(
 					Utils.getPath(parentSpritePath, h, "x"),
-					hotspotX);
+					hotspotNode.getIntAttribute("x"));
 				metadata.put(
 					Utils.getPath(parentSpritePath, h, "y"),
-					hotspotY);
+					hotspotNode.getIntAttribute("y"));
 				
 				h++;
 			}
@@ -559,15 +530,10 @@ class SpriteSetXMLLoader
 	public void loadGuardPost(File dir, XNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
-
-		Color color = Color.decode(rootNode.getAttribute("color"));
-		float[] hsb = new float[4];
-		Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
-		int playerColorHue = (int) (hsb[0] * 360);
+		Color color = rootNode.getColorAttribute("color");
+		int playerColorHue = Utils.getHueInt(color);
 		
-		List<XNode> activityNodes = rootNode.getNodes("Activity");
-		
-		for (XNode activityNode : activityNodes)
+		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
 			String activityName = activityNode.getAttribute("name");
 			String path = activityNode.getAttribute("path", ".");
@@ -582,15 +548,12 @@ class SpriteSetXMLLoader
 				
 				for (XNode directionNode : directionNodes)
 				{
-					Direction direction = Direction.getDirection(directionNode.getAttribute("name"));
-					
+					Direction direction = directionNode.getDirectionAttribute("name");
 					int dirOffsetX = directionNode.getIntAttribute("offsetX", 0);
 					int dirOffsetY = directionNode.getIntAttribute("offsetY", 0);
 					
 					dirOffsetX += activityOffsetX;
 					dirOffsetY += activityOffsetY;
-					
-					List<XNode> hotspotNodes = directionNode.getNodes("Hotspot");
 					
 					String parentSpritePath = Utils.getPath(
 						unitType,
@@ -602,17 +565,14 @@ class SpriteSetXMLLoader
 					
 					int h = 0;
 					
-					for (XNode hotspotNode : hotspotNodes)
+					for (XNode hotspotNode : directionNode.getNodes("Hotspot"))
 					{
-						int hotspotX = hotspotNode.getIntAttribute("x");
-						int hotspotY = hotspotNode.getIntAttribute("y");
-						
 						metadata.put(
 							Utils.getPath(parentSpritePath, h, "x"),
-							hotspotX);
+							hotspotNode.getIntAttribute("x"));
 						metadata.put(
 							Utils.getPath(parentSpritePath, h, "y"),
-							hotspotY);
+							hotspotNode.getIntAttribute("y"));
 						
 						h++;
 					}
@@ -677,10 +637,9 @@ class SpriteSetXMLLoader
 	public void loadAmbient(File dir, XNode rootNode) throws IOException
 	{
 		String eventType = rootNode.getAttribute("eventType");
-		List<XNode> eventNodes = rootNode.getNodes("Event");
 		double trans = rootNode.getFloatAttribute("translucency", 1.0);
 		
-		for (XNode eventNode : eventNodes)
+		for (XNode eventNode : rootNode.getNodes("Event"))
 		{
 			String eventName = eventNode.getAttribute("name");
 			String path = eventNode.getAttribute("path");
@@ -733,7 +692,7 @@ class SpriteSetXMLLoader
 		
 		return img;
 	}
-
+	
 	public static Image loadFrame(File dir, int fileNumber, double trans) throws IOException
 	{
 		BufferedImage img = (BufferedImage)loadFrame(dir, fileNumber);
