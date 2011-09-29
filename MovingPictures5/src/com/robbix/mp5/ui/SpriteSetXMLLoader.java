@@ -167,7 +167,7 @@ class SpriteSetXMLLoader
 				{
 					cargo = activityNode.getAttribute("cargo");
 				}
-				catch (IllegalArgumentException iae)
+				catch (FileFormatException iae)
 				{
 					cargo = null;
 				}
@@ -404,7 +404,7 @@ class SpriteSetXMLLoader
 		{
 			Direction direction = directionNode.getDirectionAttribute("name");
 			Offset dirOffset = directionNode.getOffsetAttributes();
-			dirOffset.add(activityOffset);
+			dirOffset = dirOffset.add(activityOffset);
 			
 			String parentSpritePath = Utils.getPath(
 				unitType,
@@ -558,7 +558,6 @@ class SpriteSetXMLLoader
 			for (int i = 0; i < frameCount; ++i)
 			{
 				Image img = loadFrame(eventDir, fileNumber++, trans);
-				
 				Offset frameOffset = eventOffset;
 				
 				if (!offsetNodes.isEmpty())
@@ -598,8 +597,7 @@ class SpriteSetXMLLoader
 		return img;
 	}
 	
-	public List<XNode> getOffsetNodes(XNode activityNode)
-	throws FileFormatException
+	public List<XNode> getOffsetNodes(XNode activityNode) throws FileFormatException
 	{
 		String offsetGroupName = activityNode.getAttribute("useOffsets", null);
 		
@@ -635,8 +633,7 @@ class SpriteSetXMLLoader
 		
 	}
 	
-	private static Map<String, List<XNode>> getOffsetFrameMap(XNode rootNode)
-	throws FileFormatException
+	private static Map<String, List<XNode>> getOffsetFrameMap(XNode rootNode) throws FileFormatException
 	{
 		Map<String, List<XNode>> offsetFrameMap =
 			new HashMap<String, List<XNode>>();
