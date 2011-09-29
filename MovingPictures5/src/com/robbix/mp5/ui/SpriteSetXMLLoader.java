@@ -16,6 +16,7 @@ import com.robbix.mp5.Utils;
 import com.robbix.mp5.XNode;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.FileFormatException;
+import com.robbix.mp5.basics.Offset;
 
 /**
  * WARNING! NOT THREAD SAFE!
@@ -76,9 +77,8 @@ class SpriteSetXMLLoader
 			
 			File activityDir = new File(dir, path);
 			
-			int activityOffsetX = activityNode.getIntAttribute("offsetX", 0);
-			int activityOffsetY = activityNode.getIntAttribute("offsetY", 0);
-			int fileNumber      = activityNode.getIntAttribute("fileNumber");
+			Offset activityOffset = activityNode.getOffsetAttributes();
+			int fileNumber = activityNode.getIntAttribute("fileNumber");
 			
 			if (activityName.equals("move"))
 			{
@@ -90,16 +90,11 @@ class SpriteSetXMLLoader
 				if (unitType.contains("Truck") && cargo == null)
 					throw new FileFormatException(xmlFile, "Cargo type not marked for Truck");
 				
-				List<XNode> directionNodes = getOffsetFrames(activityNode);
-				
-				for (XNode directionNode : directionNodes)
+				for (XNode directionNode : getOffsetNodes(activityNode))
 				{
 					Direction direction = directionNode.getDirectionAttribute("name");
-					int dirOffsetX      = directionNode.getIntAttribute("offsetX", 0);
-					int dirOffsetY      = directionNode.getIntAttribute("offsetY", 0);
-					
-					dirOffsetX += activityOffsetX;
-					dirOffsetY += activityOffsetY;
+					Offset dirOffset = directionNode.getOffsetAttributes();
+					dirOffset = dirOffset.add(activityOffset);
 					
 					int frameCount = direction.isThirdOrder()
 						? minorTurnFrameCount
@@ -120,12 +115,7 @@ class SpriteSetXMLLoader
 						
 						sprites.put(
 							Utils.getPath(parentSpritePath, i),
-							new Sprite(
-								img,
-								playerColorHue,
-								dirOffsetX,
-								dirOffsetY
-							)
+							new Sprite(img, playerColorHue, dirOffset)
 						);
 					}
 				}
@@ -139,17 +129,12 @@ class SpriteSetXMLLoader
 					throw new FileFormatException(xmlFile,
 						"Cargo type not marked for Truck"
 					);
-
-				List<XNode> directionNodes = getOffsetFrames(activityNode);
 				
-				for (XNode directionNode : directionNodes)
+				for (XNode directionNode : getOffsetNodes(activityNode))
 				{
 					Direction direction = directionNode.getDirectionAttribute("name");
-					int dirOffsetX      = directionNode.getIntAttribute("offsetX", 0);
-					int dirOffsetY      = directionNode.getIntAttribute("offsetY", 0);
-					
-					dirOffsetX += activityOffsetX;
-					dirOffsetY += activityOffsetY;
+					Offset dirOffset = directionNode.getOffsetAttributes();
+					dirOffset = dirOffset.add(activityOffset);
 					
 					String parentSpritePath = Utils.getPath(
 						unitType,
@@ -166,12 +151,7 @@ class SpriteSetXMLLoader
 						
 						sprites.put(
 							Utils.getPath(parentSpritePath, i),
-							new Sprite(
-								img,
-								playerColorHue,
-								dirOffsetX,
-								dirOffsetY
-							)
+							new Sprite(img, playerColorHue, dirOffset)
 						);
 					}
 				}
@@ -191,11 +171,9 @@ class SpriteSetXMLLoader
 				{
 					cargo = null;
 				}
-
+				
 				if (unitType.contains("Truck") && cargo == null)
-					throw new FileFormatException(xmlFile,
-						"Cargo type not marked for Truck"
-					);
+					throw new FileFormatException(xmlFile, "Cargo type not marked for Truck");
 				
 				String parentSpritePath = Utils.getPath(
 					unitType,
@@ -203,31 +181,22 @@ class SpriteSetXMLLoader
 					cargo
 				);
 				
-				List<XNode> offsetFrames = getOffsetFrames(activityNode);
-				
+				List<XNode> offsetNodes = getOffsetNodes(activityNode);
 				metadata.put(parentSpritePath, frameCount);
 				
 				for (int i = 0; i < frameCount; ++i)
 				{
 					Image img = loadFrame(activityDir, fileNumber++);
+					Offset frameOffset = activityOffset;
 					
-					int offsetX = 0;
-					int offsetY = 0;
-					
-					if (offsetFrames.size() > 0)
+					if (!offsetNodes.isEmpty())
 					{
-						offsetX += offsetFrames.get(i).getIntAttribute("offsetX", 0);
-						offsetY += offsetFrames.get(i).getIntAttribute("offsetY", 0);
+						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
 					sprites.put(
 						Utils.getPath(parentSpritePath, i),
-						new Sprite(
-							img,
-							playerColorHue,
-							activityOffsetX + offsetX,
-							activityOffsetY + offsetY
-						)
+						new Sprite(img, playerColorHue, frameOffset)
 					);
 				}
 			}
@@ -237,16 +206,13 @@ class SpriteSetXMLLoader
 			else if (activityName.equals("bulldoze"))
 			{
 				int perTurnFrameCount = activityNode.getIntAttribute("perTurnFrameCount");
-				List<XNode> directionNodes = getOffsetFrames(activityNode);
+				List<XNode> directionNodes = getOffsetNodes(activityNode);
 				
 				for (XNode directionNode : directionNodes)
 				{
 					Direction direction = directionNode.getDirectionAttribute("name");
-					int dirOffsetX      = directionNode.getIntAttribute("offsetX", 0);
-					int dirOffsetY      = directionNode.getIntAttribute("offsetY", 0);
-					
-					dirOffsetX += activityOffsetX;
-					dirOffsetY += activityOffsetY;
+					Offset dirOffset = directionNode.getOffsetAttributes();
+					dirOffset = dirOffset.add(activityOffset);
 					
 					String parentSpritePath = Utils.getPath(
 						unitType,
@@ -256,29 +222,21 @@ class SpriteSetXMLLoader
 					
 					metadata.put(parentSpritePath, perTurnFrameCount);
 					
-					List<XNode> offsetFrames = directionNode.getNodes("OffsetFrame");
+					List<XNode> offsetNodes = directionNode.getNodes("OffsetFrame");
 					
 					for (int i = 0; i < perTurnFrameCount; ++i)
 					{
 						Image img = loadFrame(activityDir, fileNumber++);
+						Offset frameOffset = dirOffset;
 						
-						int frameOffsetX = dirOffsetX;
-						int frameOffsetY = dirOffsetY;
-						
-						if (offsetFrames.size() > 0)
+						if (!offsetNodes.isEmpty())
 						{
-							frameOffsetX += offsetFrames.get(i).getIntAttribute("offsetX", 0);
-							frameOffsetY += offsetFrames.get(i).getIntAttribute("offsetY", 0);
+							frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 						}
 						
 						sprites.put(
 							Utils.getPath(parentSpritePath, i),
-							new Sprite(
-								img,
-								playerColorHue,
-								frameOffsetX,
-								frameOffsetY
-							)
+							new Sprite(img, playerColorHue, frameOffset)
 						);
 					}
 				}
@@ -292,30 +250,22 @@ class SpriteSetXMLLoader
 					activityName
 				);
 				
-				List<XNode> offsetFrames = getOffsetFrames(activityNode);
+				List<XNode> offsetNodes = getOffsetNodes(activityNode);
 				metadata.put(parentSpritePath, frameCount);
 				
 				for (int i = 0; i < frameCount; ++i)
 				{
 					Image img = loadFrame(activityDir, fileNumber++);
+					Offset frameOffset = activityOffset;
 					
-					int offsetX = 0;
-					int offsetY = 0;
-					
-					if (offsetFrames.size() > 0)
+					if (!offsetNodes.isEmpty())
 					{
-						offsetX += offsetFrames.get(i).getIntAttribute("offsetX", 0);
-						offsetY += offsetFrames.get(i).getIntAttribute("offsetY", 0);
+						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
 					sprites.put(
 						Utils.getPath(parentSpritePath, i),
-						new Sprite(
-							img,
-							playerColorHue,
-							activityOffsetX + offsetX,
-							activityOffsetY + offsetY
-						)
+						new Sprite(img, playerColorHue, frameOffset)
 					);
 				}
 			}
@@ -337,23 +287,17 @@ class SpriteSetXMLLoader
 			String path = activityNode.getAttribute("path", ".");
 			
 			File activityDir = new File(dir, path);
-
-			int activityOffsetX = activityNode.getIntAttribute("offsetX", 0);
-			int activityOffsetY = activityNode.getIntAttribute("offsetY", 0);
+			
+			Offset activityOffset = activityNode.getOffsetAttributes();
 			
 			if (activityName.equals("still"))
 			{
-				List<XNode> healthNodes = activityNode.getNodes("HealthState");
-				
-				for (XNode healthNode : healthNodes)
+				for (XNode healthNode : activityNode.getNodes("HealthState"))
 				{
 					String health = healthNode.getAttribute("health");
 					int fileNumber = healthNode.getIntAttribute("fileNumber");
-					int healthOffsetX = healthNode.getIntAttribute("offsetX", 0);
-					int healthOffsetY = healthNode.getIntAttribute("offsetY", 0);
-					
-					healthOffsetX += activityOffsetX;
-					healthOffsetY += activityOffsetY;
+					Offset healthOffset = healthNode.getOffsetAttributes();
+					healthOffset = healthOffset.add(activityOffset);
 					
 					String parentSpritePath = Utils.getPath(
 						unitType,
@@ -362,23 +306,16 @@ class SpriteSetXMLLoader
 					);
 					
 					Image img = loadFrame(activityDir, fileNumber);
-					
 					metadata.put(parentSpritePath, 1);
-					
 					sprites.put(
 						parentSpritePath,
-						new Sprite(
-							img,
-							playerColorHue,
-							healthOffsetX,
-							healthOffsetY
-						)
+						new Sprite(img, playerColorHue, healthOffset)
 					);
 				}
 			}
 			else if (activityName.equals("build"))
 			{
-				List<XNode> offsetFrames = getOffsetFrames(activityNode);
+				List<XNode> offsetNodes = getOffsetNodes(activityNode);
 				
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
 				int frameCount = activityNode.getIntAttribute("frameCount");
@@ -389,30 +326,23 @@ class SpriteSetXMLLoader
 				for (int i = 0; i < frameCount; ++i)
 				{
 					Image img = loadFrame(activityDir, fileNumber++);
+					Offset frameOffset = activityOffset;
 					
-					int offsetX = 0;
-					int offsetY = 0;
-					
-					if (offsetFrames.size() > 0)
+					if (!offsetNodes.isEmpty())
 					{
-						offsetX += offsetFrames.get(i).getIntAttribute("offsetX", 0);
-						offsetY += offsetFrames.get(i).getIntAttribute("offsetY", 0);
+						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
 					sprites.put(
 						Utils.getPath(parentSpritePath, i),
-						new Sprite(
-							img,
-							playerColorHue,
-							activityOffsetX + offsetX,
-							activityOffsetY + offsetY
+						new Sprite(img, playerColorHue, frameOffset
 						)
 					);
 				}
 			}
 			else if (activityName.equals("collapse"))
 			{
-				List<XNode> offsetFrames = getOffsetFrames(activityNode);
+				List<XNode> offsetNodes = getOffsetNodes(activityNode);
 				
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
 				int frameCount = activityNode.getIntAttribute("frameCount");
@@ -427,24 +357,16 @@ class SpriteSetXMLLoader
 				for (int i = 0; i < frameCount; ++i)
 				{
 					Image img = loadFrame(activityDir, fileNumber++);
+					Offset frameOffset = activityOffset;
 					
-					int offsetX = 0;
-					int offsetY = 0;
-					
-					if (offsetFrames.size() > 0)
+					if (!offsetNodes.isEmpty())
 					{
-						offsetX += offsetFrames.get(i).getIntAttribute("offsetX", 0);
-						offsetY += offsetFrames.get(i).getIntAttribute("offsetY", 0);
+						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
 					sprites.put(
 						Utils.getPath(parentSpritePath, i),
-						new Sprite(
-							img,
-							playerColorHue,
-							activityOffsetX + offsetX,
-							activityOffsetY + offsetY
-						)
+						new Sprite(img, playerColorHue, frameOffset)
 					);
 				}
 			}
@@ -474,19 +396,15 @@ class SpriteSetXMLLoader
 		String path = activityNode.getAttribute("path", ".");
 
 		File activityDir = new File(dir, path);
-
-		int activityOffsetX = activityNode.getIntAttribute("offsetX", 0);
-		int activityOffsetY = activityNode.getIntAttribute("offsetY", 0);
-		int fileNumber      = activityNode.getIntAttribute("fileNumber");
+		
+		Offset activityOffset = activityNode.getOffsetAttributes();
+		int fileNumber = activityNode.getIntAttribute("fileNumber");
 		
 		for (XNode directionNode : activityNode.getNodes("Direction"))
 		{
 			Direction direction = directionNode.getDirectionAttribute("name");
-			int dirOffsetX      = directionNode.getIntAttribute("offsetX", 0);
-			int dirOffsetY      = directionNode.getIntAttribute("offsetY", 0);
-			
-			dirOffsetX += activityOffsetX;
-			dirOffsetY += activityOffsetY;
+			Offset dirOffset = directionNode.getOffsetAttributes();
+			dirOffset.add(activityOffset);
 			
 			String parentSpritePath = Utils.getPath(
 				unitType,
@@ -500,12 +418,14 @@ class SpriteSetXMLLoader
 			
 			for (XNode hotspotNode : directionNode.getNodes("Hotspot"))
 			{
+				Offset hotspotOffset = hotspotNode.getOffsetAttributes();
+				
 				metadata.put(
 					Utils.getPath(parentSpritePath, h, "x"),
-					hotspotNode.getIntAttribute("x"));
+					hotspotOffset.dx);
 				metadata.put(
 					Utils.getPath(parentSpritePath, h, "y"),
-					hotspotNode.getIntAttribute("y"));
+					hotspotOffset.dy);
 				
 				h++;
 			}
@@ -514,12 +434,7 @@ class SpriteSetXMLLoader
 			
 			sprites.put(
 				Utils.getPath(parentSpritePath, 0),
-				new Sprite(
-					img,
-					playerColorHue,
-					dirOffsetX,
-					dirOffsetY
-				)
+				new Sprite(img, playerColorHue, dirOffset)
 			);
 		}
 	}
@@ -538,8 +453,7 @@ class SpriteSetXMLLoader
 			String activityName = activityNode.getAttribute("name");
 			String path = activityNode.getAttribute("path", ".");
 			File activityDir = new File(dir, path);
-			int activityOffsetX = activityNode.getIntAttribute("offsetX", 0);
-			int activityOffsetY = activityNode.getIntAttribute("offsetY", 0);
+			Offset activityOffset = activityNode.getOffsetAttributes();
 			
 			if (activityName.equals("turret"))
 			{
@@ -549,11 +463,8 @@ class SpriteSetXMLLoader
 				for (XNode directionNode : directionNodes)
 				{
 					Direction direction = directionNode.getDirectionAttribute("name");
-					int dirOffsetX = directionNode.getIntAttribute("offsetX", 0);
-					int dirOffsetY = directionNode.getIntAttribute("offsetY", 0);
-					
-					dirOffsetX += activityOffsetX;
-					dirOffsetY += activityOffsetY;
+					Offset dirOffset = directionNode.getOffsetAttributes();
+					dirOffset = dirOffset.add(activityOffset);
 					
 					String parentSpritePath = Utils.getPath(
 						unitType,
@@ -567,12 +478,14 @@ class SpriteSetXMLLoader
 					
 					for (XNode hotspotNode : directionNode.getNodes("Hotspot"))
 					{
+						Offset hotspotOffset = hotspotNode.getOffsetAttributes();
+						
 						metadata.put(
 							Utils.getPath(parentSpritePath, h, "x"),
-							hotspotNode.getIntAttribute("x"));
+							hotspotOffset.dx);
 						metadata.put(
 							Utils.getPath(parentSpritePath, h, "y"),
-							hotspotNode.getIntAttribute("y"));
+							hotspotOffset.dy);
 						
 						h++;
 					}
@@ -581,18 +494,12 @@ class SpriteSetXMLLoader
 					
 					sprites.put(
 						Utils.getPath(parentSpritePath, 0),
-						new Sprite(
-							img,
-							playerColorHue,
-							dirOffsetX,
-							dirOffsetY
-						)
+						new Sprite(img, playerColorHue, dirOffset)
 					);
 				}
 			}
 			else if (activityName.equals("build"))
 			{
-				List<XNode> offsetFrames = getOffsetFrames(activityNode);
 				
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
 				int frameCount = activityNode.getIntAttribute("frameCount");
@@ -603,28 +510,22 @@ class SpriteSetXMLLoader
 				);
 				
 				metadata.put(parentSpritePath, frameCount);
+				List<XNode> offsetNodes = getOffsetNodes(activityNode);
 				
 				for (int i = 0; i < frameCount; ++i)
 				{
 					Image img = loadFrame(activityDir, fileNumber++);
 					
-					int offsetX = 0;
-					int offsetY = 0;
+					Offset frameOffset = activityOffset;
 					
-					if (offsetFrames.size() > 0)
+					if (!offsetNodes.isEmpty())
 					{
-						offsetX += offsetFrames.get(i).getIntAttribute("offsetX", 0);
-						offsetY += offsetFrames.get(i).getIntAttribute("offsetY", 0);
+						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
 					sprites.put(
 						Utils.getPath(parentSpritePath, i),
-						new Sprite(
-							img,
-							playerColorHue,
-							activityOffsetX + offsetX,
-							activityOffsetY + offsetY
-						)
+						new Sprite(img, playerColorHue, frameOffset)
 					);
 				}
 			}
@@ -646,33 +547,28 @@ class SpriteSetXMLLoader
 			
 			int fileNumber = eventNode.getIntAttribute("fileNumber");
 			int frameCount = eventNode.getIntAttribute("frameCount");
-			int eventOffsetX = eventNode.getIntAttribute("x", 0);
-			int eventOffsetY = eventNode.getIntAttribute("y", 0);
+			Offset eventOffset = eventNode.getOffsetAttributes();
 			
 			File eventDir = new File(dir, path);
-	
 			String parentSpritePath = Utils.getPath(eventType, eventName);
-			
 			metadata.put(parentSpritePath, frameCount);
 			
-			List<XNode> offsetFrames = eventNode.getNodes("OffsetFrame");
+			List<XNode> offsetNodes = eventNode.getNodes("OffsetFrame");
 			
 			for (int i = 0; i < frameCount; ++i)
 			{
 				Image img = loadFrame(eventDir, fileNumber++, trans);
 				
-				int offsetX = eventOffsetX;
-				int offsetY = eventOffsetY;
+				Offset frameOffset = eventOffset;
 				
-				if (offsetFrames.size() > 0)
+				if (!offsetNodes.isEmpty())
 				{
-					offsetX += offsetFrames.get(i).getIntAttribute("x", 0);
-					offsetY += offsetFrames.get(i).getIntAttribute("y", 0);
+					frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 				}
 				
 				sprites.put(
 					Utils.getPath(parentSpritePath, i),
-					new Sprite(img, -1, offsetX, offsetY)
+					new Sprite(img, -1, frameOffset)
 				);
 			}
 		}
@@ -702,7 +598,7 @@ class SpriteSetXMLLoader
 		return img;
 	}
 	
-	public List<XNode> getOffsetFrames(XNode activityNode)
+	public List<XNode> getOffsetNodes(XNode activityNode)
 	throws FileFormatException
 	{
 		String offsetGroupName = activityNode.getAttribute("useOffsets", null);

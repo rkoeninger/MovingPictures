@@ -6,26 +6,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.basics.Offset;
 import com.robbix.mp5.basics.Tuple;
 
 public class Sprite
 {
-	private int xOff;
-	private int yOff;
+	private Offset offset;
 	private int baseHue;
 	private Map<HSTuple, Image> hueScaleMap;
 	private HSTuple baseTuple;
 	
 	public Sprite(Image image, int xOff, int yOff)
 	{
-		this(image, -1, xOff, yOff);
+		this(image, -1, new Offset(xOff, yOff));
 	}
 	
 	public Sprite(Image image, int baseHue, int xOff, int yOff)
 	{
+		this(image, baseHue, new Offset(xOff, yOff));
+	}
+	
+	public Sprite(Image image, Offset offset)
+	{
+		this(image, -1, offset);
+	}
+	
+	public Sprite(Image image, int baseHue, Offset offset)
+	{
 		this.baseHue = baseHue;
-		this.xOff = xOff;
-		this.yOff = yOff;
+		this.offset = offset;
 		this.hueScaleMap = new HashMap<HSTuple, Image>();
 		this.baseTuple = new HSTuple(baseHue, 0);
 		hueScaleMap.put(baseTuple, image);
@@ -87,22 +96,22 @@ public class Sprite
 	
 	public int getXOffset()
 	{
-		return xOff;
+		return offset.dx;
 	}
 	
 	public int getYOffset()
 	{
-		return yOff;
+		return offset.dy;
 	}
 	
 	public int getXOffset(int scale)
 	{
-		return scale < 0 ? xOff >> -scale : xOff << scale;
+		return offset.getDX(scale);
 	}
 	
 	public int getYOffset(int scale)
 	{
-		return scale < 0 ? yOff >> -scale : yOff << scale;
+		return offset.getDY(scale);
 	}
 	
 	private static class HSTuple extends Tuple<Integer, Integer>

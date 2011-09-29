@@ -490,10 +490,8 @@ public class XNode
 	 * 
 	 * e.g. "offsetX" and "offsetY"
 	 *      "x" and "y"
-	 * 
-	 * @throws FileFormatException If no such attributes are present
 	 */
-	public Offset getOffsetAttributes() throws FileFormatException
+	public Offset getOffsetAttributes()
 	{
 		for (String[] pair : namePairs)
 		{
@@ -510,7 +508,7 @@ public class XNode
 			}
 		}
 		
-		throw new FileFormatException("Offset attributes not present");
+		return new Offset();
 	}
 	
 	/**

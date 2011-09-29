@@ -19,6 +19,16 @@ public class Offset
 	public int getDX(){ return dx; }
 	public int getDY(){ return dy; }
 	
+	public int getDX(int scale)
+	{
+		return scale < 0 ? dx >> -scale : dx << scale;
+	}
+	
+	public int getDY(int scale)
+	{
+		return scale < 0 ? dy >> -scale : dy << scale;
+	}
+	
 	public Offset(int dx, int dy)
 	{
 		this.dx = dx;
@@ -29,6 +39,14 @@ public class Offset
 	{
 		this.dx = 0;
 		this.dy = 0;
+	}
+	
+	public Offset scale(int scale)
+	{
+		return new Offset(
+			scale < 0 ? dx >> -scale : dx << scale,
+			scale < 0 ? dy >> -scale : dy << scale
+		);
 	}
 	
 	public Offset add(Offset that)
