@@ -15,11 +15,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 
-public class TestMP5Launcher
+public class SandboxLauncher
 {
 	public static void main(String[] args)
 	{
-		Utils.trySystemLookAndFeel();
+		Sandbox.trySystemLookAndFeel();
 		
 		final JDialog dialog = new JDialog();
 		dialog.setTitle("TestMP5 Launcher");
@@ -88,7 +88,7 @@ public class TestMP5Launcher
 				try
 				{
 					dialog.setVisible(false);
-					TestMP5.main(argsList.toArray(new String[0]));
+					Sandbox.main(argsList.toArray(new String[0]));
 				}
 				catch (IOException e1)
 				{
@@ -101,8 +101,8 @@ public class TestMP5Launcher
 	
 	private static String[] getMapAndDemoOptions()
 	{
-		List<String> mapList = TestMP5.getAvailableMaps();
-		Set<String> demoList = TestMP5.getDemos().keySet();
+		List<String> mapList = Sandbox.getAvailableMaps();
+		Set<String> demoList = Sandbox.getDemos().keySet();
 		String[] mapsAndDemos = new String[mapList.size() + demoList.size()];
 		
 		int i = 0;
@@ -122,7 +122,7 @@ public class TestMP5Launcher
 	
 	private static String[] getTileSetOptions()
 	{
-		List<String> tileSetList = TestMP5.getAvailableTileSets();
+		List<String> tileSetList = Sandbox.getAvailableTileSets();
 		String[] tileSets = new String[tileSetList.size()];
 		
 		int i = 0;

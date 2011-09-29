@@ -33,10 +33,10 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 
 import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.ai.task.SteerTask;
-import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
@@ -68,7 +68,7 @@ import com.robbix.mp5.unit.UnitType;
  * @author bort
  *
  */
-public class TestMP5
+public class Sandbox
 {
 	private static final String DEFAULT_TILE_SET = "newTerraDirt";
 	private static final String DEFAULT_MAP = "plain";
@@ -174,7 +174,7 @@ public class TestMP5
 			}
 		}
 		
-		Utils.trySystemLookAndFeel();
+		Sandbox.trySystemLookAndFeel();
 		
 		/*-------------------------------------------------------------------*
 		 * Load map, units, sprites, cursors
@@ -960,7 +960,7 @@ public class TestMP5
 	{
 		Map<String, Method> demos = new HashMap<String, Method>();
 		
-		for (Method method : TestMP5.class.getDeclaredMethods())
+		for (Method method : Sandbox.class.getDeclaredMethods())
 		{
 			int paramCount = method.getParameterTypes().length;
 			String methodName = method.getName();
@@ -985,7 +985,7 @@ public class TestMP5
 	{
 		Map<String, String> demoMaps = new HashMap<String, String>();
 		
-		for (Method method : TestMP5.class.getDeclaredMethods())
+		for (Method method : Sandbox.class.getDeclaredMethods())
 		{
 			int paramCount = method.getParameterTypes().length;
 			String methodName = method.getName();
@@ -1297,21 +1297,21 @@ public class TestMP5
 		game.getDisplay().setViewCenterPosition(center);
 	}
 	
-	public static class NotMyTeamFilter extends Filter<Unit>
+	/**
+	 * Attempts to set swing look and feel to the local system's
+	 * native theme. Returns true if successful.
+	 */
+	public static boolean trySystemLookAndFeel()
 	{
-		private Player myOwner;
-		
-		public NotMyTeamFilter(Player myOwner)
+		try
 		{
-			this.myOwner = myOwner;
+			String className = UIManager.getSystemLookAndFeelClassName();
+			UIManager.setLookAndFeel(className);
+			return true;
 		}
-		
-		public boolean accept(Unit unit)
+		catch (Exception e)
 		{
-			if (unit == null)
-				return false;
-			
-			return !myOwner.equals(unit.getOwner());
+			return false;
 		}
 	}
 }

@@ -16,7 +16,6 @@ import java.util.Random;
 import java.util.Set;
 
 import javax.swing.Icon;
-import javax.swing.UIManager;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Unit;
@@ -82,24 +81,6 @@ public class Utils
 	{
 		return GraphicsEnvironment.getLocalGraphicsEnvironment()
 								  .getMaximumWindowBounds();
-	}
-	
-	/**
-	 * Attempts to set swing look and feel to the local system's
-	 * native theme. Returns true if successful.
-	 */
-	public static boolean trySystemLookAndFeel()
-	{
-		try
-		{
-			String className = UIManager.getSystemLookAndFeelClassName();
-			UIManager.setLookAndFeel(className);
-			return true;
-		}
-		catch (Exception e)
-		{
-			return false;
-		}
 	}
 	
 	/**

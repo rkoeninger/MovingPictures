@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.robbix.mp5.ResourceType;
-import com.robbix.mp5.TestMP5;
 import com.robbix.mp5.XNode;
 import com.robbix.mp5.ai.task.SelfDestructAttackTask;
 import com.robbix.mp5.ai.task.Task;
@@ -119,7 +118,7 @@ public class UnitFactory
 				throw new IllegalArgumentException(turretTypeName + " does not exist");
 			
 			unit = Unit.newTank(chassisType, turretType);
-			Filter<Unit> filter = new TestMP5.NotMyTeamFilter(owner);
+			Filter<Unit> filter = new UnitFactory.NotMyTeamFilter(owner);
 			Task turretTask = null;
 			
 			turretTask =
@@ -137,7 +136,7 @@ public class UnitFactory
 		{
 			unit = Unit.newGuardPost(uType);
 			unit.setDefaultTask(
-				new TurretTask(new TestMP5.NotMyTeamFilter(owner)));
+				new TurretTask(new UnitFactory.NotMyTeamFilter(owner)));
 		}
 		else
 		{
@@ -408,6 +407,24 @@ public class UnitFactory
 		catch (IllegalAccessException e)
 		{
 			throw new Error("Field should be accessible: " + name);
+		}
+	}
+	
+	public static class NotMyTeamFilter extends Filter<Unit>
+	{
+		private Player myOwner;
+		
+		public NotMyTeamFilter(Player myOwner)
+		{
+			this.myOwner = myOwner;
+		}
+		
+		public boolean accept(Unit unit)
+		{
+			if (unit == null)
+				return false;
+			
+			return !myOwner.equals(unit.getOwner());
 		}
 	}
 }
