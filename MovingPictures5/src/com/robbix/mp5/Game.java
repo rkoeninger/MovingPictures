@@ -30,6 +30,7 @@ public class Game
 	{
 		Game game = new Game();
 		
+		game.factory = UnitFactory.load(new File(root, "units"));
 		game.tileSet = TileSet.load(new File(root, "tileset"), tileSetName);
 		game.map = LayeredMap.load(new File(root, "terrain"), mapName, game.tileSet);
 		game.spriteLib =
@@ -41,7 +42,6 @@ public class Game
 			? SoundBank.loadLazy(new File(root, "sounds"))
 			: SoundBank.preload(new File(root, "sounds"));
 		game.cursorSet = CursorSet.load(new File(root, "cursors"));
-		game.factory = UnitFactory.load(new File(root, "units"));
 		game.panel = new DisplayPanel(
 			game.map,
 			game.spriteLib,
