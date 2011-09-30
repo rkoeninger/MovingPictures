@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SpriteSet type="ambient" eventType="aDeath">
+<SpriteSet type="ambient" eventType="aDeath" translucency="0.7">
 	<Event name="guardPostKilled"
 		   path="./guardPostKilled"
 		   fileNumber="12369"

@@ -2,6 +2,7 @@ package com.robbix.mp5.unit;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class UnitType
@@ -167,6 +168,10 @@ public class UnitType
 		return type;
 	}
 	
+	private static AtomicInteger nextSerial = new AtomicInteger();
+	
+	private int serial;
+	
 	private String name;
 	private String displayName;
 	private String civ;
@@ -189,6 +194,12 @@ public class UnitType
 	
 	private UnitType()
 	{
+		serial = nextSerial.getAndIncrement();
+	}
+	
+	public int getSerial()
+	{
+		return serial;
 	}
 	
 	public String getAcknowledgement()

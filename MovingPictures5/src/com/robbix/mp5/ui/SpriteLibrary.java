@@ -167,33 +167,33 @@ public class SpriteLibrary
 	public synchronized Sprite getSprite(String path)
 	{
 		Sprite sprite = sprites.get(path);
-		
-		if (sprite == null)
-		{
-			try
-			{
-				String parentPath = path.substring(0, path.indexOf('/'));
-				loadModule(new File(rootDir, parentPath));
-				sprite = sprites.get(path);
-			}
-			catch (IOException exc)
-			{
-				return randomSprite();
-			}
-		}
-		
-		if (sprite != null)
-		{
-			groups.put(path, Arrays.asList(sprite));
-			return sprite;
-		}
-		
-		List<Sprite> seq = getSequence(path);
-		
-		if (seq == null)
-			return null;
-		
-		return seq.get(0);
+        
+        if (sprite == null)
+        {
+        	try
+	        {
+	        	String parentPath = path.substring(0, path.indexOf('/'));
+                loadModule(new File(rootDir, parentPath));
+                sprite = sprites.get(path);
+	        }
+	        catch (IOException exc)
+	        {
+	        	return randomSprite();
+	        }
+        }
+        
+        if (sprite != null)
+        {
+        	groups.put(path, Arrays.asList(sprite));
+        	return sprite;
+        }
+        
+        List<Sprite> seq = getSequence(path);
+        
+        if (seq == null)
+                return null;
+        
+        return seq.get(0);
 	}
 	
 	public synchronized List<Sprite> getSequence(String path)
@@ -228,269 +228,224 @@ public class SpriteLibrary
 		return spriteList;
 	}
 	
-	// TODO: experienced problems with this method in PlaceUnitOverlay
-	public synchronized Sprite getDefaultSprite(Unit unit)
-	{
-		if (unit.isStructure())
-		{
-			String parentPath = Utils.getPath(
-				unit.getType().getName(),
-				"still",
-				"green"
-			);
-			
-			Sprite sprite = sprites.get(parentPath);
-			
-			if (sprite != null)
-				return sprite;
-			
-			try
-			{
-				if (rootDir != null)
-				{
-					loadModule(new File(rootDir, unit.getType().getName()));
-					
-					sprite = sprites.get(parentPath);
-					
-					if (sprite != null)
-						return sprite;
-				}
-			}
-			catch (IOException e)
-			{
-				// Ignore and failover to blank image
-			}
-			
-			int w = unit.getFootprint().getInnerRegion().getWidth();
-			int h = unit.getFootprint().getInnerRegion().getHeight();
-			
-			return randomSprite(w, h);
-		}
-		else if (unit.getType().isGuardPostType())
-		{
-			String parentPath = Utils.getPath(
-				unit.getType().getName(),
-				"turret",
-				Direction.E,
-				0
-			);
-			
-			Sprite sprite = sprites.get(parentPath);
-			
-			if (sprite != null)
-				return sprite;
-			
-			try
-			{
-				if (rootDir != null)
-				{
-					loadModule(new File(rootDir, unit.getType().getName()));
-					
-					sprite = sprites.get(parentPath);
-					
-					if (sprite != null)
-						return sprite;
-				}
-			}
-			catch (IOException e)
-			{
-				// Ignore and failover to blank image
-				e.printStackTrace();
-			}
-			
-			return randomSprite();
-		}
-		else
-		{
-			String parentPath = Utils.getPath(
-				unit.getType().getName(),
-				"move",
-				unit.isTruck() ? Cargo.EMPTY.getType() : null,
-				Direction.E
-			);
-			
-			Integer frameCount = groupInfo.get(parentPath);
-			
-			if (frameCount == null)
-				frameCount = 1;
-			
-			String spritePath = Utils.getPath(
-				parentPath,
-				unit.getAnimationFrame() % frameCount
-			);
-			
-			Sprite sprite = sprites.get(spritePath);
-			
-			if (sprite != null)
-				return sprite;
-			
-			try
-			{
-				if (rootDir != null)
-				{
-					loadModule(new File(rootDir, unit.getType().getName()));
-					
-					sprite = sprites.get(spritePath);
-					
-					if (sprite != null)
-						return sprite;
-				}
-			}
-			catch (IOException e)
-			{
-				// Ignore and failover to blank image
-				e.printStackTrace();
-			}
-			
-			return randomSprite();
-		}
-	}
-	
 	public synchronized List<Sprite> getSequence(Unit unit)
 	{
-		String activity = unit.getActivity();
-		
 		if (unit.isStructure()
-		|| (unit.getType().isGuardPostType() && activity.equals("build")))
+		|| (unit.getType().isGuardPostType() && unit.getActivity().equals("build")))
 		{
-			String parentPath = Utils.getPath(
-				unit.getType().getName(),
-				activity,
-				activity.equals("still") ? unit.getHealthBracket().name().toLowerCase() : null
-			);
-			
+			String parentPath = getStructureSequencePath(unit);
 			List<Sprite> seq = groups.get(parentPath);
 			
 			if (seq != null)
 				return seq;
 			
-			return activity.equals("still")
+			return unit.getActivity().equals("still")
 				? Arrays.asList(getSprite(parentPath))
 				: getSequence(parentPath);
 		}
 		else
 		{
-			String parentPath;
-			String dir = unit.getDirection().getShortName();
-			boolean dependsCargo = unit.isTruck();
-			boolean dependsDirection =
-				activity.contains("dock")
-			 || activity.contains("mine")
-			 || activity.contains("construct");
-			
-			parentPath = Utils.getPath(
-				unit.getType().getName(),
-				activity,
-				dependsCargo ? unit.getCargo().getType() : null,
-				dependsDirection ? null : dir
-			);
-			
+			String parentPath = getVehicleSequencePath(unit);
 			List<Sprite> seq = groups.get(parentPath);
 			return seq != null ? seq : getSequence(parentPath);
 		}
 	}
 	
+	public synchronized Sprite getDefaultSprite(Unit unit)
+	{
+		return loadUnitSpriteAsNeeded(unit, getDefaultUnitSpritePath(unit));
+	}
+	
 	public synchronized Sprite getSprite(Unit unit)
 	{
-		String activity = unit.getActivity();
-		
-		if (unit.isStructure()
-		|| (unit.getType().isGuardPostType() && activity.equals("build")))
-		{
-			String parentPath = Utils.getPath(
-				unit.getType().getName(),
-				activity,
-				activity.equals("still") ? unit.getHealthBracket().name().toLowerCase() : null,
-				activity.equals("build") ? unit.getAnimationFrame() : null
-			);
-			
-			Sprite sprite = sprites.get(parentPath);
-			
-			if (sprite != null)
-				return sprite;
-			
-			try
-			{
-				if (rootDir != null)
-				{
-					loadModule(new File(rootDir, unit.getType().getName()));
-					
-					sprite = sprites.get(parentPath);
-					
-					if (sprite != null)
-						return sprite;
-				}
-			}
-			catch (IOException e)
-			{
-				// Ignore and failover to blank image
-				e.printStackTrace();
-			}
-			
-			int w = unit.getFootprint().getInnerRegion().getWidth();
-			int h = unit.getFootprint().getInnerRegion().getHeight();
-			
-			return randomSprite(w, h);
-		}
-		else
-		{
-			String parentPath;
-			String dir = unit.getDirection().getShortName();
-			
-			boolean dependsCargo = unit.isTruck();
-			
-			boolean dependsDirection =
-				activity.contains("dock")
-			 || activity.contains("mine")
-			 || activity.contains("construct");
-			
-			parentPath = Utils.getPath(
-				unit.getType().getName(),
-				activity,
-				dependsCargo ? unit.getCargo().getType() : null,
-				dependsDirection ? null : dir
-			);
-			
-			Integer frameCount = groupInfo.get(parentPath);
-			
-			if (frameCount == null)
-				frameCount = 1;
-			
-			String spritePath = Utils.getPath(
-				parentPath,
-				unit.getAnimationFrame() % frameCount
-			);
-			
-			Sprite sprite = sprites.get(spritePath);
-			
-			if (sprite != null)
-				return sprite;
-			
-			try
-			{
-				if (rootDir != null)
-				{
-					loadModule(new File(rootDir, unit.getType().getName()));
-					
-					sprite = sprites.get(spritePath);
-					
-					if (sprite != null)
-						return sprite;
-				}
-			}
-			catch (IOException e)
-			{
-				// Ignore and failover to blank image
-				e.printStackTrace();
-			}
-			
-			return randomSprite();
-		}
+		return loadUnitSpriteAsNeeded(unit, getUnitSpritePath(unit));
 	}
 	
 	public Sprite getShadow(Unit unit)
 	{
 		return null;
+	}
+	
+	/*-----------------------------------------------------------------------*
+	 * Load-Retry Helpers
+	 */
+	
+	private Sprite loadUnitSpriteAsNeeded(Unit unit, String spritePath)
+	{
+		Sprite sprite = sprites.get(spritePath);
+		
+		if (sprite != null)
+			return sprite;
+		
+		try
+		{
+			if (rootDir != null)
+			{
+				loadModule(new File(rootDir, unit.getType().getName()));
+				
+				sprite = sprites.get(spritePath);
+				
+				if (sprite != null)
+					return sprite;
+			}
+		}
+		catch (IOException e)
+		{
+			// Ignore and failover to blank image
+			e.printStackTrace();
+		}
+		
+		return randomSprite(unit.getWidth(), unit.getHeight());
+	}
+
+	/*-----------------------------------------------------------------------*
+	 * Get Default Sprite Path
+	 */
+	
+	private String getVehicleSequencePath(Unit unit)
+	{
+		String activity = unit.getActivity();
+		String dir = unit.getDirection().getShortName();
+		boolean dependsCargo = unit.isTruck();
+		boolean dependsDirection =
+			activity.contains("dock")
+		 || activity.contains("mine")
+		 || activity.contains("construct");
+		
+		return Utils.getPath(
+			unit.getType().getName(),
+			activity,
+			dependsCargo ? unit.getCargo().getType() : null,
+			dependsDirection ? null : dir
+		);
+	}
+	
+	private String getStructureSequencePath(Unit unit)
+	{
+		String activity = unit.getActivity();
+		return Utils.getPath(
+			unit.getType().getName(),
+			activity,
+			activity.equals("still") ? unit.getHealthBracket().name().toLowerCase() : null
+		);
+	}
+	
+	/*-----------------------------------------------------------------------*
+	 * Get Default Sprite Path
+	 */
+	
+	private String getDefaultUnitSpritePath(Unit unit)
+	{
+		if (unit.isStructure())
+		{
+			return getDefaultStructureSpritePath(unit);
+		}
+		else if (unit.getType().isGuardPostType())
+		{
+			return getDefaultGuardPostSpritePath(unit);
+		}
+		else
+		{
+			return getDefaultVehicleSpritePath(unit);
+		}
+	}
+	
+	private String getDefaultGuardPostSpritePath(Unit unit)
+	{
+		return Utils.getPath(
+			unit.getType().getName(),
+			"turret",
+			Direction.E,
+			0
+		);
+	}
+	
+	private String getDefaultStructureSpritePath(Unit unit)
+	{
+		return Utils.getPath(
+			unit.getType().getName(),
+			"still",
+			"green"
+		);
+	}
+	
+	private String getDefaultVehicleSpritePath(Unit unit)
+	{
+		String parentPath = Utils.getPath(
+			unit.getType().getName(),
+			"move",
+			unit.isTruck() ? Cargo.EMPTY.getType() : null,
+			Direction.E
+		);
+		
+		Integer frameCount = groupInfo.get(parentPath);
+		
+		if (frameCount == null)
+			frameCount = 1;
+		
+		return Utils.getPath(
+			parentPath,
+			unit.getAnimationFrame() % frameCount
+		);
+	}
+	
+	/*-----------------------------------------------------------------------*
+	 * Get Sprite Path
+	 */
+	
+	private String getUnitSpritePath(Unit unit)
+	{
+		if (unit.isStructure()
+		|| (unit.getType().isGuardPostType() && unit.getActivity().equals("build")))
+		{
+			return getStructureSpritePath(unit);
+		}
+		else
+		{
+			return getVehicleSpritePath(unit);
+		}
+	}
+	
+	private String getStructureSpritePath(Unit unit)
+	{
+		String activity = unit.getActivity();
+		return Utils.getPath(
+			unit.getType().getName(),
+			activity,
+			activity.equals("still") ? unit.getHealthBracket().name().toLowerCase() : null,
+			activity.equals("build") ? unit.getAnimationFrame() : null
+		);
+	}
+	
+	private String getVehicleSpritePath(Unit unit)
+	{
+		String activity = unit.getActivity();
+		String parentPath;
+		String dir = unit.getDirection().getShortName();
+		
+		boolean dependsCargo = unit.isTruck();
+		
+		boolean dependsDirection =
+			activity.contains("dock")
+		 || activity.contains("mine")
+		 || activity.contains("construct");
+		
+		parentPath = Utils.getPath(
+			unit.getType().getName(),
+			activity,
+			dependsCargo ? unit.getCargo().getType() : null,
+			dependsDirection ? null : dir
+		);
+		
+		Integer frameCount = groupInfo.get(parentPath);
+		
+		if (frameCount == null)
+			return parentPath;
+		
+		return Utils.getPath(
+			parentPath,
+			unit.getAnimationFrame() % frameCount
+		);
 	}
 	
 	private static Sprite randomSprite()
@@ -500,7 +455,13 @@ public class SpriteLibrary
 	
 	private static Sprite randomSprite(int w, int h)
 	{
-		return new Sprite(Utils.getBlankImage(
-			Utils.getRandomPrimaryColor(), w * 32, h * 32),0,0,0);
+		// This was changed so sprite load errors
+		// are fail-fast and not obscured
+		
+		// This would also be a good spot for a break point!
+		throw new Error();
+		
+//		return new Sprite(Utils.getBlankImage(
+//			Utils.getRandomPrimaryColor(), w * 32, h * 32),0,0,0);
 	}
 }
