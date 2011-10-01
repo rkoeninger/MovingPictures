@@ -1,8 +1,6 @@
 package com.robbix.mp5.basics;
 
 import static java.lang.Math.PI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -17,16 +15,36 @@ import java.util.NoSuchElementException;
  * 
  * @author bort
  */
-public final class Direction
+public enum Direction
 {
 	/*
 	 * References to all directions. There are no other
 	 * instances of this class other than these.
 	 */
-	public static final Direction E, ENE, NE, NNE;
-	public static final Direction N, NNW, NW, WNW;
-	public static final Direction W, WSW, SW, SSW;
-	public static final Direction S, SSE, SE, ESE;
+	N ( 0, -1, "North",      "n"),
+	S ( 0,  1, "South",      "s"),
+	E ( 1,  0, "East",       "e"),
+	W (-1,  0, "West",       "w"),
+	NE( 1, -1, "North-East", "ne"),
+	NW(-1, -1, "North-West", "nw"),
+	SE( 1,  1, "South-East", "se"),
+	SW(-1,  1, "South-West", "sw"),
+	
+	/*
+	 * The dx, dy for sixteenth-turns are just placeholders.
+	 * They can be used to find the direction's angle,
+	 * but are not meaningful as offsets.
+	 * 
+	 * Units should never travel in these directions.
+	 */
+	NNW(-2, -5, "North-North-West", "nnw"),
+	NNE( 2, -5, "North-North-East", "nne"),
+	SSW(-2,  5, "South-South-West", "ssw"),
+	SSE( 2,  5, "South-South-East", "sse"),
+	WNW(-5, -2, "West-North-West",  "wnw"),
+	ENE( 5, -2, "East-North-East",  "ene"),
+	WSW(-5,  2, "West-South-West",  "wsw"),
+	ESE( 5,  2, "East-South-East",  "ese");
 	
 	/**
 	 * Returns an Iterator that will list off all 16 Directions starting
@@ -93,7 +111,7 @@ public final class Direction
 	 */
 	public static Direction getDirection(int steps)
 	{
-		return angleMap[((steps % 16) + 16) % 16];
+		return values()[((steps % 16) + 16) % 16];
 	}
 	
 	/**
@@ -103,7 +121,7 @@ public final class Direction
 	 */
 	public static Direction getDirection(double angle)
 	{
-		return angleMap[revsTo16Steps(angle)];
+		return values()[revsTo16Steps(angle)];
 	}
 	
 	/**
@@ -113,7 +131,7 @@ public final class Direction
 	public static Direction getDirection(int dx, int dy)
 	{
 		// y-axis is inverted, so dy is inverted
-		return angleMap[revsTo16Steps(Math.atan2(-dy, dx) / (2 * PI))];
+		return values()[revsTo16Steps(Math.atan2(-dy, dx) / (2 * PI))];
 	}
 
 	/**
@@ -128,7 +146,7 @@ public final class Direction
 		if (dx == 0 && dy == 0)
 			return null;
 		
-		return angleMap[revsTo16Steps(Math.atan2(-dy, dx) / (2 * PI))];
+		return values()[revsTo16Steps(Math.atan2(-dy, dx) / (2 * PI))];
 	}
 	
 	/**
@@ -143,7 +161,7 @@ public final class Direction
 		// y-axis is inverted, so dy is inverted
 		int dx = b.x - a.x;
 		int dy = b.y - a.y;
-		return angleMap[revsTo8Steps(Math.atan2(-dy, dx) / (2 * PI))];
+		return values()[revsTo8Steps(Math.atan2(-dy, dx) / (2 * PI))];
 	}
 	
 	/**
@@ -155,7 +173,7 @@ public final class Direction
 	 */
 	public static Direction getDirection(String shortName)
 	{
-		return shortNameMap.get(shortName);
+		return Enum.valueOf(Direction.class, shortName.toUpperCase());
 	}
 
 	/**
@@ -227,17 +245,6 @@ public final class Direction
 	}
 	
 	/**
-	 * Gets hash code for this Direction.
-	 * 
-	 * Hash codes are assigned sequentially. This should allow Directions
-	 * to work very efficently with HashMaps with a size of 16.
-	 */
-	public int hashCode()
-	{
-		return steps | 0x10;
-	}
-	
-	/**
 	 * Gets the full, human-readable name of this Direction.
 	 */
 	public String getName()
@@ -291,7 +298,7 @@ public final class Direction
 	public Direction rotate(double angle)
 	{
 		int steps = revsTo16Steps(angle);
-		return angleMap[(((this.steps + steps) % 16) + 16) % 16];
+		return values()[(((this.steps + steps) % 16) + 16) % 16];
 	}
 	
 	/**
@@ -310,7 +317,7 @@ public final class Direction
 	 */
 	public Direction rotate(int steps)
 	{
-		return angleMap[(((this.steps + steps) % 16) + 16) % 16];
+		return values()[(((this.steps + steps) % 16) + 16) % 16];
 	}
 	
 	/**
@@ -400,15 +407,6 @@ public final class Direction
 	}
 	
 	/**
-	 * Gets the step index of this Direction - i.e. the number of
-	 * sixteenth-turn steps from East this Direction is.
-	 */
-	public int ordinal()
-	{
-		return steps;
-	}
-	
-	/**
 	 * Gets the displacement in sixteenth-turn steps.
 	 */
 	public int getDisplacement(Direction that)
@@ -471,8 +469,6 @@ public final class Direction
 		// y-axis is inverted, so dy is inverted
 		steps = revsTo16Steps(Math.atan2(-dy, dx) / (2 * PI));
 		angle = steps / 16.0;
-		angleMap[steps] = this;
-		shortNameMap.put(shortName, this);
 	}
 	
 	/**
@@ -495,51 +491,6 @@ public final class Direction
 	private static int revsTo8Steps(double angle)
 	{
 		return ((((int) Math.round(angle * 8)) % 8) + 8) % 8 * 2;
-	}
-	
-	/**
-	 * shortNameMap is used to look up a direction by its short name.
-	 */
-	private static Map<String, Direction> shortNameMap;
-	
-	/**
-	 * angleMap is used to look up a direction by the number
-	 * of steps it is from East.
-	 */
-	private static Direction[] angleMap;
-	
-	/**
-	 * Create lookup tables, create all Direction instances.
-	 */
-	static
-	{
-		shortNameMap = new HashMap<String, Direction>();
-		angleMap = new Direction[16];
-		
-		N   = new Direction( 0, -1, "North",      "n");
-		S   = new Direction( 0,  1, "South",      "s");
-		E   = new Direction( 1,  0, "East",       "e");
-		W   = new Direction(-1,  0, "West",       "w");
-		NE  = new Direction( 1, -1, "North-East", "ne");
-		NW  = new Direction(-1, -1, "North-West", "nw");
-		SE  = new Direction( 1,  1, "South-East", "se");
-		SW  = new Direction(-1,  1, "South-West", "sw");
-		
-		/*
-		 * The dx, dy for sixteenth-turns are just placeholders.
-		 * They can be used to find the direction's angle,
-		 * but are not meaningful as offsets.
-		 * 
-		 * Units should never travel in these directions.
-		 */
-		NNW = new Direction(-2, -5, "North-North-West", "nnw");
-		NNE = new Direction( 2, -5, "North-North-East", "nne");
-		SSW = new Direction(-2,  5, "South-South-West", "ssw");
-		SSE = new Direction( 2,  5, "South-South-East", "sse");
-		WNW = new Direction(-5, -2, "West-North-West",  "wnw");
-		ENE = new Direction( 5, -2, "East-North-East",  "ene");
-		WSW = new Direction(-5,  2, "West-South-West",  "wsw");
-		ESE = new Direction( 5,  2, "East-South-East",  "ese");
 	}
 	
 	/**
