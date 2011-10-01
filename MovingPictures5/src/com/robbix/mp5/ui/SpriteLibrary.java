@@ -98,7 +98,7 @@ public class SpriteLibrary
 		
 		String parentSpritePath =
 			turret.getType().getName() + "/" + TURRET + "/" +
-			dir.getShortName() + "/0";
+			dir + "/0";
 		
 		Integer x = groupInfo.get(Utils.getPath(parentSpritePath, "x"));
 		Integer y = groupInfo.get(Utils.getPath(parentSpritePath, "y"));
@@ -307,7 +307,6 @@ public class SpriteLibrary
 	private String getVehicleSequencePath(Unit unit)
 	{
 		Activity activity = unit.getActivity();
-		String dir = unit.getDirection().getShortName();
 		boolean dependsCargo = unit.isTruck();
 		boolean dependsDirection =
 			activity == DOCKUP
@@ -319,7 +318,7 @@ public class SpriteLibrary
 			unit.getType().getName(),
 			activity,
 			dependsCargo ? unit.getCargo().getType() : null,
-			dependsDirection ? null : dir
+			dependsDirection ? null : unit.getDirection()
 		);
 	}
 	

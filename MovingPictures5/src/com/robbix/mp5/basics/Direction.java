@@ -18,33 +18,26 @@ import java.util.NoSuchElementException;
 public enum Direction
 {
 	/*
-	 * References to all directions. There are no other
-	 * instances of this class other than these.
+	 * <dx, dy> are undefined for 16th-turns (e.g. ENE, SSW).
+	 * angle is measured in counter-clockwise revs from East.
 	 */
-	N ( 0, -1, "North",      "n"),
-	S ( 0,  1, "South",      "s"),
-	E ( 1,  0, "East",       "e"),
-	W (-1,  0, "West",       "w"),
-	NE( 1, -1, "North-East", "ne"),
-	NW(-1, -1, "North-West", "nw"),
-	SE( 1,  1, "South-East", "se"),
-	SW(-1,  1, "South-West", "sw"),
-	
-	/*
-	 * The dx, dy for sixteenth-turns are just placeholders.
-	 * They can be used to find the direction's angle,
-	 * but are not meaningful as offsets.
-	 * 
-	 * Units should never travel in these directions.
-	 */
-	NNW(-2, -5, "North-North-West", "nnw"),
-	NNE( 2, -5, "North-North-East", "nne"),
-	SSW(-2,  5, "South-South-West", "ssw"),
-	SSE( 2,  5, "South-South-East", "sse"),
-	WNW(-5, -2, "West-North-West",  "wnw"),
-	ENE( 5, -2, "East-North-East",  "ene"),
-	WSW(-5,  2, "West-South-West",  "wsw"),
-	ESE( 5,  2, "East-South-East",  "ese");
+	//  dx  dy  angle   longName
+	E  ( 1,  0, 0,      "East"),
+	ENE( 0,  0, 0.0625, "East-North-East"),
+	NE ( 1, -1, 0.125,  "North-East"),
+	NNE( 0,  0, 0.1875, "North-North-East"),
+	N  ( 0, -1, 0.25,   "North"),
+	NNW( 0,  0, 0.3125, "North-North-West"),
+	NW (-1, -1, 0.375,  "North-West"),
+	WNW( 0,  0, 0.4375, "West-North-West"),
+	W  (-1,  0, 0.5,    "West"),
+	WSW( 0,  0, 0.5625, "West-South-West"),
+	SW (-1,  1, 0.625,  "South-West"),
+	SSW( 0,  0, 0.6875, "South-South-West"),
+	S  ( 0,  1, 0.75,   "South"),
+	SSE( 0,  0, 0.8125, "South-South-East"),
+	SE ( 1,  1, 0.875,  "South-East"),
+	ESE( 0,  0, 0.9375, "East-South-East");
 	
 	/**
 	 * Returns an Iterator that will list off all 16 Directions starting
@@ -111,7 +104,7 @@ public enum Direction
 	 */
 	public static Direction getDirection(int steps)
 	{
-		return values()[((steps % 16) + 16) % 16];
+		return values()[(steps % 16 + 16) % 16];
 	}
 	
 	/**
@@ -183,7 +176,7 @@ public enum Direction
 	 */
 	public double cos()
 	{
-		return Math.cos(angle * (2 * PI));
+		return Math.cos(angle * 2 * PI);
 	}
 
 	/**
@@ -197,7 +190,7 @@ public enum Direction
 	public double sin()
 	{
 		// Math.sin treats y-axis differently than screen co-ordinates
-		return -Math.sin(angle * (2 * PI));
+		return -Math.sin(angle * 2 * PI);
 	}
 
 	/**
@@ -211,7 +204,7 @@ public enum Direction
 	public double tan()
 	{
 		// Math.tan treats y-axis differently than screen co-ordinates
-		return -Math.tan(angle * (2 * PI));
+		return -Math.tan(angle * 2 * PI);
 	}
 	
 	/**
@@ -249,23 +242,7 @@ public enum Direction
 	 */
 	public String getName()
 	{
-		return name;
-	}
-	
-	/**
-	 * Gets the short, code-name of this Direction.
-	 */
-	public String getShortName()
-	{
-		return shortName;
-	}
-	
-	/**
-	 * Returns the short name of this Direciton.
-	 */
-	public String toString()
-	{
-		return shortName;
+		return longName;
 	}
 	
 	/**
@@ -298,7 +275,7 @@ public enum Direction
 	public Direction rotate(double angle)
 	{
 		int steps = revsTo16Steps(angle);
-		return values()[(((this.steps + steps) % 16) + 16) % 16];
+		return values()[((ordinal() + steps) % 16 + 16) % 16];
 	}
 	
 	/**
@@ -317,7 +294,7 @@ public enum Direction
 	 */
 	public Direction rotate(int steps)
 	{
-		return values()[(((this.steps + steps) % 16) + 16) % 16];
+		return values()[((ordinal() + steps) % 16 + 16) % 16];
 	}
 	
 	/**
@@ -350,7 +327,7 @@ public enum Direction
 	 */
 	public boolean isThirdOrder()
 	{
-		return (Math.abs(dx) == 2 || Math.abs(dy) == 2);
+		return dx == 0 && dy == 0;
 	}
 	
 	/**
@@ -386,7 +363,7 @@ public enum Direction
 	 */
 	public boolean isVertical()
 	{
-		return dx == 0;
+		return dx == 0 && dy != 0;
 	}
 	
 	/**
@@ -395,15 +372,31 @@ public enum Direction
 	 */
 	public boolean isHorizontal()
 	{
-		return dy == 0;
+		return dx != 0 && dy == 0;
+	}
+	
+	/**
+	 * Gets the angle (in revs) this Direction points in.
+	 */
+	public double getAngle()
+	{
+		return angle;
 	}
 	
 	/**
 	 * Gets the angle (in radians) this Direction points in.
 	 */
-	public double getAngle()
+	public double getRadianAngle()
 	{
-		return angle;
+		return angle * PI * 2;
+	}
+	
+	/**
+	 * Gets the angle (in radians) this Direction points in.
+	 */
+	public double getDegreeAngle()
+	{
+		return angle * 360.0;
 	}
 	
 	/**
@@ -428,12 +421,7 @@ public enum Direction
 	/**
 	 * Human-readable representation of this Direction's name.
 	 */
-	private final String name;
-	
-	/**
-	 * Short machine-readable code-name representation of this Direction.
-	 */
-	private final String shortName;
+	private final String longName;
 	
 	/**
 	 * The x-coordinate offset this Direction applies to a Position.
@@ -447,28 +435,19 @@ public enum Direction
 	
 	/**
 	 * The angle in the range [0, 1) this Direction points in.
+	 * Measured in revolutions.
 	 */
 	private final double angle;
 	
 	/**
-	 * The number of sixteenth-turn steps this Direction is rotated from E.
+	 * <dx, dy> is undefined for 16th-turns.
 	 */
-	private final int steps;
-	
-	/**
-	 * Private constructor. External code should not be creating
-	 * instances of this class.
-	 */
-	private Direction(int dx, int dy, String name, String shortName)
+	private Direction(int dx, int dy, double angle, String name)
 	{
 		this.dx = dx;
 		this.dy = dy;
-		this.name = name;
-		this.shortName = shortName;
-		
-		// y-axis is inverted, so dy is inverted
-		steps = revsTo16Steps(Math.atan2(-dy, dx) / (2 * PI));
-		angle = steps / 16.0;
+		this.angle = angle;
+		this.longName = name;
 	}
 	
 	/**
@@ -479,7 +458,7 @@ public enum Direction
 	 */
 	private static int revsTo16Steps(double angle)
 	{
-		return ((((int) Math.round(angle * 16)) % 16) + 16) % 16;
+		return (((int) Math.round(angle * 16)) % 16 + 16) % 16;
 	}
 	
 	/**
@@ -490,7 +469,7 @@ public enum Direction
 	 */
 	private static int revsTo8Steps(double angle)
 	{
-		return ((((int) Math.round(angle * 8)) % 8) + 8) % 8 * 2;
+		return (((int) Math.round(angle * 8)) % 8 + 8) % 8 * 2;
 	}
 	
 	/**
