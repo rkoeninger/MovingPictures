@@ -6,6 +6,7 @@ import com.robbix.mp5.Mediator;
 import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap.Fixture;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Unit;
 
 public class EarthworkerConstructRowTask extends Task
@@ -36,7 +37,7 @@ public class EarthworkerConstructRowTask extends Task
 	{
 		if (currentTarget >= targets.size())
 		{
-			unit.setActivity("move");
+			unit.setActivity(MOVE);
 			unit.completeTask(this);
 		}
 		else

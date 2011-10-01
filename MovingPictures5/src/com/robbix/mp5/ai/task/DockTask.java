@@ -4,6 +4,7 @@ import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.player.Player;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 
@@ -34,7 +35,7 @@ public class DockTask extends Task
 			}
 			else
 			{
-				unit.setActivity("dockDown");
+				unit.setActivity(DOCKDOWN);
 				unit.resetAnimationFrame();
 				state = 1;
 			}
@@ -64,14 +65,14 @@ public class DockTask extends Task
 				toLoad = null;
 			}
 			
-			unit.setActivity("dockUp");
+			unit.setActivity(DOCKUP);
 			unit.setCargo(toLoad);
 			unit.resetAnimationFrame();
 			state = 2;
 		}
 		else if (state == 2 && unit.getAnimationFrame() >= upFrameCount - 1)
 		{
-			unit.setActivity("move");
+			unit.setActivity(MOVE);
 			unit.completeTask(this);
 		}
 		else

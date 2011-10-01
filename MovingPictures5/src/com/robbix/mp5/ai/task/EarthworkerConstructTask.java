@@ -4,6 +4,7 @@ import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.basics.Position;
 import static com.robbix.mp5.map.LayeredMap.*;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Unit;
 
 public class EarthworkerConstructTask extends Task
@@ -34,11 +35,11 @@ public class EarthworkerConstructTask extends Task
 	
 	public void step(Unit unit)
 	{
-		if (!unit.getActivity().equals("bulldoze"))
+		if (unit.getActivity() != BULLDOZE)
 		{
 			Position pos = unit.getPosition();
 			
-			unit.setActivity("bulldoze");
+			unit.setActivity(BULLDOZE);
 			unit.resetAnimationFrame();
 			unit.setDirection(Direction.getMoveDirection(pos, target));
 		}
@@ -48,7 +49,7 @@ public class EarthworkerConstructTask extends Task
 			if (fixture == Fixture.WALL) unit.getMap().putWall(target);
 			if (fixture == Fixture.TUBE) unit.getMap().putTube(target);
 			
-			unit.setActivity("move");
+			unit.setActivity(MOVE);
 			unit.completeTask(this);
 		}
 		else

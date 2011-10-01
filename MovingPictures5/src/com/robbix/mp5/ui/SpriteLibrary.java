@@ -15,6 +15,8 @@ import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.unit.Activity;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 
@@ -95,7 +97,7 @@ public class SpriteLibrary
 			throw new IllegalArgumentException("not a turret or guard post");
 		
 		String parentSpritePath =
-			turret.getType().getName() + "/turret/" +
+			turret.getType().getName() + "/" + TURRET + "/" +
 			dir.getShortName() + "/0";
 		
 		Integer x = groupInfo.get(Utils.getPath(parentSpritePath, "x"));
@@ -231,7 +233,7 @@ public class SpriteLibrary
 	public synchronized List<Sprite> getSequence(Unit unit)
 	{
 		if (unit.isStructure()
-		|| (unit.getType().isGuardPostType() && unit.getActivity().equals("build")))
+		|| (unit.getType().isGuardPostType() && unit.getActivity() == BUILD))
 		{
 			String parentPath = getStructureSequencePath(unit);
 			List<Sprite> seq = groups.get(parentPath);
@@ -239,7 +241,7 @@ public class SpriteLibrary
 			if (seq != null)
 				return seq;
 			
-			return unit.getActivity().equals("still")
+			return unit.getActivity() == STILL
 				? Arrays.asList(getSprite(parentPath))
 				: getSequence(parentPath);
 		}
@@ -304,13 +306,14 @@ public class SpriteLibrary
 	
 	private String getVehicleSequencePath(Unit unit)
 	{
-		String activity = unit.getActivity();
+		Activity activity = unit.getActivity();
 		String dir = unit.getDirection().getShortName();
 		boolean dependsCargo = unit.isTruck();
 		boolean dependsDirection =
-			activity.contains("dock")
-		 || activity.contains("mine")
-		 || activity.contains("construct");
+			activity == DOCKUP
+		 || activity == DOCKDOWN
+		 || activity == MINELOAD
+		 || activity == CONSTRUCT;
 		
 		return Utils.getPath(
 			unit.getType().getName(),
@@ -322,11 +325,11 @@ public class SpriteLibrary
 	
 	private String getStructureSequencePath(Unit unit)
 	{
-		String activity = unit.getActivity();
+		Activity activity = unit.getActivity();
 		return Utils.getPath(
 			unit.getType().getName(),
 			activity,
-			activity.equals("still") ? unit.getHealthBracket().name().toLowerCase() : null
+			activity == STILL ? unit.getHealthBracket().name().toLowerCase() : null
 		);
 	}
 	
@@ -354,7 +357,7 @@ public class SpriteLibrary
 	{
 		return Utils.getPath(
 			unit.getType().getName(),
-			"turret",
+			TURRET,
 			Direction.E,
 			0
 		);
@@ -364,7 +367,7 @@ public class SpriteLibrary
 	{
 		return Utils.getPath(
 			unit.getType().getName(),
-			"still",
+			STILL,
 			"green"
 		);
 	}
@@ -373,7 +376,7 @@ public class SpriteLibrary
 	{
 		String parentPath = Utils.getPath(
 			unit.getType().getName(),
-			"move",
+			MOVE,
 			unit.isTruck() ? Cargo.EMPTY.getType() : null,
 			Direction.E
 		);
@@ -396,7 +399,7 @@ public class SpriteLibrary
 	private String getUnitSpritePath(Unit unit)
 	{
 		if (unit.isStructure()
-		|| (unit.getType().isGuardPostType() && unit.getActivity().equals("build")))
+		|| (unit.getType().isGuardPostType() && unit.getActivity() == BUILD))
 		{
 			return getStructureSpritePath(unit);
 		}
@@ -408,33 +411,31 @@ public class SpriteLibrary
 	
 	private String getStructureSpritePath(Unit unit)
 	{
-		String activity = unit.getActivity();
+		Activity activity = unit.getActivity();
 		return Utils.getPath(
 			unit.getType().getName(),
 			activity,
-			activity.equals("still") ? unit.getHealthBracket().name().toLowerCase() : null,
-			activity.equals("build") ? unit.getAnimationFrame() : null
+			activity == STILL ? unit.getHealthBracket().name().toLowerCase() : null,
+			activity == BUILD ? unit.getAnimationFrame() : null
 		);
 	}
 	
 	private String getVehicleSpritePath(Unit unit)
 	{
-		String activity = unit.getActivity();
+		Activity activity = unit.getActivity();
 		String parentPath;
-		String dir = unit.getDirection().getShortName();
-		
 		boolean dependsCargo = unit.isTruck();
-		
-		boolean dependsDirection =
-			activity.contains("dock")
-		 || activity.contains("mine")
-		 || activity.contains("construct");
+		boolean constDirection =
+			activity == DOCKUP
+		 || activity == DOCKDOWN
+		 || activity == MINELOAD
+		 || activity == CONSTRUCT;
 		
 		parentPath = Utils.getPath(
 			unit.getType().getName(),
 			activity,
 			dependsCargo ? unit.getCargo().getType() : null,
-			dependsDirection ? null : dir
+			constDirection ? null : unit.getDirection()
 		);
 		
 		Integer frameCount = groupInfo.get(parentPath);

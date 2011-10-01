@@ -11,6 +11,7 @@ import com.robbix.mp5.ai.task.BuildTask;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.ui.Sprite;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 
@@ -33,7 +34,7 @@ public class BuildStructureOverlay extends InputOverlay
 		this.factory = factory;
 		this.type = type;
 		this.unit = factory.newUnit(type);
-		this.unit.setActivity("build");
+		this.unit.setActivity(BUILD);
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
@@ -75,12 +76,12 @@ public class BuildStructureOverlay extends InputOverlay
 			}
 			
 			int buildTime = panel.getSpriteLibrary().getSequenceLength(
-				Utils.getPath(unit.getType().getName(), "build")
+				Utils.getPath(unit.getType().getName(), BUILD)
 			);
 			
 			panel.getMap().putUnit(unit, pos);
 			unit.assignNow(new BuildTask(buildTime, 200));
-			unit.setActivity("build");
+			unit.setActivity(BUILD);
 			Mediator.sounds.play("structureBuild");
 			panel.refresh();
 			

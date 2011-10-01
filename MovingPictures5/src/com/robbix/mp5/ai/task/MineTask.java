@@ -2,6 +2,7 @@ package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.basics.Direction;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 
@@ -30,7 +31,7 @@ public class MineTask extends Task
 			}
 			else
 			{
-				unit.setActivity("mineLoad");
+				unit.setActivity(MINELOAD);
 				unit.setCargo(toLoad);
 				unit.resetAnimationFrame();
 				state = 1;
@@ -38,7 +39,7 @@ public class MineTask extends Task
 		}
 		else if (state == 1 && unit.getAnimationFrame() >= frameCount)
 		{
-			unit.setActivity("move");
+			unit.setActivity(MOVE);
 			unit.resetAnimationFrame();
 			unit.completeTask(this);
 		}

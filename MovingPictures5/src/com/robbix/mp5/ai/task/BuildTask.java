@@ -1,5 +1,6 @@
 package com.robbix.mp5.ai.task;
 
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Unit;
 
 public class BuildTask extends Task
@@ -19,9 +20,9 @@ public class BuildTask extends Task
 	
 	public void step(Unit unit)
 	{
-		if (!unit.getActivity().equals("build"))
+		if (unit.getActivity() != BUILD)
 		{
-			unit.setActivity("build");
+			unit.setActivity(BUILD);
 			unit.resetAnimationFrame();
 		}
 		else
@@ -36,11 +37,11 @@ public class BuildTask extends Task
 			{
 				if (unit.getType().isGuardPostType())
 				{
-					unit.setActivity("turret");
+					unit.setActivity(TURRET);
 				}
 				else
 				{
-					unit.setActivity("still");
+					unit.setActivity(STILL);
 				}
 				
 				unit.completeTask(this);

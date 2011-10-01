@@ -28,6 +28,7 @@ import com.robbix.mp5.ui.ani.RPGFireAnimation;
 import com.robbix.mp5.ui.ani.RailGunFireAnimation;
 import com.robbix.mp5.ui.ani.SpriteSequenceAnimation;
 import com.robbix.mp5.ui.ani.WeaponFireAnimation;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
@@ -292,10 +293,10 @@ public class Mediator
 	public static void doBuild(Unit unit, Position pos)
 	{
 		int buildFrames = panel.getSpriteLibrary().getSequenceLength(
-			Utils.getPath(unit.getType().getName(), "build")
+			Utils.getPath(unit.getType().getName(), BUILD)
 		);
 		
-		unit.setActivity("build");
+		unit.setActivity(BUILD);
 		unit.assignNow(new BuildTask(buildFrames, 100));
 		map.putUnit(unit, pos);
 		sounds.play("structureBuild");
@@ -362,7 +363,7 @@ public class Mediator
 		if (unit.getType().isGuardPostType())
 		{
 			Position pos = unit.getPosition();
-			Point point = new Point(pos.x * 32, pos.y * 32);
+			Point point = panel.getPoint(pos);
 			String path = "aDeath/guardPostKilled";
 			List<Sprite> seq = panel.getSpriteLibrary().getSequence(path);
 			panel.cueAnimation(new SpriteSequenceAnimation(
@@ -377,7 +378,7 @@ public class Mediator
 		else if (unit.isStructure())
 		{
 			Position pos = unit.getPosition();
-			Point point = new Point(pos.x * 32, pos.y * 32);
+			Point point = panel.getPoint(pos);
 			String path = unit.getType().getName() + "/collapse";
 			List<Sprite> seq = panel.getSpriteLibrary().getSequence(path);
 			panel.cueAnimation(new SpriteSequenceAnimation(

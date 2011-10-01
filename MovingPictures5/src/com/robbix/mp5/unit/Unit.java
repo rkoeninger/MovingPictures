@@ -15,6 +15,7 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteLibrary;
+import static com.robbix.mp5.unit.Activity.*;
 
 /**
  * Hashcode and equals methods remain defaults, since there should
@@ -27,7 +28,7 @@ public class Unit
 	public static Unit newStructure(UnitType type)
 	{
 		Unit struct = new Unit(type);
-		struct.setActivity("still");
+		struct.setActivity(STILL);
 		return struct;
 	}
 	
@@ -37,14 +38,14 @@ public class Unit
 		Unit turret = new Unit(turretType);
 		chassis.turret = turret;
 		turret.chassis = chassis;
-		turret.setActivity("turret");
+		turret.setActivity(TURRET);
 		return chassis;
 	}
 	
 	public static Unit newGuardPost(UnitType type)
 	{
 		Unit guardPost = new Unit(type);
-		guardPost.setActivity("turret");
+		guardPost.setActivity(TURRET);
 		return guardPost;
 	}
 	
@@ -57,7 +58,7 @@ public class Unit
 	
 	private LinkedList<Task> taskList;
 	private Task defaultTask;
-	private String activity;
+	private Activity activity;
 	
 	private UnitType type;
 	
@@ -85,7 +86,7 @@ public class Unit
 		this.serial = nextSerial.getAndIncrement();
 		
 		this.type = type;
-		this.activity = "move";
+		this.activity = MOVE;
 		this.hp = type.getMaxHP();
 		taskList = new LinkedList<Task>();
 		reservations = new HashSet<Position>();
@@ -307,15 +308,15 @@ public class Unit
 		return cargo.getType() == Cargo.Type.EMPTY;
 	}
 	
-	public void setActivity(String activity)
+	public void setActivity(Activity activity)
 	{
 		this.activity = activity;
 		clearAnimationSequence();
 	}
 	
-	public String getActivity()
+	public Activity getActivity()
 	{
-		if (!activity.equals("move"))
+		if (activity != MOVE)
 			previous = null;
 		
 		return activity;

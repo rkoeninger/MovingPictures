@@ -2,6 +2,7 @@ package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Filter;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Unit;
 
 public class ConVecConstructTask extends Task
@@ -26,15 +27,15 @@ public class ConVecConstructTask extends Task
 	
 	public void step(Unit unit)
 	{
-		if (!unit.getActivity().equals("construct"))
+		if (unit.getActivity() != CONSTRUCT)
 		{
-			unit.setActivity("construct");
+			unit.setActivity(CONSTRUCT);
 			unit.resetAnimationFrame();
 			unit.setDirection(Direction.SW);
 		}
-		else if (!target.getActivity().equals("build"))
+		else if (target.getActivity() != BUILD)
 		{
-			unit.setActivity("move");
+			unit.setActivity(MOVE);
 			unit.completeTask(this);
 		}
 		else

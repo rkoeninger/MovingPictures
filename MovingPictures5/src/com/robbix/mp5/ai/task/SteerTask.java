@@ -2,6 +2,7 @@ package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Unit;
 
 public class SteerTask extends Task
@@ -26,7 +27,7 @@ public class SteerTask extends Task
 			return;
 		}
 		
-		unit.setActivity("move");
+		unit.setActivity(MOVE);
 		Position pos = unit.getPosition();
 		Direction dir = Direction.getMoveDirection(pos, destination);
 		Position next = dir.apply(pos);

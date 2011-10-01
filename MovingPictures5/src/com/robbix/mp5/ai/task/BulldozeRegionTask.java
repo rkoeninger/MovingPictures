@@ -5,6 +5,7 @@ import java.util.List;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.basics.Position;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Unit;
 
 public class BulldozeRegionTask extends Task
@@ -29,7 +30,7 @@ public class BulldozeRegionTask extends Task
 	{
 		if (currentSpot >= spots.size())
 		{
-			unit.setActivity("move");
+			unit.setActivity(MOVE);
 			unit.completeTask(this);
 			return;
 		}

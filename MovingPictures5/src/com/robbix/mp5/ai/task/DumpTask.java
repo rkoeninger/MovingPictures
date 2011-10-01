@@ -1,5 +1,6 @@
 package com.robbix.mp5.ai.task;
 
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 
@@ -16,9 +17,9 @@ public class DumpTask extends Task
 
 	public void step(Unit unit)
 	{
-		if (!unit.getActivity().equals("dump"))
+		if (unit.getActivity() != DUMP)
 		{
-			unit.setActivity("dump");
+			unit.setActivity(DUMP);
 			unit.resetAnimationFrame();
 		}
 		else
@@ -35,7 +36,7 @@ public class DumpTask extends Task
 		if (unit.getAnimationFrame() >= frameCount - 1)
 		{
 			unit.setCargo(Cargo.EMPTY);
-			unit.setActivity("move");
+			unit.setActivity(MOVE);
 			unit.completeTask(this);
 		}
 	}

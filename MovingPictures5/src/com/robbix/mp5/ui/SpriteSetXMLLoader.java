@@ -17,6 +17,8 @@ import com.robbix.mp5.XNode;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.FileFormatException;
 import com.robbix.mp5.basics.Offset;
+import com.robbix.mp5.unit.Activity;
+import static com.robbix.mp5.unit.Activity.*;
 
 /**
  * WARNING! NOT THREAD SAFE!
@@ -73,6 +75,7 @@ class SpriteSetXMLLoader
 		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
 			String activityName = activityNode.getAttribute("name");
+			Activity activity = getActivity(activityName);
 			String path = activityNode.getAttribute("path", ".");
 			
 			File activityDir = new File(dir, path);
@@ -80,7 +83,7 @@ class SpriteSetXMLLoader
 			Offset activityOffset = activityNode.getOffsetAttributes();
 			int fileNumber = activityNode.getIntAttribute("fileNumber");
 			
-			if (activityName.equals("move"))
+			if (activity == MOVE)
 			{
 				int majorTurnFrameCount = activityNode.getIntAttribute("majorTurnFrameCount");
 				int minorTurnFrameCount = activityNode.getIntAttribute("minorTurnFrameCount");
@@ -102,9 +105,9 @@ class SpriteSetXMLLoader
 					
 					String parentSpritePath = Utils.getPath(
 						unitType,
-						activityName,
+						activity,
 						cargo,
-						direction.getShortName()
+						direction
 					);
 					
 					metadata.put(parentSpritePath, frameCount);
@@ -120,7 +123,7 @@ class SpriteSetXMLLoader
 					}
 				}
 			}
-			else if (activityName.equals("dump"))
+			else if (activity == DUMP)
 			{
 				int perTurnFrameCount = activityNode.getIntAttribute("perTurnFrameCount");
 				String cargo = activityNode.getAttribute("cargo");
@@ -138,9 +141,9 @@ class SpriteSetXMLLoader
 					
 					String parentSpritePath = Utils.getPath(
 						unitType,
-						activityName,
+						activity,
 						cargo,
-						direction.getShortName()
+						direction
 					);
 					
 					metadata.put(parentSpritePath, perTurnFrameCount);
@@ -156,9 +159,9 @@ class SpriteSetXMLLoader
 					}
 				}
 			}
-			else if (activityName.equals("dockUp")
-				  || activityName.equals("dockDown")
-				  || activityName.equals("mineLoad"))
+			else if (activity == DOCKUP
+				  || activity == DOCKDOWN
+				  || activity == MINELOAD)
 			{
 				int frameCount = activityNode.getIntAttribute("frameCount");
 				String cargo;
@@ -177,7 +180,7 @@ class SpriteSetXMLLoader
 				
 				String parentSpritePath = Utils.getPath(
 					unitType,
-					activityName,
+					activity,
 					cargo
 				);
 				
@@ -200,10 +203,10 @@ class SpriteSetXMLLoader
 					);
 				}
 			}
-			else if (activityName.equals("survey"))
+			else if (activity == SURVEY)
 			{
 			}
-			else if (activityName.equals("bulldoze"))
+			else if (activity == BULLDOZE)
 			{
 				int perTurnFrameCount = activityNode.getIntAttribute("perTurnFrameCount");
 				List<XNode> directionNodes = getOffsetNodes(activityNode);
@@ -216,8 +219,8 @@ class SpriteSetXMLLoader
 					
 					String parentSpritePath = Utils.getPath(
 						unitType,
-						activityName,
-						direction.getShortName()
+						activity,
+						direction
 					);
 					
 					metadata.put(parentSpritePath, perTurnFrameCount);
@@ -241,13 +244,13 @@ class SpriteSetXMLLoader
 					}
 				}
 			}
-			else if (activityName.equals("construct"))
+			else if (activity == CONSTRUCT)
 			{
 				int frameCount = activityNode.getIntAttribute("frameCount");
 				
 				String parentSpritePath = Utils.getPath(
 					unitType,
-					activityName
+					activity
 				);
 				
 				List<XNode> offsetNodes = getOffsetNodes(activityNode);
@@ -284,13 +287,14 @@ class SpriteSetXMLLoader
 		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
 			String activityName = activityNode.getAttribute("name");
+			Activity activity = getActivity(activityName);
 			String path = activityNode.getAttribute("path", ".");
 			
 			File activityDir = new File(dir, path);
 			
 			Offset activityOffset = activityNode.getOffsetAttributes();
 			
-			if (activityName.equals("still"))
+			if (activity == STILL)
 			{
 				for (XNode healthNode : activityNode.getNodes("HealthState"))
 				{
@@ -301,7 +305,7 @@ class SpriteSetXMLLoader
 					
 					String parentSpritePath = Utils.getPath(
 						unitType,
-						activityName,
+						activity,
 						health
 					);
 					
@@ -313,14 +317,14 @@ class SpriteSetXMLLoader
 					);
 				}
 			}
-			else if (activityName.equals("build"))
+			else if (activity == BUILD)
 			{
 				List<XNode> offsetNodes = getOffsetNodes(activityNode);
 				
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
 				int frameCount = activityNode.getIntAttribute("frameCount");
 				
-				String parentSpritePath = Utils.getPath(unitType, activityName);
+				String parentSpritePath = Utils.getPath(unitType, activity);
 				metadata.put(parentSpritePath, frameCount);
 				
 				for (int i = 0; i < frameCount; ++i)
@@ -340,7 +344,7 @@ class SpriteSetXMLLoader
 					);
 				}
 			}
-			else if (activityName.equals("collapse"))
+			else if (activity == COLLAPSE)
 			{
 				List<XNode> offsetNodes = getOffsetNodes(activityNode);
 				
@@ -349,7 +353,7 @@ class SpriteSetXMLLoader
 	
 				String parentSpritePath = Utils.getPath(
 					unitType,
-					activityName
+					activity
 				);
 				
 				metadata.put(parentSpritePath, frameCount);
@@ -389,8 +393,9 @@ class SpriteSetXMLLoader
 			throw new FileFormatException(xmlFile, "No activity Node");
 		
 		String activityName = activityNode.getAttribute("name");
+		Activity activity = getActivity(activityName);
 		
-		if (! activityName.equals("turret"))
+		if (activity != TURRET)
 			throw new IOException("Only \"turret\" activity valid for turrets");
 		
 		String path = activityNode.getAttribute("path", ".");
@@ -408,8 +413,8 @@ class SpriteSetXMLLoader
 			
 			String parentSpritePath = Utils.getPath(
 				unitType,
-				activityName,
-				direction.getShortName()
+				activity,
+				direction
 			);
 			
 			metadata.put(parentSpritePath, 1);
@@ -451,11 +456,12 @@ class SpriteSetXMLLoader
 		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
 			String activityName = activityNode.getAttribute("name");
+			Activity activity = getActivity(activityName);
 			String path = activityNode.getAttribute("path", ".");
 			File activityDir = new File(dir, path);
 			Offset activityOffset = activityNode.getOffsetAttributes();
 			
-			if (activityName.equals("turret"))
+			if (activity == TURRET)
 			{
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
 				List<XNode> directionNodes = activityNode.getNodes("Direction");
@@ -468,8 +474,8 @@ class SpriteSetXMLLoader
 					
 					String parentSpritePath = Utils.getPath(
 						unitType,
-						activityName,
-						direction.getShortName()
+						activity,
+						direction
 					);
 					
 					metadata.put(parentSpritePath, 1);
@@ -498,7 +504,7 @@ class SpriteSetXMLLoader
 					);
 				}
 			}
-			else if (activityName.equals("build"))
+			else if (activity == BUILD)
 			{
 				
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
@@ -506,7 +512,7 @@ class SpriteSetXMLLoader
 
 				String parentSpritePath = Utils.getPath(
 					unitType,
-					activityName
+					activity
 				);
 				
 				metadata.put(parentSpritePath, frameCount);
@@ -655,5 +661,12 @@ class SpriteSetXMLLoader
 		}
 		
 		return offsetFrameMap;
+	}
+	
+	private static Activity getActivity(String name)
+	{
+		name = name.replace(' ', '_');
+		name = name.toUpperCase();
+		return Enum.valueOf(Activity.class, name);
 	}
 }

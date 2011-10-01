@@ -1,6 +1,7 @@
 package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.basics.Filter;
+import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Unit;
 
 public class BulldozeTask extends Task
@@ -22,9 +23,9 @@ public class BulldozeTask extends Task
 	
 	public void step(Unit unit)
 	{
-		if (!unit.getActivity().equals("bulldoze"))
+		if (unit.getActivity() != BULLDOZE)
 		{
-			unit.setActivity("bulldoze");
+			unit.setActivity(BULLDOZE);
 			unit.resetAnimationFrame();
 			return;
 		}
@@ -34,7 +35,7 @@ public class BulldozeTask extends Task
 		if (unit.getAnimationFrame() == duration)
 		{
 			unit.getMap().bulldoze(unit.getPosition());
-			unit.setActivity("move");
+			unit.setActivity(MOVE);
 			unit.completeTask(this);
 		}
 	}

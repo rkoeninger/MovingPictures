@@ -17,7 +17,7 @@ import java.util.NoSuchElementException;
  * 
  * @author bort
  */
-public class Direction
+public final class Direction
 {
 	/*
 	 * References to all directions. There are no other
@@ -403,7 +403,7 @@ public class Direction
 	 * Gets the step index of this Direction - i.e. the number of
 	 * sixteenth-turn steps from East this Direction is.
 	 */
-	public int getStepIndex()
+	public int ordinal()
 	{
 		return steps;
 	}
