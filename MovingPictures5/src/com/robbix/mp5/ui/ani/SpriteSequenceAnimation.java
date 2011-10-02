@@ -7,17 +7,39 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteGroup;
 
 
 public class SpriteSequenceAnimation extends AmbientAnimation
 {
-	private List<Sprite> sprites;
+	private SpriteGroup sprites;
 	private Point point;
 	
 	private int frame = 0;
-	private int delay;
 	
 	private int hue = -1;
+	
+	public SpriteSequenceAnimation(SpriteGroup group, Point point)
+	{
+		this(group, -1, point, 1);
+	}
+	
+	public SpriteSequenceAnimation(SpriteGroup group, Point point, int delay)
+	{
+		this(group, -1, point, delay);
+	}
+	
+	public SpriteSequenceAnimation(SpriteGroup group, int hue, Point point)
+	{
+		this(group, hue, point, 1);
+	}
+	
+	public SpriteSequenceAnimation(SpriteGroup group, int hue, Point point, int delay)
+	{
+		this.sprites = group;
+		this.hue = hue;
+		this.point = point;
+	}
 	
 	public SpriteSequenceAnimation(List<Sprite> sprites, Point point)
 	{
@@ -36,15 +58,14 @@ public class SpriteSequenceAnimation extends AmbientAnimation
 	
 	public SpriteSequenceAnimation(List<Sprite> sprites, int hue, Point point, int delay)
 	{
-		this.sprites = sprites;
+		this.sprites = new SpriteGroup(sprites, delay);
 		this.hue = hue;
 		this.point = point;
-		this.delay = delay;
 	}
 	
 	public Rectangle getBounds()
 	{
-		Sprite sprite = sprites.get(frame / delay);
+		Sprite sprite = sprites.getFrame(frame);
 		int x = point.x + sprite.getXOffset();
 		int y = point.y + sprite.getYOffset();
 		int w = sprite.getImage().getWidth(null);
@@ -60,7 +81,7 @@ public class SpriteSequenceAnimation extends AmbientAnimation
 	
 	public void paint(Graphics g)
 	{
-		Sprite sprite = sprites.get(frame / delay);
+		Sprite sprite = sprites.getFrame(frame);
 		g.drawImage(
 			hue < 0 ? sprite.getImage() : sprite.getImage(hue),
 			point.x + sprite.getXOffset(),
@@ -71,6 +92,6 @@ public class SpriteSequenceAnimation extends AmbientAnimation
 	
 	public boolean isDone()
 	{
-		return (frame / delay) >= sprites.size();
+		return frame >= sprites.getFrameCount();
 	}
 }

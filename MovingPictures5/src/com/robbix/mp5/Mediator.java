@@ -14,12 +14,13 @@ import com.robbix.mp5.ai.task.PathTask;
 import com.robbix.mp5.ai.task.RotateTask;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.PositionCache;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.SoundBank;
-import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.ani.AcidCloudFireAnimation;
 import com.robbix.mp5.ui.ani.LaserFireAnimation;
 import com.robbix.mp5.ui.ani.MeteorAnimation;
@@ -45,13 +46,7 @@ public class Mediator
 	
 	public static Game game;
 	
-	public static void initMediator(LayeredMap map, DisplayPanel panel, UnitFactory factory, SoundBank sounds)
-	{
-		Mediator.map = map;
-		Mediator.panel = panel;
-		Mediator.factory = factory;
-		Mediator.sounds = sounds;
-	}
+	private static PositionCache cache;
 	
 	public static void initMediator(Game game)
 	{
@@ -60,6 +55,17 @@ public class Mediator
 		Mediator.factory = game.getUnitFactory();
 		Mediator.sounds = game.getSoundBank();
 		Mediator.game = game;
+	}
+	
+	public static void initCache(int w, int h)
+	{
+		Mediator.cache = new PositionCache(w, h);
+		Mediator.cache.prepare();
+	}
+	
+	public static Position getPosition(int x, int y)
+	{
+		return cache.get(x, y);
 	}
 	
 	public static void doAttack(Unit attacker, Unit target)
@@ -165,7 +171,7 @@ public class Mediator
 		for (int x = xMin; x <= xMax; ++x)
 		for (int y = yMin; y <= yMax; ++y)
 		{
-			Position current = new Position(x, y);
+			Position current = cache.get(x, y);
 			Unit unit = map.getUnit(current);
 			
 			if (unit != null)
@@ -365,7 +371,7 @@ public class Mediator
 			Position pos = unit.getPosition();
 			Point point = panel.getPoint(pos);
 			String path = "aDeath/guardPostKilled";
-			List<Sprite> seq = panel.getSpriteLibrary().getSequence(path);
+			SpriteGroup seq = panel.getSpriteLibrary().getSequence(path);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				seq,
 				point,
@@ -380,7 +386,7 @@ public class Mediator
 			Position pos = unit.getPosition();
 			Point point = panel.getPoint(pos);
 			String path = unit.getType().getName() + "/collapse";
-			List<Sprite> seq = panel.getSpriteLibrary().getSequence(path);
+			SpriteGroup seq = panel.getSpriteLibrary().getSequence(path);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				seq,
 				unit.getOwner().getColorHue(),

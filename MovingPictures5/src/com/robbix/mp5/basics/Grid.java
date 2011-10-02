@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.robbix.mp5.Mediator;
+
 /**
  * A two-dimensional grid containing elements of a generic type. All positions
  * in the grid can be assigned a value of null.
@@ -122,6 +124,14 @@ public class Grid<T> implements Iterable<T>
 		this.h = that.h;
 		this.bounds = that.bounds;
 		this.cells = Arrays.copyOf(that.cells, that.cells.length);
+	}
+	
+	public boolean isNull(int x, int y)
+	{
+		if (x < 0 || y < 0 || x >= w || y >= h)
+			throw new IndexOutOfBoundsException("(" + x + ", " + y + ")");
+		
+		return cells[x + y * w] != null;
 	}
 	
 	/**
@@ -476,7 +486,7 @@ public class Grid<T> implements Iterable<T>
 						if (distSq < closestDistance)
 						{
 							closestDistance = distSq;
-							closestPos = new Position(x, startY);
+							closestPos = Mediator.getPosition(x, startY);
 						}
 					}
 					
@@ -486,7 +496,7 @@ public class Grid<T> implements Iterable<T>
 						if (distSq < closestDistance)
 						{
 							closestDistance = distSq;
-							closestPos = new Position(x, stopY);
+							closestPos = Mediator.getPosition(x, stopY);
 						}
 					}
 				}
@@ -503,7 +513,7 @@ public class Grid<T> implements Iterable<T>
 						if (distSq < closestDistance)
 						{
 							closestDistance = distSq;
-							closestPos = new Position(startX, y);
+							closestPos = Mediator.getPosition(startX, y);
 						}
 					}
 					
@@ -513,7 +523,7 @@ public class Grid<T> implements Iterable<T>
 						if (distSq < closestDistance)
 						{
 							closestDistance = distSq;
-							closestPos = new Position(stopX, y);
+							closestPos = Mediator.getPosition(stopX, y);
 						}
 					}
 				}

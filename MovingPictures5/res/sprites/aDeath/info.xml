@@ -4,6 +4,7 @@
 		   path="./guardPostKilled"
 		   fileNumber="12369"
 		   frameCount="12"
+		   delay="2"
 		   x="-21"
 		   y="-22">
 		<OffsetFrame x="22" y="23"/>
@@ -23,6 +24,7 @@
 		   path="./vehicleKilled"
 		   fileNumber="24165"
 		   frameCount="14"
+		   delay="2"
 		   x="-108"
 		   y="-70">
 		<OffsetFrame x="116" y="78"/>
@@ -44,6 +46,7 @@
 		   path="./arachnidKilled"
 		   fileNumber="24146"
 		   frameCount="19"
+		   delay="2"
 		   x="-41"
 		   y="-20">
 		<OffsetFrame x="49" y="25"/>
@@ -70,6 +73,7 @@
 		   path="./vehicleSelfDestruct"
 		   fileNumber="12381"
 		   frameCount="13"
+		   delay="2"
 		   x="-15"
 		   y="-4">
 		<OffsetFrame x="29" y="13"/>
@@ -90,6 +94,7 @@
 		   path="./collapseSmoke1"
 		   fileNumber="17230"
 		   frameCount="12"
+		   delay="2"
 		   x="-18"
 		   y="-16">
 		<OffsetFrame x="29" y="31"/>
@@ -109,6 +114,7 @@
 		   path="./collapseSmoke2"
 		   fileNumber="17242"
 		   frameCount="12"
+		   delay="2"
 		   x="0"
 		   y="0">
 		<OffsetFrame x="26" y="32"/>
@@ -128,6 +134,7 @@
 		   path="./collapseSmoke3"
 		   fileNumber="17254"
 		   frameCount="12"
+		   delay="2"
 		   x="-10"
 		   y="-16">
 		<OffsetFrame x="24" y="34"/>
@@ -147,6 +154,7 @@
 		   path="./collapseSmoke4"
 		   fileNumber="17266"
 		   frameCount="12"
+		   delay="2"
 		   x="0"
 		   y="0">
 		<OffsetFrame x="23" y="69"/>
@@ -166,6 +174,7 @@
 		   path="./collapseSmoke5"
 		   fileNumber="15773"
 		   frameCount="9"
+		   delay="2"
 		   x="-10"
 		   y="-18">
 		<OffsetFrame x="17" y="31"/>
@@ -182,6 +191,7 @@
 		   path="./collapseSmoke6"
 		   fileNumber="14426"
 		   frameCount="10"
+		   delay="2"
 		   x="-16"
 		   y="-10">
 		<OffsetFrame x="23" y="33"/>

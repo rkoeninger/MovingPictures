@@ -11,7 +11,6 @@ import java.util.Set;
  * 
  * @author bort
  */
-// TODO: cache Position objects - have a static getPosition(x, y) method
 public class Position
 {
 	/**
@@ -43,15 +42,6 @@ public class Position
 	public Position shift(int dx, int dy)
 	{
 		return new Position(x + dx, y + dy);
-	}
-
-	/**
-	 * Readdresses this Position's coordinates using the given Position
-	 * as the relative origin.
-	 */
-	public Position shift(Position pos)
-	{
-		return new Position(x + pos.x, y + pos.y);
 	}
 	
 	/**

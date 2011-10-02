@@ -15,6 +15,7 @@ import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
@@ -28,7 +29,7 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 	
 	private Set<SmokeRing> rings;
 	
-	private List<Sprite> ringGroup;
+	private SpriteGroup ringGroup;
 	
 	private int frame = 0;
 	private int frameCount;
@@ -52,10 +53,11 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 		
 		rings = new HashSet<SmokeRing>();
 		
-		ringGroup = new ArrayList<Sprite>();
-		ringGroup.addAll(lib.getSequence("aRocket/smokeRing1"));
-		ringGroup.addAll(lib.getSequence("aRocket/smokeRing2"));
-		ringGroup.addAll(lib.getSequence("aRocket/smokeRing3"));
+		List<Sprite> ringGroupSprites = new ArrayList<Sprite>();
+		ringGroupSprites.addAll(lib.getSequence("aRocket/smokeRing1").getSprites());
+		ringGroupSprites.addAll(lib.getSequence("aRocket/smokeRing2").getSprites());
+		ringGroupSprites.addAll(lib.getSequence("aRocket/smokeRing3").getSprites());
+		ringGroup = new SpriteGroup(ringGroupSprites);
 		
 		Direction rocketDir = Direction.getDirection(
 			attacker.getPosition(),
@@ -95,7 +97,7 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 		rocketAngle /= (2 * Math.PI);
 		int i = ((((int) Math.round(rocketAngle * 16)) % 16) + 16) % 16 * 2;
 		
-		rocketSprite = lib.getSequence("aRocket/projectile").get(i);
+		rocketSprite = lib.getSequence("aRocket/projectile").getFrame(i);
 	}
 	
 	public boolean atHotPoint()
@@ -171,13 +173,13 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 			{
 				continue;
 			}
-			else if (ringFrame >= ringGroup.size())
+			else if (ringFrame >= ringGroup.getFrameCount())
 			{
 				ringItr.remove();
 				continue;
 			}
 			
-			Sprite ringSprite = ringGroup.get(ringFrame);
+			Sprite ringSprite = ringGroup.getFrame(ringFrame);
 			
 			g.drawImage(
 				ringSprite.getImage(),

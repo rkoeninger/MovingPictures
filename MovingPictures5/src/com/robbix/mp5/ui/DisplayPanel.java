@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
+import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.CostMap;
@@ -595,10 +596,10 @@ public class DisplayPanel extends JComponent
 	
 	public void shiftViewPosition(int dx, int dy)
 	{
-		scrollPoint.x += dx;
-		scrollPoint.y += dy;
-		centerAsNeeded();
-		refresh(getDisplayRegion());
+		setViewPosition(
+			scrollPoint.x + dx,
+			scrollPoint.y + dy
+		);
 	}
 	
 	public void setViewCenterPosition(int x, int y)
@@ -808,7 +809,7 @@ public class DisplayPanel extends JComponent
 	 */
 	public Position getPosition(Point point)
 	{
-		return new Position(point.x / tileSize, point.y / tileSize);
+		return Mediator.getPosition(point.x / tileSize, point.y / tileSize);
 	}
 	
 	/**
@@ -817,7 +818,7 @@ public class DisplayPanel extends JComponent
 	 */
 	public Position getPosition(int absX, int absY)
 	{
-		return new Position(absX / tileSize, absY / tileSize);
+		return Mediator.getPosition(absX / tileSize, absY / tileSize);
 	}
 	
 	/**
@@ -1235,8 +1236,8 @@ public class DisplayPanel extends JComponent
 			return;
 		}
 		
-		List<Sprite> seq = unit.getAnimationSequence();
-		Sprite sprite = seq.get(unit.getAnimationFrame() % seq.size());
+		SpriteGroup seq = unit.getAnimationSequence();
+		Sprite sprite = seq.getFrame(unit.getAnimationFrame() % seq.getFrameCount());
 		Point unitPoint = new Point(unit.getAbsX(), unit.getAbsY());
 		
 		if (showUnitLayerState && !unit.isTurret())
@@ -1284,8 +1285,8 @@ public class DisplayPanel extends JComponent
 			}
 			else if (unit.isDisabled())
 			{
-				List<Sprite> seq = sprites.getSequence("aStructureStatus/disabled");
-				draw(g, seq.get(Utils.getTimeBasedIndex(100, seq.size())), pos);
+				SpriteGroup seq = sprites.getSequence("aStructureStatus/disabled");
+				draw(g, seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount())), pos);
 			}
 			else if (unit.isStructure())
 			{

@@ -44,17 +44,17 @@ public class DockTask extends Task
 		{
 			Cargo cargo = unit.getCargo();
 			
-			if (toLoad != null && cargo != null && cargo.getType() == Cargo.Type.COMMON_ORE)
+			if (toLoad != null && cargo != null && cargo.getType() == Cargo.Type.COMMONORE)
 			{
 				Player owner = smelter.getOwner();
 				ResourceType type = null;
 				
 				switch (cargo.getType())
 				{
-				case COMMON_ORE:
+				case COMMONORE:
 					type = ResourceType.COMMON_ORE;
 					break;
-				case RARE_ORE:
+				case RAREORE:
 					type = ResourceType.RARE_ORE;
 					break;
 				default:

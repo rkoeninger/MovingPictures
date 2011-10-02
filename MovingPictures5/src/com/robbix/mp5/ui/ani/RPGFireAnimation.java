@@ -15,6 +15,7 @@ import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
@@ -29,9 +30,9 @@ public class RPGFireAnimation extends WeaponFireAnimation
 	
 	private Set<SmokePuff> puffs;
 	
-	private List<List<Sprite>> puffGroups;
+	private List<SpriteGroup> puffGroups;
 	
-	private List<Sprite> explosion;
+	private SpriteGroup explosion;
 	
 	private int frame = 0;
 	private int rocketFrameCount;
@@ -56,7 +57,7 @@ public class RPGFireAnimation extends WeaponFireAnimation
 		
 		puffs = new HashSet<SmokePuff>();
 		
-		puffGroups = new ArrayList<List<Sprite>>(3);
+		puffGroups = new ArrayList<SpriteGroup>(3);
 		
 		puffGroups.add(lib.getSequence("aRocket/smokePuff1"));
 		puffGroups.add(lib.getSequence("aRocket/smokePuff2"));
@@ -94,7 +95,7 @@ public class RPGFireAnimation extends WeaponFireAnimation
 			firePoint.x - targetPoint.x
 		);
 		rocketFrameCount = (int) (distance / speed);
-		totalFrameCount = rocketFrameCount + explosion.size();
+		totalFrameCount = rocketFrameCount + explosion.getFrameCount();
 		
 		double rocketAngle = Math.atan2(
 			firePoint.y - targetPoint.y,
@@ -103,7 +104,7 @@ public class RPGFireAnimation extends WeaponFireAnimation
 		rocketAngle /= (2 * Math.PI);
 		int i = ((((int) Math.round(rocketAngle * 16)) % 16) + 16) % 16 * 2;
 		
-		rocketSprite = lib.getSequence("aRocket/projectile").get(i);
+		rocketSprite = lib.getSequence("aRocket/projectile").getFrame(i);
 	}
 	
 	public boolean atHotPoint()
@@ -172,19 +173,19 @@ public class RPGFireAnimation extends WeaponFireAnimation
 			
 			int puffFrame = (frame - puff.startingFrame) / 2;
 			
-			List<Sprite> puffGroup = puffGroups.get(puff.puffNumber);
+			SpriteGroup puffGroup = puffGroups.get(puff.puffNumber);
 			
 			if (puffFrame < 0)
 			{
 				continue;
 			}
-			else if (puffFrame >= puffGroup.size())
+			else if (puffFrame >= puffGroup.getFrameCount())
 			{
 				puffItr.remove();
 				continue;
 			}
 			
-			Sprite puffSprite = puffGroup.get(puffFrame);
+			Sprite puffSprite = puffGroup.getFrame(puffFrame);
 			
 			g.drawImage(
 				puffSprite.getImage(),
@@ -213,7 +214,7 @@ public class RPGFireAnimation extends WeaponFireAnimation
 		}
 		else if (frame < totalFrameCount)
 		{
-			Sprite explosionSprite = explosion.get(frame - rocketFrameCount);
+			Sprite explosionSprite = explosion.getFrame(frame - rocketFrameCount);
 			
 			g.drawImage(
 				explosionSprite.getImage(),

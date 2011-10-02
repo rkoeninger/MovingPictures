@@ -7,8 +7,8 @@ public class Cargo
 	public static enum Type
 	{
 		EMPTY("empty"),
-		COMMON_ORE("commonOre"),
-		RARE_ORE("rareOre"),
+		COMMONORE("commonOre"),
+		RAREORE("rareOre"),
 		STRUCTURE_KIT("structureKit");
 		
 		private String name;
@@ -60,8 +60,8 @@ public class Cargo
 		
 		switch (type)
 		{
-		case COMMON_ORE: return new Cargo(Type.COMMON_ORE, amount);
-		case RARE_ORE:   return new Cargo(Type.RARE_ORE, amount);
+		case COMMON_ORE: return new Cargo(Type.COMMONORE, amount);
+		case RARE_ORE:   return new Cargo(Type.RAREORE, amount);
 		default: throw new IllegalArgumentException("invalid res type");
 		}
 	}

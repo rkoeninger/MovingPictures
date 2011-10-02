@@ -13,6 +13,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
@@ -107,7 +108,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 				: fullRegion.getMaxY() - 1;
 		}
 		
-		return new Region(origin, new Position(endX, endY));
+		return new Region(origin, Mediator.getPosition(endX, endY));
 	}
 	
 	public static enum Edge {NW,N,NE,W,C,E,SW,S,SE;}

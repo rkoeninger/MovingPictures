@@ -147,7 +147,6 @@ public class AStar// implements Pathfinder
 			/*
 			 * If we found the end, we're done.
 			 */
-//			if (sqDistance(end, current) <= distance)
 			if (end.equals(current))
 				return Arrays.asList(nodes.toArray(new PosPair[0]));
 			

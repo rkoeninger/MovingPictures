@@ -2,7 +2,6 @@ package com.robbix.mp5.unit;
 
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,7 +12,7 @@ import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
-import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 import static com.robbix.mp5.unit.Activity.*;
 
@@ -70,7 +69,7 @@ public class Unit
 	private Unit turret;
 	private Unit chassis;
 	
-	private List<Sprite> animationSequence;
+	private SpriteGroup animationSequence;
 	private int animationFrame = 0;
 		
 	private LayeredMap container;
@@ -355,7 +354,7 @@ public class Unit
 		);
 	}
 	
-	public List<Sprite> getAnimationSequence()
+	public SpriteGroup getAnimationSequence()
 	{
 		return animationSequence;
 	}
@@ -365,7 +364,7 @@ public class Unit
 		animationSequence = lib.getSequence(this);
 	}
 	
-	public void setAnimationSequence(List<Sprite> seq)
+	public void setAnimationSequence(SpriteGroup seq)
 	{
 		animationSequence = seq;
 	}

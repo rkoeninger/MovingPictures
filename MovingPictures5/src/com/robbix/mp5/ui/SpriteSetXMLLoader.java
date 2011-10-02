@@ -12,31 +12,54 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.XNode;
+import com.robbix.mp5.basics.AutoArrayList;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.FileFormatException;
 import com.robbix.mp5.basics.Offset;
 import com.robbix.mp5.unit.Activity;
+import com.robbix.mp5.unit.Cargo;
+import com.robbix.mp5.unit.HealthBracket;
+
 import static com.robbix.mp5.unit.Activity.*;
 
 /**
  * WARNING! NOT THREAD SAFE!
+ * 
+ * OR REUSABLE! DO NOT REUSE!
+ * 
+ * One instance per info.xml file/sprite set!
  */
 class SpriteSetXMLLoader
 {
 	private Map<String, Sprite> sprites;
 	private Map<String, Integer> metadata;
 	
+	private Map<String, SpriteGroup> groups;
+	private boolean eagerGroups = true;
+	
+	private List<SpriteSet> unitSets;
+	private Map<String, SpriteSet> ambientSets;
+	
 	private Map<String, List<XNode>> offsetFrameMap;
 	private File xmlFile;
 	
+	private List<Sprite> tempList = new AutoArrayList<Sprite>();
+	
 	public SpriteSetXMLLoader(
 		Map<String, Sprite> sprites,
-		Map<String, Integer> metadata)
+		Map<String, Integer> metadata,
+		Map<String, SpriteGroup> groups,
+		List<SpriteSet> unitSets,
+		Map<String, SpriteSet> ambientSets)
 	{
 		this.sprites = sprites;
 		this.metadata = metadata;
+		this.groups = groups;
+		this.unitSets = unitSets;
+		this.ambientSets = ambientSets;
 	}
 	
 	public void load(File xmlFile) throws IOException
@@ -72,6 +95,10 @@ class SpriteSetXMLLoader
 		Color color = rootNode.getColorAttribute("color");
 		int playerColorHue = Utils.getHueInt(color);
 		
+		SpriteSet spriteSet = unitType.contains("Truck")
+			? SpriteSet.forTrucks(unitType)
+			: SpriteSet.forVehicles(unitType);
+		
 		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
 			String activityName = activityNode.getAttribute("name");
@@ -83,6 +110,8 @@ class SpriteSetXMLLoader
 			Offset activityOffset = activityNode.getOffsetAttributes();
 			int fileNumber = activityNode.getIntAttribute("fileNumber");
 			
+			int delay = activityNode.getIntAttribute("delay", 1);
+			
 			if (activity == MOVE)
 			{
 				int majorTurnFrameCount = activityNode.getIntAttribute("majorTurnFrameCount");
@@ -92,7 +121,7 @@ class SpriteSetXMLLoader
 				
 				if (unitType.contains("Truck") && cargo == null)
 					throw new FileFormatException(xmlFile, "Cargo type not marked for Truck");
-				
+								
 				for (XNode directionNode : getOffsetNodes(activityNode))
 				{
 					Direction direction = directionNode.getDirectionAttribute("name");
@@ -111,16 +140,27 @@ class SpriteSetXMLLoader
 					);
 					
 					metadata.put(parentSpritePath, frameCount);
+					tempList.clear();
 					
 					for (int i = 0; i < frameCount; ++i)
 					{
 						Image img = loadFrame(activityDir, fileNumber++);
-						
+						Sprite sprite = new Sprite(img, playerColorHue, dirOffset);
 						sprites.put(
 							Utils.getPath(parentSpritePath, i),
-							new Sprite(img, playerColorHue, dirOffset)
+							sprite
 						);
+						tempList.add(sprite);
 					}
+					
+					SpriteGroup group = new SpriteGroup(tempList, true, delay);
+					
+					if (unitType.contains("Truck"))
+						spriteSet.set(group, activity, direction, Cargo.Type.valueOf(cargo.toUpperCase()));
+					else
+						spriteSet.set(group, activity, direction);
+					
+					if (eagerGroups) groups.put(parentSpritePath, group);
 				}
 			}
 			else if (activity == DUMP)
@@ -147,16 +187,22 @@ class SpriteSetXMLLoader
 					);
 					
 					metadata.put(parentSpritePath, perTurnFrameCount);
+					tempList.clear();
 					
 					for (int i = 0; i < perTurnFrameCount; ++i)
 					{
 						Image img = loadFrame(activityDir, fileNumber++);
-						
+						Sprite sprite = new Sprite(img, playerColorHue, dirOffset);
 						sprites.put(
 							Utils.getPath(parentSpritePath, i),
-							new Sprite(img, playerColorHue, dirOffset)
+							sprite
 						);
+						tempList.add(sprite);
 					}
+					
+					SpriteGroup group = new SpriteGroup(tempList, false, delay);
+					spriteSet.set(group, activity, direction, Cargo.Type.valueOf(cargo.toUpperCase()));
+					if (eagerGroups) groups.put(parentSpritePath, group);
 				}
 			}
 			else if (activity == DOCKUP
@@ -186,6 +232,7 @@ class SpriteSetXMLLoader
 				
 				List<XNode> offsetNodes = getOffsetNodes(activityNode);
 				metadata.put(parentSpritePath, frameCount);
+				tempList.clear();
 				
 				for (int i = 0; i < frameCount; ++i)
 				{
@@ -197,16 +244,22 @@ class SpriteSetXMLLoader
 						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
+					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
 					sprites.put(
 						Utils.getPath(parentSpritePath, i),
-						new Sprite(img, playerColorHue, frameOffset)
+						sprite
 					);
+					tempList.add(sprite);
 				}
+				
+				SpriteGroup group = new SpriteGroup(tempList, false, delay);
+				spriteSet.set(group, activity, Direction.E, Cargo.Type.valueOf(cargo.toUpperCase()));
+				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 			else if (activity == SURVEY)
 			{
 			}
-			else if (activity == BULLDOZE)
+			else if (activity == BULLDOZE) // also earthworker construct
 			{
 				int perTurnFrameCount = activityNode.getIntAttribute("perTurnFrameCount");
 				List<XNode> directionNodes = getOffsetNodes(activityNode);
@@ -224,8 +277,8 @@ class SpriteSetXMLLoader
 					);
 					
 					metadata.put(parentSpritePath, perTurnFrameCount);
-					
 					List<XNode> offsetNodes = directionNode.getNodes("OffsetFrame");
+					tempList.clear();
 					
 					for (int i = 0; i < perTurnFrameCount; ++i)
 					{
@@ -237,14 +290,20 @@ class SpriteSetXMLLoader
 							frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 						}
 						
+						Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
 						sprites.put(
 							Utils.getPath(parentSpritePath, i),
-							new Sprite(img, playerColorHue, frameOffset)
+							sprite
 						);
+						tempList.add(sprite);
 					}
+					
+					SpriteGroup group = new SpriteGroup(tempList, true, delay);
+					spriteSet.set(group, activity, direction);
+					if (eagerGroups) groups.put(parentSpritePath, group);
 				}
 			}
-			else if (activity == CONSTRUCT)
+			else if (activity == CONSTRUCT) // convec construct
 			{
 				int frameCount = activityNode.getIntAttribute("frameCount");
 				
@@ -255,6 +314,7 @@ class SpriteSetXMLLoader
 				
 				List<XNode> offsetNodes = getOffsetNodes(activityNode);
 				metadata.put(parentSpritePath, frameCount);
+				tempList.clear();
 				
 				for (int i = 0; i < frameCount; ++i)
 				{
@@ -266,13 +326,21 @@ class SpriteSetXMLLoader
 						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
+					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
 					sprites.put(
 						Utils.getPath(parentSpritePath, i),
-						new Sprite(img, playerColorHue, frameOffset)
+						sprite
 					);
+					tempList.add(sprite);
 				}
+				
+				SpriteGroup group = new SpriteGroup(tempList, true, delay);
+				spriteSet.set(group, activity, Direction.SW);
+				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 		}
+		
+		unitSets.set(Mediator.factory.getType(unitType).getSerial(), spriteSet);
 	}
 	
 	/**
@@ -284,6 +352,8 @@ class SpriteSetXMLLoader
 		Color color = rootNode.getColorAttribute("color");
 		int playerColorHue = Utils.getHueInt(color);
 		
+		SpriteSet spriteSet = SpriteSet.forStructures(unitType);
+		
 		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
 			String activityName = activityNode.getAttribute("name");
@@ -292,10 +362,14 @@ class SpriteSetXMLLoader
 			
 			File activityDir = new File(dir, path);
 			
+			int delay = activityNode.getIntAttribute("delay", 1);
+			
 			Offset activityOffset = activityNode.getOffsetAttributes();
 			
 			if (activity == STILL)
 			{
+				setListSize(tempList, HealthBracket.values().length);
+				
 				for (XNode healthNode : activityNode.getNodes("HealthState"))
 				{
 					String health = healthNode.getAttribute("health");
@@ -311,11 +385,16 @@ class SpriteSetXMLLoader
 					
 					Image img = loadFrame(activityDir, fileNumber);
 					metadata.put(parentSpritePath, 1);
+					Sprite sprite = new Sprite(img, playerColorHue, healthOffset);
 					sprites.put(
 						parentSpritePath,
-						new Sprite(img, playerColorHue, healthOffset)
+						sprite
 					);
+					tempList.set(getHealth(health).ordinal(), sprite);
 				}
+				
+				SpriteGroup group = new EnumSpriteGroup<HealthBracket>(HealthBracket.class, tempList);
+				spriteSet.set(group, activity);
 			}
 			else if (activity == BUILD)
 			{
@@ -326,6 +405,7 @@ class SpriteSetXMLLoader
 				
 				String parentSpritePath = Utils.getPath(unitType, activity);
 				metadata.put(parentSpritePath, frameCount);
+				tempList.clear();
 				
 				for (int i = 0; i < frameCount; ++i)
 				{
@@ -337,12 +417,17 @@ class SpriteSetXMLLoader
 						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
+					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
 					sprites.put(
 						Utils.getPath(parentSpritePath, i),
-						new Sprite(img, playerColorHue, frameOffset
-						)
+						sprite
 					);
+					tempList.add(sprite);
 				}
+				
+				SpriteGroup group = new SpriteGroup(tempList, false, delay);
+				spriteSet.set(group, activity);
+				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 			else if (activity == COLLAPSE)
 			{
@@ -357,6 +442,7 @@ class SpriteSetXMLLoader
 				);
 				
 				metadata.put(parentSpritePath, frameCount);
+				tempList.clear();
 				
 				for (int i = 0; i < frameCount; ++i)
 				{
@@ -368,13 +454,21 @@ class SpriteSetXMLLoader
 						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
+					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
 					sprites.put(
 						Utils.getPath(parentSpritePath, i),
-						new Sprite(img, playerColorHue, frameOffset)
+						sprite
 					);
+					tempList.add(sprite);
 				}
+				
+				SpriteGroup group = new SpriteGroup(tempList, false, delay);
+				spriteSet.set(group, activity);
+				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 		}
+		
+		unitSets.set(Mediator.factory.getType(unitType).getSerial(), spriteSet);
 	}
 	
 	/**
@@ -383,9 +477,10 @@ class SpriteSetXMLLoader
 	public void loadTurret(File dir, XNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
-
 		Color color = rootNode.getColorAttribute("color");
 		int playerColorHue = Utils.getHueInt(color);
+		
+		SpriteSet spriteSet = SpriteSet.forTurrets(unitType);
 		
 		XNode activityNode = rootNode.getNode("Activity");
 		
@@ -404,6 +499,7 @@ class SpriteSetXMLLoader
 		
 		Offset activityOffset = activityNode.getOffsetAttributes();
 		int fileNumber = activityNode.getIntAttribute("fileNumber");
+		setListSize(tempList, 16);
 		
 		for (XNode directionNode : activityNode.getNodes("Direction"))
 		{
@@ -436,12 +532,17 @@ class SpriteSetXMLLoader
 			}
 			
 			Image img = loadFrame(activityDir, fileNumber++);
-			
+			Sprite sprite = new Sprite(img, playerColorHue, dirOffset);
 			sprites.put(
 				Utils.getPath(parentSpritePath, 0),
-				new Sprite(img, playerColorHue, dirOffset)
+				sprite
 			);
+			tempList.set(direction.ordinal(), sprite);
 		}
+		
+		SpriteGroup group = new EnumSpriteGroup<Direction>(Direction.class, tempList);
+		spriteSet.set(group, activity);
+		unitSets.set(Mediator.factory.getType(unitType).getSerial(), spriteSet);
 	}
 	
 	/**
@@ -453,6 +554,8 @@ class SpriteSetXMLLoader
 		Color color = rootNode.getColorAttribute("color");
 		int playerColorHue = Utils.getHueInt(color);
 		
+		SpriteSet spriteSet = SpriteSet.forGuardPosts(unitType);
+		
 		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
 			String activityName = activityNode.getAttribute("name");
@@ -461,10 +564,14 @@ class SpriteSetXMLLoader
 			File activityDir = new File(dir, path);
 			Offset activityOffset = activityNode.getOffsetAttributes();
 			
+			int delay = activityNode.getIntAttribute("delay", 1);
+			
 			if (activity == TURRET)
 			{
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
 				List<XNode> directionNodes = activityNode.getNodes("Direction");
+				
+				setListSize(tempList, 16);
 				
 				for (XNode directionNode : directionNodes)
 				{
@@ -497,16 +604,19 @@ class SpriteSetXMLLoader
 					}
 					
 					Image img = loadFrame(activityDir, fileNumber++);
-					
+					Sprite sprite = new Sprite(img, playerColorHue, dirOffset);
 					sprites.put(
 						Utils.getPath(parentSpritePath, 0),
-						new Sprite(img, playerColorHue, dirOffset)
+						sprite
 					);
+					tempList.set(direction.ordinal(), sprite);
 				}
+				
+				SpriteGroup group = new EnumSpriteGroup<Direction>(Direction.class, tempList);
+				spriteSet.set(group, activity);
 			}
 			else if (activity == BUILD)
 			{
-				
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
 				int frameCount = activityNode.getIntAttribute("frameCount");
 
@@ -517,6 +627,7 @@ class SpriteSetXMLLoader
 				
 				metadata.put(parentSpritePath, frameCount);
 				List<XNode> offsetNodes = getOffsetNodes(activityNode);
+				tempList.clear();
 				
 				for (int i = 0; i < frameCount; ++i)
 				{
@@ -529,13 +640,21 @@ class SpriteSetXMLLoader
 						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
+					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
 					sprites.put(
 						Utils.getPath(parentSpritePath, i),
-						new Sprite(img, playerColorHue, frameOffset)
+						sprite
 					);
+					tempList.add(sprite);
 				}
+				
+				SpriteGroup group = new SpriteGroup(tempList, false, delay);
+				spriteSet.set(group, activity);
+				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 		}
+		
+		unitSets.set(Mediator.factory.getType(unitType).getSerial(), spriteSet);
 	}
 	
 	/**
@@ -546,6 +665,8 @@ class SpriteSetXMLLoader
 		String eventType = rootNode.getAttribute("eventType");
 		double trans = rootNode.getFloatAttribute("translucency", 1.0);
 		
+		SpriteSet spriteSet = SpriteSet.forAmbient(eventType);
+		
 		for (XNode eventNode : rootNode.getNodes("Event"))
 		{
 			String eventName = eventNode.getAttribute("name");
@@ -555,10 +676,12 @@ class SpriteSetXMLLoader
 			int frameCount = eventNode.getIntAttribute("frameCount");
 			Offset eventOffset = eventNode.getOffsetAttributes();
 			
+			int delay = eventNode.getIntAttribute("delay", 1);
+			
 			File eventDir = new File(dir, path);
 			String parentSpritePath = Utils.getPath(eventType, eventName);
 			metadata.put(parentSpritePath, frameCount);
-			
+			tempList.clear();
 			List<XNode> offsetNodes = eventNode.getNodes("OffsetFrame");
 			
 			for (int i = 0; i < frameCount; ++i)
@@ -571,12 +694,20 @@ class SpriteSetXMLLoader
 					frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 				}
 				
+				Sprite sprite = new Sprite(img, -1, frameOffset);
 				sprites.put(
 					Utils.getPath(parentSpritePath, i),
-					new Sprite(img, -1, frameOffset)
+					sprite
 				);
+				tempList.add(sprite);
 			}
+			
+			SpriteGroup group = new SpriteGroup(tempList, false, delay);
+			spriteSet.set(group, eventName);
+			if (eagerGroups) groups.put(parentSpritePath, group);
 		}
+		
+		ambientSets.put(eventType, spriteSet);
 	}
 	
 	public static Image loadFrame(File dir, int fileNumber) throws IOException
@@ -667,6 +798,20 @@ class SpriteSetXMLLoader
 	{
 		name = name.replace(' ', '_');
 		name = name.toUpperCase();
-		return Enum.valueOf(Activity.class, name);
+		return Activity.valueOf(name);
+	}
+	
+	private static HealthBracket getHealth(String name)
+	{
+		name = name.replace(' ', '_');
+		name = name.toUpperCase();
+		return HealthBracket.valueOf(name);
+	}
+	
+	private static void setListSize(List<?> list, int size)
+	{
+		list.clear();
+		for (int i = 0; i < size; ++i)
+			list.add(null);
 	}
 }

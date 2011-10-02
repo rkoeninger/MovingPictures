@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,15 +12,19 @@ import java.util.Set;
 
 import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.basics.AutoArrayList;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.unit.Activity;
 import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.unit.UnitType;
 
 public class SpriteLibrary
 {
+	static boolean useSets = false;
+	
 	public static SpriteLibrary loadLazy(File rootDir)
 	{
 		SpriteLibrary library = new SpriteLibrary();
@@ -59,7 +62,7 @@ public class SpriteLibrary
 		if (loadedModules.contains(moduleName))
 			return;
 		
-		new SpriteSetXMLLoader(sprites, groupInfo).load(xmlFile);
+		new SpriteSetXMLLoader(sprites, groupInfo, groups, unitSets, ambientSets).load(xmlFile);
 		
 		loadedModules.add(moduleName);
 	}
@@ -73,7 +76,10 @@ public class SpriteLibrary
 	
 	private HashMap<String, Sprite> sprites;
 	private HashMap<String, Integer> groupInfo;
-	private HashMap<String, List<Sprite>> groups;
+	private HashMap<String, SpriteGroup> groups;
+	
+	private List<SpriteSet> unitSets; // indexed by UnitType.serial
+	private HashMap<String, SpriteSet> ambientSets; // indexed by eventName
 	
 	private File rootDir;
 	
@@ -82,8 +88,21 @@ public class SpriteLibrary
 		loadedModules = new HashSet<String>(64);
 		
 		sprites = new HashMap<String, Sprite>(2048);
-		groups = new HashMap<String, List<Sprite>>(256);
+		groups = new HashMap<String, SpriteGroup>(256);
 		groupInfo = new HashMap<String, Integer>(256);
+		
+		unitSets = new AutoArrayList<SpriteSet>();
+		ambientSets = new HashMap<String, SpriteSet>(256);
+	}
+	
+	public SpriteSet getUnitSpriteSet(UnitType type)
+	{
+		return unitSets.get(type.getSerial());
+	}
+	
+	public SpriteSet getAmbientSpriteSet(String eventName)
+	{
+		return ambientSets.get(eventName);
 	}
 	
 	public Point getHotspot(Unit turret)
@@ -113,22 +132,22 @@ public class SpriteLibrary
 	
 	public synchronized Sprite getDefaultSprite(ResourceDeposit res)
 	{
-		return getSequence(res).get(0);
+		return getSequence(res).get();
 	}
 	
 	public synchronized Sprite getUnknownDepositSprite()
 	{
-		List<Sprite> seq = getSequence("aResource/unknown");
-		return seq.get(Utils.getTimeBasedIndex(100, seq.size()));
+		SpriteGroup seq = getSequence("aResource/unknown");
+		return seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount()));
 	}
 	
 	public Sprite getSprite(ResourceDeposit res)
 	{
-		List<Sprite> seq = getSequence(res);
-		return seq.get(Utils.getTimeBasedIndex(100, seq.size()));
+		SpriteGroup seq = getSequence(res);
+		return seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount()));
 	}
 	
-	public synchronized List<Sprite> getSequence(ResourceDeposit res)
+	public synchronized SpriteGroup getSequence(ResourceDeposit res)
 	{
 		String resName =
 			res.getType() == ResourceType.COMMON_ORE
@@ -186,19 +205,19 @@ public class SpriteLibrary
         
         if (sprite != null)
         {
-        	groups.put(path, Arrays.asList(sprite));
+        	groups.put(path, new SpriteGroup(Arrays.asList(sprite)));
         	return sprite;
         }
         
-        List<Sprite> seq = getSequence(path);
+        SpriteGroup seq = getSequence(path);
         
         if (seq == null)
                 return null;
         
-        return seq.get(0);
+        return seq.getFirst();
 	}
 	
-	public synchronized List<Sprite> getSequence(String path)
+	public synchronized SpriteGroup getSequence(String path)
 	{
 		if (!groupInfo.containsKey(path))
 		{
@@ -212,7 +231,7 @@ public class SpriteLibrary
 			{
 				// Failover to random sprite
 				e.printStackTrace();
-				return Collections.singletonList(randomSprite());
+				return new SpriteGroup(randomSprite());
 			}
 		}
 		
@@ -226,29 +245,56 @@ public class SpriteLibrary
 		for (int i = 0; i < frameCount; ++i)
 			spriteList.add(sprites.get(path + "/" + i));
 		
-		groups.put(path, spriteList);
-		return spriteList;
+		SpriteGroup group = new SpriteGroup(spriteList);
+		groups.put(path, group);
+		return group;
 	}
 	
-	public synchronized List<Sprite> getSequence(Unit unit)
+	public synchronized SpriteGroup getSequence(Unit unit)
 	{
+		if (useSets)
+		{
+			SpriteSet set = unitSets.get(unit.getType().getSerial());
+			
+			if (unit.isStructure())
+			{
+				return set.get(unit.getActivity());
+			}
+			else if (unit.isGuardPost())
+			{
+				return set.get(unit.getActivity());
+			}
+			else if (unit.isTurret())
+			{
+				return set.get(unit.getActivity());
+			}
+			else if (unit.isTruck())
+			{
+				return set.get(unit.getActivity(), unit.getDirection(), unit.getCargo().getType());
+			}
+			else // vehicle
+			{
+				return set.get(unit.getActivity(), unit.getDirection());
+			}
+		}
+		
 		if (unit.isStructure()
 		|| (unit.getType().isGuardPostType() && unit.getActivity() == BUILD))
 		{
 			String parentPath = getStructureSequencePath(unit);
-			List<Sprite> seq = groups.get(parentPath);
+			SpriteGroup seq = groups.get(parentPath);
 			
 			if (seq != null)
 				return seq;
 			
 			return unit.getActivity() == STILL
-				? Arrays.asList(getSprite(parentPath))
+				? new SpriteGroup(getSprite(parentPath))
 				: getSequence(parentPath);
 		}
 		else
 		{
 			String parentPath = getVehicleSequencePath(unit);
-			List<Sprite> seq = groups.get(parentPath);
+			SpriteGroup seq = groups.get(parentPath);
 			return seq != null ? seq : getSequence(parentPath);
 		}
 	}
@@ -274,6 +320,7 @@ public class SpriteLibrary
 	
 	private Sprite loadUnitSpriteAsNeeded(Unit unit, String spritePath)
 	{
+		System.out.println("loadUnitSpriteAsNeeded(Unit, String)");
 		Sprite sprite = sprites.get(spritePath);
 		
 		if (sprite != null)

@@ -1035,27 +1035,27 @@ public class Sandbox
 		for (int x = 0; x < 12; ++x)
 		for (int y = 0; y < 20; ++y)
 		{
-			map.putUnit(factory.newUnit("pScout"), new Position(x, y));
+			map.putUnit(factory.newUnit("pScout"), Mediator.getPosition(x, y));
 		}
 		
 		for (int x = 12; x < 30; x += 2)
 		for (int y = 13; y < 19; y += 2)
 		{
-			map.putUnit(factory.newUnit("pResidence"), new Position(x, y));
+			map.putUnit(factory.newUnit("pResidence"), Mediator.getPosition(x, y));
 		}
 		
-		map.putUnit(factory.newUnit("eVehicleFactory"), new Position(12, 1));
-		map.putUnit(factory.newUnit("eVehicleFactory"), new Position(16, 1));
-		map.putUnit(factory.newUnit("eVehicleFactory"), new Position(20, 1));
-		map.putUnit(factory.newUnit("eVehicleFactory"), new Position(24, 1));
-		map.putUnit(factory.newUnit("eStructureFactory"), new Position(12, 5));
-		map.putUnit(factory.newUnit("eStructureFactory"), new Position(16, 5));
-		map.putUnit(factory.newUnit("eStructureFactory"), new Position(20, 5));
-		map.putUnit(factory.newUnit("eStructureFactory"), new Position(24, 5));
-		map.putUnit(factory.newUnit("eCommonSmelter"), new Position(12, 9));
-		map.putUnit(factory.newUnit("eCommonSmelter"), new Position(16, 9));
-		map.putUnit(factory.newUnit("eCommonSmelter"), new Position(20, 9));
-		map.putUnit(factory.newUnit("eCommonSmelter"), new Position(24, 9));
+		map.putUnit(factory.newUnit("eVehicleFactory"), Mediator.getPosition(12, 1));
+		map.putUnit(factory.newUnit("eVehicleFactory"), Mediator.getPosition(16, 1));
+		map.putUnit(factory.newUnit("eVehicleFactory"), Mediator.getPosition(20, 1));
+		map.putUnit(factory.newUnit("eVehicleFactory"), Mediator.getPosition(24, 1));
+		map.putUnit(factory.newUnit("eStructureFactory"), Mediator.getPosition(12, 5));
+		map.putUnit(factory.newUnit("eStructureFactory"), Mediator.getPosition(16, 5));
+		map.putUnit(factory.newUnit("eStructureFactory"), Mediator.getPosition(20, 5));
+		map.putUnit(factory.newUnit("eStructureFactory"), Mediator.getPosition(24, 5));
+		map.putUnit(factory.newUnit("eCommonSmelter"), Mediator.getPosition(12, 9));
+		map.putUnit(factory.newUnit("eCommonSmelter"), Mediator.getPosition(16, 9));
+		map.putUnit(factory.newUnit("eCommonSmelter"), Mediator.getPosition(20, 9));
+		map.putUnit(factory.newUnit("eCommonSmelter"), Mediator.getPosition(24, 9));
 		
 		SpriteLibrary lib = game.getSpriteLibrary();
 		
@@ -1108,12 +1108,12 @@ public class Sandbox
 		convec3.setCargo(Cargo.newConVecCargo("eCommonSmelter"));
 		convec4.setCargo(Cargo.newConVecCargo("eCommandCenter"));
 		
-		map.putUnit(convec1,     new Position(9,  7));
-		map.putUnit(convec2,     new Position(10, 7));
-		map.putUnit(convec3,     new Position(11, 7));
-		map.putUnit(convec4,     new Position(12, 7));
-		map.putUnit(earthworker, new Position(10, 9));
-		map.putUnit(dozer,       new Position(11, 9));
+		map.putUnit(convec1,     Mediator.getPosition(9,  7));
+		map.putUnit(convec2,     Mediator.getPosition(10, 7));
+		map.putUnit(convec3,     Mediator.getPosition(11, 7));
+		map.putUnit(convec4,     Mediator.getPosition(12, 7));
+		map.putUnit(earthworker, Mediator.getPosition(10, 9));
+		map.putUnit(dozer,       Mediator.getPosition(11, 9));
 	}
 	
 	public static String mapMineRouteDemo()
@@ -1138,22 +1138,22 @@ public class Sandbox
 		for (int y = 2; y < 20; y += 6)
 		{
 			Unit smelter = factory.newUnit("eCommonSmelter", player1);
-			map.putUnit(smelter, new Position(x, y));
-			map.putTube(new Position(x + 5, y + 1));
-			map.putTube(new Position(x + 2, y + 4));
-			map.putTube(new Position(x + 2, y + 5));
+			map.putUnit(smelter, Mediator.getPosition(x, y));
+			map.putTube(Mediator.getPosition(x + 5, y + 1));
+			map.putTube(Mediator.getPosition(x + 2, y + 4));
+			map.putTube(Mediator.getPosition(x + 2, y + 5));
 			smelters.add(smelter);
 		}
 		
-		map.putUnit(factory.newUnit("eCommandCenter", player1), new Position(44, 2));
+		map.putUnit(factory.newUnit("eCommandCenter", player1), Mediator.getPosition(44, 2));
 		
 		for (int x = 2;  x < 46; x += 4)
 		for (int y = 38; y < 45; y += 4)
 		{
 			ResourceDeposit res = ResourceDeposit.get2BarCommon();
-			map.putResourceDeposit(res, new Position(x + 1, y));
+			map.putResourceDeposit(res, Mediator.getPosition(x + 1, y));
 			Unit mine = factory.newUnit("eCommonMine", player1);
-			map.putUnit(mine, new Position(x, y));
+			map.putUnit(mine, Mediator.getPosition(x, y));
 			mines.add(mine);
 		}
 		
@@ -1168,7 +1168,7 @@ public class Sandbox
 		{
 			if (Utils.randInt(0, 5) % 6 == 0)
 			{
-				Position pos = new Position(
+				Position pos = Mediator.getPosition(
 					truckIndex % 42 + 2,
 					truckIndex / 42 + 24
 				);
@@ -1197,7 +1197,7 @@ public class Sandbox
 			ioe.printStackTrace();
 		}
 		
-		game.getDisplay().setViewCenterPosition(new Position(24, 26));
+		game.getDisplay().setViewCenterPosition(Mediator.getPosition(24, 26));
 	}
 	
 	public static String mapCombatDemo()
@@ -1210,7 +1210,7 @@ public class Sandbox
 		LayeredMap map = game.getMap();
 		UnitFactory factory = game.getUnitFactory();
 		Region bounds = map.getBounds();
-		Position center = new Position(bounds.w / 2, bounds.h / 2);
+		Position center = Mediator.getPosition(bounds.w / 2, bounds.h / 2);
 		Player player1 = new Player(1, "Axen", 320);
 		Player player2 = new Player(2, "Emma", 200);
 		Player player3 = new Player(3, "Nguyen", 40);
@@ -1232,7 +1232,7 @@ public class Sandbox
 		for (int y = 1; y <= 11; ++y)
 		{
 			Unit tank = factory.newUnit("pMicrowaveLynx", player1);
-			map.putUnit(tank, new Position(x, y));
+			map.putUnit(tank, Mediator.getPosition(x, y));
 			tank.assignNow(new SteerTask(center));
 		}
 		
@@ -1240,7 +1240,7 @@ public class Sandbox
 		for (int y = 1;  y <= 15;  ++y)
 		{
 			Unit tank = factory.newUnit("eLaserLynx", player2);
-			map.putUnit(tank, new Position(x, y));
+			map.putUnit(tank, Mediator.getPosition(x, y));
 			tank.assignNow(new SteerTask(center));
 		}
 
@@ -1248,7 +1248,7 @@ public class Sandbox
 		for (int y = 31; y <= 46; ++y)
 		{
 			Unit tank = factory.newUnit("pRPGLynx", player3);
-			map.putUnit(tank, new Position(x, y));
+			map.putUnit(tank, Mediator.getPosition(x, y));
 			tank.assignNow(new SteerTask(center));
 		}
 
@@ -1256,7 +1256,7 @@ public class Sandbox
 		for (int y = 36; y <= 46; ++y)
 		{
 			Unit tank = factory.newUnit("eRailGunLynx", player4);
-			map.putUnit(tank, new Position(x, y));
+			map.putUnit(tank, Mediator.getPosition(x, y));
 			tank.assignNow(new SteerTask(center));
 		}
 		
@@ -1264,7 +1264,7 @@ public class Sandbox
 		for (int y = 20; y <= 29; ++y)
 		{
 			Unit tank = factory.newUnit("eAcidCloudLynx", player5);
-			map.putUnit(tank, new Position(x, y));
+			map.putUnit(tank, Mediator.getPosition(x, y));
 		}
 		
 		SpriteLibrary lib = game.getSpriteLibrary();

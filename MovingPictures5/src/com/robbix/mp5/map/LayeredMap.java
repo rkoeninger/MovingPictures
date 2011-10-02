@@ -589,7 +589,7 @@ public class LayeredMap
 			
 			for (Position tubePos0 : unit.getFootprint().getTubePositions())
 			{
-				Position tubePos = tubePos0.shift(pos);
+				Position tubePos = tubePos0.shift(pos.x, pos.y);
 				
 				if (!getBounds().contains(tubePos))
 					continue;

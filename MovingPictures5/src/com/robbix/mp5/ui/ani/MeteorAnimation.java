@@ -3,12 +3,12 @@ package com.robbix.mp5.ui.ani;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 
 public class MeteorAnimation extends AmbientAnimation
@@ -25,9 +25,9 @@ public class MeteorAnimation extends AmbientAnimation
 	
 	private boolean impactSoundPlayed = false;
 	
-	private List<Sprite> forming;
-	private List<Sprite> flying;
-	private List<Sprite> impact;
+	private SpriteGroup forming;
+	private SpriteGroup flying;
+	private SpriteGroup impact;
 	
 	public MeteorAnimation(Position target, SpriteLibrary lib)
 	{
@@ -59,7 +59,7 @@ public class MeteorAnimation extends AmbientAnimation
 	{
 		if (frame < 5)
 		{
-			Sprite sprite = forming.get(frame);
+			Sprite sprite = forming.getFrame(frame);
 
 			double progress = (frameCount - frame) / (double)(frameCount);
 			
@@ -78,7 +78,7 @@ public class MeteorAnimation extends AmbientAnimation
 		}
 		else if (frame > frameCount - 9)
 		{
-			Sprite sprite = impact.get(impact.size() - (frameCount - frame + 1));
+			Sprite sprite = impact.getFrame(impact.getFrameCount() - (frameCount - frame + 1));
 			
 			int x = point.x;
 			int y = point.y;
@@ -92,7 +92,7 @@ public class MeteorAnimation extends AmbientAnimation
 		}
 		else
 		{
-			Sprite sprite = flying.get(frame % flying.size());
+			Sprite sprite = flying.getFrame(frame % flying.getFrameCount());
 			
 			int x = point.x;
 			int y = point.y;

@@ -33,6 +33,7 @@ public class Game
 		game.factory = UnitFactory.load(new File(root, "units"));
 		game.tileSet = TileSet.load(new File(root, "tileset"), tileSetName);
 		game.map = LayeredMap.load(new File(root, "terrain"), mapName, game.tileSet);
+		Mediator.initCache(game.map.getWidth(), game.map.getHeight());
 		game.spriteLib =
 			lazySprites
 			? SpriteLibrary.loadLazy(new File(root, "sprites"))

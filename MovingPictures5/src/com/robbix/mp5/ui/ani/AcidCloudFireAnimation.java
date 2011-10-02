@@ -16,6 +16,7 @@ import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
@@ -30,9 +31,9 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 	
 	private Set<SmokePuff> puffs;
 	
-	private List<List<Sprite>> puffGroups;
+	private List<SpriteGroup> puffGroups;
 	
-	private List<Sprite> acidCloud;
+	private SpriteGroup acidCloud;
 	
 	private int frame = 0;
 	private int rocketFrameCount;
@@ -60,16 +61,17 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 		
 		puffs = new HashSet<SmokePuff>();
 		
-		puffGroups = new ArrayList<List<Sprite>>(3);
+		puffGroups = new ArrayList<SpriteGroup>(3);
 		puffGroups.add(lib.getSequence("aRocket/smokePuff1"));
 		puffGroups.add(lib.getSequence("aRocket/smokePuff2"));
 		puffGroups.add(lib.getSequence("aRocket/smokePuff3"));
 		
-		acidCloud = new ArrayList<Sprite>();
-		acidCloud.addAll(lib.getSequence("aAcidCloud/cloud1"));
-		acidCloud.addAll(lib.getSequence("aAcidCloud/cloud2"));
-		acidCloud.addAll(lib.getSequence("aAcidCloud/cloud2"));
-		acidCloud.addAll(lib.getSequence("aAcidCloud/cloud3"));
+		List<Sprite> acidCouldSprites = new ArrayList<Sprite>();
+		acidCouldSprites.addAll(lib.getSequence("aAcidCloud/cloud1").getSprites());
+		acidCouldSprites.addAll(lib.getSequence("aAcidCloud/cloud2").getSprites());
+		acidCouldSprites.addAll(lib.getSequence("aAcidCloud/cloud2").getSprites());
+		acidCouldSprites.addAll(lib.getSequence("aAcidCloud/cloud3").getSprites());
+		acidCloud = new SpriteGroup(acidCouldSprites);
 		
 		Direction rocketDir = Direction.getDirection(
 			attacker.getPosition(),
@@ -104,7 +106,7 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 			firePoint.x - targetPoint.x
 		);
 		rocketFrameCount = (int) (distance / speed);
-		totalFrameCount = rocketFrameCount + acidCloud.size();
+		totalFrameCount = rocketFrameCount + acidCloud.getFrameCount();
 		
 		double rocketAngle = Math.atan2(
 			firePoint.y - targetPoint.y,
@@ -113,7 +115,7 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 		rocketAngle /= (2 * Math.PI);
 		int i = ((((int) Math.round(rocketAngle * 16)) % 16) + 16) % 16 * 2;
 		
-		rocketSprite = lib.getSequence("aRocket/projectile").get(i);
+		rocketSprite = lib.getSequence("aRocket/projectile").getSprite(i);
 	}
 	
 	public boolean atHotPoint()
@@ -198,19 +200,19 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 			
 			int puffFrame = (frame - puff.startingFrame) / 2;
 			
-			List<Sprite> puffGroup = puffGroups.get(puff.puffNumber);
+			SpriteGroup puffGroup = puffGroups.get(puff.puffNumber);
 			
 			if (puffFrame < 0)
 			{
 				continue;
 			}
-			else if (puffFrame >= puffGroup.size())
+			else if (puffFrame >= puffGroup.getFrameCount())
 			{
 				puffItr.remove();
 				continue;
 			}
 			
-			Sprite puffSprite = puffGroup.get(puffFrame);
+			Sprite puffSprite = puffGroup.getSprite(puffFrame);
 			
 			g.drawImage(
 				puffSprite.getImage(),
@@ -239,7 +241,7 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 		}
 		else if (frame < totalFrameCount)
 		{
-			Sprite acidSprite = acidCloud.get(frame - rocketFrameCount);
+			Sprite acidSprite = acidCloud.getFrame(frame - rocketFrameCount);
 			
 			g.drawImage(
 				acidSprite.getImage(),
