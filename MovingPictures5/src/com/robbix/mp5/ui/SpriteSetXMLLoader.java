@@ -117,7 +117,7 @@ class SpriteSetXMLLoader
 				int majorTurnFrameCount = activityNode.getIntAttribute("majorTurnFrameCount");
 				int minorTurnFrameCount = activityNode.getIntAttribute("minorTurnFrameCount");
 				
-				String cargo = activityNode.getAttribute("cargo", null);
+				Cargo.Type cargo = getCargoType(activityNode.getAttribute("cargo", null));
 				
 				if (unitType.contains("Truck") && cargo == null)
 					throw new FileFormatException(xmlFile, "Cargo type not marked for Truck");
@@ -156,7 +156,7 @@ class SpriteSetXMLLoader
 					SpriteGroup group = new SpriteGroup(tempList, true, delay);
 					
 					if (unitType.contains("Truck"))
-						spriteSet.set(group, activity, direction, Cargo.Type.valueOf(cargo.toUpperCase()));
+						spriteSet.set(group, activity, direction, cargo);
 					else
 						spriteSet.set(group, activity, direction);
 					
@@ -166,7 +166,7 @@ class SpriteSetXMLLoader
 			else if (activity == DUMP)
 			{
 				int perTurnFrameCount = activityNode.getIntAttribute("perTurnFrameCount");
-				String cargo = activityNode.getAttribute("cargo");
+				Cargo.Type cargo = getCargoType(activityNode.getAttribute("cargo"));
 
 				if (unitType.contains("Truck") && cargo == null)
 					throw new FileFormatException(xmlFile,
@@ -201,20 +201,18 @@ class SpriteSetXMLLoader
 					}
 					
 					SpriteGroup group = new SpriteGroup(tempList, false, delay);
-					spriteSet.set(group, activity, direction, Cargo.Type.valueOf(cargo.toUpperCase()));
+					spriteSet.set(group, activity, direction, cargo);
 					if (eagerGroups) groups.put(parentSpritePath, group);
 				}
 			}
-			else if (activity == DOCKUP
-				  || activity == DOCKDOWN
-				  || activity == MINELOAD)
+			else if (activity == DOCKUP || activity == DOCKDOWN || activity == MINELOAD)
 			{
 				int frameCount = activityNode.getIntAttribute("frameCount");
-				String cargo;
+				Cargo.Type cargo;
 				
 				try
 				{
-					cargo = activityNode.getAttribute("cargo");
+					cargo = getCargoType(activityNode.getAttribute("cargo"));
 				}
 				catch (FileFormatException iae)
 				{
@@ -253,7 +251,10 @@ class SpriteSetXMLLoader
 				}
 				
 				SpriteGroup group = new SpriteGroup(tempList, false, delay);
-				spriteSet.set(group, activity, Direction.E, Cargo.Type.valueOf(cargo.toUpperCase()));
+				if (unitType.contains("Truck"))
+					spriteSet.set(group, activity, Direction.W, cargo);
+				else
+					spriteSet.set(group, activity, Direction.W);
 				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 			else if (activity == SURVEY)
@@ -796,6 +797,7 @@ class SpriteSetXMLLoader
 	
 	private static Activity getActivity(String name)
 	{
+		if (name == null) return null;
 		name = name.replace(' ', '_');
 		name = name.toUpperCase();
 		return Activity.valueOf(name);
@@ -803,9 +805,18 @@ class SpriteSetXMLLoader
 	
 	private static HealthBracket getHealth(String name)
 	{
+		if (name == null) return null;
 		name = name.replace(' ', '_');
 		name = name.toUpperCase();
 		return HealthBracket.valueOf(name);
+	}
+	
+	private static Cargo.Type getCargoType(String name)
+	{
+		if (name == null) return null;
+		name = name.replace(' ', '_');
+		name = name.toUpperCase();
+		return Cargo.Type.valueOf(name);
 	}
 	
 	private static void setListSize(List<?> list, int size)

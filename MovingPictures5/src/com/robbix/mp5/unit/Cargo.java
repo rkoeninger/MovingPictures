@@ -6,27 +6,10 @@ public class Cargo
 {
 	public static enum Type
 	{
-		EMPTY("empty"),
-		COMMONORE("commonOre"),
-		RAREORE("rareOre"),
-		STRUCTURE_KIT("structureKit");
-		
-		private String name;
-		
-		private Type (String name)
-		{
-			this.name = name;
-		}
-		
-		public String getName()
-		{
-			return name;
-		}
-		
-		public String toString()
-		{
-			return name;
-		}
+		EMPTY,
+		COMMONORE,
+		RAREORE,
+		STRUCTURE_KIT;
 	}
 	
 	private Type type;
@@ -99,7 +82,7 @@ public class Cargo
 		}
 		else
 		{
-			return getAmount() + " " + type.name;
+			return getAmount() + " " + type;
 		}
 	}
 }

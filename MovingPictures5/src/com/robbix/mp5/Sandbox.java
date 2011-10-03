@@ -622,8 +622,18 @@ public class Sandbox
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				JFrame slViewer =
-					new SpriteLibraryViewer(game.getSpriteLibrary());
+				List<Integer> hues = new ArrayList<Integer>();
+				hues.add(240);
+				
+				for (Player p : game.getPlayers())
+				{
+					hues.add(p.getColorHue());
+				}
+				
+				JFrame slViewer = new SpriteLibraryViewer(
+					game.getSpriteLibrary(),
+					hues.toArray(new Integer[0])
+				);
 				slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 				slViewer.setVisible(true);
 			}

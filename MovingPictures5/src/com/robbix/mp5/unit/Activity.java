@@ -14,5 +14,6 @@ public enum Activity
 	DOCKUP,
 	DOCKDOWN,
 	MINELOAD,
-	DUMP
+	DUMP,
+	REPAIR
 }

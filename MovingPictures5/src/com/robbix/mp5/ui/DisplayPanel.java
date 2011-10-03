@@ -974,20 +974,34 @@ public class DisplayPanel extends JComponent
 	
 	public void draw(Graphics g, Sprite sprite, Position pos)
 	{
+		Image img = sprite.getImage();
+		int x = pos.x * tileSize + sprite.getXOffset(scale);
+		int y = pos.y * tileSize + sprite.getYOffset(scale);
+		int w = img.getWidth(null);
+		int h = img.getHeight(null);
+		int w2 = scale < 0 ? w >> -scale : w << scale;
+		int h2 = scale < 0 ? h >> -scale : h << scale;
 		g.drawImage(
-			sprite.getImage(-1),
-			pos.x * tileSize + sprite.getXOffset(scale),
-			pos.y * tileSize + sprite.getYOffset(scale),
+			img,
+			x, y, x + w2, y + h2,
+			0, 0, w, h,
 			null
 		);
 	}
 	
 	public void draw(Graphics g, Sprite sprite, Point point, Player owner)
 	{
+		Image img = sprite.getImage(owner == null ? -1 : owner.getColorHue());
+		int x = point.x + sprite.getXOffset(scale);
+		int y = point.y + sprite.getYOffset(scale);
+		int w = img.getWidth(null);
+		int h = img.getHeight(null);
+		int w2 = scale < 0 ? w >> -scale : w << scale;
+		int h2 = scale < 0 ? h >> -scale : h << scale;
 		g.drawImage(
-			sprite.getImage(owner == null ? -1 : owner.getColorHue()),
-			point.x + sprite.getXOffset(scale),
-			point.y + sprite.getYOffset(scale),
+			img,
+			x, y, x + w2, y + h2,
+			0, 0, w, h,
 			null
 		);
 	}

@@ -24,7 +24,7 @@ public abstract class SpriteSet
 	}
 	
 	public abstract Class<?>[] getParameterList();
-	public Object[] getArgumentList(){return null;}
+	public abstract Object[] getArgumentList();
 	public abstract void set(SpriteGroup group, Object... args);
 	public abstract SpriteGroup get(Object... args);
 	
@@ -222,10 +222,10 @@ public abstract class SpriteSet
 		public Object[] getArgumentList()
 		{
 			List<Object> keys = new ArrayList<Object>();
-			
+
+			for (Cargo.Type cargo : Cargo.Type.values())
 			for (Activity act     : Activity.values())
 			for (Direction dir    : Direction.values())
-			for (Cargo.Type cargo : Cargo.Type.values())
 				if (get(act, dir, cargo) != null)
 				{
 					keys.add(new Object[]{act, dir, cargo});
