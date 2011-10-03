@@ -95,6 +95,22 @@ public class SpriteLibrary
 		ambientSets = new HashMap<String, SpriteSet>(256);
 	}
 	
+	public Set<String> getLoadedUnitModules()
+	{
+		Set<String> moduleNames = new HashSet<String>();
+		
+		for (int i = 0; i < unitSets.size(); ++i)
+			if (unitSets.get(i) != null)
+				moduleNames.add(unitSets.get(i).getName());
+		
+		return moduleNames;
+	}
+	
+	public Set<String> getLoadedAmbientModules()
+	{
+		return ambientSets.keySet();
+	}
+	
 	public SpriteSet getUnitSpriteSet(UnitType type)
 	{
 		return unitSets.get(type.getSerial());
@@ -320,7 +336,6 @@ public class SpriteLibrary
 	
 	private Sprite loadUnitSpriteAsNeeded(Unit unit, String spritePath)
 	{
-		System.out.println("loadUnitSpriteAsNeeded(Unit, String)");
 		Sprite sprite = sprites.get(spritePath);
 		
 		if (sprite != null)

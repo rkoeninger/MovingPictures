@@ -1,6 +1,8 @@
 package com.robbix.mp5.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.robbix.mp5.basics.Direction;
@@ -22,6 +24,7 @@ public abstract class SpriteSet
 	}
 	
 	public abstract Class<?>[] getParameterList();
+	public Object[] getArgumentList(){return null;}
 	public abstract void set(SpriteGroup group, Object... args);
 	public abstract SpriteGroup get(Object... args);
 	
@@ -108,6 +111,19 @@ public abstract class SpriteSet
 			return new Class<?>[]{Activity.class};
 		}
 		
+		public Object[] getArgumentList()
+		{
+			List<Object> keys = new ArrayList<Object>();
+			
+			for (Activity act : Activity.values())
+				if (get(act) != null)
+				{
+					keys.add(new Object[]{act});
+				}
+			
+			return keys.toArray();
+		}
+		
 		public void set(SpriteGroup group, Object... args)
 		{
 			checkArgCount(args, 1);
@@ -146,6 +162,20 @@ public abstract class SpriteSet
 		public Class<?>[] getParameterList()
 		{
 			return new Class<?>[]{Activity.class, Direction.class};
+		}
+		
+		public Object[] getArgumentList()
+		{
+			List<Object> keys = new ArrayList<Object>();
+			
+			for (Activity act  : Activity.values())
+			for (Direction dir : Direction.values())
+				if (get(act, dir) != null)
+				{
+					keys.add(new Object[]{act, dir});
+				}
+			
+			return keys.toArray();
 		}
 		
 		public void set(SpriteGroup group, Object... args)
@@ -189,6 +219,21 @@ public abstract class SpriteSet
 			return new Class<?>[]{Activity.class, Direction.class, Cargo.Type.class};
 		}
 		
+		public Object[] getArgumentList()
+		{
+			List<Object> keys = new ArrayList<Object>();
+			
+			for (Activity act     : Activity.values())
+			for (Direction dir    : Direction.values())
+			for (Cargo.Type cargo : Cargo.Type.values())
+				if (get(act, dir, cargo) != null)
+				{
+					keys.add(new Object[]{act, dir, cargo});
+				}
+			
+			return keys.toArray();
+		}
+		
 		public void set(SpriteGroup group, Object... args)
 		{
 			checkArgCount(args, 3);
@@ -225,6 +270,11 @@ public abstract class SpriteSet
 		public Class<?>[] getParameterList()
 		{
 			return new Class<?>[]{String.class};
+		}
+		
+		public Object[] getArgumentList()
+		{
+			return groups.keySet().toArray();
 		}
 		
 		public void set(SpriteGroup group, Object... args)

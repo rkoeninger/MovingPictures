@@ -86,6 +86,9 @@ public class Sandbox
 	private static ButtonGroup playerSelectButtonGroup;
 	private static ActionListener playerSelectListener;
 	private static boolean showFrameRate = false;
+
+	private static Image smallIcon;
+	private static Image mediumIcon;
 	
 	public static void main(String[] args) throws IOException
 	{
@@ -359,6 +362,7 @@ public class Sandbox
 		final JMenuItem pauseMenuItem = new JMenuItem("Pause");
 		final JMenuItem stepMenuItem = new JMenuItem("Step Once");
 		stepMenuItem.setEnabled(false);
+		final JMenuItem spriteLibMenuItem = new JMenuItem("Sprite Library");
 		final JMenuItem throttleMenuItem = new JMenuItem("Unthrottle");
 		throttleMenuItem.setEnabled(engine.isThrottled());
 		final JMenuItem exitMenuItem = new JMenuItem("Exit");
@@ -546,6 +550,8 @@ public class Sandbox
 		engineMenu.add(throttleMenuItem);
 		engineMenu.add(stepMenuItem);
 		engineMenu.addSeparator();
+		engineMenu.add(spriteLibMenuItem);
+		engineMenu.addSeparator();
 		engineMenu.add(exitMenuItem);
 		soundMenu.add(playSoundMenuItem);
 		soundMenu.add(playMusicMenuItem);
@@ -569,8 +575,8 @@ public class Sandbox
 		menuBar.add(playerMenu);
 		menuBar.add(unitMenu);
 		
-		Image smallIcon = ImageIO.read(new File(RES_DIR, "art/smallIcon.png"));
-		Image mediumIcon = ImageIO.read(new File(RES_DIR, "art/mediumIcon.png"));
+		smallIcon = ImageIO.read(new File(RES_DIR, "art/smallIcon.png"));
+		mediumIcon = ImageIO.read(new File(RES_DIR, "art/mediumIcon.png"));
 		
 		JPanel statusesPanel = new JPanel();
 		statusesPanel.setLayout(new GridLayout(2, 1));
@@ -611,6 +617,17 @@ public class Sandbox
 			windowBounds.x + (windowBounds.width  - frame.getWidth())  / 2,
 			windowBounds.y + (windowBounds.height - frame.getHeight()) / 2
 		);
+		
+		spriteLibMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JFrame slViewer =
+					new SpriteLibraryViewer(game.getSpriteLibrary());
+				slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
+				slViewer.setVisible(true);
+			}
+		});
 		
 		scrollBarsMenuItem.addActionListener(new ActionListener()
 		{
