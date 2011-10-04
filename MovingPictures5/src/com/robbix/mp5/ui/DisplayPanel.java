@@ -1238,11 +1238,6 @@ public class DisplayPanel extends JComponent
 	 */
 	private void drawUnit(Graphics g, Unit unit)
 	{
-		if (!unit.hasAnimationSequence())
-		{
-			unit.setAnimationSequence(sprites);
-		}
-		
 		if (!unit.isTurret() && scale < -2)
 		{
 			g.setColor(unit.getOwner().getColor());
@@ -1250,8 +1245,7 @@ public class DisplayPanel extends JComponent
 			return;
 		}
 		
-		SpriteGroup seq = unit.getAnimationSequence();
-		Sprite sprite = seq.getFrame(unit.getAnimationFrame() % seq.getFrameCount());
+		Sprite sprite = unit.getSprite();
 		Point unitPoint = new Point(unit.getAbsX(), unit.getAbsY());
 		
 		if (showUnitLayerState && !unit.isTurret())

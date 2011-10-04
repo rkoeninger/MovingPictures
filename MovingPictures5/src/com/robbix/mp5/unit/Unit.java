@@ -12,8 +12,9 @@ import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
+import com.robbix.mp5.ui.EnumSpriteGroup;
+import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
-import com.robbix.mp5.ui.SpriteLibrary;
 import static com.robbix.mp5.unit.Activity.*;
 
 /**
@@ -69,7 +70,6 @@ public class Unit
 	private Unit turret;
 	private Unit chassis;
 	
-	private SpriteGroup animationSequence;
 	private int animationFrame = 0;
 		
 	private LayeredMap container;
@@ -79,6 +79,8 @@ public class Unit
 	private int serial;
 	
 	private boolean idle = false;
+	
+	private Object[] spriteArgs;
 	
 	public Unit(UnitType type)
 	{
@@ -91,6 +93,19 @@ public class Unit
 		reservations = new HashSet<Position>();
 		dir = Direction.E;
 		cargo = Cargo.EMPTY;
+		
+		if (isTruck())
+		{
+			spriteArgs = new Object[3];
+		}
+		else if (type.getFootprint() == Footprint.VEHICLE)
+		{
+			spriteArgs = new Object[2];
+		}
+		else
+		{
+			spriteArgs = new Object[1];
+		}
 	}
 	
 	public int getSerial()
@@ -125,11 +140,6 @@ public class Unit
 			throw new IllegalArgumentException("HP out of range");
 		
 		this.hp = hp;
-		
-		if (type.isStructureType())
-		{
-			clearAnimationSequence();
-		}
 	}
 	
 	public int getHP()
@@ -294,7 +304,6 @@ public class Unit
 			throw new IllegalStateException("Not a truck");
 		
 		this.cargo = cargo == null ? Cargo.EMPTY : cargo;
-		clearAnimationSequence();
 	}
 	
 	public Cargo getCargo()
@@ -310,7 +319,6 @@ public class Unit
 	public void setActivity(Activity activity)
 	{
 		this.activity = activity;
-		clearAnimationSequence();
 	}
 	
 	public Activity getActivity()
@@ -354,29 +362,54 @@ public class Unit
 		);
 	}
 	
+	public Object[] getSpriteArgs()
+	{
+		spriteArgs[0] = activity;
+		
+		if (type.getFootprint() == Footprint.VEHICLE)
+		{
+			spriteArgs[1] = dir;
+			
+			if (isTruck())
+			{
+				spriteArgs[2] = cargo.getType();
+			}
+		}
+		
+		return spriteArgs;
+	}
+	
 	public SpriteGroup getAnimationSequence()
 	{
-		return animationSequence;
+		return type.getSpriteSet().get(getSpriteArgs());
 	}
 	
-	public void setAnimationSequence(SpriteLibrary lib)
+	public Sprite getSprite()
 	{
-		animationSequence = lib.getSequence(this);
-	}
-	
-	public void setAnimationSequence(SpriteGroup seq)
-	{
-		animationSequence = seq;
-	}
-	
-	public void clearAnimationSequence()
-	{
-		animationSequence = null;
-	}
-	
-	public boolean hasAnimationSequence()
-	{
-		return animationSequence != null;
+		SpriteGroup group = getAnimationSequence();
+		
+		if (group instanceof EnumSpriteGroup)
+		{
+			EnumSpriteGroup<?> enumGroup = (EnumSpriteGroup<?>) group;
+			Class<?> enumClass = enumGroup.getEnumType();
+			
+			if (enumClass.equals(Direction.class))
+			{
+				return enumGroup.getFrame(dir.ordinal());
+			}
+			else if (enumClass.equals(HealthBracket.class))
+			{
+				return enumGroup.getFrame(getHealthBracket().ordinal());
+			}
+			else
+			{
+				throw new Error("Unsupported enum type" + enumClass);
+			}
+		}
+		else
+		{
+			return group.getFrame(animationFrame);
+		}
 	}
 	
 	public int getAnimationFrame()
@@ -473,14 +506,12 @@ public class Unit
 	{
 		this.dir = dir.rotate(steps);
 		resetAnimationFrame();
-		clearAnimationSequence();
 	}
 	
 	public void setDirection(Direction dir)
 	{
 		this.dir = dir;
 		resetAnimationFrame();
-		clearAnimationSequence();
 	}
 	
 	public Direction getDirection()

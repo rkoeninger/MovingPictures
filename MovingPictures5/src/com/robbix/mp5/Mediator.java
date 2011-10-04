@@ -30,6 +30,8 @@ import com.robbix.mp5.ui.ani.RailGunFireAnimation;
 import com.robbix.mp5.ui.ani.SpriteSequenceAnimation;
 import com.robbix.mp5.ui.ani.WeaponFireAnimation;
 import static com.robbix.mp5.unit.Activity.*;
+
+import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
@@ -385,8 +387,7 @@ public class Mediator
 		{
 			Position pos = unit.getPosition();
 			Point point = panel.getPoint(pos);
-			String path = unit.getType().getName() + "/collapse";
-			SpriteGroup seq = panel.getSpriteLibrary().getSequence(path);
+			SpriteGroup seq = unit.getType().getSpriteSet().get(Activity.COLLAPSE);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				seq,
 				unit.getOwner().getColorHue(),
@@ -394,6 +395,7 @@ public class Mediator
 				2
 			));
 			
+			String path = null;
 			int fpWidth = unit.getFootprint().getWidth();
 			int fpHeight = unit.getFootprint().getHeight();
 			

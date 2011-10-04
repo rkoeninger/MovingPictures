@@ -22,6 +22,7 @@ import com.robbix.mp5.basics.Offset;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.HealthBracket;
+import com.robbix.mp5.unit.UnitType;
 
 import static com.robbix.mp5.unit.Activity.*;
 
@@ -341,7 +342,9 @@ class SpriteSetXMLLoader
 			}
 		}
 		
-		unitSets.set(Mediator.factory.getType(unitType).getSerial(), spriteSet);
+		UnitType type = Mediator.factory.getType(unitType);
+		unitSets.set(type.getSerial(), spriteSet);
+		type.setSpriteSet(spriteSet);
 	}
 	
 	/**
@@ -469,7 +472,9 @@ class SpriteSetXMLLoader
 			}
 		}
 		
-		unitSets.set(Mediator.factory.getType(unitType).getSerial(), spriteSet);
+		UnitType type = Mediator.factory.getType(unitType);
+		unitSets.set(type.getSerial(), spriteSet);
+		type.setSpriteSet(spriteSet);
 	}
 	
 	/**
@@ -543,7 +548,9 @@ class SpriteSetXMLLoader
 		
 		SpriteGroup group = new EnumSpriteGroup<Direction>(Direction.class, tempList);
 		spriteSet.set(group, activity);
-		unitSets.set(Mediator.factory.getType(unitType).getSerial(), spriteSet);
+		UnitType type = Mediator.factory.getType(unitType);
+		unitSets.set(type.getSerial(), spriteSet);
+		type.setSpriteSet(spriteSet);
 	}
 	
 	/**
@@ -655,7 +662,9 @@ class SpriteSetXMLLoader
 			}
 		}
 		
-		unitSets.set(Mediator.factory.getType(unitType).getSerial(), spriteSet);
+		UnitType type = Mediator.factory.getType(unitType);
+		unitSets.set(type.getSerial(), spriteSet);
+		type.setSpriteSet(spriteSet);
 	}
 	
 	/**

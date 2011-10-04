@@ -148,7 +148,7 @@ public class SpriteLibrary
 	
 	public synchronized Sprite getDefaultSprite(ResourceDeposit res)
 	{
-		return getSequence(res).get();
+		return getSequence(res).getFirst();
 	}
 	
 	public synchronized Sprite getUnknownDepositSprite()

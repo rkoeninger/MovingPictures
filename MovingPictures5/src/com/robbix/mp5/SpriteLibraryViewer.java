@@ -51,12 +51,13 @@ public class SpriteLibraryViewer extends JFrame
 {
 	public static void main(String[] args) throws IOException
 	{
-
 		Image smallIcon  = ImageIO.read(new File("./res/art/smallIcon.png"));
 		Image mediumIcon = ImageIO.read(new File("./res/art/mediumIcon.png"));
 		
 		Sandbox.trySystemLookAndFeel();
+		System.out.println("Loading unit defintions...");
 		Mediator.factory = UnitFactory.load(new File("./res/units"));
+		System.out.println("Loading sprite sets...");
 		SpriteLibrary lib = SpriteLibrary.preload(new File("./res/sprites"));
 		JFrame slViewer = new SpriteLibraryViewer(lib, new Integer[]{240});
 		slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));

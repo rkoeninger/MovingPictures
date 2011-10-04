@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.robbix.mp5.ui.SpriteSet;
+
 
 public class UnitType
 {
@@ -192,6 +194,8 @@ public class UnitType
 	private boolean connectionSource;
 	private boolean needsConnection;
 	
+	private SpriteSet spriteSet;
+	
 	private UnitType()
 	{
 		serial = nextSerial.getAndIncrement();
@@ -200,6 +204,16 @@ public class UnitType
 	public int getSerial()
 	{
 		return serial;
+	}
+	
+	public void setSpriteSet(SpriteSet spriteSet)
+	{
+		this.spriteSet = spriteSet;
+	}
+	
+	public SpriteSet getSpriteSet()
+	{
+		return spriteSet;
 	}
 	
 	public String getAcknowledgement()
