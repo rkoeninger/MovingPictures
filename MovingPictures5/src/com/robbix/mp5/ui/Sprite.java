@@ -43,6 +43,11 @@ public class Sprite
 		}
 	}
 	
+	public int getBaseTeamHue()
+	{
+		return baseHue;
+	}
+	
 	public Image getImage()
 	{
 		return baseImage;

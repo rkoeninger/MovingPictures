@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -18,7 +19,13 @@ import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -30,8 +37,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.robbix.mp5.ui.Sprite;
@@ -51,14 +61,16 @@ public class SpriteLibraryViewer extends JFrame
 {
 	public static void main(String[] args) throws IOException
 	{
+		boolean lazy = Arrays.asList(args).contains("-lazyLoadSprites");
+		
 		Image smallIcon  = ImageIO.read(new File("./res/art/smallIcon.png"));
 		Image mediumIcon = ImageIO.read(new File("./res/art/mediumIcon.png"));
 		
 		Sandbox.trySystemLookAndFeel();
-		System.out.println("Loading unit defintions...");
 		Mediator.factory = UnitFactory.load(new File("./res/units"));
-		System.out.println("Loading sprite sets...");
-		SpriteLibrary lib = SpriteLibrary.preload(new File("./res/sprites"));
+		SpriteLibrary lib = lazy
+			? SpriteLibrary.loadLazy(new File("./res/sprites"))
+			: SpriteLibrary.preload(new File("./res/sprites"));
 		JFrame slViewer = new SpriteLibraryViewer(lib, new Integer[]{240});
 		slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 		slViewer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,23 +82,36 @@ public class SpriteLibraryViewer extends JFrame
 	private SpriteLibrary lib;
 	private JTree tree;
 	private SLTreeNode rootNode;
+	private DefaultTreeModel treeModel;
 	private PreviewPanel preview;
 	
-	public SpriteLibraryViewer(SpriteLibrary lib, Integer[] playerHues)
+	public SpriteLibraryViewer(final SpriteLibrary lib, Integer[] playerHues)
 	{
 		super("Sprite Library Viewer");
 		this.lib = lib;
+		rootNode = new SLTreeNode("Sprite Library");
+		rootNode.setSLObject(lib);
+		treeModel = new DefaultTreeModel(rootNode);
 		loadTree();
-		tree = new JTree(rootNode);
+		tree = new JTree(treeModel);
 		tree.getSelectionModel().setSelectionMode(
 			TreeSelectionModel.SINGLE_TREE_SELECTION);
-		JScrollPane treeScrollPane = new JScrollPane();
-		treeScrollPane.setViewportView(tree);
+		tree.setEditable(true);
+		tree.setShowsRootHandles(false);
 		preview = new PreviewPanel(playerHues);
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		splitPane.setLeftComponent(treeScrollPane);
+		splitPane.setLeftComponent(new JScrollPane(tree));
 		splitPane.setRightComponent(preview);
-		add(splitPane);
+		JMenuBar menuBar = new JMenuBar();
+		JMenu loadMenu = new JMenu("Load");
+		final JMenuItem loadByNameMenuItem = new JMenuItem("By Name...");
+		final JMenuItem loadFromFileMenuItem = new JMenuItem("From File...");
+		loadMenu.add(loadByNameMenuItem);
+		loadMenu.add(loadFromFileMenuItem);
+		menuBar.add(loadMenu);
+		setJMenuBar(menuBar);
+		setLayout(new BorderLayout());
+		add(splitPane, BorderLayout.CENTER);
 		setSize(500, 500);
 		splitPane.setDividerLocation(0.5);
 		setLocationRelativeTo(null);
@@ -97,6 +122,89 @@ public class SpriteLibraryViewer extends JFrame
 			public void windowClosing(WindowEvent e)
 			{
 				preview.dispose();
+			}
+		});
+		
+		loadByNameMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String moduleList = JOptionPane.showInputDialog(
+					SpriteLibraryViewer.this,
+					"Module Name (separate multiple names with commas):",
+					"Load Module",
+					JOptionPane.QUESTION_MESSAGE
+				);
+				
+				if (moduleList == null)
+					return;
+				
+				try
+				{
+					for (String moduleName : moduleList.split(","))
+					{
+						moduleName = moduleName.trim();
+						lib.loadModule(moduleName);
+						appendSpriteSet(moduleName, true);
+					}
+					tree.expandRow(0);
+					SpriteLibraryViewer.this.repaint();
+				}
+				catch (IOException ioe)
+				{
+					JOptionPane.showMessageDialog(
+						SpriteLibraryViewer.this,
+						"Could not load module(s): " + moduleList + "\n" +
+						ioe.getMessage(),
+						"Load Error",
+						JOptionPane.ERROR_MESSAGE
+					);
+				}
+			}
+		});
+		
+		loadFromFileMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JFileChooser chooser = new JFileChooser();
+				chooser.setDialogTitle("Load Module");
+				chooser.setCurrentDirectory(new File("./res/sprites"));
+				chooser.setFileFilter(new FileFilter(){
+					public boolean accept(File file) {
+						return file.getName().equals("info.xml") ||
+							file.isDirectory();
+					}
+					public String getDescription() {
+						return "SpriteSet Info Files (info.xml)";
+					}
+				});
+				int result = chooser.showOpenDialog(SpriteLibraryViewer.this);
+				
+				if (result != JFileChooser.APPROVE_OPTION)
+					return;
+				
+				File file = chooser.getSelectedFile();
+				try
+				{
+					lib.loadModule(file);
+					String moduleName = file.isDirectory()
+						? file.getName()
+						: file.getParentFile().getName();
+					appendSpriteSet(moduleName, true);
+					tree.expandRow(0);
+					SpriteLibraryViewer.this.repaint();
+				}
+				catch (IOException ioe)
+				{
+					JOptionPane.showMessageDialog(
+						SpriteLibraryViewer.this,
+						"Could not load file: " + file + "\n" +
+						ioe.getMessage(),
+						"Load Error",
+						JOptionPane.ERROR_MESSAGE
+					);
+				}
 			}
 		});
 		
@@ -128,89 +236,128 @@ public class SpriteLibraryViewer extends JFrame
 	
 	private void loadTree()
 	{
-		rootNode = new SLTreeNode("Sprite Library");
-		rootNode.setSLObject(lib);
-		
 		for (String ambientSetName : lib.getLoadedAmbientModules())
 		{
 			SpriteSet ambientSet = lib.getAmbientSpriteSet(ambientSetName);
-			SLTreeNode setNode = new SLTreeNode(ambientSet.getName());
-			setNode.setSLObject(ambientSet);
-			append(rootNode, setNode);
-			Object[] keys = ambientSet.getArgumentList();
-			Arrays.sort(keys);
-			
-			for (Object key : keys)
-			{
-				SpriteGroup group = ambientSet.get(key);
-				SLTreeNode groupNode = new SLTreeNode(key.toString());
-				groupNode.setSLObject(group);
-				append(setNode, groupNode);
-				
-				for (int i = 0; i < group.getSpriteCount(); ++i)
-				{
-					Sprite sprite = group.getSprite(i);
-					SLTreeNode spriteNode = new SLTreeNode(String.valueOf(i));
-					spriteNode.setSLObject(sprite);
-					append(groupNode, spriteNode);
-				}
-			}
+			appendAmbientSet(ambientSet);
 		}
 		
 		for (String unitSetName : lib.getLoadedUnitModules())
 		{
 			UnitType type = Mediator.factory.getType(unitSetName);
-			Footprint fp = type.getFootprint();
 			SpriteSet unitSet = lib.getUnitSpriteSet(type);
-			SLTreeNode setNode = new SLTreeNode(unitSet.getName());
-			setNode.setSLObject(unitSet);
-			append(rootNode, setNode);
-			Object[] keys = unitSet.getArgumentList();
-			
-			for (Object key : keys)
-			{
-				Object[] keyArray = (Object[]) key;
-				SpriteGroup group = unitSet.get(keyArray);
-				SLTreeNode groupNode = new SLTreeNode(Arrays.toString(keyArray));
-				groupNode.setSLObject(group);
-				if (fp != null) groupNode.setCornerOffset(fp.getWidth(), fp.getHeight());
-				else groupNode.setCornerOffset(1, 1);
-				append(setNode, groupNode);
-				
-				if (group instanceof EnumSpriteGroup)
-				{
-					EnumSpriteGroup<?> enumGroup = ((EnumSpriteGroup<?>) group);
-					Object[] enumVals = enumGroup.getEnumType().getEnumConstants();
-					
-					for (int i = 0; i < group.getSpriteCount(); ++i)
-					{
-						Sprite sprite = group.getSprite(i);
-						SLTreeNode spriteNode = new SLTreeNode(enumVals[i].toString());
-						spriteNode.setSLObject(sprite);
-						if (fp != null) spriteNode.setCornerOffset(fp.getWidth(), fp.getHeight());
-						else spriteNode.setCornerOffset(1, 1);
-						append(groupNode, spriteNode);
-					}
-				}
-				else
-				{
-					for (int i = 0; i < group.getSpriteCount(); ++i)
-					{
-						Sprite sprite = group.getSprite(i);
-						SLTreeNode spriteNode = new SLTreeNode(String.valueOf(i));
-						spriteNode.setSLObject(sprite);
-						if (fp != null) spriteNode.setCornerOffset(fp.getWidth(), fp.getHeight());
-						else spriteNode.setCornerOffset(1, 1);
-						append(groupNode, spriteNode);
-					}
-				}
-			}
+			appendUnitSet(unitSet, type);
 		}
 	}
 	
-	private static void append(MutableTreeNode parent, MutableTreeNode child)
+	private void appendSpriteSet(String moduleName, boolean scroll)
 	{
-		parent.insert(child, parent.getChildCount());
+		SpriteSet spriteSet = lib.getAmbientSpriteSet(moduleName);
+		
+		if (spriteSet == null)
+		{
+			UnitType unitType = Mediator.factory.getType(moduleName);
+			spriteSet = lib.getUnitSpriteSet(unitType);
+			appendUnitSet(spriteSet, unitType, scroll);
+		}
+		else
+		{
+			appendAmbientSet(spriteSet, scroll);
+		}
+	}
+	
+	private void appendAmbientSet(SpriteSet ambientSet)
+	{
+		appendAmbientSet(ambientSet, false);
+	}
+	
+	private void appendAmbientSet(SpriteSet ambientSet, boolean scroll)
+	{
+		SLTreeNode setNode = new SLTreeNode(ambientSet.getName());
+		setNode.setSLObject(ambientSet);
+		append(rootNode, setNode);
+		Object[] keys = ambientSet.getArgumentList();
+		Arrays.sort(keys);
+		
+		for (Object key : keys)
+		{
+			SpriteGroup group = ambientSet.get(key);
+			SLTreeNode groupNode = new SLTreeNode(key.toString());
+			groupNode.setSLObject(group);
+			append(setNode, groupNode);
+			
+			for (int i = 0; i < group.getSpriteCount(); ++i)
+			{
+				Sprite sprite = group.getSprite(i);
+				SLTreeNode spriteNode = new SLTreeNode(String.valueOf(i));
+				spriteNode.setSLObject(sprite);
+				append(groupNode, spriteNode);
+			}
+		}
+		
+		if (scroll)
+			tree.scrollPathToVisible(new TreePath(setNode.getPath()));
+	}
+
+	private void appendUnitSet(SpriteSet unitSet, UnitType type)
+	{
+		appendUnitSet(unitSet, type, false);
+	}
+	
+	private void appendUnitSet(SpriteSet unitSet, UnitType type, boolean scroll)
+	{
+		Footprint fp = type.getFootprint();
+		SLTreeNode setNode = new SLTreeNode(unitSet.getName());
+		setNode.setSLObject(unitSet);
+		append(rootNode, setNode);
+		Object[] keys = unitSet.getArgumentList();
+		
+		for (Object key : keys)
+		{
+			Object[] keyArray = (Object[]) key;
+			SpriteGroup group = unitSet.get(keyArray);
+			SLTreeNode groupNode = new SLTreeNode(Arrays.toString(keyArray));
+			groupNode.setSLObject(group);
+			if (fp != null) groupNode.setCornerOffset(fp.getWidth(), fp.getHeight());
+			else groupNode.setCornerOffset(1, 1);
+			append(setNode, groupNode);
+			
+			if (group instanceof EnumSpriteGroup)
+			{
+				EnumSpriteGroup<?> enumGroup = ((EnumSpriteGroup<?>) group);
+				Object[] enumVals = enumGroup.getEnumType().getEnumConstants();
+				
+				for (int i = 0; i < group.getSpriteCount(); ++i)
+				{
+					Sprite sprite = group.getSprite(i);
+					SLTreeNode spriteNode = new SLTreeNode(enumVals[i].toString());
+					spriteNode.setSLObject(sprite);
+					if (fp != null) spriteNode.setCornerOffset(fp.getWidth(), fp.getHeight());
+					else spriteNode.setCornerOffset(1, 1);
+					append(groupNode, spriteNode);
+				}
+			}
+			else
+			{
+				for (int i = 0; i < group.getSpriteCount(); ++i)
+				{
+					Sprite sprite = group.getSprite(i);
+					SLTreeNode spriteNode = new SLTreeNode(String.valueOf(i));
+					spriteNode.setSLObject(sprite);
+					if (fp != null) spriteNode.setCornerOffset(fp.getWidth(), fp.getHeight());
+					else spriteNode.setCornerOffset(1, 1);
+					append(groupNode, spriteNode);
+				}
+			}
+		}
+		
+		if (scroll)
+			tree.scrollPathToVisible(new TreePath(setNode.getPath()));
+	}
+	
+	private void append(MutableTreeNode parent, DefaultMutableTreeNode child)
+	{
+		treeModel.insertNodeInto(child, parent, parent.getChildCount());
 	}
 	
 	private static class SLTreeNode extends DefaultMutableTreeNode
@@ -312,12 +459,12 @@ public class SpriteLibraryViewer extends JFrame
 					timer.setDelay(delaySlider.getValue());
 				}
 			});
-			hueSlider = new JSlider(SwingConstants.HORIZONTAL, 0, hues.length - 1, 0);
+			hueSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 359, 240);
 			hueSlider.addChangeListener(new ChangeListener()
 			{
 				public void stateChanged(ChangeEvent arg0)
 				{
-					hue = hues[hueSlider.getValue()];
+					hue = hueSlider.getValue();
 					drawPanel.repaint();
 				}
 			});
@@ -390,17 +537,28 @@ public class SpriteLibraryViewer extends JFrame
 				
 				private void paintSprite(Graphics g, Sprite sprite)
 				{
-					Image img = sprite.getImage(hue);
+					Image img = sprite.getImage();
+					int baseHue = sprite.getBaseTeamHue();
+					if (baseHue != hue)
+						img = Utils.recolorUnit((BufferedImage) img, baseHue, hue);
 					int x = (getWidth()  - w) / 2 + sprite.getXOffset();
 					int y = (getHeight() - h) / 2 + sprite.getYOffset();
 					g.drawImage(img, x, y, null);
 				}
 			};
 			
+			JPanel controlPanelLabels = new JPanel();
+			controlPanelLabels.setLayout(new GridLayout(2, 1));
+			controlPanelLabels.add(new JLabel("Delay"));
+			controlPanelLabels.add(new JLabel("Team Color"));
+			JPanel controlPanelSliders = new JPanel();
+			controlPanelSliders.setLayout(new GridLayout(2, 1));
+			controlPanelSliders.add(delaySlider);
+			controlPanelSliders.add(hueSlider);
 			controlPanel = new JPanel();
-			controlPanel.setLayout(new GridLayout(2, 1));
-			controlPanel.add(delaySlider);
-			controlPanel.add(hueSlider);
+			controlPanel.setLayout(new BorderLayout());
+			controlPanel.add(controlPanelLabels, BorderLayout.WEST);
+			controlPanel.add(controlPanelSliders, BorderLayout.CENTER);
 			
 			setLayout(new BorderLayout());
 			add(drawPanel, BorderLayout.CENTER);

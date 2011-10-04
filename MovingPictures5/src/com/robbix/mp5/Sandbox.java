@@ -1141,6 +1141,19 @@ public class Sandbox
 		map.putUnit(convec4,     Mediator.getPosition(12, 7));
 		map.putUnit(earthworker, Mediator.getPosition(10, 9));
 		map.putUnit(dozer,       Mediator.getPosition(11, 9));
+		
+		SpriteLibrary lib = game.getSpriteLibrary();
+		
+		try
+		{
+			lib.loadModule("eConVec");
+			lib.loadModule("eEarthworker");
+			lib.loadModule("pRoboDozer");
+		}
+		catch (IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
 	}
 	
 	public static String mapMineRouteDemo()

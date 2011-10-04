@@ -5,7 +5,7 @@
 			  majorTurnFrameCount="6"
 			  minorTurnFrameCount="1"
 			  fileNumber="16691"
-			  delay="2"
+			  delay="3"
 			  offsetX="3"
 			  offsetY="4">
 		<Direction name="e"   offsetX="-2" offsetY="3"/>

@@ -1,5 +1,6 @@
 package com.robbix.mp5.unit;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -15,6 +16,8 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.EnumSpriteGroup;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
+import com.robbix.mp5.ui.SpriteLibrary;
+
 import static com.robbix.mp5.unit.Activity.*;
 
 /**
@@ -384,8 +387,25 @@ public class Unit
 		return type.getSpriteSet().get(getSpriteArgs());
 	}
 	
-	public Sprite getSprite()
+	public Sprite getSprite(SpriteLibrary lib)
 	{
+		if (type.getSpriteSet() == null)
+		{
+			try
+			{
+				lib.loadModule(type.getName());
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			
+			if (type.getSpriteSet() == null)
+			{
+				throw new Error("Could not load spriteset: " + type.getName());
+			}
+		}
+		
 		SpriteGroup group = getAnimationSequence();
 		
 		if (group instanceof EnumSpriteGroup)

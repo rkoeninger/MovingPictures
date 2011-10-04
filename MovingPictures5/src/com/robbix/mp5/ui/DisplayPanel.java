@@ -1245,7 +1245,7 @@ public class DisplayPanel extends JComponent
 			return;
 		}
 		
-		Sprite sprite = unit.getSprite();
+		Sprite sprite = unit.getSprite(sprites);
 		Point unitPoint = new Point(unit.getAbsX(), unit.getAbsY());
 		
 		if (showUnitLayerState && !unit.isTurret())
