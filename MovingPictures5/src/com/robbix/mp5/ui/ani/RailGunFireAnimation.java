@@ -54,9 +54,9 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 		rings = new HashSet<SmokeRing>();
 		
 		List<Sprite> ringGroupSprites = new ArrayList<Sprite>();
-		ringGroupSprites.addAll(lib.getSequence("aRocket/smokeRing1").getSprites());
-		ringGroupSprites.addAll(lib.getSequence("aRocket/smokeRing2").getSprites());
-		ringGroupSprites.addAll(lib.getSequence("aRocket/smokeRing3").getSprites());
+		ringGroupSprites.addAll(lib.getAmbientSpriteGroup("aRocket", "smokeRing1").getSprites());
+		ringGroupSprites.addAll(lib.getAmbientSpriteGroup("aRocket", "smokeRing2").getSprites());
+		ringGroupSprites.addAll(lib.getAmbientSpriteGroup("aRocket", "smokeRing3").getSprites());
 		ringGroup = new SpriteGroup(ringGroupSprites);
 		
 		Direction rocketDir = Direction.getDirection(
@@ -97,7 +97,7 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 		rocketAngle /= (2 * Math.PI);
 		int i = ((((int) Math.round(rocketAngle * 16)) % 16) + 16) % 16 * 2;
 		
-		rocketSprite = lib.getSequence("aRocket/projectile").getFrame(i);
+		rocketSprite = lib.getAmbientSpriteGroup("aRocket", "projectile").getFrame(i);
 	}
 	
 	public boolean atHotPoint()

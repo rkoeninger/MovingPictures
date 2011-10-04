@@ -62,15 +62,15 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 		puffs = new HashSet<SmokePuff>();
 		
 		puffGroups = new ArrayList<SpriteGroup>(3);
-		puffGroups.add(lib.getSequence("aRocket/smokePuff1"));
-		puffGroups.add(lib.getSequence("aRocket/smokePuff2"));
-		puffGroups.add(lib.getSequence("aRocket/smokePuff3"));
+		puffGroups.add(lib.getAmbientSpriteGroup("aRocket", "smokePuff1"));
+		puffGroups.add(lib.getAmbientSpriteGroup("aRocket", "smokePuff2"));
+		puffGroups.add(lib.getAmbientSpriteGroup("aRocket", "smokePuff3"));
 		
 		List<Sprite> acidCouldSprites = new ArrayList<Sprite>();
-		acidCouldSprites.addAll(lib.getSequence("aAcidCloud/cloud1").getSprites());
-		acidCouldSprites.addAll(lib.getSequence("aAcidCloud/cloud2").getSprites());
-		acidCouldSprites.addAll(lib.getSequence("aAcidCloud/cloud2").getSprites());
-		acidCouldSprites.addAll(lib.getSequence("aAcidCloud/cloud3").getSprites());
+		acidCouldSprites.addAll(lib.getAmbientSpriteGroup("aAcidCloud", "cloud1").getSprites());
+		acidCouldSprites.addAll(lib.getAmbientSpriteGroup("aAcidCloud", "cloud2").getSprites());
+		acidCouldSprites.addAll(lib.getAmbientSpriteGroup("aAcidCloud", "cloud2").getSprites());
+		acidCouldSprites.addAll(lib.getAmbientSpriteGroup("aAcidCloud", "cloud3").getSprites());
 		acidCloud = new SpriteGroup(acidCouldSprites);
 		
 		Direction rocketDir = Direction.getDirection(
@@ -115,7 +115,7 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 		rocketAngle /= (2 * Math.PI);
 		int i = ((((int) Math.round(rocketAngle * 16)) % 16) + 16) % 16 * 2;
 		
-		rocketSprite = lib.getSequence("aRocket/projectile").getSprite(i);
+		rocketSprite = lib.getAmbientSpriteGroup("aRocket", "projectile").getSprite(i);
 	}
 	
 	public boolean atHotPoint()

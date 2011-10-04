@@ -12,6 +12,7 @@ import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.ui.Sprite;
 import static com.robbix.mp5.unit.Activity.*;
+
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 
@@ -75,10 +76,7 @@ public class BuildStructureOverlay extends InputOverlay
 					return;
 			}
 			
-			int buildTime = panel.getSpriteLibrary().getSequenceLength(
-				Utils.getPath(unit.getType().getName(), BUILD)
-			);
-			
+			int buildTime = getDisplay().getSpriteLibrary().getUnitSpriteSet(unit.getType()).get(BUILD).getFrameCount();
 			panel.getMap().putUnit(unit, pos);
 			unit.assignNow(new BuildTask(buildTime, 200));
 			unit.setActivity(BUILD);

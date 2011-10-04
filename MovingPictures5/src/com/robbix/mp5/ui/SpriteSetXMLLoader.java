@@ -2,6 +2,7 @@ package com.robbix.mp5.ui;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.imageio.ImageIO;
 
 import com.robbix.mp5.Mediator;
@@ -35,12 +35,6 @@ import static com.robbix.mp5.unit.Activity.*;
  */
 class SpriteSetXMLLoader
 {
-	private Map<String, Sprite> sprites;
-	private Map<String, Integer> metadata;
-	
-	private Map<String, SpriteGroup> groups;
-	private boolean eagerGroups = true;
-	
 	private List<SpriteSet> unitSets;
 	private Map<String, SpriteSet> ambientSets;
 	
@@ -50,15 +44,9 @@ class SpriteSetXMLLoader
 	private List<Sprite> tempList = new AutoArrayList<Sprite>();
 	
 	public SpriteSetXMLLoader(
-		Map<String, Sprite> sprites,
-		Map<String, Integer> metadata,
-		Map<String, SpriteGroup> groups,
 		List<SpriteSet> unitSets,
 		Map<String, SpriteSet> ambientSets)
 	{
-		this.sprites = sprites;
-		this.metadata = metadata;
-		this.groups = groups;
 		this.unitSets = unitSets;
 		this.ambientSets = ambientSets;
 	}
@@ -133,24 +121,12 @@ class SpriteSetXMLLoader
 						? minorTurnFrameCount
 						: majorTurnFrameCount;
 					
-					String parentSpritePath = Utils.getPath(
-						unitType,
-						activity,
-						cargo,
-						direction
-					);
-					
-					metadata.put(parentSpritePath, frameCount);
 					tempList.clear();
 					
 					for (int i = 0; i < frameCount; ++i)
 					{
 						Image img = loadFrame(activityDir, fileNumber++);
 						Sprite sprite = new Sprite(img, playerColorHue, dirOffset);
-						sprites.put(
-							Utils.getPath(parentSpritePath, i),
-							sprite
-						);
 						tempList.add(sprite);
 					}
 					
@@ -160,8 +136,6 @@ class SpriteSetXMLLoader
 						spriteSet.set(group, activity, direction, cargo);
 					else
 						spriteSet.set(group, activity, direction);
-					
-					if (eagerGroups) groups.put(parentSpritePath, group);
 				}
 			}
 			else if (activity == DUMP)
@@ -180,30 +154,17 @@ class SpriteSetXMLLoader
 					Offset dirOffset = directionNode.getOffsetAttributes();
 					dirOffset = dirOffset.add(activityOffset);
 					
-					String parentSpritePath = Utils.getPath(
-						unitType,
-						activity,
-						cargo,
-						direction
-					);
-					
-					metadata.put(parentSpritePath, perTurnFrameCount);
 					tempList.clear();
 					
 					for (int i = 0; i < perTurnFrameCount; ++i)
 					{
 						Image img = loadFrame(activityDir, fileNumber++);
 						Sprite sprite = new Sprite(img, playerColorHue, dirOffset);
-						sprites.put(
-							Utils.getPath(parentSpritePath, i),
-							sprite
-						);
 						tempList.add(sprite);
 					}
 					
 					SpriteGroup group = new SpriteGroup(tempList, false, delay);
 					spriteSet.set(group, activity, direction, cargo);
-					if (eagerGroups) groups.put(parentSpritePath, group);
 				}
 			}
 			else if (activity == DOCKUP || activity == DOCKDOWN || activity == MINELOAD)
@@ -223,14 +184,7 @@ class SpriteSetXMLLoader
 				if (unitType.contains("Truck") && cargo == null)
 					throw new FileFormatException(xmlFile, "Cargo type not marked for Truck");
 				
-				String parentSpritePath = Utils.getPath(
-					unitType,
-					activity,
-					cargo
-				);
-				
 				List<XNode> offsetNodes = getOffsetNodes(activityNode);
-				metadata.put(parentSpritePath, frameCount);
 				tempList.clear();
 				
 				for (int i = 0; i < frameCount; ++i)
@@ -244,10 +198,6 @@ class SpriteSetXMLLoader
 					}
 					
 					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
-					sprites.put(
-						Utils.getPath(parentSpritePath, i),
-						sprite
-					);
 					tempList.add(sprite);
 				}
 				
@@ -256,7 +206,6 @@ class SpriteSetXMLLoader
 					spriteSet.set(group, activity, Direction.W, cargo);
 				else
 					spriteSet.set(group, activity, Direction.W);
-				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 			else if (activity == SURVEY)
 			{
@@ -272,13 +221,6 @@ class SpriteSetXMLLoader
 					Offset dirOffset = directionNode.getOffsetAttributes();
 					dirOffset = dirOffset.add(activityOffset);
 					
-					String parentSpritePath = Utils.getPath(
-						unitType,
-						activity,
-						direction
-					);
-					
-					metadata.put(parentSpritePath, perTurnFrameCount);
 					List<XNode> offsetNodes = directionNode.getNodes("OffsetFrame");
 					tempList.clear();
 					
@@ -293,29 +235,17 @@ class SpriteSetXMLLoader
 						}
 						
 						Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
-						sprites.put(
-							Utils.getPath(parentSpritePath, i),
-							sprite
-						);
 						tempList.add(sprite);
 					}
 					
 					SpriteGroup group = new SpriteGroup(tempList, true, delay);
 					spriteSet.set(group, activity, direction);
-					if (eagerGroups) groups.put(parentSpritePath, group);
 				}
 			}
 			else if (activity == CONSTRUCT) // convec construct
 			{
 				int frameCount = activityNode.getIntAttribute("frameCount");
-				
-				String parentSpritePath = Utils.getPath(
-					unitType,
-					activity
-				);
-				
 				List<XNode> offsetNodes = getOffsetNodes(activityNode);
-				metadata.put(parentSpritePath, frameCount);
 				tempList.clear();
 				
 				for (int i = 0; i < frameCount; ++i)
@@ -329,22 +259,16 @@ class SpriteSetXMLLoader
 					}
 					
 					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
-					sprites.put(
-						Utils.getPath(parentSpritePath, i),
-						sprite
-					);
 					tempList.add(sprite);
 				}
 				
 				SpriteGroup group = new SpriteGroup(tempList, true, delay);
 				spriteSet.set(group, activity, Direction.SW);
-				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 		}
 		
 		UnitType type = Mediator.factory.getType(unitType);
 		unitSets.set(type.getSerial(), spriteSet);
-		type.setSpriteSet(spriteSet);
 	}
 	
 	/**
@@ -380,20 +304,8 @@ class SpriteSetXMLLoader
 					int fileNumber = healthNode.getIntAttribute("fileNumber");
 					Offset healthOffset = healthNode.getOffsetAttributes();
 					healthOffset = healthOffset.add(activityOffset);
-					
-					String parentSpritePath = Utils.getPath(
-						unitType,
-						activity,
-						health
-					);
-					
 					Image img = loadFrame(activityDir, fileNumber);
-					metadata.put(parentSpritePath, 1);
 					Sprite sprite = new Sprite(img, playerColorHue, healthOffset);
-					sprites.put(
-						parentSpritePath,
-						sprite
-					);
 					tempList.set(getHealth(health).ordinal(), sprite);
 				}
 				
@@ -406,9 +318,6 @@ class SpriteSetXMLLoader
 				
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
 				int frameCount = activityNode.getIntAttribute("frameCount");
-				
-				String parentSpritePath = Utils.getPath(unitType, activity);
-				metadata.put(parentSpritePath, frameCount);
 				tempList.clear();
 				
 				for (int i = 0; i < frameCount; ++i)
@@ -422,16 +331,11 @@ class SpriteSetXMLLoader
 					}
 					
 					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
-					sprites.put(
-						Utils.getPath(parentSpritePath, i),
-						sprite
-					);
 					tempList.add(sprite);
 				}
 				
 				SpriteGroup group = new SpriteGroup(tempList, false, delay);
 				spriteSet.set(group, activity);
-				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 			else if (activity == COLLAPSE)
 			{
@@ -439,13 +343,6 @@ class SpriteSetXMLLoader
 				
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
 				int frameCount = activityNode.getIntAttribute("frameCount");
-	
-				String parentSpritePath = Utils.getPath(
-					unitType,
-					activity
-				);
-				
-				metadata.put(parentSpritePath, frameCount);
 				tempList.clear();
 				
 				for (int i = 0; i < frameCount; ++i)
@@ -459,22 +356,16 @@ class SpriteSetXMLLoader
 					}
 					
 					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
-					sprites.put(
-						Utils.getPath(parentSpritePath, i),
-						sprite
-					);
 					tempList.add(sprite);
 				}
 				
 				SpriteGroup group = new SpriteGroup(tempList, false, delay);
 				spriteSet.set(group, activity);
-				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 		}
 		
 		UnitType type = Mediator.factory.getType(unitType);
 		unitSets.set(type.getSerial(), spriteSet);
-		type.setSpriteSet(spriteSet);
 	}
 	
 	/**
@@ -512,37 +403,19 @@ class SpriteSetXMLLoader
 			Direction direction = directionNode.getDirectionAttribute("name");
 			Offset dirOffset = directionNode.getOffsetAttributes();
 			dirOffset = dirOffset.add(activityOffset);
-			
-			String parentSpritePath = Utils.getPath(
-				unitType,
-				activity,
-				direction
-			);
-			
-			metadata.put(parentSpritePath, 1);
-			
-			int h = 0;
-			
-			for (XNode hotspotNode : directionNode.getNodes("Hotspot"))
+			List<XNode> hotspotNodes = directionNode.getNodes("Hotspot");
+			Point hotspot = new Point();
+			if (!hotspotNodes.isEmpty())
 			{
+				XNode hotspotNode = hotspotNodes.get(0);
 				Offset hotspotOffset = hotspotNode.getOffsetAttributes();
-				
-				metadata.put(
-					Utils.getPath(parentSpritePath, h, "x"),
-					hotspotOffset.dx);
-				metadata.put(
-					Utils.getPath(parentSpritePath, h, "y"),
-					hotspotOffset.dy);
-				
-				h++;
+				hotspot = new Point(
+					hotspotOffset.dx,
+					hotspotOffset.dy
+				);
 			}
-			
 			Image img = loadFrame(activityDir, fileNumber++);
-			Sprite sprite = new Sprite(img, playerColorHue, dirOffset);
-			sprites.put(
-				Utils.getPath(parentSpritePath, 0),
-				sprite
-			);
+			Sprite sprite = new TurretSprite(img, playerColorHue, dirOffset, hotspot);
 			tempList.set(direction.ordinal(), sprite);
 		}
 		
@@ -550,7 +423,6 @@ class SpriteSetXMLLoader
 		spriteSet.set(group, activity);
 		UnitType type = Mediator.factory.getType(unitType);
 		unitSets.set(type.getSerial(), spriteSet);
-		type.setSpriteSet(spriteSet);
 	}
 	
 	/**
@@ -586,37 +458,19 @@ class SpriteSetXMLLoader
 					Direction direction = directionNode.getDirectionAttribute("name");
 					Offset dirOffset = directionNode.getOffsetAttributes();
 					dirOffset = dirOffset.add(activityOffset);
-					
-					String parentSpritePath = Utils.getPath(
-						unitType,
-						activity,
-						direction
-					);
-					
-					metadata.put(parentSpritePath, 1);
-					
-					int h = 0;
-					
-					for (XNode hotspotNode : directionNode.getNodes("Hotspot"))
+					List<XNode> hotspotNodes = directionNode.getNodes("Hotspot");
+					Point hotspot = new Point();
+					if (!hotspotNodes.isEmpty())
 					{
+						XNode hotspotNode = hotspotNodes.get(0);
 						Offset hotspotOffset = hotspotNode.getOffsetAttributes();
-						
-						metadata.put(
-							Utils.getPath(parentSpritePath, h, "x"),
-							hotspotOffset.dx);
-						metadata.put(
-							Utils.getPath(parentSpritePath, h, "y"),
-							hotspotOffset.dy);
-						
-						h++;
+						hotspot = new Point(
+							hotspotOffset.dx,
+							hotspotOffset.dy
+						);
 					}
-					
 					Image img = loadFrame(activityDir, fileNumber++);
-					Sprite sprite = new Sprite(img, playerColorHue, dirOffset);
-					sprites.put(
-						Utils.getPath(parentSpritePath, 0),
-						sprite
-					);
+					Sprite sprite = new TurretSprite(img, playerColorHue, dirOffset, hotspot);
 					tempList.set(direction.ordinal(), sprite);
 				}
 				
@@ -627,13 +481,6 @@ class SpriteSetXMLLoader
 			{
 				int fileNumber = activityNode.getIntAttribute("fileNumber");
 				int frameCount = activityNode.getIntAttribute("frameCount");
-
-				String parentSpritePath = Utils.getPath(
-					unitType,
-					activity
-				);
-				
-				metadata.put(parentSpritePath, frameCount);
 				List<XNode> offsetNodes = getOffsetNodes(activityNode);
 				tempList.clear();
 				
@@ -649,22 +496,16 @@ class SpriteSetXMLLoader
 					}
 					
 					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
-					sprites.put(
-						Utils.getPath(parentSpritePath, i),
-						sprite
-					);
 					tempList.add(sprite);
 				}
 				
 				SpriteGroup group = new SpriteGroup(tempList, false, delay);
 				spriteSet.set(group, activity);
-				if (eagerGroups) groups.put(parentSpritePath, group);
 			}
 		}
 		
 		UnitType type = Mediator.factory.getType(unitType);
 		unitSets.set(type.getSerial(), spriteSet);
-		type.setSpriteSet(spriteSet);
 	}
 	
 	/**
@@ -689,8 +530,6 @@ class SpriteSetXMLLoader
 			int delay = eventNode.getIntAttribute("delay", 1);
 			
 			File eventDir = new File(dir, path);
-			String parentSpritePath = Utils.getPath(eventType, eventName);
-			metadata.put(parentSpritePath, frameCount);
 			tempList.clear();
 			List<XNode> offsetNodes = eventNode.getNodes("OffsetFrame");
 			
@@ -705,16 +544,11 @@ class SpriteSetXMLLoader
 				}
 				
 				Sprite sprite = new Sprite(img, -1, frameOffset);
-				sprites.put(
-					Utils.getPath(parentSpritePath, i),
-					sprite
-				);
 				tempList.add(sprite);
 			}
 			
 			SpriteGroup group = new SpriteGroup(tempList, false, delay);
 			spriteSet.set(group, eventName);
-			if (eagerGroups) groups.put(parentSpritePath, group);
 		}
 		
 		ambientSets.put(eventType, spriteSet);

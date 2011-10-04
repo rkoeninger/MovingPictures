@@ -27,8 +27,7 @@ public class PlaceGeyserOverlay extends InputOverlay
 			
 			if (geyserSprite == null)
 			{
-				geyserSprite = panel.getSpriteLibrary()
-									.getSprite("aGeyser/geyser");
+				geyserSprite = panel.getSpriteLibrary().getSprite("aGeyser", "geyser");
 				geyserSprite = Utils.getTranslucency(geyserSprite, -1, 0.5f);
 			}
 			

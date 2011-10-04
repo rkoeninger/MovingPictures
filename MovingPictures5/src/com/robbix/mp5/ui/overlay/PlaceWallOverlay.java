@@ -25,7 +25,7 @@ public class PlaceWallOverlay extends InputOverlay
 		{
 			if (wallSprite == null)
 			{
-				wallSprite = panel.getSpriteLibrary().getSprite("oTerrainFixture/wall");
+				wallSprite = panel.getSpriteLibrary().getSprite("oTerrainFixture", "wall");
 				wallSprite = Utils.getTranslucency(wallSprite, -1, 0.8f);
 			}
 			

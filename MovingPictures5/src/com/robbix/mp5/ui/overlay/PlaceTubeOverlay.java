@@ -25,7 +25,7 @@ public class PlaceTubeOverlay extends InputOverlay
 		{
 			if (tubeSprite == null)
 			{
-				tubeSprite = panel.getSpriteLibrary().getSprite("oTerrainFixture/tube");
+				tubeSprite = panel.getSpriteLibrary().getSprite("oTerrainFixture", "tube");
 				tubeSprite = Utils.getTranslucency(tubeSprite, -1, 0.8f);
 			}
 			

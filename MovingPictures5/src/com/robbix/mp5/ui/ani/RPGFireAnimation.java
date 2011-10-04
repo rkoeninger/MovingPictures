@@ -59,11 +59,11 @@ public class RPGFireAnimation extends WeaponFireAnimation
 		
 		puffGroups = new ArrayList<SpriteGroup>(3);
 		
-		puffGroups.add(lib.getSequence("aRocket/smokePuff1"));
-		puffGroups.add(lib.getSequence("aRocket/smokePuff2"));
-		puffGroups.add(lib.getSequence("aRocket/smokePuff3"));
+		puffGroups.add(lib.getAmbientSpriteGroup("aRocket", "smokePuff1"));
+		puffGroups.add(lib.getAmbientSpriteGroup("aRocket", "smokePuff2"));
+		puffGroups.add(lib.getAmbientSpriteGroup("aRocket", "smokePuff3"));
 		
-		explosion = lib.getSequence("aRocket/explosion");
+		explosion = lib.getAmbientSpriteGroup("aRocket", "explosion");
 		
 		Direction rocketDir = Direction.getDirection(
 			attacker.getPosition(),
@@ -104,7 +104,7 @@ public class RPGFireAnimation extends WeaponFireAnimation
 		rocketAngle /= (2 * Math.PI);
 		int i = ((((int) Math.round(rocketAngle * 16)) % 16) + 16) % 16 * 2;
 		
-		rocketSprite = lib.getSequence("aRocket/projectile").getFrame(i);
+		rocketSprite = lib.getAmbientSpriteGroup("aRocket", "projectile").getFrame(i);
 	}
 	
 	public boolean atHotPoint()

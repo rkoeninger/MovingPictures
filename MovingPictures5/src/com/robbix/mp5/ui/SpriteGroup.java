@@ -86,14 +86,6 @@ public class SpriteGroup
 		return sprites[0];
 	}
 	
-	public Sprite get()
-	{
-		if (sprites.length != 1)
-			throw new IllegalStateException("contains more than 1 sprite");
-		
-		return sprites[0];
-	}
-	
 	public List<Sprite> getSprites()
 	{
 		return Arrays.asList(sprites);

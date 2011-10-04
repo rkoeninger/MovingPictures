@@ -33,9 +33,9 @@ public class MeteorAnimation extends AmbientAnimation
 	{
 		this.target = target;
 		
-		forming = lib.getSequence("aMeteor/forming");
-		flying  = lib.getSequence("aMeteor/flying");
-		impact  = lib.getSequence("aMeteor/impact");
+		forming = lib.getAmbientSpriteGroup("aMeteor", "forming");
+		flying  = lib.getAmbientSpriteGroup("aMeteor", "flying");
+		impact  = lib.getAmbientSpriteGroup("aMeteor", "impact");
 		
 		point = new Point(
 			target.x * 32 + 16,

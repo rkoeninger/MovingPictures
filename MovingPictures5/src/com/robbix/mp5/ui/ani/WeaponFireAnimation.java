@@ -34,7 +34,7 @@ public abstract class WeaponFireAnimation extends AmbientAnimation
 		Point hotspot = lib.getHotspot(turret, Direction.getDirection(
 			attacker.getPosition(), target.getPosition()));
 		
-		Sprite turretSprite = lib.getSprite(turret);
+		Sprite turretSprite = turret.getSprite(lib);
 		
 		int xSpriteOffset = turretSprite.getXOffset() + hotspot.x;
 		int ySpriteOffset = turretSprite.getYOffset() + hotspot.y;

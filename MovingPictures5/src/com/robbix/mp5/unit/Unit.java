@@ -1,6 +1,5 @@
 package com.robbix.mp5.unit;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -17,6 +16,7 @@ import com.robbix.mp5.ui.EnumSpriteGroup;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
+import com.robbix.mp5.ui.SpriteSet;
 
 import static com.robbix.mp5.unit.Activity.*;
 
@@ -382,31 +382,16 @@ public class Unit
 		return spriteArgs;
 	}
 	
-	public SpriteGroup getAnimationSequence()
+	public SpriteGroup getAnimationSequence(SpriteLibrary lib)
 	{
-		return type.getSpriteSet().get(getSpriteArgs());
+		SpriteSet set = lib.getUnitSpriteSet(type);
+		return set.get(getSpriteArgs());
 	}
 	
 	public Sprite getSprite(SpriteLibrary lib)
 	{
-		if (type.getSpriteSet() == null)
-		{
-			try
-			{
-				lib.loadModule(type.getName());
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			
-			if (type.getSpriteSet() == null)
-			{
-				throw new Error("Could not load spriteset: " + type.getName());
-			}
-		}
-		
-		SpriteGroup group = getAnimationSequence();
+		SpriteSet set = lib.getUnitSpriteSet(type);
+		SpriteGroup group = set.get(getSpriteArgs());
 		
 		if (group instanceof EnumSpriteGroup)
 		{
@@ -428,7 +413,9 @@ public class Unit
 		}
 		else
 		{
-			return group.getFrame(animationFrame);
+			return group.getFrame(animationFrame
+				% group.getFrameCount());
+			//FIXME: temporary, looping should take care of this
 		}
 	}
 	

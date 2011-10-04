@@ -1221,11 +1221,11 @@ public class DisplayPanel extends JComponent
 			
 			if (map.hasMinePlatform(pos))
 			{
-				draw(g, sprites.getSprite("aCommonMine/platform"), pos);
+				draw(g, sprites.getSprite("aCommonMine", "platform"), pos);
 			}
 			else if (map.hasGeyser(pos))
 			{
-				draw(g, sprites.getSprite("aGeyser/geyser"), pos);
+				draw(g, sprites.getSprite("aGeyser", "geyser"), pos);
 			}
 			
 			dirty.set(pos, false);
@@ -1289,16 +1289,16 @@ public class DisplayPanel extends JComponent
 			
 			if (unit.isIdle())
 			{
-				draw(g, sprites.getSprite("aStructureStatus/idle"), pos);
+				draw(g, sprites.getSprite("aStructureStatus", "idle"), pos);
 			}
 			else if (unit.isDisabled())
 			{
-				SpriteGroup seq = sprites.getSequence("aStructureStatus/disabled");
+				SpriteGroup seq = sprites.getAmbientSpriteGroup("aStructureStatus", "disabled");
 				draw(g, seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount())), pos);
 			}
 			else if (unit.isStructure())
 			{
-				draw(g, sprites.getSprite("aStructureStatus/active"), pos);
+				draw(g, sprites.getSprite("aStructureStatus", "active"), pos);
 			}
 		}
 	}

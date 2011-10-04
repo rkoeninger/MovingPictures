@@ -31,7 +31,6 @@ import com.robbix.mp5.ui.ani.SpriteSequenceAnimation;
 import com.robbix.mp5.ui.ani.WeaponFireAnimation;
 import static com.robbix.mp5.unit.Activity.*;
 
-import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
@@ -300,10 +299,7 @@ public class Mediator
 	
 	public static void doBuild(Unit unit, Position pos)
 	{
-		int buildFrames = panel.getSpriteLibrary().getSequenceLength(
-			Utils.getPath(unit.getType().getName(), BUILD)
-		);
-		
+		int buildFrames = panel.getSpriteLibrary().getUnitSpriteSet(unit.getType()).get(BUILD).getFrameCount();
 		unit.setActivity(BUILD);
 		unit.assignNow(new BuildTask(buildFrames, 100));
 		map.putUnit(unit, pos);
@@ -372,8 +368,7 @@ public class Mediator
 		{
 			Position pos = unit.getPosition();
 			Point point = panel.getPoint(pos);
-			String path = "aDeath/guardPostKilled";
-			SpriteGroup seq = panel.getSpriteLibrary().getSequence(path);
+			SpriteGroup seq = panel.getSpriteLibrary().getAmbientSpriteGroup("aDeath", "guardPostKilled");
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				seq,
 				point,
@@ -387,7 +382,7 @@ public class Mediator
 		{
 			Position pos = unit.getPosition();
 			Point point = panel.getPoint(pos);
-			SpriteGroup seq = unit.getType().getSpriteSet().get(Activity.COLLAPSE);
+			SpriteGroup seq = panel.getSpriteLibrary().getUnitSpriteSet(unit.getType()).get(COLLAPSE);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				seq,
 				unit.getOwner().getColorHue(),
@@ -395,44 +390,44 @@ public class Mediator
 				2
 			));
 			
-			String path = null;
+			String eventName = null;
 			int fpWidth = unit.getFootprint().getWidth();
 			int fpHeight = unit.getFootprint().getHeight();
 			
 			if (fpWidth == 4 && fpHeight == 3)
 			{
-				path = "aDeath/collapseSmoke3";
+				eventName = "collapseSmoke3";
 			}
 			else if (fpWidth == 3 && fpHeight == 3)
 			{
-				path = "aDeath/collapseSmoke2";
+				eventName = "collapseSmoke2";
 			}
 			else if (fpWidth == 5 && fpHeight == 4)
 			{
-				path = "aDeath/collapseSmoke5";
+				eventName = "collapseSmoke5";
 			}
 			else if (fpWidth == 3 && fpHeight == 2)
 			{
-				path = "aDeath/collapseSmoke1";
+				eventName = "collapseSmoke1";
 			}
 			else if (fpWidth == 2 && fpHeight == 2)
 			{
-				path = "aDeath/collapseSmoke6";
+				eventName = "collapseSmoke6";
 			}
 			else if (fpWidth == 2 && fpHeight == 1)
 			{
-				path = "aDeath/collapseSmoke5";
+				eventName = "collapseSmoke5";
 			}
 			else if (fpWidth == 1 && fpHeight == 2)
 			{
-				path = "aDeath/collapseSmoke5";
+				eventName = "collapseSmoke5";
 			}
 			else if (fpWidth == 1 && fpHeight == 1)
 			{
-				path = "aDeath/collapseSmoke5";
+				eventName = "collapseSmoke5";
 			}
 			
-			seq = panel.getSpriteLibrary().getSequence(path);
+			seq = panel.getSpriteLibrary().getAmbientSpriteGroup("aDeath", eventName);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				seq,
 				point,
@@ -443,13 +438,10 @@ public class Mediator
 		}
 		else
 		{
-			String seq = unit.isArachnid()
-				? "aDeath/arachnidKilled"
-				: "aDeath/vehicleKilled";
-			
+			String eventName = unit.isArachnid() ? "arachnidKilled" : "vehicleKilled";
 			map.remove(unit);
 			panel.cueAnimation(new SpriteSequenceAnimation(
-				panel.getSpriteLibrary().getSequence(seq),
+				panel.getSpriteLibrary().getAmbientSpriteGroup("aDeath", eventName),
 				new Point(unit.getAbsX(), unit.getAbsY()),
 				2
 			));
@@ -472,35 +464,39 @@ public class Mediator
 			
 			Position pos = unit.getPosition();
 			
-			String path = null;
+			String setName = null;
+			String eventName = null;
 			double damage = 0;
 			double range = 0;
 			
 			if (unit.isStarflare())
 			{
 				sounds.play("smallExplosion2");
-				path = "aStarflareExplosion/explosion";
+				setName = "aStarflareExplosion";
+				eventName = "explosion";
 				damage = unit.getTurret().getType().getDamage();
 				range = 1.5;
 			}
 			else if (unit.isSupernova())
 			{
 				sounds.play("smallExplosion3");
-				path = "aSupernovaExplosion/explosion";
+				setName = "aSupernovaExplosion";
+				eventName = "explosion";
 				damage = unit.getTurret().getType().getDamage();
 				range = 3;
 			}
 			else
 			{
 				sounds.play("smallExplosion1");
-				path = "aDeath/vehicleSelfDestruct";
+				setName = "aDeath";
+				eventName = "vehicleSelfDestruct";
 				damage = 50;
 				range = 1.5;
 			}
 			
 			map.remove(unit);
 			panel.cueAnimation(new SpriteSequenceAnimation(
-				panel.getSpriteLibrary().getSequence(path),
+				panel.getSpriteLibrary().getAmbientSpriteGroup(setName, eventName),
 				new Point(unit.getAbsX(), unit.getAbsY()),
 				2
 			));
