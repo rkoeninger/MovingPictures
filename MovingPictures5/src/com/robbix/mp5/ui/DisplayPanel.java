@@ -10,11 +10,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-
-import static java.awt.event.KeyEvent.*;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
@@ -59,9 +55,6 @@ public class DisplayPanel extends JComponent
 	private int tileSize = 32;
 	private int scale = 0;
 	private final int minScale, maxScale;
-	private Timer scrollTimer;
-	private int sx, sy;
-	private int scrollSpeed = 16;
 	
 	private Map<Integer, BufferedImage> cachedBackgrounds = null;
 	private Object cacheLock = new Object();
@@ -131,12 +124,10 @@ public class DisplayPanel extends JComponent
 		);
 		setPreferredSize(size);
 		this.cachedBackgrounds = new HashMap<Integer, BufferedImage>();
-		addKeyListener(new KeyEvents());
 		MouseEvents mouseEvents = new MouseEvents();
 		addMouseWheelListener(mouseEvents);
 		addMouseMotionListener(mouseEvents);
 		addMouseListener(mouseEvents);
-		this.scrollTimer = new Timer(20, new DoScroll());
 	}
 	
 	public List<String> getOptionNames()
@@ -481,55 +472,6 @@ public class DisplayPanel extends JComponent
 	public List<AmbientAnimation> getAnimations()
 	{
 		return animations;
-	}
-	
-	private class KeyEvents extends KeyAdapter
-	{
-		public void keyPressed(KeyEvent e)
-		{
-			if (e.getModifiers() == 0)
-			{
-				switch (e.getKeyCode())
-				{
-				case VK_UP:     sy = +scrollSpeed; break;
-				case VK_DOWN:   sy = -scrollSpeed; break;
-				case VK_LEFT:   sx = +scrollSpeed; break;
-				case VK_RIGHT:  sx = -scrollSpeed; break;
-				case VK_MINUS:  zoomOut();         break;
-				case VK_EQUALS: zoomIn();          break;
-				}
-				
-			}
-			
-			if (sx != 0 || sy != 0)
-				scrollTimer.start();
-		}
-		
-		public void keyReleased(KeyEvent e)
-		{
-			if (e.getModifiers() == 0)
-			{
-				switch (e.getKeyCode())
-				{
-				case VK_UP:
-				case VK_DOWN:   sy = 0; break;
-				case VK_LEFT:
-				case VK_RIGHT:  sx = 0; break;
-				}
-			}
-			
-			if (sx == 0 && sy == 0)
-				scrollTimer.stop();
-		}
-	}
-	
-	private class DoScroll implements ActionListener
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			shiftViewPosition(sx, sy);
-			repaint();
-		}
 	}
 	
 	private class MouseEvents extends MouseAdapter

@@ -369,6 +369,7 @@ public class Sandbox
 		final JMenuItem exitMenuItem = new JMenuItem("Exit");
 		final JMenuItem scrollBarsMenuItem = new JMenuItem("Scroll Bars");
 		final JMenuItem frameRateMenuItem = new JMenuItem("Frame Rate");
+		final JMenuItem scrollSpeedMenuItem = new JMenuItem("Scroll Speed");
 		final JMenu disastersMenu = new JMenu("Disasters");
 		final JMenuItem spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
 		final JMenuItem meteorShowerMenuItem = new JMenuItem("Meteor Shower");
@@ -532,6 +533,7 @@ public class Sandbox
 		
 		displayMenu.add(scrollBarsMenuItem);
 		displayMenu.add(frameRateMenuItem);
+		displayMenu.add(scrollSpeedMenuItem);
 		
 		pauseMenuItem.setAccelerator(
 			KeyStroke.getKeyStroke(KeyEvent.VK_PAUSE, 0)
@@ -590,7 +592,7 @@ public class Sandbox
 		frame.setJMenuBar(menuBar);
 		frame.setLayout(new BorderLayout());
 //		frame.add(commandBar, BorderLayout.EAST);
-		frame.add(panel, BorderLayout.CENTER);
+		frame.add(game.getView(), BorderLayout.CENTER);
 		frame.add(statusesPanel, BorderLayout.SOUTH);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setIconImages(Arrays.asList(smallIcon, mediumIcon));
@@ -640,11 +642,39 @@ public class Sandbox
 			}
 		});
 		
+		scrollSpeedMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				for (;;)
+				{
+					String result = JOptionPane.showInputDialog(
+						frame,
+						"Scroll Speed (1+)",
+						String.valueOf(game.getView().getScrollSpeed())
+					);
+					
+					if (result == null)
+						return;
+					
+					try
+					{
+						game.getView().setScrollSpeed(Integer.parseInt(result));
+						break;
+					}
+					catch (NumberFormatException nfe)
+					{
+						continue;
+					}
+				}
+			}
+		});
+		
 		scrollBarsMenuItem.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				// TODO: show/hide scroll bars
+				game.getView().showScrollBars(! game.getView().areScrollBarsVisible());
 			}
 		});
 		
