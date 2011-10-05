@@ -59,6 +59,9 @@ public class DisplayPanel extends JComponent
 	private int tileSize = 32;
 	private int scale = 0;
 	private final int minScale, maxScale;
+	private Timer scrollTimer;
+	private int sx, sy;
+	private int scrollSpeed = 16;
 	
 	private Map<Integer, BufferedImage> cachedBackgrounds = null;
 	private Object cacheLock = new Object();
@@ -133,6 +136,7 @@ public class DisplayPanel extends JComponent
 		addMouseWheelListener(mouseEvents);
 		addMouseMotionListener(mouseEvents);
 		addMouseListener(mouseEvents);
+		this.scrollTimer = new Timer(20, new DoScroll());
 	}
 	
 	public List<String> getOptionNames()
@@ -483,16 +487,47 @@ public class DisplayPanel extends JComponent
 	{
 		public void keyPressed(KeyEvent e)
 		{
-			switch (e.getKeyCode())
+			if (e.getModifiers() == 0)
 			{
-			case VK_UP:     scrollUp();    break;
-			case VK_DOWN:   scrollDown();  break;
-			case VK_LEFT:   scrollLeft();  break;
-			case VK_RIGHT:  scrollRight(); break;
-			case VK_MINUS:  zoomOut();     break;
-			case VK_EQUALS: zoomIn();      break;
+				switch (e.getKeyCode())
+				{
+				case VK_UP:     sy = +scrollSpeed; break;
+				case VK_DOWN:   sy = -scrollSpeed; break;
+				case VK_LEFT:   sx = +scrollSpeed; break;
+				case VK_RIGHT:  sx = -scrollSpeed; break;
+				case VK_MINUS:  zoomOut();         break;
+				case VK_EQUALS: zoomIn();          break;
+				}
+				
 			}
 			
+			if (sx != 0 || sy != 0)
+				scrollTimer.start();
+		}
+		
+		public void keyReleased(KeyEvent e)
+		{
+			if (e.getModifiers() == 0)
+			{
+				switch (e.getKeyCode())
+				{
+				case VK_UP:
+				case VK_DOWN:   sy = 0; break;
+				case VK_LEFT:
+				case VK_RIGHT:  sx = 0; break;
+				}
+			}
+			
+			if (sx == 0 && sy == 0)
+				scrollTimer.stop();
+		}
+	}
+	
+	private class DoScroll implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			shiftViewPosition(sx, sy);
 			repaint();
 		}
 	}
@@ -632,46 +667,6 @@ public class DisplayPanel extends JComponent
 			: Math.max(Math.min(scrollPoint.y, 0), diffHeight);
 		
 		refresh(getDisplayRegion());
-	}
-	
-	public void scrollUp()
-	{
-		if (getTotalHeight() > getHeight())
-		{
-			scrollPoint.y += Math.max(1, tileSize / 2);
-			scrollPoint.y = Math.min(scrollPoint.y, 0);
-			refresh(getDisplayRegion());
-		}
-	}
-	
-	public void scrollDown()
-	{
-		if (getTotalHeight() > getHeight())
-		{
-			scrollPoint.y -= Math.max(1, tileSize / 2);
-			scrollPoint.y = Math.max(scrollPoint.y, getHeight() - getTotalHeight());
-			refresh(getDisplayRegion());
-		}
-	}
-	
-	public void scrollLeft()
-	{
-		if (getTotalWidth() > getWidth())
-		{
-			scrollPoint.x += Math.max(1, tileSize / 2);
-			scrollPoint.x = Math.min(scrollPoint.x, 0);
-			refresh(getDisplayRegion());
-		}
-	}
-	
-	public void scrollRight()
-	{
-		if (getTotalWidth() > getWidth())
-		{
-			scrollPoint.x -= Math.max(1, tileSize / 2);
-			scrollPoint.x = Math.max(scrollPoint.x, getWidth() - getTotalWidth());
-			refresh(getDisplayRegion());
-		}
 	}
 	
 	public void zoomIn()
