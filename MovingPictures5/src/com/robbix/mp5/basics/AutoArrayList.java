@@ -11,6 +11,14 @@ public class AutoArrayList<E> extends ArrayList<E>
 {
 	private static final long serialVersionUID = 2683149508996716586L;
 	
+	public E get(int index)
+	{
+		if (index < 0 || index >= size())
+			return null;
+		
+		return super.get(index);
+	}
+	
 	public E set(int index, E element)
 	{
 		int newSize = index + 1;

@@ -1,4 +1,4 @@
-package com.robbix.mp5;
+package com.robbix.mp5.map;
 
 public enum ResourceType
 {

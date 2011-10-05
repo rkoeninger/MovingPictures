@@ -41,6 +41,7 @@ import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.CommandButton;
 import com.robbix.mp5.ui.DisplayPanel;

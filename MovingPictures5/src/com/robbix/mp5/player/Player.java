@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.EnumMap;
 import java.util.Map;
 
-import com.robbix.mp5.ResourceType;
+import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.unit.Cost;
 import com.robbix.mp5.unit.Unit;
 

@@ -1,6 +1,6 @@
 package com.robbix.mp5.unit;
 
-import com.robbix.mp5.ResourceType;
+import com.robbix.mp5.map.ResourceType;
 
 public class Cargo
 {

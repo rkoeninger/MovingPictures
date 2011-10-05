@@ -29,7 +29,6 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.CostMap;
 import com.robbix.mp5.basics.Filter;
@@ -38,6 +37,7 @@ import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.map.TileSet;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.ani.AmbientAnimation;
@@ -1245,7 +1245,7 @@ public class DisplayPanel extends JComponent
 			return;
 		}
 		
-		Sprite sprite = unit.getSprite(sprites);
+		Sprite sprite = sprites.getSprite(unit);
 		Point unitPoint = new Point(unit.getAbsX(), unit.getAbsY());
 		
 		if (showUnitLayerState && !unit.isTurret())

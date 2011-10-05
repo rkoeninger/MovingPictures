@@ -8,13 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.XNode;
 import com.robbix.mp5.ai.task.SelfDestructAttackTask;
 import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.ai.task.TurretTask;
 import com.robbix.mp5.basics.FileFormatException;
 import com.robbix.mp5.basics.Filter;
+import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
 
 public class UnitFactory

@@ -8,7 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.robbix.mp5.ResourceType;
+import com.robbix.mp5.Mediator;
+import com.robbix.mp5.ModuleEvent;
+import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.AutoArrayList;
 import com.robbix.mp5.basics.Direction;
@@ -16,11 +18,17 @@ import com.robbix.mp5.map.ResourceDeposit;
 import static com.robbix.mp5.unit.Activity.*;
 
 import com.robbix.mp5.unit.Footprint;
+import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
 
 public class SpriteLibrary
 {
+	public static SpriteLibrary load(File rootDir, boolean lazy) throws IOException
+	{
+		return lazy ? loadLazy(rootDir) : preload(rootDir);
+	}
+	
 	public static SpriteLibrary loadLazy(File rootDir)
 	{
 		SpriteLibrary library = new SpriteLibrary();
@@ -48,7 +56,49 @@ public class SpriteLibrary
 		return library;
 	}
 	
-	public void loadModule(File xmlFile) throws IOException
+	private List<SpriteSet> unitSets; // indexed by UnitType.serial
+	private HashMap<String, SpriteSet> ambientSets; // indexed by eventName
+	
+	private File rootDir;
+
+	private Set<String> loadedModules;
+	private Set<ModuleListener> listeners;
+	
+	public SpriteLibrary()
+	{
+		loadedModules = new HashSet<String>(64);
+		unitSets = new AutoArrayList<SpriteSet>();
+		ambientSets = new HashMap<String, SpriteSet>(256);
+		listeners = new HashSet<ModuleListener>();
+	}
+	
+	public void addModuleListener(ModuleListener listener)
+	{
+		listeners.add(listener);
+	}
+	
+	public void removeModuleListener(ModuleListener listener)
+	{
+		listeners.remove(listener);
+	}
+	
+	private void fireModuleLoaded(String name)
+	{
+		ModuleEvent event = new ModuleEvent(this, name);
+		
+		for (ModuleListener listener : listeners)
+			listener.moduleLoaded(event);
+	}
+	
+	private void fireModuleUnloaded(String name)
+	{
+		ModuleEvent event = new ModuleEvent(this, name);
+		
+		for (ModuleListener listener : listeners)
+			listener.moduleUnloaded(event);
+	}
+	
+	public SpriteSet loadModule(File xmlFile) throws IOException
 	{
 		String moduleName = 
 			xmlFile.isDirectory()
@@ -56,30 +106,57 @@ public class SpriteLibrary
 			: xmlFile.getParentFile().getName();
 		
 		if (loadedModules.contains(moduleName))
-			return;
+			return getSpriteSet(moduleName);
 		
-		new SpriteSetXMLLoader(unitSets, ambientSets).load(xmlFile);
+		SpriteSet set = new SpriteSetXMLLoader(xmlFile).load();
+		Class<?>[] params = set.getParameterList();
+		
+		if (params.length == 1 && params[0].equals(String.class))
+		{
+			ambientSets.put(set.getName(), set);
+		}
+		else
+		{
+			UnitType type = Mediator.factory.getType(set.getName());
+			unitSets.set(type.getSerial(), set);
+		}
 		
 		loadedModules.add(moduleName);
+		fireModuleLoaded(moduleName);
+		return set;
 	}
 	
-	public void loadModule(String name) throws IOException
+	public SpriteSet loadModule(String name) throws IOException
 	{
-		loadModule(new File(rootDir, name));
+		return loadModule(new File(rootDir, name));
 	}
 	
-	private Set<String> loadedModules;
-	
-	private List<SpriteSet> unitSets; // indexed by UnitType.serial
-	private HashMap<String, SpriteSet> ambientSets; // indexed by eventName
-	
-	private File rootDir;
-	
-	public SpriteLibrary()
+	public boolean isLoaded(String module)
 	{
-		loadedModules = new HashSet<String>(64);
-		unitSets = new AutoArrayList<SpriteSet>();
-		ambientSets = new HashMap<String, SpriteSet>(256);
+		return loadedModules.contains(module);
+	}
+	
+	public boolean unloadModule(String name)
+	{
+		if (ambientSets.containsKey(name))
+		{
+			ambientSets.remove(name);
+			loadedModules.remove(name);
+			fireModuleUnloaded(name);
+			return true;
+		}
+		
+		UnitType type = Mediator.factory.getType(name);
+		
+		if (type != null)
+		{
+			unitSets.set(type.getSerial(), null);
+			loadedModules.remove(name);
+			fireModuleUnloaded(name);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public Set<String> getLoadedUnitModules()
@@ -96,6 +173,19 @@ public class SpriteLibrary
 	public Set<String> getLoadedAmbientModules()
 	{
 		return ambientSets.keySet();
+	}
+	
+	public SpriteSet getSpriteSet(String name)
+	{
+		if (ambientSets.containsKey(name))
+			return ambientSets.get(name);
+		
+		UnitType type = Mediator.factory.getType(name);
+		
+		if (type == null)
+			return null;
+		
+		return unitSets.get(type.getSerial());
 	}
 	
 	public SpriteSet getUnitSpriteSet(UnitType type)
@@ -164,11 +254,7 @@ public class SpriteLibrary
 	
 	public SpriteGroup getSpriteGroup(ResourceDeposit res)
 	{
-		String resName = res.getType() == ResourceType.COMMON_ORE
-			? "common"
-			: "rare";
-		resName += (res.getYieldRange().ordinal() + 1);
-		return getAmbientSpriteGroup("aResource", resName);
+		return getAmbientSpriteGroup("aResource", res.toString());
 	}
 	
 	public Sprite getSprite(String setName, String eventName)
@@ -219,6 +305,37 @@ public class SpriteLibrary
 		}
 		
 		return set.get(spriteArgs).getFirst();
+	}
+	
+	public Sprite getSprite(Unit unit)
+	{
+		SpriteSet set = getUnitSpriteSet(unit.getType());
+		SpriteGroup group = set.get(unit.getSpriteArgs());
+		
+		if (group instanceof EnumSpriteGroup)
+		{
+			EnumSpriteGroup<?> enumGroup = (EnumSpriteGroup<?>) group;
+			Class<?> enumClass = enumGroup.getEnumType();
+			
+			if (enumClass.equals(Direction.class))
+			{
+				return enumGroup.getFrame(unit.getDirection().ordinal());
+			}
+			else if (enumClass.equals(HealthBracket.class))
+			{
+				return enumGroup.getFrame(unit.getHealthBracket().ordinal());
+			}
+			else
+			{
+				throw new Error("Unsupported enum type" + enumClass);
+			}
+		}
+		else
+		{
+			return group.getFrame(unit.getAnimationFrame()
+				% group.getFrameCount());
+			//FIXME: temporary, group looping should take care of this
+		}
 	}
 	
 	public Sprite getShadow(Unit unit)

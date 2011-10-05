@@ -1,6 +1,5 @@
 package com.robbix.mp5.map;
 
-import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
@@ -191,5 +190,13 @@ public class ResourceDeposit implements Cloneable
 	public boolean isSurveyedBy(Player player)
 	{
 		return true;
+	}
+	
+	public String toString()
+	{
+		String resName = type == ResourceType.COMMON_ORE
+			? "common"
+			: "rare";
+		return resName + (range.ordinal() + 1);
 	}
 }

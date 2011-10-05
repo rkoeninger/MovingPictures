@@ -3,7 +3,7 @@ package com.robbix.mp5.unit;
 import java.util.Collections;
 import java.util.Map;
 
-import com.robbix.mp5.ResourceType;
+import com.robbix.mp5.map.ResourceType;
 
 public class Cost
 {

@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
@@ -48,7 +48,7 @@ public class PlaceUnitOverlay extends InputOverlay
 			if (unitSprite == null)
 			{
 				int hue = unit.getOwner().getColorHue();
-				unitSprite = unit.getSprite(panel.getSpriteLibrary());
+				unitSprite = panel.getSpriteLibrary().getSprite(unit);
 				unitSprite = Utils.getTranslucency(unitSprite, hue, 0.5f);
 			}
 			
@@ -56,7 +56,7 @@ public class PlaceUnitOverlay extends InputOverlay
 			{
 				Unit turret = unit.getTurret();
 				int hue = unit.getOwner().getColorHue();
-				turretSprite = turret.getSprite(panel.getSpriteLibrary());
+				turretSprite = panel.getSpriteLibrary().getSprite(turret);
 				turretSprite = Utils.getTranslucency(turretSprite, hue, 0.5f);
 			}
 			

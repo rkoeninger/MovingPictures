@@ -34,14 +34,8 @@ public class Game
 		game.tileSet = TileSet.load(new File(root, "tileset"), tileSetName);
 		game.map = LayeredMap.load(new File(root, "terrain"), mapName, game.tileSet);
 		Mediator.initCache(game.map.getWidth(), game.map.getHeight());
-		game.spriteLib =
-			lazySprites
-			? SpriteLibrary.loadLazy(new File(root, "sprites"))
-			: SpriteLibrary.preload(new File(root, "sprites"));
-		game.sounds =
-			lazySounds
-			? SoundBank.loadLazy(new File(root, "sounds"))
-			: SoundBank.preload(new File(root, "sounds"));
+		game.spriteLib = SpriteLibrary.load(new File(root, "sprites"), lazySprites);
+		game.sounds = SoundBank.load(new File(root, "sounds"), lazySounds);
 		game.cursorSet = CursorSet.load(new File(root, "cursors"));
 		game.panel = new DisplayPanel(
 			game.map,

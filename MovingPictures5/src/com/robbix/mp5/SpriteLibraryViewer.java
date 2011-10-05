@@ -15,7 +15,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
@@ -68,9 +71,7 @@ public class SpriteLibraryViewer extends JFrame
 		
 		Sandbox.trySystemLookAndFeel();
 		Mediator.factory = UnitFactory.load(new File("./res/units"));
-		SpriteLibrary lib = lazy
-			? SpriteLibrary.loadLazy(new File("./res/sprites"))
-			: SpriteLibrary.preload(new File("./res/sprites"));
+		SpriteLibrary lib = SpriteLibrary.load(new File("./res/sprites"), lazy);
 		JFrame slViewer = new SpriteLibraryViewer(lib, new Integer[]{240});
 		slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 		slViewer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -89,26 +90,33 @@ public class SpriteLibraryViewer extends JFrame
 	{
 		super("Sprite Library Viewer");
 		this.lib = lib;
+		lib.addModuleListener(new ModuleListener(){
+			public void moduleLoaded(ModuleEvent e) {buildTree();}
+			public void moduleUnloaded(ModuleEvent e) {buildTree();}
+		});
 		rootNode = new SLTreeNode("Sprite Library");
 		rootNode.setSLObject(lib);
 		treeModel = new DefaultTreeModel(rootNode);
-		loadTree();
 		tree = new JTree(treeModel);
 		tree.getSelectionModel().setSelectionMode(
 			TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.setEditable(true);
 		tree.setShowsRootHandles(false);
+		buildTree();
 		preview = new PreviewPanel(playerHues);
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		splitPane.setLeftComponent(new JScrollPane(tree));
 		splitPane.setRightComponent(preview);
 		JMenuBar menuBar = new JMenuBar();
-		JMenu loadMenu = new JMenu("Load");
+		JMenu moduleMenu = new JMenu("Module");
 		final JMenuItem loadByNameMenuItem = new JMenuItem("By Name...");
 		final JMenuItem loadFromFileMenuItem = new JMenuItem("From File...");
-		loadMenu.add(loadByNameMenuItem);
-		loadMenu.add(loadFromFileMenuItem);
-		menuBar.add(loadMenu);
+		final JMenuItem unloadMenuItem = new JMenuItem("Unload...");
+		moduleMenu.add(loadByNameMenuItem);
+		moduleMenu.add(loadFromFileMenuItem);
+		moduleMenu.addSeparator();
+		moduleMenu.add(unloadMenuItem);
+		menuBar.add(moduleMenu);
 		setJMenuBar(menuBar);
 		setLayout(new BorderLayout());
 		add(splitPane, BorderLayout.CENTER);
@@ -132,7 +140,7 @@ public class SpriteLibraryViewer extends JFrame
 				String moduleList = JOptionPane.showInputDialog(
 					SpriteLibraryViewer.this,
 					"Module Name (separate multiple names with commas):",
-					"Load Module",
+					"Load Module(s)",
 					JOptionPane.QUESTION_MESSAGE
 				);
 				
@@ -145,9 +153,8 @@ public class SpriteLibraryViewer extends JFrame
 					{
 						moduleName = moduleName.trim();
 						lib.loadModule(moduleName);
-						appendSpriteSet(moduleName, true);
 					}
-					tree.expandRow(0);
+					buildTree();
 					SpriteLibraryViewer.this.repaint();
 				}
 				catch (IOException ioe)
@@ -188,11 +195,7 @@ public class SpriteLibraryViewer extends JFrame
 				try
 				{
 					lib.loadModule(file);
-					String moduleName = file.isDirectory()
-						? file.getName()
-						: file.getParentFile().getName();
-					appendSpriteSet(moduleName, true);
-					tree.expandRow(0);
+					buildTree();
 					SpriteLibraryViewer.this.repaint();
 				}
 				catch (IOException ioe)
@@ -205,6 +208,31 @@ public class SpriteLibraryViewer extends JFrame
 						JOptionPane.ERROR_MESSAGE
 					);
 				}
+			}
+		});
+		
+		unloadMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String moduleList = JOptionPane.showInputDialog(
+					SpriteLibraryViewer.this,
+					"Module Name (separate multiple names with commas):",
+					"Unload Module(s)",
+					JOptionPane.QUESTION_MESSAGE
+				);
+				
+				if (moduleList == null)
+					return;
+				
+				for (String moduleName : moduleList.split(","))
+				{
+					moduleName = moduleName.trim();
+					lib.unloadModule(moduleName);
+				}
+				
+				buildTree();
+				SpriteLibraryViewer.this.repaint();
 			}
 		});
 		
@@ -234,20 +262,25 @@ public class SpriteLibraryViewer extends JFrame
 		});
 	}
 	
-	private void loadTree()
+	private void buildTree()
 	{
-		for (String ambientSetName : lib.getLoadedAmbientModules())
+		while (rootNode.getChildCount() > 0)
 		{
-			SpriteSet ambientSet = lib.getAmbientSpriteSet(ambientSetName);
-			appendAmbientSet(ambientSet);
+			MutableTreeNode child = (MutableTreeNode) rootNode.getChildAt(0);
+			treeModel.removeNodeFromParent(child);
 		}
 		
-		for (String unitSetName : lib.getLoadedUnitModules())
+		List<String> setNames = new ArrayList<String>();
+		setNames.addAll(lib.getLoadedAmbientModules());
+		setNames.addAll(lib.getLoadedUnitModules());
+		Collections.sort(setNames);
+		
+		for (String name : setNames)
 		{
-			UnitType type = Mediator.factory.getType(unitSetName);
-			SpriteSet unitSet = lib.getUnitSpriteSet(type);
-			appendUnitSet(unitSet, type);
+			appendSpriteSet(name, false);
 		}
+		
+		tree.expandRow(0);
 	}
 	
 	private void appendSpriteSet(String moduleName, boolean scroll)
@@ -264,11 +297,6 @@ public class SpriteLibraryViewer extends JFrame
 		{
 			appendAmbientSet(spriteSet, scroll);
 		}
-	}
-	
-	private void appendAmbientSet(SpriteSet ambientSet)
-	{
-		appendAmbientSet(ambientSet, false);
 	}
 	
 	private void appendAmbientSet(SpriteSet ambientSet, boolean scroll)
@@ -297,11 +325,6 @@ public class SpriteLibraryViewer extends JFrame
 		
 		if (scroll)
 			tree.scrollPathToVisible(new TreePath(setNode.getPath()));
-	}
-
-	private void appendUnitSet(SpriteSet unitSet, UnitType type)
-	{
-		appendUnitSet(unitSet, type, false);
 	}
 	
 	private void appendUnitSet(SpriteSet unitSet, UnitType type, boolean scroll)
@@ -539,7 +562,7 @@ public class SpriteLibraryViewer extends JFrame
 				{
 					Image img = sprite.getImage();
 					int baseHue = sprite.getBaseTeamHue();
-					if (baseHue != hue)
+					if (baseHue != hue && baseHue >= 0 && baseHue < 360)
 						img = Utils.recolorUnit((BufferedImage) img, baseHue, hue);
 					int x = (getWidth()  - w) / 2 + sprite.getXOffset();
 					int y = (getHeight() - h) / 2 + sprite.getYOffset();

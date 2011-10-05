@@ -5,11 +5,11 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.ResourceType;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.BuildTask;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.ui.Sprite;
 import static com.robbix.mp5.unit.Activity.*;
 

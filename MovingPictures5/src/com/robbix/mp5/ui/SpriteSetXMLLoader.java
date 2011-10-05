@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.XNode;
 import com.robbix.mp5.basics.AutoArrayList;
@@ -22,7 +21,6 @@ import com.robbix.mp5.basics.Offset;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.HealthBracket;
-import com.robbix.mp5.unit.UnitType;
 
 import static com.robbix.mp5.unit.Activity.*;
 
@@ -35,40 +33,35 @@ import static com.robbix.mp5.unit.Activity.*;
  */
 class SpriteSetXMLLoader
 {
-	private List<SpriteSet> unitSets;
-	private Map<String, SpriteSet> ambientSets;
-	
 	private Map<String, List<XNode>> offsetFrameMap;
 	private File xmlFile;
 	
 	private List<Sprite> tempList = new AutoArrayList<Sprite>();
 	
-	public SpriteSetXMLLoader(
-		List<SpriteSet> unitSets,
-		Map<String, SpriteSet> ambientSets)
-	{
-		this.unitSets = unitSets;
-		this.ambientSets = ambientSets;
-	}
-	
-	public void load(File xmlFile) throws IOException
+	public SpriteSetXMLLoader(File xmlFile)
 	{
 		if (xmlFile.isDirectory())
 			xmlFile = new File(xmlFile, "info.xml");
 		
-		this.xmlFile = xmlFile;
+		if (!xmlFile.exists() || !xmlFile.isFile() || !xmlFile.getName().endsWith(".xml"))
+			throw new IllegalArgumentException(xmlFile + " not valid");
 		
+		this.xmlFile = xmlFile;
+	}
+	
+	public SpriteSet load() throws IOException
+	{
 		XNode rootNode = new XNode(xmlFile, false).getNode("SpriteSet");
 		
 		offsetFrameMap = getOffsetFrameMap(rootNode);
 		String type = rootNode.getAttribute("type");
 		File rootDir = xmlFile.getParentFile();
 		
-		if      (type.equals("vehicle"))   loadVehicle  (rootDir, rootNode);
-		else if (type.equals("turret"))    loadTurret   (rootDir, rootNode);
-		else if (type.equals("guardPost")) loadGuardPost(rootDir, rootNode);
-		else if (type.equals("structure")) loadStructure(rootDir, rootNode);
-		else if (type.equals("ambient"))   loadAmbient  (rootDir, rootNode);
+		if      (type.equals("vehicle"))   return loadVehicle  (rootDir, rootNode);
+		else if (type.equals("turret"))    return loadTurret   (rootDir, rootNode);
+		else if (type.equals("guardPost")) return loadGuardPost(rootDir, rootNode);
+		else if (type.equals("structure")) return loadStructure(rootDir, rootNode);
+		else if (type.equals("ambient"))   return loadAmbient  (rootDir, rootNode);
 		else
 		{
 			throw new FileFormatException(xmlFile, "Not a valid SpriteSet type");
@@ -78,7 +71,7 @@ class SpriteSetXMLLoader
 	/**
 	 * Loads vehicle activities/frames.
 	 */
-	public void loadVehicle(File dir, XNode rootNode) throws IOException
+	public SpriteSet loadVehicle(File dir, XNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
 		Color color = rootNode.getColorAttribute("color");
@@ -267,14 +260,13 @@ class SpriteSetXMLLoader
 			}
 		}
 		
-		UnitType type = Mediator.factory.getType(unitType);
-		unitSets.set(type.getSerial(), spriteSet);
+		return spriteSet;
 	}
 	
 	/**
 	 * Loads structure frames.
 	 */
-	public void loadStructure(File dir, XNode rootNode) throws IOException
+	public SpriteSet loadStructure(File dir, XNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
 		Color color = rootNode.getColorAttribute("color");
@@ -364,14 +356,13 @@ class SpriteSetXMLLoader
 			}
 		}
 		
-		UnitType type = Mediator.factory.getType(unitType);
-		unitSets.set(type.getSerial(), spriteSet);
+		return spriteSet;
 	}
 	
 	/**
 	 * Loads sprites for a turret and hotspot info.
 	 */
-	public void loadTurret(File dir, XNode rootNode) throws IOException
+	public SpriteSet loadTurret(File dir, XNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
 		Color color = rootNode.getColorAttribute("color");
@@ -421,14 +412,13 @@ class SpriteSetXMLLoader
 		
 		SpriteGroup group = new EnumSpriteGroup<Direction>(Direction.class, tempList);
 		spriteSet.set(group, activity);
-		UnitType type = Mediator.factory.getType(unitType);
-		unitSets.set(type.getSerial(), spriteSet);
+		return spriteSet;
 	}
 	
 	/**
 	 * Loads sprites for a turret and hotspot info.
 	 */
-	public void loadGuardPost(File dir, XNode rootNode) throws IOException
+	public SpriteSet loadGuardPost(File dir, XNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
 		Color color = rootNode.getColorAttribute("color");
@@ -504,14 +494,13 @@ class SpriteSetXMLLoader
 			}
 		}
 		
-		UnitType type = Mediator.factory.getType(unitType);
-		unitSets.set(type.getSerial(), spriteSet);
+		return spriteSet;
 	}
 	
 	/**
 	 * Loads an Ambient sequence.
 	 */
-	public void loadAmbient(File dir, XNode rootNode) throws IOException
+	public SpriteSet loadAmbient(File dir, XNode rootNode) throws IOException
 	{
 		String eventType = rootNode.getAttribute("eventType");
 		double trans = rootNode.getFloatAttribute("translucency", 1.0);
@@ -551,7 +540,7 @@ class SpriteSetXMLLoader
 			spriteSet.set(group, eventName);
 		}
 		
-		ambientSets.put(eventType, spriteSet);
+		return spriteSet;
 	}
 	
 	public static Image loadFrame(File dir, int fileNumber) throws IOException

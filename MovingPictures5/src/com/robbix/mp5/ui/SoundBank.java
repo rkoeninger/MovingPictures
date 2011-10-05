@@ -3,13 +3,23 @@ package com.robbix.mp5.ui;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
+import com.robbix.mp5.ModuleEvent;
+import com.robbix.mp5.ModuleListener;
+
 public class SoundBank
 {
+	public static SoundBank load(File rootDir, boolean lazy) throws IOException
+	{
+		return lazy ? loadLazy(rootDir) : preload(rootDir);
+	}
+	
 	public static SoundBank preload(File rootDir) throws IOException
 	{
 		SoundBank sounds = new SoundBank();
@@ -57,8 +67,48 @@ public class SoundBank
 		sounds.rootDir = rootDir;
 		return sounds;
 	}
-
-	public void load(String name)
+	
+	private Map<String, Clip> clips, musics;
+	private Clip currentMusic;
+	private boolean running;
+	private File rootDir;
+	private Set<ModuleListener> listeners;
+	
+	private SoundBank()
+	{
+		clips   = new HashMap<String, Clip>();
+		musics  = new HashMap<String, Clip>();
+		running = false;
+		listeners = new HashSet<ModuleListener>();
+	}
+	
+	public void addModuleListener(ModuleListener listener)
+	{
+		listeners.add(listener);
+	}
+	
+	public void removeModuleListener(ModuleListener listener)
+	{
+		listeners.remove(listener);
+	}
+	
+	private void fireModuleLoaded(String name)
+	{
+		ModuleEvent event = new ModuleEvent(this, name);
+		
+		for (ModuleListener listener : listeners)
+			listener.moduleLoaded(event);
+	}
+	
+	private void fireModuleUnloaded(String name)
+	{
+		ModuleEvent event = new ModuleEvent(this, name);
+		
+		for (ModuleListener listener : listeners)
+			listener.moduleUnloaded(event);
+	}
+	
+	public void loadModule(String name)
 	{
 		try
 		{
@@ -66,6 +116,7 @@ public class SoundBank
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(file));
 			clips.put(name, clip);
+			fireModuleLoaded(name);
 		}
 		catch (Exception e)
 		{
@@ -81,6 +132,7 @@ public class SoundBank
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(file));
 			musics.put(name, clip);
+			fireModuleLoaded(name);
 		}
 		catch (Exception e)
 		{
@@ -88,16 +140,28 @@ public class SoundBank
 		}
 	}
 	
-	private Map<String, Clip> clips, musics;
-	private Clip currentMusic;
-	private boolean running;
-	private File rootDir;
-	
-	private SoundBank()
+	public boolean isLoaded(String name)
 	{
-		clips   = new HashMap<String, Clip>();
-		musics  = new HashMap<String, Clip>();
-		running = false;
+		return clips.containsKey(name) || musics.containsKey(name);
+	}
+	
+	public boolean unloadModule(String name)
+	{
+		if (clips.containsKey(name))
+		{
+			clips.remove(name);
+		}
+		else if (musics.containsKey(name))
+		{
+			musics.remove(name);
+		}
+		else
+		{
+			return false;
+		}
+		
+		fireModuleUnloaded(name);
+		return true;
 	}
 	
 	/**
@@ -113,12 +177,13 @@ public class SoundBank
 		
 		if (clip == null)
 		{
-			load(name);
+			loadModule(name);
 			clip = clips.get(name);
 			
 			if (clip == null)
 			{
-				throw new IllegalArgumentException(name + " not found");
+				System.err.println("soundbite " + name + " not found");
+				return;
 			}
 		}
 		
@@ -145,7 +210,8 @@ public class SoundBank
 			
 			if (currentMusic == null)
 			{
-				throw new IllegalArgumentException(name + " not found");
+				System.err.println("music " + name + " not found");
+				return;
 			}
 		}
 		

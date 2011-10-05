@@ -4,10 +4,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteLibrary;
+import com.robbix.mp5.ui.TurretSprite;
 import com.robbix.mp5.unit.Unit;
 
 public abstract class WeaponFireAnimation extends AmbientAnimation
@@ -31,10 +31,8 @@ public abstract class WeaponFireAnimation extends AmbientAnimation
 		
 		SpriteLibrary lib = map.getDisplayPanel().getSpriteLibrary();
 		
-		Point hotspot = lib.getHotspot(turret, Direction.getDirection(
-			attacker.getPosition(), target.getPosition()));
-		
-		Sprite turretSprite = turret.getSprite(lib);
+		Sprite turretSprite = lib.getSprite(turret);
+		Point hotspot = ((TurretSprite) turretSprite).getHotspot();
 		
 		int xSpriteOffset = turretSprite.getXOffset() + hotspot.x;
 		int ySpriteOffset = turretSprite.getYOffset() + hotspot.y;

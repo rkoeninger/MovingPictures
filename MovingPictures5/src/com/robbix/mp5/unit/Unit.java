@@ -12,11 +12,6 @@ import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
-import com.robbix.mp5.ui.EnumSpriteGroup;
-import com.robbix.mp5.ui.Sprite;
-import com.robbix.mp5.ui.SpriteGroup;
-import com.robbix.mp5.ui.SpriteLibrary;
-import com.robbix.mp5.ui.SpriteSet;
 
 import static com.robbix.mp5.unit.Activity.*;
 
@@ -380,43 +375,6 @@ public class Unit
 		}
 		
 		return spriteArgs;
-	}
-	
-	public SpriteGroup getAnimationSequence(SpriteLibrary lib)
-	{
-		SpriteSet set = lib.getUnitSpriteSet(type);
-		return set.get(getSpriteArgs());
-	}
-	
-	public Sprite getSprite(SpriteLibrary lib)
-	{
-		SpriteSet set = lib.getUnitSpriteSet(type);
-		SpriteGroup group = set.get(getSpriteArgs());
-		
-		if (group instanceof EnumSpriteGroup)
-		{
-			EnumSpriteGroup<?> enumGroup = (EnumSpriteGroup<?>) group;
-			Class<?> enumClass = enumGroup.getEnumType();
-			
-			if (enumClass.equals(Direction.class))
-			{
-				return enumGroup.getFrame(dir.ordinal());
-			}
-			else if (enumClass.equals(HealthBracket.class))
-			{
-				return enumGroup.getFrame(getHealthBracket().ordinal());
-			}
-			else
-			{
-				throw new Error("Unsupported enum type" + enumClass);
-			}
-		}
-		else
-		{
-			return group.getFrame(animationFrame
-				% group.getFrameCount());
-			//FIXME: temporary, looping should take care of this
-		}
 	}
 	
 	public int getAnimationFrame()
