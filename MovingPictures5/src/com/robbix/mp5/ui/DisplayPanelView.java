@@ -32,12 +32,13 @@ public class DisplayPanelView extends JComponent
 	private int scrollSpeed = 16;
 	private JScrollBar vScrollBar;
 	private JScrollBar hScrollBar;
+	private boolean scrollBarsVisible = false;
 	
 	public DisplayPanelView(DisplayPanel panel)
 	{
 		this.panel = panel;
 		setLayout(new BorderLayout());
-		add(panel, BorderLayout.CENTER);
+		add(panel, SwingConstants.CENTER);
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
 		addKeyListener(new KeyEvents());
@@ -51,12 +52,26 @@ public class DisplayPanelView extends JComponent
 	
 	public void showScrollBars(boolean show)
 	{
+		if (show == scrollBarsVisible)
+			return;
 		
+		if (show)
+		{
+			add(vScrollBar, BorderLayout.EAST);
+			add(hScrollBar, BorderLayout.SOUTH);
+		}
+		else
+		{
+			remove(vScrollBar);
+			remove(hScrollBar);
+		}
+		
+		scrollBarsVisible = show;
 	}
 	
 	public boolean areScrollBarsVisible()
 	{
-		return false;
+		return scrollBarsVisible;
 	}
 	
 	public void setScrollSpeed(int speed)

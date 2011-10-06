@@ -557,7 +557,7 @@ public class Sandbox
 		engineMenu.addSeparator();
 		engineMenu.add(exitMenuItem);
 		soundMenu.add(playSoundMenuItem);
-		soundMenu.add(playMusicMenuItem);
+//		soundMenu.add(playMusicMenuItem);
 		terrainMenu.add(placeWallMenuItem);
 		terrainMenu.add(placeTubeMenuItem);
 		terrainMenu.add(placeGeyserMenuItem);

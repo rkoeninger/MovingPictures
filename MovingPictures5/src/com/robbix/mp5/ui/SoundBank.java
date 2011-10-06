@@ -40,17 +40,22 @@ public class SoundBank
 				sounds.clips.put(name, clip);
 			}
 			
-			for (File file : new File(rootDir, "music").listFiles())
+			File musicDir = new File(rootDir, "music");
+			
+			if (musicDir.exists())
 			{
-				if (! file.getName().endsWith(".wav"))
-					continue;
-				
-				Clip clip = AudioSystem.getClip();
-				clip.open(AudioSystem.getAudioInputStream(file));
-				String rawName = file.getName().toLowerCase();
-				int i = rawName.lastIndexOf(".wav");
-				String name = rawName.substring(0, i);
-				sounds.musics.put(name, clip);
+				for (File file : musicDir.listFiles())
+				{
+					if (! file.getName().endsWith(".wav"))
+						continue;
+					
+					Clip clip = AudioSystem.getClip();
+					clip.open(AudioSystem.getAudioInputStream(file));
+					String rawName = file.getName().toLowerCase();
+					int i = rawName.lastIndexOf(".wav");
+					String name = rawName.substring(0, i);
+					sounds.musics.put(name, clip);
+				}
 			}
 		}
 		catch (Exception e)
