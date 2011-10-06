@@ -70,9 +70,10 @@ public class SpriteLibraryViewer extends JFrame
 		Image mediumIcon = ImageIO.read(new File("./res/art/mediumIcon.png"));
 		
 		Sandbox.trySystemLookAndFeel();
-		Mediator.factory = UnitFactory.load(new File("./res/units"));
+		UnitFactory factory = UnitFactory.load(new File("./res/units"));
+		Mediator.factory = factory;
 		SpriteLibrary lib = SpriteLibrary.load(new File("./res/sprites"), lazy);
-		JFrame slViewer = new SpriteLibraryViewer(lib, new Integer[]{240});
+		JFrame slViewer = new SpriteLibraryViewer(Game.of(lib, factory));
 		slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 		slViewer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		slViewer.setVisible(true);
@@ -81,15 +82,17 @@ public class SpriteLibraryViewer extends JFrame
 	private static final long serialVersionUID = 1L;
 	
 	private SpriteLibrary lib;
+	private UnitFactory factory;
 	private JTree tree;
 	private SLTreeNode rootNode;
 	private DefaultTreeModel treeModel;
 	private PreviewPanel preview;
 	
-	public SpriteLibraryViewer(final SpriteLibrary lib, Integer[] playerHues)
+	public SpriteLibraryViewer(final Game game)
 	{
 		super("Sprite Library Viewer");
-		this.lib = lib;
+		this.lib = game.getSpriteLibrary();
+		this.factory = game.getUnitFactory();
 		lib.addModuleListener(new ModuleListener(){
 			public void moduleLoaded(ModuleEvent e) {buildTree();}
 			public void moduleUnloaded(ModuleEvent e) {buildTree();}
@@ -103,7 +106,7 @@ public class SpriteLibraryViewer extends JFrame
 		tree.setEditable(true);
 		tree.setShowsRootHandles(false);
 		buildTree();
-		preview = new PreviewPanel(playerHues);
+		preview = new PreviewPanel();
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		splitPane.setLeftComponent(new JScrollPane(tree));
 		splitPane.setRightComponent(preview);
@@ -289,7 +292,7 @@ public class SpriteLibraryViewer extends JFrame
 		
 		if (spriteSet == null)
 		{
-			UnitType unitType = Mediator.factory.getType(moduleName);
+			UnitType unitType = factory.getType(moduleName);
 			spriteSet = lib.getUnitSpriteSet(unitType);
 			appendUnitSet(spriteSet, unitType, scroll);
 		}
@@ -465,14 +468,11 @@ public class SpriteLibraryViewer extends JFrame
 		private JSlider delaySlider;
 		private JSlider hueSlider;
 		
-		private Integer[] hues;
-		
 		private Timer timer;
 		
-		public PreviewPanel(Integer[] hueArray)
+		public PreviewPanel()
 		{
-			this.hues = hueArray;
-			this.hue = hues[0];
+			this.hue = 240;
 			
 			delaySlider = new JSlider(SwingConstants.HORIZONTAL, 0, 500, 50);
 			delaySlider.addChangeListener(new ChangeListener()
@@ -482,7 +482,7 @@ public class SpriteLibraryViewer extends JFrame
 					timer.setDelay(delaySlider.getValue());
 				}
 			});
-			hueSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 359, 240);
+			hueSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 359, hue);
 			hueSlider.addChangeListener(new ChangeListener()
 			{
 				public void stateChanged(ChangeEvent arg0)

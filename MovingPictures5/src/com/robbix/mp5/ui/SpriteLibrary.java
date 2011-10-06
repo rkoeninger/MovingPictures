@@ -17,6 +17,8 @@ import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.map.ResourceDeposit;
 import static com.robbix.mp5.unit.Activity.*;
 
+import com.robbix.mp5.unit.Activity;
+import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
@@ -272,17 +274,17 @@ public class SpriteLibrary
 		return getAmbientSpriteSet(setName).get(eventName);
 	}
 	
-	public Sprite getDefaultSprite(Unit unit)
+	public Sprite getDefaultSprite(UnitType unitType)
 	{
-		SpriteSet set = getUnitSpriteSet(unit.getType());
+		SpriteSet set = getUnitSpriteSet(unitType);
 		
 		int argCount = 1;
 		
-		if (unit.isTruck())
+		if (unitType.getName().contains("Truck"))
 		{
 			argCount = 3;
 		}
-		else if (unit.getType().getFootprint() == Footprint.VEHICLE)
+		else if (unitType.getFootprint() == Footprint.VEHICLE)
 		{
 			argCount = 2;
 		}
@@ -292,19 +294,33 @@ public class SpriteLibrary
 		}
 		
 		Object[] spriteArgs = new Object[argCount];
-		spriteArgs[0] = unit.getActivity();
 		
-		if (unit.getType().getFootprint() == Footprint.VEHICLE)
+		if (unitType.getName().contains("Truck"))
 		{
-			spriteArgs[1] = unit.getDirection();
-			
-			if (unit.isTruck())
-			{
-				spriteArgs[2] = unit.getCargo().getType();
-			}
+			spriteArgs[0] = Cargo.Type.EMPTY;
+			spriteArgs[1] = Activity.MOVE;
+			spriteArgs[2] = Direction.E;
+		}
+		else if (unitType.getFootprint() == Footprint.VEHICLE)
+		{
+			spriteArgs[0] = Activity.MOVE;
+			spriteArgs[1] = Direction.E;
+		}
+		else if (unitType.isGuardPostType() || unitType.isTurretType())
+		{
+			spriteArgs[0] = Activity.TURRET;
+		}
+		else
+		{
+			spriteArgs[0] = Activity.STILL;
 		}
 		
 		return set.get(spriteArgs).getFirst();
+	}
+	
+	public Sprite getDefaultSprite(Unit unit)
+	{
+		return getDefaultSprite(unit.getType());
 	}
 	
 	public Sprite getSprite(Unit unit)

@@ -633,10 +633,7 @@ public class Sandbox
 					hues.add(p.getColorHue());
 				}
 				
-				JFrame slViewer = new SpriteLibraryViewer(
-					game.getSpriteLibrary(),
-					hues.toArray(new Integer[0])
-				);
+				JFrame slViewer = new SpriteLibraryViewer(game);
 				slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 				slViewer.setVisible(true);
 			}

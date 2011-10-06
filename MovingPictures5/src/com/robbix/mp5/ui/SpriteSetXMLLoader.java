@@ -126,7 +126,7 @@ class SpriteSetXMLLoader
 					SpriteGroup group = new SpriteGroup(tempList, true, delay);
 					
 					if (unitType.contains("Truck"))
-						spriteSet.set(group, activity, direction, cargo);
+						spriteSet.set(group, cargo, activity, direction);
 					else
 						spriteSet.set(group, activity, direction);
 				}
@@ -157,7 +157,7 @@ class SpriteSetXMLLoader
 					}
 					
 					SpriteGroup group = new SpriteGroup(tempList, false, delay);
-					spriteSet.set(group, activity, direction, cargo);
+					spriteSet.set(group, cargo, activity, direction);
 				}
 			}
 			else if (activity == DOCKUP || activity == DOCKDOWN || activity == MINELOAD)
@@ -196,7 +196,7 @@ class SpriteSetXMLLoader
 				
 				SpriteGroup group = new SpriteGroup(tempList, false, delay);
 				if (unitType.contains("Truck"))
-					spriteSet.set(group, activity, Direction.W, cargo);
+					spriteSet.set(group, cargo, activity, Direction.W);
 				else
 					spriteSet.set(group, activity, Direction.W);
 			}

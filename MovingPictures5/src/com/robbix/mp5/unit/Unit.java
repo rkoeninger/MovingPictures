@@ -362,16 +362,20 @@ public class Unit
 	
 	public Object[] getSpriteArgs()
 	{
-		spriteArgs[0] = activity;
-		
-		if (type.getFootprint() == Footprint.VEHICLE)
+		if (isTruck())
 		{
+			spriteArgs[0] = cargo.getType();
+			spriteArgs[1] = activity;
+			spriteArgs[2] = dir;
+		}
+		else if (type.getFootprint() == Footprint.VEHICLE)
+		{
+			spriteArgs[0] = activity;
 			spriteArgs[1] = dir;
-			
-			if (isTruck())
-			{
-				spriteArgs[2] = cargo.getType();
-			}
+		}
+		else
+		{
+			spriteArgs[0] = activity;
 		}
 		
 		return spriteArgs;

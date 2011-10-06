@@ -84,6 +84,26 @@ public class UnitFactory
 		return types.get(name);
 	}
 	
+	public UnitType getTurretType(UnitType tankType)
+	{
+		String turretTypeName = tankType.getTurretTypeName();
+		
+		if (turretTypeName == null)
+			throw new IllegalArgumentException(tankType + " doesn't have turret");
+		
+		return getType(turretTypeName);
+	}
+	
+	public UnitType getChassisType(UnitType tankType)
+	{
+		String chassisTypeName = tankType.getChassisTypeName();
+		
+		if (chassisTypeName == null)
+			throw new IllegalArgumentException(tankType + " doesn't have chassis");
+		
+		return getType(chassisTypeName);
+	}
+	
 	public List<String> getUnitTypes()
 	{
 		return typeList;

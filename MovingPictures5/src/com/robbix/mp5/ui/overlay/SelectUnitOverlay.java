@@ -42,7 +42,9 @@ public class SelectUnitOverlay extends InputOverlay
 		if (selected != null)
 		{
 			Mediator.sounds.play(selected.getType().getAcknowledgement());
-			panel.pushOverlay(new CommandUnitOverlay(selected));
+			panel.pushOverlay(selected.isTruck()
+				? new CommandTruckOverlay(selected)
+				: new CommandUnitOverlay(selected));
 			panel.showStatus(selected);
 			panel.showStatus(selected.getOwner());
 		}

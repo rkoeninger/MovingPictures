@@ -209,14 +209,14 @@ public abstract class SpriteSet
 		{
 			super(name);
 			groups = new SpriteGroup
+				[Cargo.Type.values().length]
 				[Activity.values().length]
-				[Direction.values().length]
-				[Cargo.Type.values().length];
+				[Direction.values().length];
 		}
 		
 		public Class<?>[] getParameterList()
 		{
-			return new Class<?>[]{Activity.class, Direction.class, Cargo.Type.class};
+			return new Class<?>[]{Cargo.Type.class, Activity.class, Direction.class};
 		}
 		
 		public Object[] getArgumentList()
@@ -228,7 +228,7 @@ public abstract class SpriteSet
 			for (Direction dir    : Direction.values())
 				if (get(act, dir, cargo) != null)
 				{
-					keys.add(new Object[]{act, dir, cargo});
+					keys.add(new Object[]{cargo, dir, act});
 				}
 			
 			return keys.toArray();
@@ -237,23 +237,23 @@ public abstract class SpriteSet
 		public void set(SpriteGroup group, Object... args)
 		{
 			checkArgCount(args, 3);
-			set(group, getAct(args), getDir(args), getCargo(args));
+			set(group, getCargo(args), getAct(args), getDir(args));
 		}
 		
 		public SpriteGroup get(Object... args)
 		{
 			checkArgCount(args, 3);
-			return get(getAct(args), getDir(args), getCargo(args));
+			return get(getCargo(args), getAct(args), getDir(args));
 		}
 		
-		public void set(SpriteGroup group, Activity act, Direction dir, Cargo.Type cargo)
+		public void set(SpriteGroup group, Cargo.Type cargo, Activity act, Direction dir)
 		{
-			groups[act.ordinal()][dir.ordinal()][cargo.ordinal()] = group;
+			groups[cargo.ordinal()][act.ordinal()][dir.ordinal()] = group;
 		}
 		
-		public SpriteGroup get(Activity act, Direction dir, Cargo.Type cargo)
+		public SpriteGroup get(Cargo.Type cargo, Activity act, Direction dir)
 		{
-			return groups[act.ordinal()][dir.ordinal()][cargo.ordinal()];
+			return groups[cargo.ordinal()][act.ordinal()][dir.ordinal()];
 		}
 	}
 	

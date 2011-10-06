@@ -49,6 +49,46 @@ public class Game
 		return game;
 	}
 	
+	public static Game of(Object... stuff)
+	{
+		Game game = new Game();
+		
+		for (Object thing : stuff)
+		{
+			if (thing instanceof SpriteLibrary)
+			{
+				game.spriteLib = (SpriteLibrary) thing;
+			}
+			else if (thing instanceof SoundBank)
+			{
+				game.sounds = (SoundBank) thing;
+			}
+			else if (thing instanceof UnitFactory)
+			{
+				game.factory = (UnitFactory) thing;
+			}
+			else if (thing instanceof TileSet)
+			{
+				game.tileSet = (TileSet) thing;
+			}
+			else if (thing instanceof CursorSet)
+			{
+				game.cursorSet = (CursorSet) thing;
+			}
+			else if (thing instanceof LayeredMap)
+			{
+				game.map = (LayeredMap) thing;
+			}
+			else if (thing instanceof DisplayPanel)
+			{
+				game.panel = (DisplayPanel) thing;
+				game.view = new DisplayPanelView(game.panel);
+			}
+		}
+		
+		return game;
+	}
+	
 	private Map<Integer, Player> players;
 	private Player defaultPlayer;
 	
