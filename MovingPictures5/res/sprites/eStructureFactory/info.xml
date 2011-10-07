@@ -52,10 +52,10 @@
 			  path="./collapse"
 			  fileNumber="2056"
 			  frameCount="8"
-			  offsetX="-5"
-			  offsetY="-19">
-		<OffsetFrame offsetX="0"  offsetY="0"/>
-		<OffsetFrame offsetX="0"  offsetY="7"/>
+			  offsetX="0"
+			  offsetY="-13">
+		<OffsetFrame offsetX="2"  offsetY="-8"/>
+		<OffsetFrame offsetX="7"  offsetY="-1"/>
 		<OffsetFrame offsetX="7"  offsetY="2"/>
 		<OffsetFrame offsetX="6"  offsetY="4"/>
 		<OffsetFrame offsetX="2"  offsetY="8"/>
