@@ -1,4 +1,4 @@
-package com.robbix.mp5;
+package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -47,6 +47,11 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import com.robbix.mp5.Game;
+import com.robbix.mp5.Mediator;
+import com.robbix.mp5.ModuleEvent;
+import com.robbix.mp5.ModuleListener;
+import com.robbix.mp5.Utils;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.EnumSpriteGroup;
@@ -60,7 +65,7 @@ import com.robbix.mp5.unit.UnitType;
  * setVisible(true) needs to be called on instances of this class after
  * constructor is called.
  */
-public class SpriteLibraryViewer extends JFrame
+public class SpriteViewer extends JFrame
 {
 	public static void main(String[] args) throws IOException
 	{
@@ -73,7 +78,7 @@ public class SpriteLibraryViewer extends JFrame
 		UnitFactory factory = UnitFactory.load(new File("./res/units"));
 		Mediator.factory = factory;
 		SpriteLibrary lib = SpriteLibrary.load(new File("./res/sprites"), lazy);
-		JFrame slViewer = new SpriteLibraryViewer(Game.of(lib, factory));
+		JFrame slViewer = new SpriteViewer(Game.of(lib, factory));
 		slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 		slViewer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		slViewer.setVisible(true);
@@ -88,7 +93,7 @@ public class SpriteLibraryViewer extends JFrame
 	private DefaultTreeModel treeModel;
 	private PreviewPanel preview;
 	
-	public SpriteLibraryViewer(final Game game)
+	public SpriteViewer(final Game game)
 	{
 		super("Sprite Library Viewer");
 		this.lib = game.getSpriteLibrary();
@@ -141,7 +146,7 @@ public class SpriteLibraryViewer extends JFrame
 			public void actionPerformed(ActionEvent e)
 			{
 				String moduleList = JOptionPane.showInputDialog(
-					SpriteLibraryViewer.this,
+					SpriteViewer.this,
 					"Module Name (separate multiple names with commas):",
 					"Load Module(s)",
 					JOptionPane.QUESTION_MESSAGE
@@ -158,12 +163,12 @@ public class SpriteLibraryViewer extends JFrame
 						lib.loadModule(moduleName);
 					}
 					buildTree();
-					SpriteLibraryViewer.this.repaint();
+					SpriteViewer.this.repaint();
 				}
 				catch (IOException ioe)
 				{
 					JOptionPane.showMessageDialog(
-						SpriteLibraryViewer.this,
+						SpriteViewer.this,
 						"Could not load module(s): " + moduleList + "\n" +
 						ioe.getMessage(),
 						"Load Error",
@@ -189,7 +194,7 @@ public class SpriteLibraryViewer extends JFrame
 						return "SpriteSet Info Files (info.xml)";
 					}
 				});
-				int result = chooser.showOpenDialog(SpriteLibraryViewer.this);
+				int result = chooser.showOpenDialog(SpriteViewer.this);
 				
 				if (result != JFileChooser.APPROVE_OPTION)
 					return;
@@ -199,12 +204,12 @@ public class SpriteLibraryViewer extends JFrame
 				{
 					lib.loadModule(file);
 					buildTree();
-					SpriteLibraryViewer.this.repaint();
+					SpriteViewer.this.repaint();
 				}
 				catch (IOException ioe)
 				{
 					JOptionPane.showMessageDialog(
-						SpriteLibraryViewer.this,
+						SpriteViewer.this,
 						"Could not load file: " + file + "\n" +
 						ioe.getMessage(),
 						"Load Error",
@@ -219,7 +224,7 @@ public class SpriteLibraryViewer extends JFrame
 			public void actionPerformed(ActionEvent e)
 			{
 				String moduleList = JOptionPane.showInputDialog(
-					SpriteLibraryViewer.this,
+					SpriteViewer.this,
 					"Module Name (separate multiple names with commas):",
 					"Unload Module(s)",
 					JOptionPane.QUESTION_MESSAGE
@@ -235,7 +240,7 @@ public class SpriteLibraryViewer extends JFrame
 				}
 				
 				buildTree();
-				SpriteLibraryViewer.this.repaint();
+				SpriteViewer.this.repaint();
 			}
 		});
 		

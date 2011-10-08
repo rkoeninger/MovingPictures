@@ -1,4 +1,4 @@
-package com.robbix.mp5;
+package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -35,6 +35,11 @@ import javax.swing.KeyStroke;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
+import com.robbix.mp5.Engine;
+import com.robbix.mp5.Game;
+import com.robbix.mp5.Mediator;
+import com.robbix.mp5.MeteorShowerTrigger;
+import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.ai.task.SteerTask;
 import com.robbix.mp5.basics.Position;
@@ -633,7 +638,7 @@ public class Sandbox
 					hues.add(p.getColorHue());
 				}
 				
-				JFrame slViewer = new SpriteLibraryViewer(game);
+				JFrame slViewer = new SpriteViewer(game);
 				slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 				slViewer.setVisible(true);
 			}

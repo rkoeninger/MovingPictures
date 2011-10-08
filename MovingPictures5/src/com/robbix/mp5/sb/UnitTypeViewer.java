@@ -1,4 +1,4 @@
-package com.robbix.mp5;
+package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,6 +34,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
+import com.robbix.mp5.Game;
+import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ui.SoundBank;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteLibrary;
@@ -41,7 +43,7 @@ import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
 
-public class UnitTypeLibraryViewer extends JFrame
+public class UnitTypeViewer extends JFrame
 {
 	public static void main(String[] args) throws IOException
 	{
@@ -53,7 +55,7 @@ public class UnitTypeLibraryViewer extends JFrame
 		Mediator.factory = factory;
 		SoundBank sounds = SoundBank.loadLazy(new File("./res/sounds"));
 		SpriteLibrary lib = SpriteLibrary.loadLazy(new File("./res/sprites"));
-		JFrame ufViewer = new UnitTypeLibraryViewer(Game.of(lib, factory, sounds));
+		JFrame ufViewer = new UnitTypeViewer(Game.of(lib, factory, sounds));
 		ufViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 		ufViewer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ufViewer.setVisible(true);
@@ -69,7 +71,7 @@ public class UnitTypeLibraryViewer extends JFrame
 	private DefaultTreeModel treeModel;
 	private PreviewPanel preview;
 	
-	public UnitTypeLibraryViewer(Game game)
+	public UnitTypeViewer(Game game)
 	{
 		super("UnitType Library Viewer");
 		this.sounds = game.getSoundBank();
@@ -101,7 +103,7 @@ public class UnitTypeLibraryViewer extends JFrame
 		setJMenuBar(menuBar);
 		setLayout(new BorderLayout());
 		add(splitPane, BorderLayout.CENTER);
-		setSize(350, 350);
+		setSize(500, 500);
 		splitPane.setDividerLocation(0.5);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

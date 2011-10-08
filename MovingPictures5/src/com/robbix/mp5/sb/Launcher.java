@@ -1,4 +1,4 @@
-package com.robbix.mp5;
+package com.robbix.mp5.sb;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -15,14 +15,14 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 
-public class SandboxLauncher
+public class Launcher
 {
 	public static void main(String[] args)
 	{
 		Sandbox.trySystemLookAndFeel();
 		
 		final JDialog dialog = new JDialog();
-		dialog.setTitle("TestMP5 Launcher");
+		dialog.setTitle("Sandbox Launcher");
 		final JComboBox mapComboBox = new JComboBox(getMapAndDemoOptions());
 		mapComboBox.setSelectedItem("map:plain");
 		final JComboBox tileSetBox = new JComboBox(getTileSetOptions());
