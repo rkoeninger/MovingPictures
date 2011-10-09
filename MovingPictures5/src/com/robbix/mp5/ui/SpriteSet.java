@@ -226,9 +226,9 @@ public abstract class SpriteSet
 			for (Cargo.Type cargo : Cargo.Type.values())
 			for (Activity act     : Activity.values())
 			for (Direction dir    : Direction.values())
-				if (get(act, dir, cargo) != null)
+				if (get(cargo, act, dir) != null)
 				{
-					keys.add(new Object[]{cargo, dir, act});
+					keys.add(new Object[]{cargo, act, dir});
 				}
 			
 			return keys.toArray();

@@ -1,5 +1,7 @@
 package com.robbix.mp5.ui;
 
+import static com.robbix.mp5.unit.Activity.TURRET;
+
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
@@ -15,11 +17,6 @@ import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.AutoArrayList;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.map.ResourceDeposit;
-import static com.robbix.mp5.unit.Activity.*;
-
-import com.robbix.mp5.unit.Activity;
-import com.robbix.mp5.unit.Cargo;
-import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
@@ -277,45 +274,8 @@ public class SpriteLibrary
 	public Sprite getDefaultSprite(UnitType unitType)
 	{
 		SpriteSet set = getUnitSpriteSet(unitType);
-		
-		int argCount = 1;
-		
-		if (unitType.getName().contains("Truck"))
-		{
-			argCount = 3;
-		}
-		else if (unitType.getFootprint() == Footprint.VEHICLE)
-		{
-			argCount = 2;
-		}
-		else
-		{
-			argCount = 1;
-		}
-		
-		Object[] spriteArgs = new Object[argCount];
-		
-		if (unitType.getName().contains("Truck"))
-		{
-			spriteArgs[0] = Cargo.Type.EMPTY;
-			spriteArgs[1] = Activity.MOVE;
-			spriteArgs[2] = Direction.E;
-		}
-		else if (unitType.getFootprint() == Footprint.VEHICLE)
-		{
-			spriteArgs[0] = Activity.MOVE;
-			spriteArgs[1] = Direction.E;
-		}
-		else if (unitType.isGuardPostType() || unitType.isTurretType())
-		{
-			spriteArgs[0] = Activity.TURRET;
-		}
-		else
-		{
-			spriteArgs[0] = Activity.STILL;
-		}
-		
-		return set.get(spriteArgs).getFirst();
+		Object[] spriteArgs = unitType.getDefaultSpriteArgs();
+		return spriteArgs == null ? null : set.get(spriteArgs).getFirst();
 	}
 	
 	public Sprite getDefaultSprite(Unit unit)

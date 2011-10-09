@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.robbix.mp5.basics.Direction;
+
 public class UnitType
 {
 	public static UnitType newVehicleType(
@@ -33,6 +35,7 @@ public class UnitType
 		type.rotationSpeed = rotationSpeed;
 		type.rotationDegree = rotationDegree;
 		type.fp = Footprint.VEHICLE;
+		type.initSpriteArgs();
 		
 		return type;
 	}
@@ -63,6 +66,7 @@ public class UnitType
 		type.fp = fp;
 		type.connectionSource = connectionSource;
 		type.needsConnection = needsConnection;
+		type.initSpriteArgs();
 		
 		return type;
 	}
@@ -112,6 +116,7 @@ public class UnitType
 		type.rotationSpeed = rotationSpeed;
 		type.rotationDegree = rotationDegree;
 		type.fp = Footprint.VEHICLE;
+		type.initSpriteArgs();
 		
 		return type;
 	}
@@ -132,6 +137,7 @@ public class UnitType
 		type.damage = damage;
 		type.attackRange = attackRange;
 		type.weaponChargeCost = weaponChargeCost;
+		type.initSpriteArgs();
 		
 		return type;
 	}
@@ -163,6 +169,7 @@ public class UnitType
 		type.attackRange = attackRange;
 		type.weaponChargeCost = weaponChargeCost;
 		type.fp = Footprint.STRUCT_1_BY_1;
+		type.initSpriteArgs();
 		
 		return type;
 	}
@@ -190,10 +197,47 @@ public class UnitType
 	private String ack;
 	private boolean connectionSource;
 	private boolean needsConnection;
+	private Object[] spriteArgs;
 	
 	private UnitType()
 	{
 		serial = nextSerial.getAndIncrement();
+	}
+	
+	private void initSpriteArgs()
+	{
+		if (name.contains("Truck"))
+		{
+			spriteArgs = new Object[3];
+		}
+		else if (fp == Footprint.VEHICLE)
+		{
+			spriteArgs = new Object[2];
+		}
+		else
+		{
+			spriteArgs = new Object[1];
+		}
+		
+		if (name.contains("Truck"))
+		{
+			spriteArgs[0] = Cargo.Type.EMPTY;
+			spriteArgs[1] = Activity.MOVE;
+			spriteArgs[2] = Direction.E;
+		}
+		else if (fp == Footprint.VEHICLE)
+		{
+			spriteArgs[0] = Activity.MOVE;
+			spriteArgs[1] = Direction.E;
+		}
+		else if (isGuardPostType() || isTurretType())
+		{
+			spriteArgs[0] = Activity.TURRET;
+		}
+		else
+		{
+			spriteArgs[0] = Activity.STILL;
+		}
 	}
 	
 	public int getSerial()
@@ -344,5 +388,10 @@ public class UnitType
 	public boolean isGuardPostType()
 	{
 		return name.contains("GuardPost");
+	}
+	
+	public Object[] getDefaultSpriteArgs()
+	{
+		return spriteArgs;
 	}
 }

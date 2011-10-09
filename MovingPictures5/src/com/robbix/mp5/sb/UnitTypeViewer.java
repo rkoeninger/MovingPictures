@@ -1,17 +1,14 @@
 package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,16 +16,16 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -36,6 +33,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.Mediator;
+import com.robbix.mp5.basics.RTreeNode;
 import com.robbix.mp5.ui.SoundBank;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteLibrary;
@@ -67,18 +65,18 @@ public class UnitTypeViewer extends JFrame
 	private SpriteLibrary lib;
 	private UnitFactory factory;
 	private JTree tree;
-	private UFTreeNode rootNode;
+	private RTreeNode rootNode;
 	private DefaultTreeModel treeModel;
-	private PreviewPanel preview;
+	private InfoPanel infoPanel;
 	
 	public UnitTypeViewer(Game game)
 	{
-		super("UnitType Library Viewer");
-		this.sounds = game.getSoundBank();
-		this.lib = game.getSpriteLibrary();
-		this.factory = game.getUnitFactory();
-		rootNode = new UFTreeNode("UnitType Factory");
-		rootNode.setUFObject(factory);
+		super("UnitType Viewer");
+		sounds = game.getSoundBank();
+		lib = game.getSpriteLibrary();
+		factory = game.getUnitFactory();
+		rootNode = new RTreeNode("UnitTypes");
+		rootNode.set(factory);
 		treeModel = new DefaultTreeModel(rootNode);
 		tree = new JTree(treeModel);
 		tree.getSelectionModel().setSelectionMode(
@@ -86,21 +84,10 @@ public class UnitTypeViewer extends JFrame
 		tree.setEditable(true);
 		tree.setShowsRootHandles(false);
 		buildTree();
-		preview = new PreviewPanel();
+		infoPanel = new InfoPanel();
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		splitPane.setLeftComponent(new JScrollPane(tree));
-		splitPane.setRightComponent(preview);
-		JMenuBar menuBar = new JMenuBar();
-		JMenu moduleMenu = new JMenu("Module");
-		final JMenuItem loadByNameMenuItem = new JMenuItem("By Name...");
-		final JMenuItem loadFromFileMenuItem = new JMenuItem("From File...");
-		final JMenuItem unloadMenuItem = new JMenuItem("Unload...");
-		moduleMenu.add(loadByNameMenuItem);
-		moduleMenu.add(loadFromFileMenuItem);
-		moduleMenu.addSeparator();
-		moduleMenu.add(unloadMenuItem);
-		menuBar.add(moduleMenu);
-		setJMenuBar(menuBar);
+		splitPane.setRightComponent(infoPanel);
 		setLayout(new BorderLayout());
 		add(splitPane, BorderLayout.CENTER);
 		setSize(500, 500);
@@ -112,28 +99,7 @@ public class UnitTypeViewer extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				preview.dispose();
-			}
-		});
-		
-		loadByNameMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-			}
-		});
-		
-		loadFromFileMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-			}
-		});
-		
-		unloadMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+				infoPanel.dispose();
 			}
 		});
 		
@@ -141,19 +107,19 @@ public class UnitTypeViewer extends JFrame
 		{
 			public void valueChanged(TreeSelectionEvent e)
 			{
-				UFTreeNode currentNode = (UFTreeNode)
+				RTreeNode currentNode = (RTreeNode)
 					tree.getLastSelectedPathComponent();
 				
 				if (currentNode == null)
 					return;
 				
-				if (currentNode.hasUnitType())
+				if (currentNode.has(UnitType.class))
 				{
-					preview.showUnitType(currentNode.getUnitType());
+					infoPanel.show(currentNode.get(UnitType.class));
 				}
 				else
 				{
-					preview.showNothing();
+					infoPanel.showNothing();
 				}
 			}
 		});
@@ -181,18 +147,18 @@ public class UnitTypeViewer extends JFrame
 	private void appendUnitType(String typeName)
 	{
 		UnitType type = factory.getType(typeName);
-		UFTreeNode typeNode = new UFTreeNode(typeName);
-		typeNode.setUFObject(type);
+		RTreeNode typeNode = new RTreeNode(typeName);
+		typeNode.set(type);
 		append(rootNode, typeNode);
 		
 		if (type.isTankType())
 		{
 			UnitType chassisType = factory.getChassisType(type);
 			UnitType turretType = factory.getTurretType(type);
-			UFTreeNode chassisTypeNode = new UFTreeNode("Chassis: " + chassisType.getName());
-			UFTreeNode turretTypeNode = new UFTreeNode("Turret: " + turretType.getName());
-			chassisTypeNode.setUFObject(chassisType);
-			turretTypeNode.setUFObject(turretType);
+			RTreeNode chassisTypeNode = new RTreeNode("Chassis: " + chassisType.getName());
+			RTreeNode turretTypeNode = new RTreeNode("Turret: " + turretType.getName());
+			chassisTypeNode.set(chassisType);
+			turretTypeNode.set(turretType);
 			append(typeNode, turretTypeNode);
 			append(typeNode, chassisTypeNode);
 		}
@@ -203,177 +169,174 @@ public class UnitTypeViewer extends JFrame
 		treeModel.insertNodeInto(child, parent, parent.getChildCount());
 	}
 	
-	private class UFTreeNode extends DefaultMutableTreeNode
+	private class InfoPanel extends JComponent
 	{
 		private static final long serialVersionUID = 1L;
 		
-		private Object ufObject;
-		
-		public UFTreeNode(String name)
-		{
-			super(name);
-		}
-		
-		public void setUFObject(Object ufObject)
-		{
-			this.ufObject = ufObject;
-		}
-		
-		public Object getUFObject()
-		{
-			return ufObject;
-		}
-		
-		public boolean hasUnitType()
-		{
-			return ufObject != null && ufObject instanceof UnitType;
-		}
-		
-		public UnitType getUnitType()
-		{
-			return (UnitType) getUFObject();
-		}
-	}
-	
-	private class PreviewPanel extends JComponent
-	{
-		private static final long serialVersionUID = 1L;
-
+		public SpritePanel preview;
+		private JTable table;
+		private DefaultTableModel tableModel;
 		private UnitType type;
-		private Sprite sprite;
-		private Sprite turretSprite;
-		private int fpw;
-		private int fph;
+		private JButton playAckButton;
+		private JButton loadArtButton;
 		
-		public PreviewPanel()
+		public InfoPanel()
 		{
-			addMouseListener(new MouseAdapter()
+			preview = new SpritePanel("Select a UnitType to view Default Sprite");
+			preview.setPreferredSize(new Dimension(100, 150));
+			playAckButton = new JButton("Play Ack");
+			playAckButton.setEnabled(false);
+			playAckButton.addActionListener(new ActionListener()
 			{
-				public void mouseClicked(MouseEvent e)
+				public void actionPerformed(ActionEvent e)
 				{
-					if (e.getClickCount() == 2 && type != null)
+					if (type != null)
 					{
-						String ack =
-							type.isTankType()
-							? type.getAcknowledgement()
-							: factory.getChassisType(type).getAcknowledgement();
+						String ack = type.getAcknowledgement();
 						
 						if (ack != null)
-							sounds.play(ack);
+							sounds.playAnyway(ack);
 					}
 				}
 			});
-		}
-		
-		public void dispose()
-		{
-			
-		}
-
-		String blankMessage = "Select a UnitType to Preview";
-		
-		public void paintComponent(Graphics g)
-		{
-			g.setColor(Color.BLACK);
-			
-			if (type == null)
+			loadArtButton = new JButton("Load Art");
+			loadArtButton.setEnabled(false);
+			loadArtButton.addActionListener(new ActionListener()
 			{
-				FontMetrics metrics = g.getFontMetrics();
-				Rectangle2D rect = metrics.getStringBounds(blankMessage, g);
-				g.drawString(
-					blankMessage,
-					(int) (getWidth()  / 2 - rect.getCenterX()),
-					(int) (getHeight() / 2 - rect.getCenterY())
-				);
-				return;
-			}
-			
-			StringBuilder info = new StringBuilder();
-			info.append(type.getDisplayName()).append('\n');
-			info.append(type.getName()).append('\n');
-			
-			if (!type.isTurretType())
-			{
-				info.append(type.getMaxHP() + " HP").append('\n');
-				info.append(type.getArmor() + " Armor").append('\n');
-			}
-			
-			if (type.isTurretType() || type.isGuardPostType())
-			{
-				info.append(type.getAttackRange() + " Range").append('\n');
-				info.append(type.getDamage() + " Damage").append('\n');
-			}
-			
-			drawString(g, info.toString(), 4, 4);
-			
-			if (sprite != null)
-			{
-				int x = getWidth()  / 2 - fpw * 16;
-				int y = getHeight() / 2 - fph * 16;
-				g.drawImage(
-					sprite.getImage(),
-					x + sprite.getXOffset(),
-					y + sprite.getYOffset(),
-					null
-				);
-				
-				if (turretSprite != null)
+				public void actionPerformed(ActionEvent e)
 				{
-					g.drawImage(
-						turretSprite.getImage(),
-						x + turretSprite.getXOffset(),
-						y + turretSprite.getYOffset(),
-						null
-					);
+					if (type != null)
+					{
+						try
+						{
+							if (type.isTankType())
+							{
+								lib.loadModule(type.getChassisTypeName());
+								lib.loadModule(type.getTurretTypeName());
+							}
+							else
+							{
+								lib.loadModule(type.getName());
+							}
+							
+							if (type.isTankType())
+							{
+								preview.show(
+									new Sprite[]{
+									lib.getDefaultSprite(factory.getChassisType(type)),
+									lib.getDefaultSprite(factory.getTurretType(type))
+									},
+									1,
+									1
+								);
+							}
+							else
+							{
+								Footprint fp = type.getFootprint();
+								preview.show(
+									lib.getDefaultSprite(type),
+									fp == null ? 1 : fp.getWidth(),
+									fp == null ? 1 : fp.getHeight()
+								);
+							}
+							
+							loadArtButton.setEnabled(false);
+						}
+						catch (IOException ioe)
+						{
+							System.err.println("couldn't load sprites for " + type.getName());
+						}
+					}
 				}
-			}
+			});
+			preview.setLayout(null);
+			preview.add(playAckButton);
+			playAckButton.setBounds(new Rectangle(new Point(4, 4), playAckButton.getPreferredSize()));
+			preview.add(loadArtButton);
+			loadArtButton.setBounds(new Rectangle(new Point(4, 4 + playAckButton.getPreferredSize().height + 4), playAckButton.getPreferredSize()));
+			tableModel = new DefaultTableModel();
+			tableModel.addColumn("Name");
+			tableModel.addColumn("Value");
+			table = new JTable(tableModel);
+ 			
+			setLayout(new BorderLayout());
+			add(preview, BorderLayout.NORTH);
+			add(new JScrollPane(table), BorderLayout.CENTER);
 		}
 		
-		private void drawString(Graphics g, String string, int x, int y)
+		private void clearTable()
 		{
-			String[] lines = string.split("[\r\n\f]");
-			FontMetrics metrics = g.getFontMetrics();
-			
-			y += metrics.getAscent();
-			
-			for (String line : lines)
-			{
-				g.drawString(line, x, y);
-				y += metrics.getAscent() + 4;
-			}
+			while (tableModel.getRowCount() > 0)
+				tableModel.removeRow(0);
 		}
 		
-		public void showUnitType(UnitType type)
+		private void appendTableRow(String name, Object value)
+		{
+			tableModel.addRow(new Object[]{name, value});
+		}
+		
+		public void show(UnitType type)
 		{
 			this.type = type;
 			
+			clearTable();
+			appendTableRow("Type Name", type.getName());
+			appendTableRow("Civ", type.getCiv());
+			appendTableRow("HP", type.getMaxHP());
+			
+			playAckButton.setEnabled(type.getAcknowledgement() != null);
+			
 			if (type.isTankType())
 			{
-				UnitType chassisType = factory.getChassisType(type);
-				UnitType turretType = factory.getTurretType(type);
-				sprite = lib.getDefaultSprite(chassisType);
-				turretSprite = lib.getDefaultSprite(turretType);
-				fpw = chassisType.getFootprint().getWidth();
-				fph = chassisType.getFootprint().getHeight();
+				if (lib.isLoaded(type.getChassisTypeName())
+				 && lib.isLoaded(type.getTurretTypeName()))
+				{
+					loadArtButton.setEnabled(false);
+					preview.show(
+						new Sprite[]{
+						lib.getDefaultSprite(factory.getChassisType(type)),
+						lib.getDefaultSprite(factory.getTurretType(type))
+						},
+						1,
+						1
+					);
+				}
+				else
+				{
+					loadArtButton.setEnabled(true);
+					preview.show("Art not loaded");
+				}
 			}
 			else
 			{
-				sprite = lib.getDefaultSprite(type);
-				turretSprite = null;
-				Footprint fp = type.getFootprint();
-				fpw = fp == null ? 1 : fp.getWidth();
-				fph = fp == null ? 1 : fp.getHeight();
+				if (lib.isLoaded(type.getName()))
+				{
+					loadArtButton.setEnabled(false);
+					Footprint fp = type.getFootprint();
+					preview.show(
+						lib.getDefaultSprite(type),
+						fp.getWidth(),
+						fp.getHeight()
+					);
+				}
+				else
+				{
+					loadArtButton.setEnabled(true);
+					preview.show("Art not loaded");
+				}
 			}
-			
-			repaint();
 		}
 		
 		public void showNothing()
 		{
 			type = null;
-			sprite = null;
-			turretSprite = null;
-			repaint();
+			clearTable();
+			preview.showNothing();
+		}
+		
+		public void dispose()
+		{
+			preview.dispose();
 		}
 	}
 }

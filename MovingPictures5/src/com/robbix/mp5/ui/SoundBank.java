@@ -175,7 +175,13 @@ public class SoundBank
 	 */
 	public void play(String name)
 	{
-		if (!running || name == null)
+		if (running)
+			playAnyway(name);
+	}
+	
+	public void playAnyway(String name)
+	{
+		if (name == null)
 			return;
 		
 		Clip clip = clips.get(name);

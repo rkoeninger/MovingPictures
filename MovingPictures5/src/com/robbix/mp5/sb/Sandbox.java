@@ -369,6 +369,7 @@ public class Sandbox
 		final JMenuItem stepMenuItem = new JMenuItem("Step Once");
 		stepMenuItem.setEnabled(false);
 		final JMenuItem spriteLibMenuItem = new JMenuItem("Sprite Library");
+		final JMenuItem unitLibMenuItem = new JMenuItem("Unit Library");
 		final JMenuItem throttleMenuItem = new JMenuItem("Unthrottle");
 		throttleMenuItem.setEnabled(engine.isThrottled());
 		final JMenuItem exitMenuItem = new JMenuItem("Exit");
@@ -559,6 +560,7 @@ public class Sandbox
 		engineMenu.add(stepMenuItem);
 		engineMenu.addSeparator();
 		engineMenu.add(spriteLibMenuItem);
+		engineMenu.add(unitLibMenuItem);
 		engineMenu.addSeparator();
 		engineMenu.add(exitMenuItem);
 		soundMenu.add(playSoundMenuItem);
@@ -630,17 +632,19 @@ public class Sandbox
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				List<Integer> hues = new ArrayList<Integer>();
-				hues.add(240);
-				
-				for (Player p : game.getPlayers())
-				{
-					hues.add(p.getColorHue());
-				}
-				
 				JFrame slViewer = new SpriteViewer(game);
 				slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
 				slViewer.setVisible(true);
+			}
+		});
+		
+		unitLibMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JFrame uViewer = new UnitTypeViewer(game);
+				uViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
+				uViewer.setVisible(true);
 			}
 		});
 		
