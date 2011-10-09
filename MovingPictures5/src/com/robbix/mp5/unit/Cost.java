@@ -14,7 +14,7 @@ public class Cost
 	/**
 	 * Creates a "free" Cost object.
 	 */
-	public Cost()
+	private Cost()
 	{
 		this.resourceMap = Collections.emptyMap();
 	}
@@ -32,5 +32,25 @@ public class Cost
 		}
 		
 		return 0;
+	}
+	
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		
+		for (Map.Entry<ResourceType, Integer> entry : resourceMap.entrySet())
+		{
+			if (builder.length() > 0)
+			{
+				builder.append(", ");
+			}
+			
+			String type = entry.getKey() == ResourceType.COMMON_ORE
+				? "common" : "rare";
+			
+			builder.append(entry.getValue()).append(' ').append(type);
+		}
+		
+		return builder.toString();
 	}
 }

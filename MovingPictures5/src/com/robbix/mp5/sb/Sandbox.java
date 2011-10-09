@@ -92,9 +92,6 @@ public class Sandbox
 	private static ButtonGroup playerSelectButtonGroup;
 	private static ActionListener playerSelectListener;
 	private static boolean showFrameRate = false;
-
-	private static Image smallIcon;
-	private static Image mediumIcon;
 	
 	public static void main(String[] args) throws IOException
 	{
@@ -370,6 +367,7 @@ public class Sandbox
 		stepMenuItem.setEnabled(false);
 		final JMenuItem spriteLibMenuItem = new JMenuItem("Sprite Library");
 		final JMenuItem unitLibMenuItem = new JMenuItem("Unit Library");
+		final JMenuItem soundPlayerMenuItem = new JMenuItem("Sound Player");
 		final JMenuItem throttleMenuItem = new JMenuItem("Unthrottle");
 		throttleMenuItem.setEnabled(engine.isThrottled());
 		final JMenuItem exitMenuItem = new JMenuItem("Exit");
@@ -561,6 +559,7 @@ public class Sandbox
 		engineMenu.addSeparator();
 		engineMenu.add(spriteLibMenuItem);
 		engineMenu.add(unitLibMenuItem);
+		engineMenu.add(soundPlayerMenuItem);
 		engineMenu.addSeparator();
 		engineMenu.add(exitMenuItem);
 		soundMenu.add(playSoundMenuItem);
@@ -585,9 +584,6 @@ public class Sandbox
 		menuBar.add(playerMenu);
 		menuBar.add(unitMenu);
 		
-		smallIcon = ImageIO.read(new File(RES_DIR, "art/smallIcon.png"));
-		mediumIcon = ImageIO.read(new File(RES_DIR, "art/mediumIcon.png"));
-		
 		JPanel statusesPanel = new JPanel();
 		statusesPanel.setLayout(new GridLayout(2, 1));
 		statusesPanel.add(unitStatusLabel);
@@ -602,7 +598,7 @@ public class Sandbox
 		frame.add(game.getView(), BorderLayout.CENTER);
 		frame.add(statusesPanel, BorderLayout.SOUTH);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setIconImages(Arrays.asList(smallIcon, mediumIcon));
+		frame.setIconImages(getWindowIcons());
 		frame.pack();
 		
 		boolean maximize = false;
@@ -633,7 +629,16 @@ public class Sandbox
 			public void actionPerformed(ActionEvent e)
 			{
 				JFrame slViewer = new SpriteViewer(game);
-				slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
+				
+				try
+				{
+					slViewer.setIconImages(getWindowIcons());
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+				
 				slViewer.setVisible(true);
 			}
 		});
@@ -643,8 +648,36 @@ public class Sandbox
 			public void actionPerformed(ActionEvent e)
 			{
 				JFrame uViewer = new UnitTypeViewer(game);
-				uViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
+				
+				try
+				{
+					uViewer.setIconImages(getWindowIcons());
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+				
 				uViewer.setVisible(true);
+			}
+		});
+		
+		soundPlayerMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JFrame sPlayer = new SoundPlayer(game);
+				
+				try
+				{
+					sPlayer.setIconImages(getWindowIcons());
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+				
+				sPlayer.setVisible(true);
 			}
 		});
 		
@@ -1390,5 +1423,13 @@ public class Sandbox
 		{
 			return false;
 		}
+	}
+	
+	public static List<Image> getWindowIcons() throws IOException
+	{
+		return Arrays.asList(
+			(Image) ImageIO.read(new File(RES_DIR, "art/smallIcon.png")),
+			(Image) ImageIO.read(new File(RES_DIR, "art/mediumIcon.png"))
+		);
 	}
 }

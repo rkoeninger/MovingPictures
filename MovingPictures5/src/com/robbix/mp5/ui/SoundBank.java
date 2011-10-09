@@ -169,6 +169,14 @@ public class SoundBank
 		return true;
 	}
 	
+	public Set<String> getLoadedModules()
+	{
+		Set<String> modules = new HashSet<String>();
+		modules.addAll(clips.keySet());
+		modules.addAll(musics.keySet());
+		return modules;
+	}
+	
 	/**
 	 * Starts playing clip by the given name. If clip is already in the process
 	 * of being played, it will be restarted.

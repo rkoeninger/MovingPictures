@@ -2,7 +2,6 @@ package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -11,11 +10,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -33,6 +30,8 @@ import javax.swing.tree.TreeSelectionModel;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.Mediator;
+import com.robbix.mp5.ModuleEvent;
+import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.basics.RTreeNode;
 import com.robbix.mp5.ui.SoundBank;
 import com.robbix.mp5.ui.Sprite;
@@ -45,16 +44,13 @@ public class UnitTypeViewer extends JFrame
 {
 	public static void main(String[] args) throws IOException
 	{
-		Image smallIcon  = ImageIO.read(new File("./res/art/smallIcon.png"));
-		Image mediumIcon = ImageIO.read(new File("./res/art/mediumIcon.png"));
-		
 		Sandbox.trySystemLookAndFeel();
 		UnitFactory factory = UnitFactory.load(new File("./res/units"));
 		Mediator.factory = factory;
 		SoundBank sounds = SoundBank.loadLazy(new File("./res/sounds"));
 		SpriteLibrary lib = SpriteLibrary.loadLazy(new File("./res/sprites"));
 		JFrame ufViewer = new UnitTypeViewer(Game.of(lib, factory, sounds));
-		ufViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
+		ufViewer.setIconImages(Sandbox.getWindowIcons());
 		ufViewer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ufViewer.setVisible(true);
 	}
@@ -74,6 +70,28 @@ public class UnitTypeViewer extends JFrame
 		super("UnitType Viewer");
 		sounds = game.getSoundBank();
 		lib = game.getSpriteLibrary();
+		lib.addModuleListener(new ModuleListener(){
+			public void moduleLoaded(ModuleEvent e)
+			{
+				String name = e.getModuleName();
+				
+				if (name.equals(infoPanel.type.getName()))
+				{
+					infoPanel.loadArtButton.setVisible(false);
+					infoPanel.showSpritesFor(infoPanel.type);
+				}
+			}
+			public void moduleUnloaded(ModuleEvent e)
+			{
+				String name = e.getModuleName();
+				
+				if (name.equals(infoPanel.type.getName()))
+				{
+					infoPanel.loadArtButton.setVisible(true);
+					infoPanel.preview.show("Art not loaded");
+				}
+			}
+		});
 		factory = game.getUnitFactory();
 		rootNode = new RTreeNode("UnitTypes");
 		rootNode.set(factory);
@@ -169,6 +187,41 @@ public class UnitTypeViewer extends JFrame
 		treeModel.insertNodeInto(child, parent, parent.getChildCount());
 	}
 	
+	private boolean isArtLoaded(UnitType type)
+	{
+		if (type.isTankType())
+		{
+			return lib.isLoaded(type.getChassisTypeName())
+				&& lib.isLoaded(type.getTurretTypeName());
+		}
+		else
+		{
+			return lib.isLoaded(type.getName());
+		}
+	}
+	
+	private boolean loadArt(UnitType type)
+	{
+		try
+		{
+			if (type.isTankType())
+			{
+				lib.loadModule(type.getChassisTypeName());
+				lib.loadModule(type.getTurretTypeName());
+			}
+			else
+			{
+				lib.loadModule(type.getName());
+			}
+			
+			return true;
+		}
+		catch (IOException ioe)
+		{
+			return false;
+		}
+	}
+	
 	private class InfoPanel extends JComponent
 	{
 		private static final long serialVersionUID = 1L;
@@ -176,13 +229,13 @@ public class UnitTypeViewer extends JFrame
 		public SpritePanel preview;
 		private JTable table;
 		private DefaultTableModel tableModel;
-		private UnitType type;
+		public UnitType type;
 		private JButton playAckButton;
-		private JButton loadArtButton;
+		public JButton loadArtButton;
 		
 		public InfoPanel()
 		{
-			preview = new SpritePanel("Select a UnitType to view Default Sprite");
+			preview = new SpritePanel("Select a UnitType to view info");
 			preview.setPreferredSize(new Dimension(100, 150));
 			playAckButton = new JButton("Play Ack");
 			playAckButton.setEnabled(false);
@@ -200,49 +253,19 @@ public class UnitTypeViewer extends JFrame
 				}
 			});
 			loadArtButton = new JButton("Load Art");
-			loadArtButton.setEnabled(false);
+			loadArtButton.setVisible(false);
 			loadArtButton.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
 					if (type != null)
 					{
-						try
+						if (loadArt(type))
 						{
-							if (type.isTankType())
-							{
-								lib.loadModule(type.getChassisTypeName());
-								lib.loadModule(type.getTurretTypeName());
-							}
-							else
-							{
-								lib.loadModule(type.getName());
-							}
-							
-							if (type.isTankType())
-							{
-								preview.show(
-									new Sprite[]{
-									lib.getDefaultSprite(factory.getChassisType(type)),
-									lib.getDefaultSprite(factory.getTurretType(type))
-									},
-									1,
-									1
-								);
-							}
-							else
-							{
-								Footprint fp = type.getFootprint();
-								preview.show(
-									lib.getDefaultSprite(type),
-									fp == null ? 1 : fp.getWidth(),
-									fp == null ? 1 : fp.getHeight()
-								);
-							}
-							
-							loadArtButton.setEnabled(false);
+							showSpritesFor(type);
+							loadArtButton.setVisible(false);
 						}
-						catch (IOException ioe)
+						else
 						{
 							System.err.println("couldn't load sprites for " + type.getName());
 						}
@@ -275,6 +298,30 @@ public class UnitTypeViewer extends JFrame
 			tableModel.addRow(new Object[]{name, value});
 		}
 		
+		public void showSpritesFor(UnitType type)
+		{
+			Footprint fp = type.getFootprint();
+			
+			if (fp == null)
+				fp = Footprint.VEHICLE;
+			
+			Sprite[] sprites;
+			
+			if (type.isTankType())
+			{
+				sprites = new Sprite[]{
+					lib.getDefaultSprite(factory.getChassisType(type)),
+					lib.getDefaultSprite(factory.getTurretType(type))
+				};
+			}
+			else
+			{
+				sprites = new Sprite[]{lib.getDefaultSprite(type)};
+			}
+			
+			preview.show(sprites, fp.getWidth(), fp.getHeight());
+		}
+		
 		public void show(UnitType type)
 		{
 			this.type = type;
@@ -283,47 +330,26 @@ public class UnitTypeViewer extends JFrame
 			appendTableRow("Type Name", type.getName());
 			appendTableRow("Civ", type.getCiv());
 			appendTableRow("HP", type.getMaxHP());
+			appendTableRow("Armor", type.getArmor());
+			appendTableRow("Damage", type.getDamage());
+			appendTableRow("Attack Range", type.getAttackRange());
+			appendTableRow("Sight Range", type.getSightRange());
+			appendTableRow("Reload Time", type.getWeaponChargeCost());
+			appendTableRow("Cost", type.getCost());
+			appendTableRow("Ack", type.getAcknowledgement());
+			
+			boolean artLoaded = isArtLoaded(type);
 			
 			playAckButton.setEnabled(type.getAcknowledgement() != null);
+			loadArtButton.setVisible(! artLoaded);
 			
-			if (type.isTankType())
+			if (artLoaded)
 			{
-				if (lib.isLoaded(type.getChassisTypeName())
-				 && lib.isLoaded(type.getTurretTypeName()))
-				{
-					loadArtButton.setEnabled(false);
-					preview.show(
-						new Sprite[]{
-						lib.getDefaultSprite(factory.getChassisType(type)),
-						lib.getDefaultSprite(factory.getTurretType(type))
-						},
-						1,
-						1
-					);
-				}
-				else
-				{
-					loadArtButton.setEnabled(true);
-					preview.show("Art not loaded");
-				}
+				showSpritesFor(type);
 			}
 			else
 			{
-				if (lib.isLoaded(type.getName()))
-				{
-					loadArtButton.setEnabled(false);
-					Footprint fp = type.getFootprint();
-					preview.show(
-						lib.getDefaultSprite(type),
-						fp.getWidth(),
-						fp.getHeight()
-					);
-				}
-				else
-				{
-					loadArtButton.setEnabled(true);
-					preview.show("Art not loaded");
-				}
+				preview.show("Art not loaded");
 			}
 		}
 		

@@ -2,9 +2,11 @@ package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -14,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -24,6 +25,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
@@ -54,25 +56,18 @@ import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
 
-/**
- * setVisible(true) needs to be called on instances of this class after
- * constructor is called.
- */
 public class SpriteViewer extends JFrame
 {
 	public static void main(String[] args) throws IOException
 	{
 		boolean lazy = Arrays.asList(args).contains("-lazyLoadSprites");
 		
-		Image smallIcon  = ImageIO.read(new File("./res/art/smallIcon.png"));
-		Image mediumIcon = ImageIO.read(new File("./res/art/mediumIcon.png"));
-		
 		Sandbox.trySystemLookAndFeel();
 		UnitFactory factory = UnitFactory.load(new File("./res/units"));
 		Mediator.factory = factory;
 		SpriteLibrary lib = SpriteLibrary.load(new File("./res/sprites"), lazy);
 		JFrame slViewer = new SpriteViewer(Game.of(lib, factory));
-		slViewer.setIconImages(Arrays.asList(smallIcon, mediumIcon));
+		slViewer.setIconImages(Sandbox.getWindowIcons());
 		slViewer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		slViewer.setVisible(true);
 	}
@@ -84,6 +79,7 @@ public class SpriteViewer extends JFrame
 	private JTree tree;
 	private RTreeNode rootNode;
 	private DefaultTreeModel treeModel;
+	private JPopupMenu unloadPopup;
 	private JPanel rightSidePanel;
 	private JPanel controlPanel;
 	private JSlider delaySlider;
@@ -99,6 +95,7 @@ public class SpriteViewer extends JFrame
 			public void moduleLoaded(ModuleEvent e) {buildTree();}
 			public void moduleUnloaded(ModuleEvent e) {buildTree();}
 		});
+		unloadPopup = new JPopupMenu();
 		rootNode = new RTreeNode("Sprite Library");
 		rootNode.set(lib);
 		treeModel = new DefaultTreeModel(rootNode);
@@ -107,6 +104,43 @@ public class SpriteViewer extends JFrame
 			TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.setEditable(true);
 		tree.setShowsRootHandles(false);
+		tree.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.getButton() != MouseEvent.BUTTON3)
+					return;
+				
+				TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+				
+				if (path == null)
+					return;
+				
+				RTreeNode node = (RTreeNode) path.getLastPathComponent();
+				
+				if (! node.has(SpriteSet.class))
+					return;
+				
+				tree.setSelectionPath(path);
+				final SpriteSet set = node.get(SpriteSet.class);
+				Point p = tree.getPopupLocation(e);
+				final JMenuItem unloadMenuItem = new JMenuItem("Unload");
+				unloadMenuItem.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						lib.unloadModule(set.getName());
+					}
+				});
+				unloadPopup.removeAll();
+				unloadPopup.add(unloadMenuItem);
+				
+				if (p == null)
+					p = e.getPoint();
+				
+				unloadPopup.show(tree, p.x, p.y);
+			}
+		});
 		buildTree();
 		preview = new SpritePanel("Select a Sprite or SpriteGroup to Preview");
 		delaySlider = new JSlider(SwingConstants.HORIZONTAL, 0, 500, 50);

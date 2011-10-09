@@ -32,6 +32,7 @@ public class SpritePanel extends JComponent
 	private int tileSize = 32;
 	private int fpw;
 	private int fph;
+	private boolean grid = true;
 	
 	public SpritePanel(String defaultMessage)
 	{
@@ -130,8 +131,11 @@ public class SpritePanel extends JComponent
 	{
 		g.setColor(Color.DARK_GRAY);
 		
-		if (fpw == 0 && fph == 0) drawCrosshair(g);
-		                     else drawGrid(g, fpw, fph);
+		if (grid)
+		{
+			if (fpw == 0 && fph == 0) drawCrosshair(g);
+			                     else drawGrid(g, fpw, fph);
+		}
 	}
 	
 	private void drawCrosshair(Graphics g)
@@ -232,5 +236,15 @@ public class SpritePanel extends JComponent
 	public int getHue()
 	{
 		return hue;
+	}
+	
+	public void setGridVisible(boolean grid)
+	{
+		this.grid = grid;
+	}
+	
+	public boolean isGridVisible()
+	{
+		return grid;
 	}
 }
