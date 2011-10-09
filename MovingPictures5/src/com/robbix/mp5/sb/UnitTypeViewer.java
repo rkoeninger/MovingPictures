@@ -109,7 +109,7 @@ public class UnitTypeViewer extends JFrame
 		setLayout(new BorderLayout());
 		add(splitPane, BorderLayout.CENTER);
 		setSize(500, 500);
-		splitPane.setDividerLocation(0.5);
+		splitPane.setDividerLocation(160);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
