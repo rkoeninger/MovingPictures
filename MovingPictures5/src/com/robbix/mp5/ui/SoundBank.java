@@ -77,40 +77,24 @@ public class SoundBank
 	private Clip currentMusic;
 	private boolean running;
 	private File rootDir;
-	private Set<ModuleListener> listeners;
+	private ModuleListener.Helper listenerHelper;
 	
 	private SoundBank()
 	{
 		clips   = new HashMap<String, Clip>();
 		musics  = new HashMap<String, Clip>();
 		running = false;
-		listeners = new HashSet<ModuleListener>();
+		listenerHelper = new ModuleListener.Helper();
 	}
 	
 	public void addModuleListener(ModuleListener listener)
 	{
-		listeners.add(listener);
+		listenerHelper.add(listener);
 	}
 	
 	public void removeModuleListener(ModuleListener listener)
 	{
-		listeners.remove(listener);
-	}
-	
-	private void fireModuleLoaded(String name)
-	{
-		ModuleEvent event = new ModuleEvent(this, name);
-		
-		for (ModuleListener listener : listeners)
-			listener.moduleLoaded(event);
-	}
-	
-	private void fireModuleUnloaded(String name)
-	{
-		ModuleEvent event = new ModuleEvent(this, name);
-		
-		for (ModuleListener listener : listeners)
-			listener.moduleUnloaded(event);
+		listenerHelper.remove(listener);
 	}
 	
 	public void loadModule(String name)
@@ -121,7 +105,7 @@ public class SoundBank
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(file));
 			clips.put(name, clip);
-			fireModuleLoaded(name);
+			listenerHelper.fireModuleLoaded(new ModuleEvent(this, name));
 		}
 		catch (Exception e)
 		{
@@ -137,7 +121,7 @@ public class SoundBank
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(file));
 			musics.put(name, clip);
-			fireModuleLoaded(name);
+			listenerHelper.fireModuleLoaded(new ModuleEvent(this, name));
 		}
 		catch (Exception e)
 		{
@@ -165,7 +149,7 @@ public class SoundBank
 			return false;
 		}
 		
-		fireModuleUnloaded(name);
+		listenerHelper.fireModuleUnloaded(new ModuleEvent(this, name));
 		return true;
 	}
 	

@@ -61,40 +61,24 @@ public class SpriteLibrary
 	private File rootDir;
 
 	private Set<String> loadedModules;
-	private Set<ModuleListener> listeners;
+	private ModuleListener.Helper listenerHelper;
 	
 	public SpriteLibrary()
 	{
 		loadedModules = new HashSet<String>(64);
 		unitSets = new AutoArrayList<SpriteSet>();
 		ambientSets = new HashMap<String, SpriteSet>(256);
-		listeners = new HashSet<ModuleListener>();
+		listenerHelper = new ModuleListener.Helper();
 	}
 	
 	public void addModuleListener(ModuleListener listener)
 	{
-		listeners.add(listener);
+		listenerHelper.add(listener);
 	}
 	
 	public void removeModuleListener(ModuleListener listener)
 	{
-		listeners.remove(listener);
-	}
-	
-	private void fireModuleLoaded(String name)
-	{
-		ModuleEvent event = new ModuleEvent(this, name);
-		
-		for (ModuleListener listener : listeners)
-			listener.moduleLoaded(event);
-	}
-	
-	private void fireModuleUnloaded(String name)
-	{
-		ModuleEvent event = new ModuleEvent(this, name);
-		
-		for (ModuleListener listener : listeners)
-			listener.moduleUnloaded(event);
+		listenerHelper.remove(listener);
 	}
 	
 	public SpriteSet loadModule(File xmlFile) throws IOException
@@ -121,7 +105,7 @@ public class SpriteLibrary
 		}
 		
 		loadedModules.add(moduleName);
-		fireModuleLoaded(moduleName);
+		listenerHelper.fireModuleLoaded(new ModuleEvent(this, moduleName));
 		return set;
 	}
 	
@@ -141,7 +125,7 @@ public class SpriteLibrary
 		{
 			ambientSets.remove(name);
 			loadedModules.remove(name);
-			fireModuleUnloaded(name);
+			listenerHelper.fireModuleUnloaded(new ModuleEvent(this, name));
 			return true;
 		}
 		
@@ -151,7 +135,7 @@ public class SpriteLibrary
 		{
 			unitSets.set(type.getSerial(), null);
 			loadedModules.remove(name);
-			fireModuleUnloaded(name);
+			listenerHelper.fireModuleUnloaded(new ModuleEvent(this, name));
 			return true;
 		}
 		
