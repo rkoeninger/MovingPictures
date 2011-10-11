@@ -464,7 +464,34 @@ public class FloatSampleBuffer {
 		float[] target=getChannel(targetChannel);
 		System.arraycopy(source, 0, target, 0, getSampleCount());
 	}
-
+	
+	public void mixChannels(int[] sourceChannels, int targetChannel)
+	{
+		for (int i = 0; i < sampleCount; ++i)
+		{
+			float sample = 0;
+			
+			for (int c = 0; c < sourceChannels.length; ++c)
+				sample += channels.get(c)[i];
+			
+			sample /= sourceChannels.length;
+			channels.get(targetChannel)[i] = sample;
+		}
+	}
+	
+	public void makeMono()
+	{
+		int[] sourceChannels = new int[getChannelCount()];
+		
+		for (int c = 0; c < sourceChannels.length; ++c)
+			sourceChannels[c] = c;
+		
+		mixChannels(sourceChannels, 0);
+		
+		while (getChannelCount() > 1)
+			removeChannel(1);
+	}
+	
 	//////////////////////////////// properties /////////////////////////////////
 
 	public int getChannelCount() {
