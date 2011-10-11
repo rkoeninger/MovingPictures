@@ -23,7 +23,7 @@
  *
  */
 
-package	com.robbix.mp5.basics.sound;
+package	com.robbix.mp5.basics;
 
 import	java.util.ArrayList;
 import	java.util.Random;

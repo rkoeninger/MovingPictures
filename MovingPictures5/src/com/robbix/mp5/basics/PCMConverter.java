@@ -1,4 +1,4 @@
-package com.robbix.mp5.basics.sound;
+package com.robbix.mp5.basics;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,9 +20,9 @@ public class PCMConverter
 	{
 		AudioInputStream ais = AudioSystem.getAudioInputStream(new File("./res/sounds/commandCenter.wav"));
 		AudioFormat inFormat = ais.getFormat();
-		AudioFormat outFormat = new AudioFormat(64000.0f, 16, 2, true, false);
-//		System.out.println(inFormat);
-//		System.out.println(outFormat);
+		AudioFormat outFormat = new AudioFormat(64000.0f, 24, 2, true, false);
+		System.out.println(inFormat);
+		System.out.println(outFormat);
 		int dataSize = (int) (ais.getFrameLength() * inFormat.getFrameSize());
 		byte[] data = new byte[dataSize];
 		int bytesRead = 0;
@@ -39,9 +39,9 @@ public class PCMConverter
 		clip.setFramePosition(0);
 		clip.loop(0);
 		
-//		System.out.println("clip start");
+		System.out.println("clip start");
 		while (clip.isRunning());
-//		System.out.println("clip end");
+		System.out.println("clip end");
 	}
 	
 	private static void dump(byte[] data, String filename) throws IOException
@@ -55,9 +55,13 @@ public class PCMConverter
 	
 	// END TEST METHODS ///////////////////////////////////////////////////////
 	
+	/**
+	 * Converts PCM audio data from source format to dest format. Both formats
+	 * must have PCM_SIGNED or PCM_UNSIGNED as their encoding.
+	 */
 	public static byte[] convert(AudioFormat source, AudioFormat dest, byte[] in)
 	{
-		if (AudioFormats.matches(source, dest))
+		if (matches(source, dest))
 			return Arrays.copyOf(in, in.length);
 		
 		if (! (isPCM(source) && isPCM(dest)))
@@ -111,18 +115,24 @@ public class PCMConverter
 			int previousIndex = 0;
 			
 			for (int i = 0; i < in.getSampleCount(); ++i)
-			for (int c = 0; c < channelCount; ++c)
 			{
 				int i2 = index(i, out.getSampleCount(), rateRatio);
-				out.getChannel(c)[i2] = in.getChannel(c)[i];
+				
+				for (int c = 0; c < channelCount; ++c)
+					out.getChannel(c)[i2] = in.getChannel(c)[i];
 				
 				// Interpolate over unwritten regions
 				if (i2 - previousIndex > 1)
 				{
 					for (int y = 0; y < channelCount; ++y)
-					for (int x = previousIndex + 1; x < i2; ++x)
 					{
-						out.getChannel(y)[x] = out.getChannel(y)[previousIndex];
+						float sample = 0;
+						sample += out.getChannel(y)[previousIndex];
+						sample += out.getChannel(y)[i2];
+						sample /= 2;
+						
+						for (int x = previousIndex + 1; x < i2; ++x)
+							out.getChannel(y)[x] = sample;
 					}
 				}
 				
@@ -162,5 +172,37 @@ public class PCMConverter
 	private static void throwBadChannelConversion(int a, int b)
 	{
 		throw new Error("cannot convert channels " + a + " -> " + b);
+	}
+	
+	private static boolean matches(AudioFormat a, AudioFormat b)
+	{
+		return a.getEncoding().equals(b.getEncoding())
+			&& doSampleSizeMatch(a, b)
+			&& doMatch(a.getChannels(),         b.getChannels())
+			&& doMatch(a.getSampleSizeInBits(), b.getSampleSizeInBits())
+			&& doMatch(a.getFrameSize(),        b.getFrameSize())
+			&& doMatch(a.getSampleRate(),       b.getSampleRate())
+			&& doMatch(a.getFrameRate(),        b.getFrameRate());
+	}
+	
+	private static boolean doMatch(int i1, int i2)
+	{
+		return i1 == AudioSystem.NOT_SPECIFIED
+			|| i2 == AudioSystem.NOT_SPECIFIED
+			|| i1 == i2;
+	}
+	
+	private static boolean doMatch(float f1, float f2)
+	{
+		return f1 == AudioSystem.NOT_SPECIFIED
+			|| f2 == AudioSystem.NOT_SPECIFIED
+			|| Math.abs(f1 - f2) < 1.0e-9;
+	}
+	
+	private static boolean doSampleSizeMatch(AudioFormat a, AudioFormat b)
+	{
+		return b.getSampleSizeInBits() <= 8
+			|| b.getSampleSizeInBits() == AudioSystem.NOT_SPECIFIED
+			|| a.isBigEndian() == b.isBigEndian();
 	}
 }
