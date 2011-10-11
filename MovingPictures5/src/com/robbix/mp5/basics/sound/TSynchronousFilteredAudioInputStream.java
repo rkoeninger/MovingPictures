@@ -5,17 +5,14 @@ import java.io.IOException;
 import	javax.sound.sampled.AudioSystem;
 import	javax.sound.sampled.AudioFormat;
 import	javax.sound.sampled.AudioInputStream;
-import	javax.sound.sampled.spi.FormatConversionProvider;
 
 /** 
  * base class for types of audio filter/converter that translate one frame to another frame.
  * It provides all the transformation of lengths and sizes.
  *
  * @author Florian Bomers
- * $$fb 2000-07-18: extensive clean up
  */
-public abstract class TSynchronousFilteredAudioInputStream
-	extends AudioInputStream
+public abstract class TSynchronousFilteredAudioInputStream extends AudioInputStream
 {
 
 	private AudioInputStream originalStream;
@@ -98,9 +95,8 @@ public abstract class TSynchronousFilteredAudioInputStream
 	    //convert(buffer, buffer, byteOffset, frameCount);
 	    throw new RuntimeException("Illegal call to convertInPlace");
 	}
-
-	public int read()
-		throws IOException
+	
+	public int read() throws IOException
 	{
 		if (getFormat().getFrameSize() != 1)
 		{
@@ -121,9 +117,7 @@ public abstract class TSynchronousFilteredAudioInputStream
 		}
 		return temp[0];
 	}
-
-
-
+	
 	private void clearBuffer()
 	{
 		buffer = null;
@@ -183,8 +177,7 @@ public abstract class TSynchronousFilteredAudioInputStream
 	}
 
 	
-    public long skip(long nSkip)
-	throws	IOException
+    public long skip(long nSkip) throws IOException
     {
 	// only returns integral frames
 	long skipFrames = nSkip / getFormat().getFrameSize();
@@ -192,51 +185,31 @@ public abstract class TSynchronousFilteredAudioInputStream
 	long nSkippedFrames = (int) (originalSkippedBytes/originalFrameSize);
 	return nSkippedFrames * getFormat().getFrameSize();
     }
-
-
-    public int available()
-	throws IOException
+    
+    public int available() throws IOException
     {
-	int avail = originalStream.available();
-	if (avail>0) {
-	    avail=(int) (avail * frameSizeFactor);
-	}
-	return avail;
+    	int avail = originalStream.available();
+    	return avail > 0 ? (int) (avail * frameSizeFactor) : avail;
     }
-
-
-    public void close()
-	throws IOException
+    
+    public void close() throws IOException
     {
-	originalStream.close();
-	clearBuffer();
+    	originalStream.close();
+		clearBuffer();
     }
-
-
-
+    
     public void mark(int readlimit)
     {
-	originalStream.mark((int) (readlimit*inverseFrameSizeFactor));
+    	originalStream.mark((int) (readlimit*inverseFrameSizeFactor));
     }
-
-
-
-    public void reset()
-	throws IOException
+    
+    public void reset() throws IOException
     {
-	originalStream.reset();
+    	originalStream.reset();
     }
-
-
+    
     public boolean markSupported()
     {
-	return originalStream.markSupported();
+    	return originalStream.markSupported();
     }
-
-
-    private int getFrameSize()
-    {
-	return getFormat().getFrameSize();
-    }
-
 }

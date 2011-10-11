@@ -1,10 +1,10 @@
 package com.robbix.mp5.basics.sound;
 
-import	java.util.Collection;
-import	java.util.Iterator;
+import java.util.Collection;
 
-import	javax.sound.sampled.AudioFormat;
-import	javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
+import javax.sound.sampled.AudioSystem;
 
 /**
  *	This is a base class for FormatConversionProviders that can convert
@@ -20,169 +20,125 @@ import	javax.sound.sampled.AudioSystem;
  */
 public abstract class TSimpleFormatConversionProvider extends TFormatConversionProvider
 {
-	private Collection	m_sourceEncodings;
-	private Collection	m_targetEncodings;
-	private Collection	m_sourceFormats;
-	private Collection	m_targetFormats;
-
-
-
-
+	private Collection<Encoding>    m_sourceEncodings;
+	private Collection<Encoding>    m_targetEncodings;
+	private Collection<AudioFormat> m_sourceFormats;
+	private Collection<AudioFormat> m_targetFormats;
+	
 	protected TSimpleFormatConversionProvider(
-		Collection sourceFormats,
-		Collection targetFormats)
+		Collection<AudioFormat> sourceFormats,
+		Collection<AudioFormat> targetFormats)
 	{
-		m_sourceEncodings = new ArraySet();
-		m_targetEncodings = new ArraySet();
+		m_sourceEncodings = new ArraySet<Encoding>();
+		m_targetEncodings = new ArraySet<Encoding>();
 		m_sourceFormats = sourceFormats;
 		m_targetFormats = targetFormats;
 		collectEncodings(m_sourceFormats, m_sourceEncodings);
 		collectEncodings(m_targetFormats, m_targetEncodings);
 	}
-
-
-
-	private static void collectEncodings(Collection formats,
-				      Collection encodings)
+	
+	private static void collectEncodings(
+		Collection<AudioFormat> formats,
+		Collection<Encoding> encodings)
 	{
-		Iterator	iterator = formats.iterator();
-		while (iterator.hasNext())
-		{
-			AudioFormat	format = (AudioFormat) iterator.next();
+		for (AudioFormat format : formats)
 			encodings.add(format.getEncoding());
-		}
 	}
-
-
-
-	public AudioFormat.Encoding[] getSourceEncodings()
+	
+	public Encoding[] getSourceEncodings()
 	{
-		return (AudioFormat.Encoding[]) m_sourceEncodings.toArray(EMPTY_ENCODING_ARRAY);
+		return m_sourceEncodings.toArray(EMPTY_ENCODING_ARRAY);
 	}
-
-
-
-	public AudioFormat.Encoding[] getTargetEncodings()
+	
+	public Encoding[] getTargetEncodings()
 	{
-		return (AudioFormat.Encoding[]) m_targetEncodings.toArray(EMPTY_ENCODING_ARRAY);
+		return m_targetEncodings.toArray(EMPTY_ENCODING_ARRAY);
 	}
-
-
-
-	// overwritten of FormatConversionProvider
-	public boolean isSourceEncodingSupported(AudioFormat.Encoding sourceEncoding)
+	
+	public boolean isSourceEncodingSupported(Encoding sourceEncoding)
 	{
 		return m_sourceEncodings.contains(sourceEncoding);
 	}
-
-
-
+	
 	// overwritten of FormatConversionProvider
-	public boolean isTargetEncodingSupported(AudioFormat.Encoding targetEncoding)
+	public boolean isTargetEncodingSupported(Encoding targetEncoding)
 	{
 		return m_targetEncodings.contains(targetEncoding);
 	}
-
-
-
+	
 	/**
 	 *	This implementation assumes that the converter can convert
 	 *	from each of its source encodings to each of its target
 	 *	encodings. If this is not the case, the converter has to
 	 *	override this method.
 	 */
-	public AudioFormat.Encoding[] getTargetEncodings(AudioFormat sourceFormat)
+	public Encoding[] getTargetEncodings(AudioFormat sourceFormat)
 	{
-		if (isAllowedSourceFormat(sourceFormat))
-		{
-			return getTargetEncodings();
-		}
-		else
-		{
-			return EMPTY_ENCODING_ARRAY;
-		}
+		return isAllowedSourceFormat(sourceFormat)
+			? getTargetEncodings()
+			: EMPTY_ENCODING_ARRAY;
 	}
-
-
-
+	
 	/**
 	 *	This implementation assumes that the converter can convert
 	 *	from each of its source formats to each of its target
 	 *	formats. If this is not the case, the converter has to
 	 *	override this method.
 	 */
-	public AudioFormat[] getTargetFormats(AudioFormat.Encoding targetEncoding, AudioFormat sourceFormat)
+	public AudioFormat[] getTargetFormats(
+		Encoding targetEncoding,
+		AudioFormat sourceFormat)
 	{
-		if (isConversionSupported(targetEncoding, sourceFormat))
-		{
-			return (AudioFormat[]) m_targetFormats.toArray(EMPTY_FORMAT_ARRAY);
-		}
-		else
-		{
-			return EMPTY_FORMAT_ARRAY;
-		}
+		return isConversionSupported(targetEncoding, sourceFormat)
+			? m_targetFormats.toArray(EMPTY_FORMAT_ARRAY)
+			: EMPTY_FORMAT_ARRAY;
 	}
-
-
-	// TODO: check if necessary
-	protected boolean isAllowedSourceEncoding(AudioFormat.Encoding sourceEncoding)
+	
+	protected boolean isAllowedSourceEncoding(Encoding sourceEncoding)
 	{
 		return m_sourceEncodings.contains(sourceEncoding);
 	}
-
-
-
-	protected boolean isAllowedTargetEncoding(AudioFormat.Encoding targetEncoding)
+	
+	protected boolean isAllowedTargetEncoding(Encoding targetEncoding)
 	{
 		return m_targetEncodings.contains(targetEncoding);
 	}
-
-
-
+	
 	protected boolean isAllowedSourceFormat(AudioFormat sourceFormat)
 	{
-		Iterator	iterator = m_sourceFormats.iterator();
-		while (iterator.hasNext())
-		{
-			AudioFormat	format = (AudioFormat) iterator.next();
+		for (AudioFormat format : m_sourceFormats)
 			if (AudioFormats.matches(format, sourceFormat))
-			{
 				return true;
-			}
-		}
-		return false;
-	}
-
-
-
-	protected boolean isAllowedTargetFormat(AudioFormat targetFormat)
-	{
-		Iterator	iterator = m_targetFormats.iterator();
-		while (iterator.hasNext())
-		{
-			AudioFormat	format = (AudioFormat) iterator.next();
-			if (AudioFormats.matches(format, targetFormat))
-			{
-				return true;
-			}
-		}
+		
 		return false;
 	}
 	
-	// $$fb 2000-04-02 added some convenience methods for overriding classes
-	protected Collection getCollectionSourceEncodings() {
+	protected boolean isAllowedTargetFormat(AudioFormat targetFormat)
+	{
+		for (AudioFormat format : m_targetFormats)
+			if (AudioFormats.matches(format, targetFormat))
+				return true;
+		
+		return false;
+	}
+	
+	protected Collection<Encoding> getCollectionSourceEncodings()
+	{
 		return m_sourceEncodings;
 	}
 	
-	protected Collection getCollectionTargetEncodings() {
+	protected Collection<Encoding> getCollectionTargetEncodings()
+	{
 		return m_targetEncodings;
 	}
 	
-	protected Collection getCollectionSourceFormats() {
+	protected Collection<AudioFormat> getCollectionSourceFormats()
+	{
 		return m_sourceFormats;
 	}
 	
-	protected Collection getCollectionTargetFormats() {
+	protected Collection<AudioFormat> getCollectionTargetFormats()
+	{
 		return m_targetFormats;
 	}
 	
@@ -302,9 +258,4 @@ public abstract class TSimpleFormatConversionProvider extends TFormatConversionP
 		}
 		return sampleSize*channels/8;
 	}
-
-
-
 }
-
-/*** TSimpleFormatConversionProvider.java ***/

@@ -1,11 +1,12 @@
 package com.robbix.mp5.basics.sound;
 
-import	java.util.Arrays;
-import	java.util.Iterator;
+import java.util.Arrays;
+import java.util.Iterator;
 
-import	javax.sound.sampled.AudioSystem;
-import	javax.sound.sampled.AudioFormat;
-import	javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
+import javax.sound.sampled.AudioInputStream;
 
 /**
  * This provider supports these PCM conversions (<--> meaning both directions):
@@ -136,13 +137,16 @@ public class PCM2PCMConversionProvider
 		throw new IllegalArgumentException("format conversion not supported");
 	}
 
-	public AudioFormat[] getTargetFormats(AudioFormat.Encoding targetEncoding,
-	                                      AudioFormat sourceFormat) {
+	public AudioFormat[] getTargetFormats(
+		Encoding targetEncoding,
+		AudioFormat sourceFormat)
+	{
 
-		if (isConversionSupported(targetEncoding, sourceFormat)) {
+		if (isConversionSupported(targetEncoding, sourceFormat))
+		{
 			// TODO: check that no duplicates may occur...
-			ArraySet result=new ArraySet();
-			Iterator iterator=getCollectionTargetFormats().iterator();
+			ArraySet<AudioFormat> result = new ArraySet<AudioFormat>();
+			Iterator<AudioFormat> iterator=getCollectionTargetFormats().iterator();
 			while (iterator.hasNext()) {
 				AudioFormat targetFormat = (AudioFormat) iterator.next();
 				targetFormat=replaceNotSpecified(sourceFormat, targetFormat);
@@ -150,13 +154,15 @@ public class PCM2PCMConversionProvider
 					result.add(targetFormat);
 				}
 			}
-			return (AudioFormat[]) result.toArray(EMPTY_FORMAT_ARRAY);
-		} else {
+			
+			return result.toArray(EMPTY_FORMAT_ARRAY);
+		}
+		else
+		{
 			return EMPTY_FORMAT_ARRAY;
 		}
 	}
-
-
+	
 	/** method overidden due to the difficult situation with the channel count
 	 * and the possible conversions possible.
 	 */
@@ -263,82 +269,13 @@ public class PCM2PCMConversionProvider
 		}
 		return CONVERT_FLOAT;
 	}
-
-	/**
-	 * Debugging functions
-	 */
-	private static String formatType2Str(int formatType) {
-		switch (formatType) {
-		case 0:
-			return "unsupported";
-		case UNSIGNED8:
-			return "UNSIGNED8";
-		case SIGNED8:
-			return "SIGNED8";
-		case BIG_ENDIAN16:
-			return "BIG_ENDIAN16";
-		case LITTLE_ENDIAN16:
-			return "LITTLE_ENDIAN16";
-		case BIG_ENDIAN24:
-			return "BIG_ENDIAN24";
-		case LITTLE_ENDIAN24:
-			return "LITTLE_ENDIAN24";
-		case BIG_ENDIAN32:
-			return "BIG_ENDIAN32";
-		case LITTLE_ENDIAN32:
-			return "LITTLE_ENDIAN32";
-		}
-		return "unknown";
-	}
-
-	private static String conversionType2Str(int conversionType) {
-		switch (conversionType) {
-		case CONVERT_NOT_POSSIBLE:
-			return "CONVERT_NOT_POSSIBLE";
-		case CONVERT_SIGN:
-			return "CONVERT_SIGN";
-		case CONVERT_BYTE_ORDER16:
-			return "CONVERT_BYTE_ORDER16";
-		case CONVERT_BYTE_ORDER24:
-			return "CONVERT_BYTE_ORDER24";
-		case CONVERT_BYTE_ORDER32:
-			return "CONVERT_BYTE_ORDER32";
-		case CONVERT_16LTO8S:
-			return "CONVERT_16LTO8S";
-		case CONVERT_16LTO8U:
-			return "CONVERT_16LTO8U";
-		case CONVERT_16BTO8S:
-			return "CONVERT_16BTO8S";
-		case CONVERT_16BTO8U:
-			return "CONVERT_16BTO8U";
-		case CONVERT_8STO16L:
-			return "CONVERT_8STO16L";
-		case CONVERT_8STO16B:
-			return "CONVERT_8STO16B";
-		case CONVERT_8UTO16L:
-			return "CONVERT_8UTO16L";
-		case CONVERT_8UTO16B:
-			return "CONVERT_8UTO16B";
-		case CONVERT_ONLY_EXPAND_CHANNELS:
-			return "CONVERT_ONLY_EXPAND_CHANNELS";
-		case CONVERT_FLOAT:
-			return "CONVERT_FLOAT";
-		case CONVERT_NONE:
-			return "CONVERT_NONE";
-		}
-		return "unknown";
-	}
-
-
+	
 	/**
 	 * PCM2PCMStream
 	 * Provides direct conversion of some selected formats and rxpanding of channels.
 	 */
-
 	class PCM2PCMStream extends TSynchronousFilteredAudioInputStream {
 		private int conversionType;
-		private int sourceType;
-		private int targetType;
 		private boolean needExpandChannels;
 		private boolean needMixDown;
 
@@ -358,8 +295,6 @@ public class PCM2PCMConversionProvider
 			           sourceStream.getFormat().getFrameRate(),
 			           targetFormat.isBigEndian()));
 			this.conversionType=conversionType;
-			this.sourceType=sourceType;
-			this.targetType=targetType;
 			needExpandChannels=sourceStream.getFormat().getChannels()<targetFormat.getChannels();
 			needMixDown=sourceStream.getFormat().getChannels()>targetFormat.getChannels();
 
