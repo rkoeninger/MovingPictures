@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -32,7 +33,7 @@ public class PCMConverter
 			pos += bytesRead;
 		
 		ais.close();
-		data = convert(inFormat, outFormat, data);
+		data = convert(data, inFormat, outFormat);
 		dump(data, "dataOut" + System.currentTimeMillis());
 		Clip clip = AudioSystem.getClip();
 		clip.open(outFormat, data, 0, data.length);
@@ -56,10 +57,35 @@ public class PCMConverter
 	// END TEST METHODS ///////////////////////////////////////////////////////
 	
 	/**
+	 * Converts one sample buffer to another by spreading/downmixing channels
+	 * and decimating/interpolating sample rates as necessary.
+	 */
+	public static SampleBuffer convert(SampleBuffer in, int channels, float rate)
+	{
+		SampleBuffer out;
+		
+		if (! doMatch(in.getSampleRate(), rate))
+		{
+			out = convertRate(in, rate);
+		}
+		else
+		{
+			out = new SampleBuffer(in);
+		}
+		
+		if (in.getChannelCount() != channels)
+		{
+			out = convertChannels(out, channels);
+		}
+		
+		return out;
+	}
+	
+	/**
 	 * Converts PCM audio data from source format to dest format. Both formats
 	 * must have PCM_SIGNED or PCM_UNSIGNED as their encoding.
 	 */
-	public static byte[] convert(AudioFormat source, AudioFormat dest, byte[] in)
+	public static byte[] convert(byte[] in, AudioFormat source, AudioFormat dest)
 	{
 		if (matches(source, dest))
 			return Arrays.copyOf(in, in.length);
@@ -67,21 +93,15 @@ public class PCMConverter
 		if (! (isPCM(source) && isPCM(dest)))
 			throw new IllegalArgumentException();
 		
-		FloatSampleBuffer buffer = new FloatSampleBuffer(in, 0, in.length, source);
-		
-		if (source.getChannels() != dest.getChannels())
-			buffer = convertChannels(buffer, dest.getChannels());
-		
-		if (source.getSampleRate() != dest.getSampleRate())
-			buffer = convertRate(buffer, dest.getSampleRate());
-		
+		SampleBuffer buffer = new SampleBuffer(in, 0, in.length, source);
+		buffer = convert(buffer, dest.getChannels(), dest.getSampleRate());
 		int outSize = buffer.getByteArrayBufferSize(dest);
 		byte[] out = new byte[outSize];
 		buffer.convertToByteArray(out, 0, dest);
 		return out;
 	}
 	
-	private static FloatSampleBuffer convertChannels(FloatSampleBuffer in, int destChannels)
+	private static SampleBuffer convertChannels(SampleBuffer in, int destChannels)
 	{
 		int sourceChannels = in.getChannelCount();
 		
@@ -102,13 +122,13 @@ public class PCMConverter
 		return in;
 	}
 	
-	private static FloatSampleBuffer convertRate(FloatSampleBuffer in, float destRate)
+	private static SampleBuffer convertRate(SampleBuffer in, float destRate)
 	{
 		int channelCount      = in.getChannelCount();
 		float sourceRate      = in.getSampleRate();
 		float rateRatio       = destRate / sourceRate;
 		int size              = (int) (in.getSampleCount() * rateRatio);
-		FloatSampleBuffer out = new FloatSampleBuffer(channelCount, size, destRate);
+		SampleBuffer out = new SampleBuffer(channelCount, size, destRate);
 		
 		if (destRate > sourceRate)
 		{
@@ -166,12 +186,8 @@ public class PCMConverter
 	
 	private static boolean isPCM(AudioFormat format)
 	{
-		return format.getEncoding().toString().contains("PCM");
-	}
-	
-	private static void throwBadChannelConversion(int a, int b)
-	{
-		throw new Error("cannot convert channels " + a + " -> " + b);
+		return format.getEncoding() == Encoding.PCM_SIGNED
+			|| format.getEncoding() == Encoding.PCM_UNSIGNED;
 	}
 	
 	private static boolean matches(AudioFormat a, AudioFormat b)
@@ -205,4 +221,10 @@ public class PCMConverter
 			|| b.getSampleSizeInBits() == AudioSystem.NOT_SPECIFIED
 			|| a.isBigEndian() == b.isBigEndian();
 	}
+	
+	private static void throwBadChannelConversion(int a, int b)
+	{
+		throw new Error("cannot convert channels " + a + " -> " + b);
+	}
+	
 }

@@ -22,15 +22,12 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  */
-
 package	com.robbix.mp5.basics;
 
 import	java.util.ArrayList;
 import	java.util.Random;
 
 import	javax.sound.sampled.AudioFormat;
-
-// TODO: Cut out unused methods
 
 /**
  * A class for small buffers of samples in linear, 32-bit
@@ -111,11 +108,10 @@ import	javax.sound.sampled.AudioFormat;
  * <a href="http://www.iqsoft.com/IQSMagazine/BobsSoapbox/Dithering2.htm">
  * here</a>.
  *
- * @author Florian Bomers
+ * @author Florian Bomers, robbixthebobbix
  */
-
-public class FloatSampleBuffer {
-
+public class SampleBuffer
+{
 	/** Whether the functions without lazy parameter are lazy or not. */
 	private static final boolean LAZY_DEFAULT=true;
 
@@ -160,22 +156,27 @@ public class FloatSampleBuffer {
 
 	//////////////////////////////// initialization /////////////////////////////////
 
-	public FloatSampleBuffer() {
+	public SampleBuffer() {
 		this(0,0,1);
 	}
 
-	public FloatSampleBuffer(int channelCount, int sampleCount, float sampleRate) {
+	public SampleBuffer(int channelCount, int sampleCount, float sampleRate) {
 		init(channelCount, sampleCount, sampleRate, LAZY_DEFAULT);
 	}
 
-	public FloatSampleBuffer(byte[] buffer, int offset, int byteCount,
+	public SampleBuffer(byte[] buffer, int offset, int byteCount,
 	                         AudioFormat format) {
 		this(format.getChannels(),
 		     byteCount/(format.getSampleSizeInBits()/8*format.getChannels()),
 		     format.getSampleRate());
 		initFromByteArray(buffer, offset, byteCount, format);
 	}
-
+	
+	public SampleBuffer(SampleBuffer source)
+	{
+		initFromFloatSampleBuffer(source);
+	}
+	
 	protected void init(int channelCount, int sampleCount, float sampleRate) {
 		init(channelCount, sampleCount, sampleRate, LAZY_DEFAULT);
 	}
@@ -240,7 +241,7 @@ public class FloatSampleBuffer {
 
 	}
 
-	public void initFromFloatSampleBuffer(FloatSampleBuffer source) {
+	public void initFromFloatSampleBuffer(SampleBuffer source) {
 		init(source.getChannelCount(), source.getSampleCount(), source.getSampleRate());
 		for (int ch=0; ch<getChannelCount(); ch++) {
 			System.arraycopy(source.getChannel(ch), 0, getChannel(ch), 0, sampleCount);

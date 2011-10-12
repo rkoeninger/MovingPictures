@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
@@ -33,7 +35,9 @@ public class SoundBank
 					continue;
 				
 				Clip clip = AudioSystem.getClip();
-				clip.open(AudioSystem.getAudioInputStream(file));
+				AudioInputStream in = AudioSystem.getAudioInputStream(file);
+				byte[] data = readFully(in);
+				clip.open(in.getFormat(), data, 0, data.length);
 				String rawName = file.getName().toLowerCase();
 				int i = rawName.lastIndexOf(".wav");
 				String name = rawName.substring(0, i);
@@ -50,7 +54,9 @@ public class SoundBank
 						continue;
 					
 					Clip clip = AudioSystem.getClip();
-					clip.open(AudioSystem.getAudioInputStream(file));
+					AudioInputStream in = AudioSystem.getAudioInputStream(file);
+					byte[] data = readFully(in);
+					clip.open(in.getFormat(), data, 0, data.length);
 					String rawName = file.getName().toLowerCase();
 					int i = rawName.lastIndexOf(".wav");
 					String name = rawName.substring(0, i);
@@ -71,6 +77,21 @@ public class SoundBank
 		SoundBank sounds = new SoundBank();
 		sounds.rootDir = rootDir;
 		return sounds;
+	}
+	
+	private static byte[] readFully(AudioInputStream ais) throws IOException
+	{
+		AudioFormat format = ais.getFormat();
+		int dataSize = (int) (format.getFrameRate() * ais.getFrameLength());
+		byte[] data = new byte[dataSize];
+		int bytesRead = 0;
+		int pos = 0;
+		
+		while ((bytesRead = ais.read(data, pos, data.length - pos)) >= 0)
+			pos += bytesRead;
+		
+		ais.close();
+		return data;
 	}
 	
 	private Map<String, Clip> clips, musics;
