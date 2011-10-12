@@ -1,488 +1,286 @@
-/*
- * This file was ripped from Tritonus (tritonus.org).
- * All due credit to Bomers and Pfisterer
- */
-
-/*
- *  Copyright (c) 2000 by Florian Bomers <florian@bome.com>
- *
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU Library General Public License as published
- *   by the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU Library General Public License for more details.
- *
- *   You should have received a copy of the GNU Library General Public
- *   License along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- */
 package	com.robbix.mp5.basics;
 
 import	java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import	java.util.Random;
 
 import	javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
+import javax.sound.sampled.AudioSystem;
 
 /**
- * A class for small buffers of samples in linear, 32-bit
- * floating point format. All samples are normalized to the
- * interval [-1.0...1.0].
- * <p>
- * It is supposed to be a replacement of the byte[] stream
- * architecture of JavaSound, especially for chains of
- * AudioInputStreams. Ideally, all involved AudioInputStreams
- * handle reading into a FloatSampleBuffer. 
- * <p>
- * Using a FloatSampleBuffer for streaming has some advantages:
- * <ul>
- * <li>no conversions from bytes have to be done during processing
- * <li>the sample size in bits is irrelevant - normalized range
- * <li>higher quality for processing
- * <li>separated channels
- * <li>potentially less copying of audio data, as processing
- * of the float samples is generally done in-place. The same
- * instance of a FloatSampleBuffer may be used from the data source
- * to the final data sink.
- * </ul>
- * Simple benchmarks showed that the computational power
- * used by the conversion to and from float
- * is neglectible without dithering, and significantly higher
- * with dithering. An own implementation of a random number
- * generator may improve this.
- * <p>
- * It supports &quot;lazy&quot; deletion of samples and channels:
- * <ul>
- * <li>When the sample count is reduced, the arrays are not resized, but
- * only the member variable <code>sampleCount</code> is reduced. A subsequent
- * increase of the sample count (which will occur frequently), will check
- * that and eventually reuse the existing array.
- * <li>When a channel is deleted, it is not removed from memory but only
- * hidden. Subsequent insertions of a channel will check whether a hidden channel
- * can be reused.
- * </ul>
- * The lazy mechanism can save many array instantiation (and copy-) operations
- * for the sake of performance. All relevant methods exist in a second
- * version which allows explicitely to disable lazy deletion.
- * <p>
- * Use the <code>reset</code> functions to clear the memory and remove 
- * hidden samples and channels.
- * <p>
- * Note that the lazy mechanism implies that the arrays returned
- * from <code>getChannel(int)</code> may have a greater size
- * than getSampleCount(). Consequently, be sure to never rely on the 
- * length field of the sample arrays.
- * <p>
- * As an example, consider a chain of converters that all act
- * on the same instance of FloatSampleBuffer. Some converters
- * may decrease the sample count (e.g. sample rate converter) and
- * delete channels (e.g. PCM2PCM converter). So, processing of one
- * chunk will decrease both. For the next chunk, all starts
- * from the beginning. With the lazy mechanism, all float arrays
- * are only created once for processing all chunks.<br>
- * Having lazy disabled would require for each chunk that is processed
- * <ol>
- * <li>new instantiation of all channel arrays
- * at the converter chain beginning as they have been
- * either deleted or decreased in size during processing of the 
- * previous chunk, and
- * <li>re-instantiation of all channel arrays for
- * the reduction of the sample count.
- * </ol>
- * <p>
- * By default, this class uses dithering for reduction 
- * of sample width (e.g. original data was 16bit, target 
- * data is 8bit). As dithering may be needed in other cases 
- * (especially when the float samples are processed using DSP
- * algorithms), or it is preferred to switch it off,
- * dithering can be explicitely switched on or off with
- * the method setDitherMode(int).<br>
- * For a discussion about dithering, see
- * <a href="http://www.iqsoft.com/IQSMagazine/BobsSoapbox/Dithering.htm">
- * here</a> and 
- * <a href="http://www.iqsoft.com/IQSMagazine/BobsSoapbox/Dithering2.htm">
- * here</a>.
- *
- * @author Florian Bomers, robbixthebobbix
+ * A float-based audio data buffer designed to stand-in for JavaSound's byte[] idiom.
+ * 
+ * Not thread safe.
  */
-public class SampleBuffer
+public class SampleBuffer implements Cloneable
 {
-	/** Whether the functions without lazy parameter are lazy or not. */
-	private static final boolean LAZY_DEFAULT=true;
-
-	private ArrayList<float[]> channels=new ArrayList<float[]>(); // contains for each channel a float array
-	private int sampleCount=0;
-	private int channelCount=0;
-	private float sampleRate=0;
-	private int originalFormatType=0;
-
-	/** Constant for setDitherMode: dithering will be enabled if sample size is decreased */
-	public static final int DITHER_MODE_AUTOMATIC=0;
-	/** Constant for setDitherMode: dithering will be done */
-	public static final int DITHER_MODE_ON=1;
-	/** Constant for setDitherMode: dithering will not be done */
-	public static final int DITHER_MODE_OFF=2;
-
-	private static Random random=null;
-	private float ditherBits=0.8f;
-	private boolean doDither=false; // set in convertFloatToBytes
-	// e.g. the sample rate converter may want to force dithering
-	private int ditherMode=DITHER_MODE_AUTOMATIC;
-
-	// sample width (must be in order !)
-	private static final int F_8=1;
-	private static final int F_16=2;
-	private static final int F_24=3;
-	private static final int F_32=4;
-	private static final int F_SAMPLE_WIDTH_MASK=F_8 | F_16 | F_24 | F_32;
-	// format bit-flags
-	private static final int F_SIGNED=8;
-	private static final int F_BIGENDIAN=16;
-
-	// supported formats
-	private static final int CT_8S=F_8 | F_SIGNED;
-	private static final int CT_8U=F_8;
-	private static final int CT_16SB=F_16 | F_SIGNED | F_BIGENDIAN;
-	private static final int CT_16SL=F_16 | F_SIGNED;
-	private static final int CT_24SB=F_24 | F_SIGNED | F_BIGENDIAN;
-	private static final int CT_24SL=F_24 | F_SIGNED;
-	private static final int CT_32SB=F_32 | F_SIGNED | F_BIGENDIAN;
-	private static final int CT_32SL=F_32 | F_SIGNED;
-
-	//////////////////////////////// initialization /////////////////////////////////
-
-	public SampleBuffer() {
-		this(0,0,1);
+	/**
+	 * When dithering mode is AUTO, it will generally only be done when
+	 * sample size is decreased.
+	 */
+	public static enum DitherMode { AUTO, ON, OFF }
+	
+	private List<float[]> channelList = new ArrayList<float[]>();
+	private int sampleCount;
+	private float sampleRate;
+	private SampleType originalFormatType;
+	
+	private DitherMode ditherMode = DitherMode.AUTO;
+	private float ditherBits = 0.8f;
+	private static Random random = new Random();
+	
+	/*------------------------------------------------------------------------------------------[*]
+	 * Initializers.
+	 */
+	
+	public SampleBuffer(int channels, int size, float rate)
+	{
+		sampleRate  = rate;
+		sampleCount = size;
+		channelList = newChannels(channels, size);
 	}
-
-	public SampleBuffer(int channelCount, int sampleCount, float sampleRate) {
-		init(channelCount, sampleCount, sampleRate, LAZY_DEFAULT);
+	
+	public SampleBuffer(byte[] data, AudioFormat format)
+	{
+		this(data, 0, data.length, format);
 	}
-
-	public SampleBuffer(byte[] buffer, int offset, int byteCount,
-	                         AudioFormat format) {
-		this(format.getChannels(),
-		     byteCount/(format.getSampleSizeInBits()/8*format.getChannels()),
-		     format.getSampleRate());
-		initFromByteArray(buffer, offset, byteCount, format);
+	
+	public SampleBuffer(byte[] data, int off, int len, AudioFormat format)
+	{
+		if (! isPCM(format))
+			throw new IllegalArgumentException("Must be PCM");
+		
+		if (off + len > data.length)
+			throw new IllegalArgumentException("buffer too small");
+		
+		if (! hasSampleSize(format))
+			throw new IllegalArgumentException("Sample size must be specified");
+		
+		if (! hasSampleRate(format))
+			throw new IllegalArgumentException("Sample rate must be specified");
+		
+		if (! hasChannelCount(format))
+			throw new IllegalArgumentException("Channels must be specified");
+		
+		int bytesPerSample = format.getSampleSizeInBits() / 8;
+		int bytesPerFrame = bytesPerSample * format.getChannels();
+		int size = len / bytesPerFrame;
+		channelList = newChannels(format.getChannels(), size);
+		sampleRate = format.getSampleRate();
+		sampleCount = size;
+		SampleType formatType = SampleType.get(format);
+		originalFormatType = formatType;
+		
+		for (int ch=0; ch<format.getChannels(); ch++, off+=bytesPerSample)
+			convertByteToFloat(
+				data,
+				off,
+				sampleCount,
+				getChannel(ch),
+				bytesPerFrame,
+				formatType
+			);
 	}
 	
 	public SampleBuffer(SampleBuffer source)
 	{
-		initFromFloatSampleBuffer(source);
+		sampleRate  = source.sampleRate;
+		sampleCount = source.sampleCount;
+		channelList = copy(source.channelList, source.sampleCount);
 	}
 	
-	protected void init(int channelCount, int sampleCount, float sampleRate) {
-		init(channelCount, sampleCount, sampleRate, LAZY_DEFAULT);
-	}
-
-	protected void init(int channelCount, int sampleCount, float sampleRate, boolean lazy) {
-		if (channelCount<0 || sampleCount<0) {
-			throw new IllegalArgumentException(
-			    "Invalid parameters in initialization of FloatSampleBuffer.");
-		}
-		setSampleRate(sampleRate);
-		if (getSampleCount()!=sampleCount || getChannelCount()!=channelCount) {
-			createChannels(channelCount, sampleCount, lazy);
-		}
-	}
-
-	private void createChannels(int channelCount, int sampleCount, boolean lazy) {
-		this.sampleCount=sampleCount;
-		// lazy delete of all channels. Intentionally lazy !
-		this.channelCount=0;
-		for (int ch=0; ch<channelCount; ch++) {
-			insertChannel(ch, false, lazy);
-		}
-		if (!lazy) {
-			// remove hidden channels
-			while (channels.size()>channelCount) {
-				channels.remove(channels.size()-1);
-			}
-		}
-	}
-
-
-	public void initFromByteArray(byte[] buffer, int offset, int byteCount,
-	                              AudioFormat format) {
-		initFromByteArray(buffer, offset, byteCount, format, LAZY_DEFAULT);
-	}
-
-	public void initFromByteArray(byte[] buffer, int offset, int byteCount,
-	                              AudioFormat format, boolean lazy) {
-		if (offset+byteCount>buffer.length) {
-			throw new IllegalArgumentException
-			("FloatSampleBuffer.initFromByteArray: buffer too small.");
-		}
-		boolean signed=format.getEncoding().equals(AudioFormat.Encoding.PCM_SIGNED);
-		if (!signed &&
-		        !format.getEncoding().equals(AudioFormat.Encoding.PCM_UNSIGNED)) {
-			throw new IllegalArgumentException
-			("FloatSampleBuffer: only PCM samples are possible.");
-		}
-		int bytesPerSample=format.getSampleSizeInBits()/8;
-		int bytesPerFrame=bytesPerSample*format.getChannels();
-		int thisSampleCount=byteCount/bytesPerFrame;
-		init(format.getChannels(), thisSampleCount, format.getSampleRate(), lazy);
-		int formatType=getFormatType(format.getSampleSizeInBits(),
-		                             signed, format.isBigEndian());
-		// save format for automatic dithering mode
-		originalFormatType=formatType;
-		for (int ch=0; ch<format.getChannels(); ch++) {
-			convertByteToFloat(buffer, offset, sampleCount, getChannel(ch),
-			                   bytesPerFrame, formatType);
-			offset+=bytesPerSample; // next channel
-		}
-
-	}
-
-	public void initFromFloatSampleBuffer(SampleBuffer source) {
-		init(source.getChannelCount(), source.getSampleCount(), source.getSampleRate());
-		for (int ch=0; ch<getChannelCount(); ch++) {
-			System.arraycopy(source.getChannel(ch), 0, getChannel(ch), 0, sampleCount);
-		}
-	}
-
-	/**
-	 * deletes all channels, frees memory...
-	 * This also removes hidden channels by lazy remove.
-	 */
-	public void reset() {
-		init(0,0,1, false);
-	}
-
-	/**
-	 * destroys any existing data and creates new channels.
-	 * It also destroys lazy removed channels and samples.
-	 */
-	public void reset(int channels, int sampleCount, float sampleRate) {
-		init(channels, sampleCount, sampleRate, false);
-	}
-
-	//////////////////////////////// conversion back to bytes /////////////////////////////////
-
-	/**
-	 * returns the required size of the buffer
-	 * when convertToByteArray(..) is called
-	 */
-	public int getByteArrayBufferSize(AudioFormat format) {
-		if (!format.getEncoding().equals(AudioFormat.Encoding.PCM_SIGNED) &&
-		        !format.getEncoding().equals(AudioFormat.Encoding.PCM_UNSIGNED)) {
-			throw new IllegalArgumentException
-			("FloatSampleBuffer: only PCM samples are possible.");
-		}
-		int bytesPerSample=format.getSampleSizeInBits()/8;
-		int bytesPerFrame=bytesPerSample*format.getChannels();
-		return bytesPerFrame*getSampleCount();
-	}
-
-	/**
-	 * throws exception when buffer is too small or <code>format</code> doesn't match
-	 */
-	public void convertToByteArray(byte[] buffer, int offset, AudioFormat format) {
-		int byteCount=getByteArrayBufferSize(format);
-		if (offset+byteCount>buffer.length) {
-			throw new IllegalArgumentException
-			("FloatSampleBuffer.convertToByteArray: buffer too small.");
-		}
-		boolean signed=format.getEncoding().equals(AudioFormat.Encoding.PCM_SIGNED);
-		if (!signed &&
-		        !format.getEncoding().equals(AudioFormat.Encoding.PCM_UNSIGNED)) {
-			throw new IllegalArgumentException
-			("FloatSampleBuffer.convertToByteArray: only PCM samples are allowed.");
-		}
-		if (format.getSampleRate()!=getSampleRate()) {
-			throw new IllegalArgumentException
-			("FloatSampleBuffer.convertToByteArray: different samplerates.");
-		}
-		if (format.getChannels()!=getChannelCount()) {
-			throw new IllegalArgumentException
-			("FloatSampleBuffer.convertToByteArray: different channel count.");
-		}
-		int bytesPerSample=format.getSampleSizeInBits()/8;
-		int bytesPerFrame=bytesPerSample*format.getChannels();
-		int formatType=getFormatType(format.getSampleSizeInBits(),
-		                             signed, format.isBigEndian());
-		for (int ch=0; ch<format.getChannels(); ch++) {
-			convertFloatToByte(getChannel(ch), sampleCount,
-			                   buffer, offset,
-			                   bytesPerFrame, formatType);
-			offset+=bytesPerSample; // next channel
-		}
-
-
-	}
-
-	
-	/**
-	 * Creates a new byte[] buffer and returns it.
-	 * Throws an exception when sample rate doesn't match.
-	 * @see #convertToByteArray(byte[], int, AudioFormat)
-	 *
-	public byte[] convertToByteArray(AudioFormat format) {
-		// throws exception when sampleRate doesn't match
-		// creates a new byte[] buffer and returns it
-		byte[] res=new byte[getByteArrayBufferSize(format)];
-		convertToByteArray(res, 0, format);
-		return res;
-	}
-
-	//////////////////////////////// actions /////////////////////////////////
-
-	/**
-	 * Resizes this buffer.
-	 * <p>If <code>keepOldSamples</code> is true, as much as possible samples are
-	 * retained. If the buffer is enlarged, silence is added at the end.
-	 * If <code>keepOldSamples</code> is false, existing samples are discarded
-	 * and the buffer contains random samples.
-	 */
-	public void changeSampleCount(int newSampleCount, boolean keepOldSamples) {
-		int oldSampleCount=getSampleCount();
-		Object[] oldChannels=null;
-		if (keepOldSamples) {
-			oldChannels=getAllChannels();
-		}
-		init(getChannelCount(), newSampleCount, getSampleRate());
-		if (keepOldSamples) {
-			// copy old channels and eventually silence out new samples
-			int copyCount=newSampleCount<oldSampleCount?
-			              newSampleCount:oldSampleCount;
-			for (int ch=0; ch<getChannelCount(); ch++) {
-				float[] oldSamples=(float[]) oldChannels[ch];
-				float[] newSamples=(float[]) getChannel(ch);
-				if (oldSamples!=newSamples) {
-					// if this sample array was not object of lazy delete
-					System.arraycopy(oldSamples, 0, newSamples, 0, copyCount);
-				}
-				if (oldSampleCount<newSampleCount) {
-					// silence out new samples
-					for (int i=oldSampleCount; i<newSampleCount; i++) {
-						newSamples[i]=0.0f;
-					}
-				}
-			}
-		}
-	}
-
-	public void makeSilence() {
-		// silence all channels
-		if (getChannelCount()>0) {
-			makeSilence(0);
-			for (int ch=1; ch<getChannelCount(); ch++) {
-				copyChannel(0, ch);
-			}
-		}
-	}
-
-	public void makeSilence(int channel) {
-		float[] samples=getChannel(0);
-		for (int i=0; i<getSampleCount(); i++) {
-			samples[i]=0.0f;
-		}
-	}
-
-	public void addChannel(boolean silent) {
-		// creates new, silent channel
-		insertChannel(getChannelCount(), silent);
-	}
-
-	/**
-	 * lazy insert of a (silent) channel at position <code>index</code>.
-	 */
-	public void insertChannel(int index, boolean silent) {
-		insertChannel(index, silent, LAZY_DEFAULT);
-	}
-
-	/**
-	 * Inserts a channel at position <code>index</code>.
-	 * <p>If <code>silent</code> is true, the new channel will be silent. 
-	 * Otherwise it will contain random data.
-	 * <p>If <code>lazy</code> is true, hidden channels which have at least getSampleCount()
-	 * elements will be examined for reusage as inserted channel.<br>
-	 * If <code>lazy</code> is false, still hidden channels are reused,
-	 * but it is assured that the inserted channel has exactly getSampleCount() elements,
-	 * thus not wasting memory.
-	 */
-	public void insertChannel(int index, boolean silent, boolean lazy) {
-		int physSize=channels.size();
-		int virtSize=getChannelCount();
-		float[] newChannel=null;
-		if (physSize>virtSize) {
-			// there are hidden channels. Try to use one.
-			for (int ch=virtSize; ch<physSize; ch++) {
-				float[] thisChannel=(float[]) channels.get(ch);
-				if ((lazy && thisChannel.length>=getSampleCount())
-				        || (!lazy && thisChannel.length==getSampleCount())) {
-					// we found a matching channel. Use it !
-					newChannel=thisChannel;
-					channels.remove(ch);
-					break;
-				}
-			}
-		}
-		if (newChannel==null) {
-			newChannel=new float[getSampleCount()];
-		}
-		channels.add(index, newChannel);
-		this.channelCount++;
-		if (silent) {
-			makeSilence(index);
-		}
-	}
-
-	/** performs a lazy remove of the channel */
-	public void removeChannel(int channel) {
-		removeChannel(channel, LAZY_DEFAULT);
-	}
-
-	/**
-	 * Removes a channel.
-	 * If lazy is true, the channel is not physically removed, but only hidden.
-	 * These hidden channels are reused by subsequent calls to addChannel 
-	 * or insertChannel.
-	 */
-	public void removeChannel(int channel, boolean lazy) {
-		if (!lazy) {
-			channels.remove(channel);
-		} else if (channel<getChannelCount()-1) {
-			// if not already, move this channel at the end
-			channels.add(channels.remove(channel));
-		}
-		channelCount--;
-	}
-
-	/**
-	 * both source and target channel have to exist. targetChannel
-	 * will be overwritten
-	 */
-	public void copyChannel(int sourceChannel, int targetChannel) {
-		float[] source=getChannel(sourceChannel);
-		float[] target=getChannel(targetChannel);
-		System.arraycopy(source, 0, target, 0, getSampleCount());
+	public SampleBuffer clone()
+	{
+		return new SampleBuffer(this);
 	}
 	
-	public void mixChannels(int[] sourceChannels, int targetChannel)
+	private List<float[]> newChannels(int channelCount, int length)
+	{
+		List<float[]> newList = new ArrayList<float[]>(channelCount);
+		
+		for (int ch = 0; ch < channelCount; ++ch)
+			newList.add(new float[length]);
+		
+		return newList;
+	}
+	
+	private List<float[]> copy(List<float[]> channels, int length)
+	{
+		List<float[]> newList = new ArrayList<float[]>(channels.size());
+		
+		for (float[] array : channels)
+			newList.add(Arrays.copyOf(array, length));
+		
+		return newList;
+	}
+	
+	/*------------------------------------------------------------------------------------------[*]
+	 * Conversion to byte array.
+	 */
+	
+	/**
+	 * Computes the size in bytes of the data in this buffer
+	 * for the given raw (PCM) audio format. Format must be
+	 * PCM_SIGNED or PCM_UNSIGNED.
+	 */
+	public int getByteSize(AudioFormat format)
+	{
+		if (! isPCM(format))
+			throw new IllegalArgumentException("Format must be PCM");
+		
+		int bytesPerSample = format.getSampleSizeInBits() / 8;
+		int bytesPerFrame = bytesPerSample * format.getChannels();
+		return bytesPerFrame * length();
+	}
+	
+	/**
+	 * Writes byte data of this buffer to given array, starting at off.
+	 * Samples are converted to byte data considering format.
+	 */
+	public int getBytes(byte[] data, int off, AudioFormat format)
+	{
+		int byteSize = getByteSize(format);
+		
+		if (off + byteSize > data.length)
+			throw new IllegalArgumentException("buffer too small");
+		
+		List<float[]> channels = channelList;
+		int size = sampleCount;
+		
+		if (hasSampleRate(format) && format.getSampleRate() != sampleRate)
+		{
+			channels = copy(channelList, sampleCount);
+			size = convertSampleRate(channels, format.getSampleRate());
+		}
+		
+		if (hasChannelCount(format) && format.getChannels() != channels.size())
+		{
+			if (channels == channelList)
+				channels = copy(channelList, sampleCount);
+			
+			convertChannelCount(channels, format.getChannels());
+		}
+		
+		int bytesPerSample = format.getSampleSizeInBits() / 8;
+		int bytesPerFrame = bytesPerSample * format.getChannels();
+		SampleType formatType = SampleType.get(format);
+		
+		for (int ch = 0; ch < format.getChannels(); ch++, off += bytesPerSample)
+			convertFloatToByte(
+				channels.get(ch),
+				size,
+				data,
+				off,
+				bytesPerFrame,
+				formatType
+			);
+		
+		return byteSize;
+	}
+	
+	/**
+	 * Writes byte data of this buffer to given array considering format.
+	 */
+	public int getBytes(byte[] data, AudioFormat format)
+	{
+		return getBytes(data, 0, format);
+	}
+	
+	/**
+	 * Creates a precisely-sized byte array and writes sample data from this
+	 * buffer into it, considering format.
+	 */
+	public byte[] getBytes(AudioFormat format)
+	{
+		byte[] data = new byte[getByteSize(format)];
+		getBytes(data, 0, format);
+		return data;
+	}
+	
+	/*------------------------------------------------------------------------------------------[*]
+	 * Channel actions: add, remove, copy, mix.
+	 */
+	
+	public void makeSilence()
+	{
+		for (int ch = 1; ch < getChannelCount(); ch++)
+			Arrays.fill(getChannel(ch), 0.0f);
+	}
+	
+	public void makeSilence(int channel)
+	{
+		Arrays.fill(getChannel(0), 0.0f);
+	}
+	
+	/**
+	 * Returns the index of the new channel.
+	 */
+	public int addChannel()
+	{
+		int index = getChannelCount();
+		insertChannel(index);
+		return index;
+	}
+	
+	public void insertChannel(int index)
+	{
+		channelList.add(index, new float[length()]);
+	}
+	
+	public void removeChannel(int index)
+	{
+		channelList.remove(index);
+	}
+	
+	public void copyChannel(int from, int to)
+	{
+		System.arraycopy(getChannel(from), 0, getChannel(to), 0, length());
+	}
+	
+	public void swapChannels(int from, int to)
+	{
+		float[] temp = channelList.get(from);
+		channelList.set(from, channelList.get(to));
+		channelList.set(to, temp);
+	}
+	
+	/**
+	 * Only works for 2-channel buffers.
+	 * 
+	 * @throws IllegalStateException If buffer doesn't have exactly 2 channels.
+	 */
+	public void swapChannels()
+	{
+		if (channelList.size() != 2)
+			throw new IllegalStateException("Must be stereo");
+		
+		swapChannels(0, 1);
+	}
+	
+	public void mixChannels(int[] from, int to)
 	{
 		for (int i = 0; i < sampleCount; ++i)
 		{
 			float sample = 0;
 			
-			for (int c = 0; c < sourceChannels.length; ++c)
-				sample += channels.get(c)[i];
+			for (int c = 0; c < from.length; ++c)
+				sample += channelList.get(from[c])[i];
 			
-			sample /= sourceChannels.length;
-			channels.get(targetChannel)[i] = sample;
+			sample /= from.length;
+			channelList.get(to)[i] = sample;
 		}
 	}
 	
-	public void makeMono()
+	public void mixToMono()
 	{
-		int[] sourceChannels = new int[getChannelCount()];
+		int channelCount = channelList.size();
+		
+		if (channelCount == 0 || channelCount == 1)
+			return;
+		
+		int[] sourceChannels = new int[channelCount];
 		
 		for (int c = 0; c < sourceChannels.length; ++c)
 			sourceChannels[c] = c;
@@ -493,330 +291,497 @@ public class SampleBuffer
 			removeChannel(1);
 	}
 	
-	//////////////////////////////// properties /////////////////////////////////
-
-	public int getChannelCount() {
-		return channelCount;
+	/**
+	 * Only works for 1-channel buffers.
+	 * 
+	 * @throws IllegalStateException If buffer doesn't have exactly 1 channel.
+	 */
+	public void spreadToStereo()
+	{
+		if (channelList.size() != 1)
+			throw new IllegalStateException("Must be mono");
+		
+		addChannel();
+		copyChannel(0, 1);
 	}
-
-	public int getSampleCount() {
-		return sampleCount;
+	
+	/*------------------------------------------------------------------------------------------[*]
+	 * Conversion methods.
+	 */
+	
+	/**
+	 * Changes buffer length to given size. Only if size is increased beyond
+	 * current capacity will underlying arrays be resized and replaced.
+	 * Any float[] from the getChannel() method will no longer share memory
+	 * with this buffer in that case.
+	 */
+	public void resize(int size)
+	{
+		if (size < 0)
+			throw new IllegalArgumentException(String.valueOf(size));
+		
+		if (size > sampleCount)
+		{
+			for (int ch = 0; ch < channelList.size(); ++ch)
+			{
+				float[] newChannel = new float[size];
+				System.arraycopy(getChannel(ch), 0, newChannel, 0, sampleCount);
+				channelList.set(ch, newChannel);
+			}
+		}
+		
+		sampleCount = size;
 	}
-
-	public float getSampleRate() {
+	
+	/**
+	 * Only supports mono->stereo and stereo->mono.
+	 */
+	public void rechannel(int channels)
+	{
+		if (channels == channelList.size())
+			return;
+		
+		convertChannelCount(channelList, channels);
+	}
+	
+	/**
+	 * Makes no changes to this buffer.
+	 * Uses current sampleCount of this buffer.
+	 */
+	private void convertChannelCount(List<float[]> channels, int newCount)
+	{
+		int oldCount = channels.size();
+		
+		if (oldCount == 1 && newCount == 2)
+		{
+			float[] left  = channels.get(0);
+			float[] right = Arrays.copyOf(left, left.length);
+			channels.add(1, right);
+		}
+		else if (oldCount == 2 && newCount == 1)
+		{
+			float[] left  = channels.get(0);
+			float[] right = channels.get(1);
+			
+			for (int i = 0; i < sampleCount; ++i)
+			{
+				left[i] += right[i];
+				left[i] /= 2;
+			}
+			
+			channels.remove(1);
+		}
+		else
+		{
+			StringBuilder message = new StringBuilder();
+			message.append("cannot convert channels ");
+			message.append(channelList.size());
+			message.append(" -> ");
+			message.append(channels);
+			throw new UnsupportedOperationException(message.toString());
+		}
+	}
+	
+	/**
+	 * Performs sample rate conversion on this buffer. The length of samples
+	 * and the sample rate will both be changed when this method returns.
+	 * New float arrays will not share memory space with arrays previously
+	 * returned by getChannel().
+	 */
+	public void resample(float rate)
+	{
+		if (rate == sampleRate)
+			return;
+		
+		sampleCount = convertSampleRate(channelList, rate);
+		sampleRate = rate;
+	}
+	
+	/**
+	 * Makes no changes to this buffer.
+	 * Uses current sampleCount/Length of this buffer.
+	 * Returns new sample length.
+	 */
+	private int convertSampleRate(List<float[]> channels, float rate)
+	{
+		float rateRatio = rate / sampleRate;
+		int oldLength = sampleCount;
+		int newLength = (int) (sampleCount * rateRatio);
+		
+		for (int ch = 0; ch < channels.size(); ++ch)
+		{
+			float[] newChannel = new float[newLength];
+			float[] oldChannel = getChannel(ch);
+			
+			if (rateRatio > 1) // Linear Interpolation
+			{
+				int previousIndex = 0;
+				
+				for (int i = 0; i < oldLength; ++i)
+				{
+					int i2 = index(i, newLength, rateRatio);
+					newChannel[i2] = oldChannel[i];
+					
+					// Interpolate over spaced region
+					if (i2 - previousIndex > 1)
+					{
+						float space = i2 - previousIndex;
+						float base = newChannel[previousIndex];
+						float diff = newChannel[i2] - base;
+						
+						for (int y = 1, x = previousIndex + 1; x < i2; ++x, ++y)
+							newChannel[x] = base + (y / space) * diff;
+					}
+					
+					previousIndex = i2;
+				}
+			}
+			else // Decimation
+			{
+				rateRatio = 1 / rateRatio;
+				
+				for (int i = 0; i < newLength; ++i)
+				{
+					int i2 = index(i, oldLength, rateRatio);
+					newChannel[i] = oldChannel[i2];
+				}
+			}
+			
+			channels.set(ch, newChannel);
+		}
+		
+		return newLength;
+	}
+	
+	private static int index(int i, int size, float ratio)
+	{
+		return Math.max(Math.min((int) (i * ratio), size - 1), 0);
+	}
+	
+	/*------------------------------------------------------------------------------------------[*]
+	 * Property setters/getters.
+	 */
+	
+	public int getChannelCount()
+	{
+		return channelList.size();
+	}
+	
+	public float getSampleRate()
+	{
 		return sampleRate;
 	}
-
-	/**
-	 * Sets the sample rate of this buffer.
-	 * NOTE: no conversion is done. The samples are only re-interpreted.
-	 */
-	public void setSampleRate(float sampleRate) {
-		if (sampleRate<=0) {
-			throw new IllegalArgumentException
-			("Invalid samplerate for FloatSampleBuffer.");
-		}
-		this.sampleRate=sampleRate;
+	
+	public int length()
+	{
+		return sampleCount;
 	}
-
+	
 	/**
-	 * NOTE: the returned array may be larger than sampleCount. So in any case, 
-	 * sampleCount is to be respected.
+	 * Returned array shares memory space with buffer. Changing values in array
+	 * changes sample values in buffer.
 	 */
-	public float[] getChannel(int channel) {
-		if (channel<0 || channel>=getChannelCount()) {
-			throw new IllegalArgumentException(
-			    "FloatSampleBuffer: invalid channel number.");
-		}
-		return (float[]) channels.get(channel);
+	public float[] getChannel(int index)
+	{
+		return channelList.get(index);
 	}
-
-	public Object[] getAllChannels() {
-		Object[] res=new Object[getChannelCount()];
-		for (int ch=0; ch<getChannelCount(); ch++) {
-			res[ch]=getChannel(ch);
-		}
-		return res;
-	}
-
+	
 	/**
-	 * Set the number of bits for dithering.
-	 * Typically, a value between 0.2 and 0.9 gives best results.
-	 * <p>Note: this value is only used, when dithering is actually performed.
+	 * Returned arrays share memory space with buffer. Changing values in arrays
+	 * changes sample values in buffer.
 	 */
-	public void setDitherBits(float ditherBits) {
-		if (ditherBits<=0) {
+	public List<float[]> getAllChannels()
+	{
+		return Arrays.asList(channelList.toArray(new float[0][]));
+	}
+	
+	/**
+	 * A value between 0.2 and 0.9 gives best results.
+	 */
+	public void setDitherBits(float ditherBits)
+	{
+		if (ditherBits <= 0)
 			throw new IllegalArgumentException("DitherBits must be greater than 0");
-		}
+		
 		this.ditherBits=ditherBits;
 	}
-
-	public float getDitherBits() {
+	
+	public float getDitherBits()
+	{
 		return ditherBits;
 	}
-
-	/**
-	 * Sets the mode for dithering.
-	 * This can be one of:
-	 * <ul><li>DITHER_MODE_AUTOMATIC: it is decided automatically,
-	 * whether dithering is necessary - in general when sample size is
-	 * decreased.
-	 * <li>DITHER_MODE_ON: dithering will be forced
-	 * <li>DITHER_MODE_OFF: dithering will not be done.
-	 * </ul>
-	 */
-	public void setDitherMode(int mode) {
-		if (mode!=DITHER_MODE_AUTOMATIC
-		        && mode!=DITHER_MODE_ON
-		        && mode!=DITHER_MODE_OFF) {
-			throw new IllegalArgumentException("Illegal DitherMode");
-		}
-		this.ditherMode=mode;
+	
+	public void setDitherMode(DitherMode mode)
+	{
+		this.ditherMode = mode;
 	}
-
-	public int getDitherMode() {
+	
+	public DitherMode getDitherMode()
+	{
 		return ditherMode;
 	}
-
-
-	/////////////////////////////// "low level" conversion functions ////////////////////////////////
-
-	public int getFormatType(int ssib, boolean signed, boolean bigEndian) {
-		int bytesPerSample=ssib/8;
-		int res=0;
-		if (ssib==8) {
-			res=F_8;
-		} else if (ssib==16) {
-			res=F_16;
-		} else if (ssib==24) {
-			res=F_24;
-		} else if (ssib==32) {
-			res=F_32;
-		}
-		if (res==0) {
-			throw new IllegalArgumentException
-			("FloatSampleBuffer: unsupported sample size of "
-			 +ssib+" bits per sample.");
-		}
-		if (!signed && bytesPerSample>1) {
-			throw new IllegalArgumentException
-			("FloatSampleBuffer: unsigned samples larger than "
-			 +"8 bit are not supported");
-		}
-		if (signed) {
-			res|=F_SIGNED;
-		}
-		if (bigEndian && (ssib!=8)) {
-			res|=F_BIGENDIAN;
-		}
-		return res;
-	}
-
-
-	private static final float twoPower7=128.0f;
-	private static final float twoPower15=32768.0f;
-	private static final float twoPower23=8388608.0f;
-	private static final float twoPower31=2147483648.0f;
-
-	private static final float invTwoPower7=1/twoPower7;
-	private static final float invTwoPower15=1/twoPower15;
-	private static final float invTwoPower23=1/twoPower23;
-	private static final float invTwoPower31=1/twoPower31;
-
-	/*public*/
-	private static void convertByteToFloat(byte[] input, int offset, int sampleCount,
-	                                       float[] output, int bytesPerFrame,
-	                                       int formatType) {
-		//if (TDebug.TraceAudioConverter) {
-		//    TDebug.out("FloatSampleBuffer.convertByteToFloat, formatType="
-		//           +formatType2Str(formatType));
-		//}
-		int sample;
-		for (sample=0; sample<sampleCount; sample++) {
-			// do conversion
-			switch (formatType) {
-			case CT_8S:
-				output[sample]=
+	
+	/*------------------------------------------------------------------------------------------[*]
+	 * Low-level float<-->byte[] block conversion.
+	 */
+	
+	private static void convertByteToFloat(
+		byte[] input,
+		int offset,
+		int sampleCount,
+		float[] output,
+		int bytesPerFrame,
+		SampleType type)
+	{
+		for (int i = 0; i < sampleCount; i++, offset += bytesPerFrame)
+		{
+			switch (type) {
+			case SIGNED_8BIT:
+				output[i]=
 				    ((float) input[offset])*invTwoPower7;
 				break;
-			case CT_8U:
-				output[sample]=
+			case UNSIGNED_8BIT:
+				output[i]=
 				    ((float) ((input[offset] & 0xFF)-128))*invTwoPower7;
 				break;
-			case CT_16SB:
-				output[sample]=
+			case SIGNED_16BIT_BIG_ENDIAN:
+				output[i]=
 				    ((float) ((input[offset]<<8)
 				              | (input[offset+1] & 0xFF)))*invTwoPower15;
 				break;
-			case CT_16SL:
-				output[sample]=
+			case SIGNED_16BIT_LITTLE_ENDIAN:
+				output[i]=
 				    ((float) ((input[offset+1]<<8)
 				              | (input[offset] & 0xFF)))*invTwoPower15;
 				break;
-			case CT_24SB:
-				output[sample]=
+			case SIGNED_24BIT_BIG_ENDIAN:
+				output[i]=
 				    ((float) ((input[offset]<<16)
 				              | ((input[offset+1] & 0xFF)<<8)
 				              | (input[offset+2] & 0xFF)))*invTwoPower23;
 				break;
-			case CT_24SL:
-				output[sample]=
+			case SIGNED_24BIT_LITTLE_ENDIAN:
+				output[i]=
 				    ((float) ((input[offset+2]<<16)
 				              | ((input[offset+1] & 0xFF)<<8)
 				              | (input[offset] & 0xFF)))*invTwoPower23;
 				break;
-			case CT_32SB:
-				output[sample]=
+			case SIGNED_32BIT_BIG_ENDIAN:
+				output[i]=
 				    ((float) ((input[offset]<<24)
 				              | ((input[offset+1] & 0xFF)<<16)
 				              | ((input[offset+2] & 0xFF)<<8)
 				              | (input[offset+3] & 0xFF)))*invTwoPower31;
 				break;
-			case CT_32SL:
-				output[sample]=
+			case SIGNED_32BIT_LITTLE_ENDIAN:
+				output[i]=
 				    ((float) ((input[offset+3]<<24)
 				              | ((input[offset+2] & 0xFF)<<16)
 				              | ((input[offset+1] & 0xFF)<<8)
 				              | (input[offset] & 0xFF)))*invTwoPower31;
 				break;
 			default:
-				throw new IllegalArgumentException
-				("Unsupported formatType="+formatType);
+				throw new IllegalArgumentException("Unsupported: " + type);
 			}
-			offset+=bytesPerFrame;
 		}
 	}
-
-	protected byte quantize8(float sample) {
-		if (doDither) {
-			sample+=random.nextFloat()*ditherBits;
+	
+	private void convertFloatToByte(
+		float[] input,
+		int sampleCount,
+		byte[] output,
+		int off,
+		int bytesPerFrame,
+		SampleType type)
+	{
+		boolean dither = false;
+		boolean sampleSizeShrunk =
+			originalFormatType != null &&
+			originalFormatType.sampleSizeInBits > type.sampleSizeInBits;
+		
+		switch (ditherMode)
+		{
+		case AUTO: dither = sampleSizeShrunk; break;
+		case ON:   dither = true;  break;
+		case OFF:  dither = false; break;
 		}
-		if (sample>=127.0f) {
-			return (byte) 127;
-		} else if (sample<=-128) {
-			return (byte) -128;
-		} else {
-			return (byte) (sample<0?(sample-0.5f):(sample+0.5f));
-		}
-	}
-
-	protected int quantize16(float sample) {
-		if (doDither) {
-			sample+=random.nextFloat()*ditherBits;
-		}
-		if (sample>=32767.0f) {
-			return 32767;
-		} else if (sample<=-32768.0f) {
-			return -32768;
-		} else {
-			return (int) (sample<0?(sample-0.5f):(sample+0.5f));
-		}
-	}
-
-	protected int quantize24(float sample) {
-		if (doDither) {
-			sample+=random.nextFloat()*ditherBits;
-		}
-		if (sample>=8388607.0f) {
-			return 8388607;
-		} else if (sample<=-8388608.0f) {
-			return -8388608;
-		} else {
-			return (int) (sample<0?(sample-0.5f):(sample+0.5f));
-		}
-	}
-
-	protected int quantize32(float sample) {
-		if (doDither) {
-			sample+=random.nextFloat()*ditherBits;
-		}
-		if (sample>=2147483647.0f) {
-			return 2147483647;
-		} else if (sample<=-2147483648.0f) {
-			return -2147483648;
-		} else {
-			return (int) (sample<0?(sample-0.5f):(sample+0.5f));
-		}
-	}
-
-	// should be static and public, but dithering needs class members
-	private void convertFloatToByte(float[] input, int sampleCount,
-	                                byte[] output, int offset,
-	                                int bytesPerFrame, int formatType) {
-		//if (TDebug.TraceAudioConverter) {
-		//    TDebug.out("FloatSampleBuffer.convertFloatToByte, formatType="
-		//               +"formatType2Str(formatType));
-		//}
-
-		// let's see whether dithering is necessary
-		switch (ditherMode) {
-		case DITHER_MODE_AUTOMATIC:
-			doDither=(originalFormatType & F_SAMPLE_WIDTH_MASK)>
-			         (formatType & F_SAMPLE_WIDTH_MASK);
-			break;
-		case DITHER_MODE_ON:
-			doDither=true;
-			break;
-		case DITHER_MODE_OFF:
-			doDither=false;
-			break;
-		}
-		if (doDither && random==null) {
-			// create the random number generator for dithering
-			random=new Random();
-		}
-		int inIndex;
-		int iSample;
-		for (inIndex=0; inIndex<sampleCount; inIndex++) {
-			// do conversion
-			switch (formatType) {
-			case CT_8S:
-				output[offset]=quantize8(input[inIndex]*twoPower7);
+		
+		int word;
+		
+		for (int i = 0; i < sampleCount; i++, off += bytesPerFrame)
+		{
+			switch (type)
+			{
+			case SIGNED_8BIT:
+				output[off] = to8(input[i], dither);
 				break;
-			case CT_8U:
-				output[offset]=(byte) (quantize8(input[inIndex]*twoPower7)+128);
+			case UNSIGNED_8BIT:
+				output[off] = (byte) (to8(input[i], dither) + 128);
 				break;
-			case CT_16SB:
-				iSample=quantize16(input[inIndex]*twoPower15);
-				output[offset]=(byte) (iSample >> 8);
-				output[offset+1]=(byte) (iSample & 0xFF);
+			case SIGNED_16BIT_BIG_ENDIAN:
+				word = to16(input[i], dither);
+				output[off]=(byte) (word >> 8);
+				output[off+1]=(byte) (word & 0xFF);
 				break;
-			case CT_16SL:
-				iSample=quantize16(input[inIndex]*twoPower15);
-				output[offset+1]=(byte) (iSample >> 8);
-				output[offset]=(byte) (iSample & 0xFF);
+			case SIGNED_16BIT_LITTLE_ENDIAN:
+				word = to16(input[i], dither);
+				output[off+1]=(byte) (word >> 8);
+				output[off]=(byte) (word & 0xFF);
 				break;
-			case CT_24SB:
-				iSample=quantize24(input[inIndex]*twoPower23);
-				output[offset]=(byte) (iSample >> 16);
-				output[offset+1]=(byte) ((iSample >>> 8) & 0xFF);
-				output[offset+2]=(byte) (iSample & 0xFF);
+			case SIGNED_24BIT_BIG_ENDIAN:
+				word = to24(input[i], dither);
+				output[off]=(byte) (word >> 16);
+				output[off+1]=(byte) ((word >>> 8) & 0xFF);
+				output[off+2]=(byte) (word & 0xFF);
 				break;
-			case CT_24SL:
-				iSample=quantize24(input[inIndex]*twoPower23);
-				output[offset+2]=(byte) (iSample >> 16);
-				output[offset+1]=(byte) ((iSample >>> 8) & 0xFF);
-				output[offset]=(byte) (iSample & 0xFF);
+			case SIGNED_24BIT_LITTLE_ENDIAN:
+				word = to24(input[i], dither);
+				output[off+2]=(byte) (word >> 16);
+				output[off+1]=(byte) ((word >>> 8) & 0xFF);
+				output[off]=(byte) (word & 0xFF);
 				break;
-			case CT_32SB:
-				iSample=quantize32(input[inIndex]*twoPower31);
-				output[offset]=(byte) (iSample >> 24);
-				output[offset+1]=(byte) ((iSample >>> 16) & 0xFF);
-				output[offset+2]=(byte) ((iSample >>> 8) & 0xFF);
-				output[offset+3]=(byte) (iSample & 0xFF);
+			case SIGNED_32BIT_BIG_ENDIAN:
+				word = to32(input[i], dither);
+				output[off]=(byte) (word >> 24);
+				output[off+1]=(byte) ((word >>> 16) & 0xFF);
+				output[off+2]=(byte) ((word >>> 8) & 0xFF);
+				output[off+3]=(byte) (word & 0xFF);
 				break;
-			case CT_32SL:
-				iSample=quantize32(input[inIndex]*twoPower31);
-				output[offset+3]=(byte) (iSample >> 24);
-				output[offset+2]=(byte) ((iSample >>> 16) & 0xFF);
-				output[offset+1]=(byte) ((iSample >>> 8) & 0xFF);
-				output[offset]=(byte) (iSample & 0xFF);
+			case SIGNED_32BIT_LITTLE_ENDIAN:
+				word = to32(input[i], dither);
+				output[off+3]=(byte) (word >> 24);
+				output[off+2]=(byte) ((word >>> 16) & 0xFF);
+				output[off+1]=(byte) ((word >>> 8) & 0xFF);
+				output[off]=(byte) (word & 0xFF);
 				break;
 			default:
-				throw new IllegalArgumentException
-				("Unsupported formatType="+formatType);
+				throw new IllegalArgumentException("Unsupported: " + type);
 			}
-			offset+=bytesPerFrame;
 		}
+	}
+	
+	private byte to8(float sample, boolean dither)
+	{
+		return (byte) to(sample, twoPower7, -128.0f, 127.0f, dither);
+	}
+	
+	private int to16(float sample, boolean dither)
+	{
+		return to(sample, twoPower15, -32768.0f, 32767.0f, dither);
+	}
+	
+	private int to24(float sample, boolean dither)
+	{
+		return to(sample, twoPower23, -8388608.0f, 8388607.0f, dither);
+	}
+	
+	private int to32(float sample, boolean dither)
+	{
+		return to(sample, twoPower31, -2147483648.0f, 2147483647.0f, dither);
+	}
+	
+	private int to(float sample, float factor, float min, float max, boolean dither)
+	{
+		sample *= factor;
+		
+		if (dither)
+			sample += random.nextFloat() * ditherBits;
+		
+		if      (sample >= max) return (int) max;
+		else if (sample <= min) return (int) min;
+		else if (sample < 0)    return (int) (sample - 0.5f);
+		else                    return (int) (sample + 0.5f);
+	}
+	
+	private static final float twoPower7  = 128.0f;
+	private static final float twoPower15 = 32768.0f;
+	private static final float twoPower23 = 8388608.0f;
+	private static final float twoPower31 = 2147483648.0f;
+	
+	private static final float invTwoPower7  = 1 / twoPower7;
+	private static final float invTwoPower15 = 1 / twoPower15;
+	private static final float invTwoPower23 = 1 / twoPower23;
+	private static final float invTwoPower31 = 1 / twoPower31;
+	
+	private static enum SampleType
+	{
+		SIGNED_8BIT               (8,  true,  false),
+		UNSIGNED_8BIT             (8,  false, false),
+		SIGNED_16BIT_BIG_ENDIAN   (16, true,  true),
+		SIGNED_16BIT_LITTLE_ENDIAN(16, true,  false),
+		SIGNED_24BIT_BIG_ENDIAN   (24, true,  true),
+		SIGNED_24BIT_LITTLE_ENDIAN(24, true,  false),
+		SIGNED_32BIT_BIG_ENDIAN   (32, true,  true),
+		SIGNED_32BIT_LITTLE_ENDIAN(32, true,  false);
+		
+		public int sampleSizeInBits;
+		public boolean signed;
+		public boolean bigEndian;
+		
+		private SampleType(int ssib, boolean s, boolean be)
+		{
+			sampleSizeInBits = ssib;
+			signed = s;
+			bigEndian = be;
+			
+			if (!(ssib == 8 || ssib == 16 || ssib == 24 || ssib == 32))
+				throw new IllegalArgumentException("Unsupported sample size");
+			if (ssib != 8 && !s)
+				throw new IllegalArgumentException("Unsupported sampleSize/signed combo");
+		}
+		
+		public static SampleType get(int ssib, boolean s, boolean be)
+		{
+			for (SampleType bFormat : values())
+			{
+				if (ssib == bFormat.sampleSizeInBits
+				 && s == bFormat.signed
+				 && (be == bFormat.bigEndian || ssib == 8))
+					return bFormat;
+			}
+			
+			throw new IllegalArgumentException("Undefined raw format");
+		}
+		
+		public static SampleType get(AudioFormat format)
+		{
+			return get(
+				format.getSampleSizeInBits(),
+				isSigned(format),
+				format.isBigEndian()
+			);
+		}
+		
+		public String toString()
+		{
+			return "sampleSize: " + sampleSizeInBits + " signed: " + signed +
+				(bigEndian ? " big endian" : " little endian");
+		}
+	}
+	
+	private static boolean isPCM(AudioFormat format)
+	{
+		return format.getEncoding() == Encoding.PCM_SIGNED
+			|| format.getEncoding() == Encoding.PCM_UNSIGNED;
+	}
+	
+	private static boolean isSigned(AudioFormat format)
+	{
+		return format.getEncoding().equals(Encoding.PCM_SIGNED);
+	}
+	
+	private static boolean hasSampleSize(AudioFormat format)
+	{
+		return format.getSampleSizeInBits() != AudioSystem.NOT_SPECIFIED;
+	}
+	
+	private static boolean hasSampleRate(AudioFormat format)
+	{
+		return format.getSampleRate() != AudioSystem.NOT_SPECIFIED;
+	}
+	
+	private static boolean hasChannelCount(AudioFormat format)
+	{
+		return format.getChannels() != AudioSystem.NOT_SPECIFIED;
 	}
 }

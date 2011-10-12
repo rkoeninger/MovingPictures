@@ -13,12 +13,12 @@ public class SampleStream
 	
 	public int available()
 	{
-		return buffer.getSampleCount() - pos;
+		return buffer.length() - pos;
 	}
 	
 	public boolean isDone()
 	{
-		return pos >= buffer.getSampleCount();
+		return pos >= buffer.length();
 	}
 	
 	public synchronized void reset()
@@ -26,12 +26,12 @@ public class SampleStream
 		pos = 0;
 	}
 	
-	public synchronized int mix(SampleBuffer out)
+	public synchronized int add(SampleBuffer out)
 	{
-		return mix(out, 0, out.getSampleCount());
+		return add(out, 0, out.length());
 	}
 	
-	public synchronized int mix(SampleBuffer out, int off, int len)
+	public synchronized int add(SampleBuffer out, int off, int len)
 	{
 		len = Math.min(len, available());
 		
