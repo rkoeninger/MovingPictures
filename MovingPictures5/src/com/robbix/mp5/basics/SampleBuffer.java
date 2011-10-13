@@ -1,11 +1,10 @@
 package	com.robbix.mp5.basics;
 
-import	java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import	java.util.Random;
 
-import	javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioSystem;
 
@@ -15,21 +14,19 @@ import javax.sound.sampled.AudioSystem;
  * Not thread safe.
  */
 public class SampleBuffer implements Cloneable
-{
+{	
 	/**
 	 * When dithering mode is AUTO, it will generally only be done when
 	 * sample size is decreased.
 	 */
 	public static enum DitherMode { AUTO, ON, OFF }
 	
-	private List<float[]> channelList = new ArrayList<float[]>();
-	private int sampleCount;
-	private float sampleRate;
-	private SampleType originalFormatType;
-	
-	private DitherMode ditherMode = DitherMode.AUTO;
-	private float ditherBits = 0.8f;
-	private static Random random = new Random();
+	private List<float[]> channelList;
+	private int           sampleCount;
+	private float         sampleRate;
+	private SampleType    originalFormatType;
+	private DitherMode    ditherMode = DitherMode.AUTO;
+	private float         ditherBits = 0.8f;
 	
 	/*------------------------------------------------------------------------------------------[*]
 	 * Initializers.
@@ -82,6 +79,9 @@ public class SampleBuffer implements Cloneable
 	{
 	}
 	
+	/**
+	 * Alternative to clone() because of clone's weirdness.
+	 */
 	public SampleBuffer copy()
 	{
 		SampleBuffer copy = new SampleBuffer();
@@ -629,39 +629,39 @@ public class SampleBuffer implements Cloneable
 				break;
 			case SIGNED_16BIT_BIG_ENDIAN:
 				word = to16(input[i], dither);
-				output[off]=(byte) (word >> 8);
-				output[off+1]=(byte) (word & 0xFF);
+				output[off + 0] = (byte) (word >> 8);
+				output[off + 1] = (byte) (word & 0xff);
 				break;
 			case SIGNED_16BIT_LITTLE_ENDIAN:
 				word = to16(input[i], dither);
-				output[off+1]=(byte) (word >> 8);
-				output[off]=(byte) (word & 0xFF);
+				output[off + 1] = (byte) (word >> 8);
+				output[off + 0] = (byte) (word & 0xff);
 				break;
 			case SIGNED_24BIT_BIG_ENDIAN:
 				word = to24(input[i], dither);
-				output[off]=(byte) (word >> 16);
-				output[off+1]=(byte) ((word >>> 8) & 0xFF);
-				output[off+2]=(byte) (word & 0xFF);
+				output[off + 0] = (byte) (word >> 16);
+				output[off + 1] = (byte) ((word >>> 8) & 0xff);
+				output[off + 2] = (byte) (word & 0xff);
 				break;
 			case SIGNED_24BIT_LITTLE_ENDIAN:
 				word = to24(input[i], dither);
-				output[off+2]=(byte) (word >> 16);
-				output[off+1]=(byte) ((word >>> 8) & 0xFF);
-				output[off]=(byte) (word & 0xFF);
+				output[off + 2] = (byte) (word >> 16);
+				output[off + 1] = (byte) ((word >>> 8) & 0xff);
+				output[off + 0] = (byte) (word & 0xff);
 				break;
 			case SIGNED_32BIT_BIG_ENDIAN:
 				word = to32(input[i], dither);
-				output[off]=(byte) (word >> 24);
-				output[off+1]=(byte) ((word >>> 16) & 0xFF);
-				output[off+2]=(byte) ((word >>> 8) & 0xFF);
-				output[off+3]=(byte) (word & 0xFF);
+				output[off + 0] = (byte) (word >> 24);
+				output[off + 1] = (byte) ((word >>> 16) & 0xff);
+				output[off + 2] = (byte) ((word >>> 8) & 0xff);
+				output[off + 3] = (byte) (word & 0xff);
 				break;
 			case SIGNED_32BIT_LITTLE_ENDIAN:
 				word = to32(input[i], dither);
-				output[off+3]=(byte) (word >> 24);
-				output[off+2]=(byte) ((word >>> 16) & 0xFF);
-				output[off+1]=(byte) ((word >>> 8) & 0xFF);
-				output[off]=(byte) (word & 0xFF);
+				output[off + 3] = (byte) (word >> 24);
+				output[off + 2] = (byte) ((word >>> 16) & 0xff);
+				output[off + 1] = (byte) ((word >>> 8) & 0xff);
+				output[off + 0] = (byte) (word & 0xff);
 				break;
 			default:
 				throw new IllegalArgumentException("Unsupported: " + type);
@@ -694,7 +694,7 @@ public class SampleBuffer implements Cloneable
 		sample *= factor;
 		
 		if (dither)
-			sample += random.nextFloat() * ditherBits;
+			sample += Math.random() * ditherBits;
 		
 		if      (sample >= max) return (int) max;
 		else if (sample <= min) return (int) min;
@@ -739,32 +739,21 @@ public class SampleBuffer implements Cloneable
 				throw new IllegalArgumentException("Unsupported sampleSize/signed combo");
 		}
 		
-		public static SampleType get(int ssib, boolean s, boolean be)
+		public static SampleType get(AudioFormat format)
 		{
+			int ssib = format.getSampleSizeInBits();
+			boolean s = isSigned(format);
+			boolean be = format.isBigEndian();
+			
 			for (SampleType bFormat : values())
 			{
 				if (ssib == bFormat.sampleSizeInBits
-				 && s == bFormat.signed
-				 && (be == bFormat.bigEndian || ssib == 8))
+				 &&    s == bFormat.signed
+				 &&  (be == bFormat.bigEndian || ssib == 8))
 					return bFormat;
 			}
 			
-			throw new IllegalArgumentException("Undefined raw format");
-		}
-		
-		public static SampleType get(AudioFormat format)
-		{
-			return get(
-				format.getSampleSizeInBits(),
-				isSigned(format),
-				format.isBigEndian()
-			);
-		}
-		
-		public String toString()
-		{
-			return "sampleSize: " + sampleSizeInBits + " signed: " + signed +
-				(bigEndian ? " big endian" : " little endian");
+			throw new IllegalArgumentException("Undefined sample format");
 		}
 	}
 	
