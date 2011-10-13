@@ -36,9 +36,17 @@ public class SampleStream
 		len = Math.min(len, available());
 		
 		for (int c = 0; c < buffer.getChannelCount(); ++c)
-		for (int i = off; i < off + len; ++i, ++pos)
 		{
-			out.getChannel(c)[pos] += buffer.getChannel(c)[i];
+			float[] bufferChannel = buffer.getChannel(c);
+			float[] outChannel = out.getChannel(c);
+			
+			for (int i = off; i < off + len; ++i, ++pos)
+			{
+				float sample = outChannel[i];
+				sample += bufferChannel[pos];
+				outChannel[i] = Math.max(-1, Math.min(1, sample));
+				
+			}
 		}
 		
 		return len;

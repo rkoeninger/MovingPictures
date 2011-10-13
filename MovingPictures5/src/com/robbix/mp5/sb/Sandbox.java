@@ -103,7 +103,7 @@ public class Sandbox
 		boolean lazyLoadSprites = true;
 		boolean lazyLoadSounds  = true;
 		boolean soundOn         = false;
-		boolean musicOn         = false;
+//		boolean musicOn         = false;
 		String demoName         = null;
 		String mapName          = null;
 		String tileSetName      = null;
@@ -129,14 +129,14 @@ public class Sandbox
 			{
 				soundOn = false;
 			}
-			else if (args[a].equals("-musicOn"))
-			{
-				musicOn = true;
-			}
-			else if (args[a].equals("-musicOff"))
-			{
-				musicOn = false;
-			}
+//			else if (args[a].equals("-musicOn"))
+//			{
+//				musicOn = true;
+//			}
+//			else if (args[a].equals("-musicOff"))
+//			{
+//				musicOn = false;
+//			}
 			else if (args[a].startsWith("-demo:") && demos.containsKey(option))
 			{
 				if (demoName != null || mapName != null)
@@ -199,7 +199,6 @@ public class Sandbox
 		Mediator.initMediator(game);
 		
 		if (soundOn) Mediator.sounds.start();
-		if (musicOn) Mediator.sounds.playMusic("ep1");
 		
 		currentPlayer = game.getDefaultPlayer();
 		
@@ -390,9 +389,8 @@ public class Sandbox
 		final JMenuItem placeRare3 = new JMenuItem("Rare High");
 		final JMenu soundMenu = new JMenu("Sound");
 		final JMenuItem playSoundMenuItem = new JCheckBoxMenuItem("Play Sounds");
-		final JMenuItem playMusicMenuItem = new JCheckBoxMenuItem("Play Music");
+//		final JMenuItem playMusicMenuItem = new JCheckBoxMenuItem("Play Music");
 		playSoundMenuItem.setSelected(game.getSoundBank().isRunning());
-		playMusicMenuItem.setSelected(game.getSoundBank().isMusicPlaying());
 		final JMenu addUnitMenu = new JMenu("Add");
 		final JMenu buildStructureMenu = new JMenu("Build");
 		final JMenuItem removeAllUnitsMenuItem = new JMenuItem("Remove All");
@@ -763,20 +761,20 @@ public class Sandbox
 			}
 		});
 		
-		playMusicMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if (playMusicMenuItem.isSelected())
-				{
-					game.getSoundBank().playMusic("ep1");
-				}
-				else
-				{
-					game.getSoundBank().killMusic();
-				}
-			}
-		});
+//		playMusicMenuItem.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				if (playMusicMenuItem.isSelected())
+//				{
+//					
+//				}
+//				else
+//				{
+//					
+//				}
+//			}
+//		});
 		
 		placeCommon1.addActionListener(new ActionListener()
 		{

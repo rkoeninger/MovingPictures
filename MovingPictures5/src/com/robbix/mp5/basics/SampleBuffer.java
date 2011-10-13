@@ -1,12 +1,16 @@
 package	com.robbix.mp5.basics;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  * A float-based audio data buffer designed to stand-in for JavaSound's byte[] idiom.
@@ -14,7 +18,47 @@ import javax.sound.sampled.AudioSystem;
  * Not thread safe.
  */
 public class SampleBuffer implements Cloneable
-{	
+{
+	private static final int NS = AudioSystem.NOT_SPECIFIED;
+	
+	public static SampleBuffer load(AudioInputStream stream) throws IOException
+	{
+		AudioFormat format = stream.getFormat();
+		
+		if (! isPCM(format))
+			throw new IllegalArgumentException("Must be PCM");
+		
+		int byteSize = (int) (format.getFrameSize() * stream.getFrameLength());
+		byte[] data = new byte[byteSize];
+		int bytesRead = 0;
+		int pos = 0;
+		
+		while ((bytesRead = stream.read(data, pos, byteSize - pos)) >= 0)
+			pos += bytesRead;
+		
+		return new SampleBuffer(data, format);
+	}
+	
+	public static SampleBuffer load(File file) throws IOException
+	{
+		AudioInputStream stream = null;
+		
+		try
+		{
+			stream = AudioSystem.getAudioInputStream(file);
+			return load(stream);
+		}
+		catch (UnsupportedAudioFileException uafe)
+		{
+			throw new FileFormatException(file, uafe.getMessage());
+		}
+		finally
+		{
+			if (stream != null)
+				stream.close();
+		}
+	}
+	
 	/**
 	 * When dithering mode is AUTO, it will generally only be done when
 	 * sample size is decreased.
@@ -31,6 +75,16 @@ public class SampleBuffer implements Cloneable
 	/*------------------------------------------------------------------------------------------[*]
 	 * Initializers.
 	 */
+	
+	public SampleBuffer(AudioFormat format, int size)
+	{
+		if (format.getSampleRate() == NS || format.getChannels() == NS)
+			throw new IllegalArgumentException("Rate and channels must be specified");
+		
+		sampleRate  = format.getSampleRate();
+		sampleCount = size;
+		channelList = newChannels(format.getChannels(), size);
+	}
 	
 	public SampleBuffer(int channels, int size, float rate)
 	{
@@ -153,8 +207,8 @@ public class SampleBuffer implements Cloneable
 		List<float[]> channels = channelList;
 		int size = sampleCount;
 		
-		// Spread/downmix channels
-		if (! matchChannelCount(format, channels.size()))
+		// Spread/downmix channels first if downmixing
+		if (! matchChannelCount(format, channels.size()) && format.getChannels() < channels.size())
 		{
 			if (channels == channelList)
 				channels = copy(channelList, sampleCount);
@@ -162,13 +216,22 @@ public class SampleBuffer implements Cloneable
 			convertChannelCount(channels, format.getChannels());
 		}
 		
-		// Convert sample rate
+		// Convert sample rate after downmix so we resample less data
 		if (! matchSampleRate(format, sampleRate))
 		{
 			if (channels == channelList)
 				channels = copy(channelList, sampleCount);
 			
 			size = convertSampleRate(channels, format.getSampleRate());
+		}
+
+		// Spread/downmix channels now if not done formerly
+		if (! matchChannelCount(format, channels.size()))
+		{
+			if (channels == channelList)
+				channels = copy(channelList, sampleCount);
+			
+			convertChannelCount(channels, format.getChannels());
 		}
 		
 		int bytesPerSample = format.getSampleSizeInBits() / 8;
@@ -420,7 +483,7 @@ public class SampleBuffer implements Cloneable
 		for (int ch = 0; ch < channels.size(); ++ch)
 		{
 			float[] newChannel = new float[newLength];
-			float[] oldChannel = getChannel(ch);
+			float[] oldChannel = channels.get(ch);
 			
 			if (rateRatio > 1) // Linear Interpolation
 			{
@@ -778,12 +841,12 @@ public class SampleBuffer implements Cloneable
 	private static boolean matchSampleRate(AudioFormat format, float rate)
 	{
 		return format.getSampleRate() == rate
-			|| format.getSampleRate() == AudioSystem.NOT_SPECIFIED;
+			|| format.getSampleRate() == NS;
 	}
 	
 	private static boolean matchChannelCount(AudioFormat format, int channels)
 	{
 		return format.getChannels() == channels
-			|| format.getChannels() == AudioSystem.NOT_SPECIFIED;
+			|| format.getChannels() == NS;
 	}
 }

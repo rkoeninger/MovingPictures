@@ -2,22 +2,28 @@ package com.robbix.mp5.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
 
 import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.basics.SampleBuffer;
+import com.robbix.mp5.basics.SampleStream;
 
 public class SoundBank
 {
+	private static AudioFormat INCOMING_FORMAT = new AudioFormat(22050.0f, 8, 1, false, false);
+	private static AudioFormat DEFAULT_FORMAT = new AudioFormat(44100.0f, 16, 2, true, false);
+	
 	public static SoundBank load(File rootDir, boolean lazy) throws IOException
 	{
 		return lazy ? loadLazy(rootDir) : preload(rootDir);
@@ -27,57 +33,20 @@ public class SoundBank
 	{
 		SoundBank sounds = new SoundBank();
 		sounds.rootDir = rootDir;
+		sounds.openLine(DEFAULT_FORMAT);
 		
-		try
+		for (File file : rootDir.listFiles())
 		{
-			for (File file : rootDir.listFiles())
-			{
-				if (! file.getName().endsWith(".wav"))
-					continue;
-				
-				AudioInputStream in = AudioSystem.getAudioInputStream(file);
-				byte[] data = readFully(in);
-				SampleBuffer buffer = new SampleBuffer(data, in.getFormat());
-				
-				Clip clip = AudioSystem.getClip();
-				clip.open(in.getFormat(), data, 0, data.length);
-				
-				String rawName = file.getName().toLowerCase();
-				int i = rawName.lastIndexOf(".wav");
-				String name = rawName.substring(0, i);
-				sounds.clips.put(name, clip);
-				
-				sounds.buffers.put(name, buffer);
-			}
+			if (! file.getName().endsWith(".wav"))
+				continue;
 			
-			File musicDir = new File(rootDir, "music");
-			
-			if (musicDir.exists())
-			{
-				for (File file : musicDir.listFiles())
-				{
-					if (! file.getName().endsWith(".wav"))
-						continue;
-					
-					AudioInputStream in = AudioSystem.getAudioInputStream(file);
-					byte[] data = readFully(in);
-					SampleBuffer buffer = new SampleBuffer(data, in.getFormat());
-					
-					Clip clip = AudioSystem.getClip();
-					clip.open(in.getFormat(), data, 0, data.length);
-					
-					String rawName = file.getName().toLowerCase();
-					int i = rawName.lastIndexOf(".wav");
-					String name = rawName.substring(0, i);
-					sounds.musics.put(name, clip);
-					
-					sounds.buffers.put(name, buffer);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			throw new IOException(e);
+			String rawName = file.getName().toLowerCase();
+			int i = rawName.lastIndexOf(".");
+			String name = rawName.substring(0, i);
+			SampleBuffer buffer = SampleBuffer.load(file);
+			buffer.rechannel(INCOMING_FORMAT.getChannels());
+			buffer.resample(INCOMING_FORMAT.getSampleRate());
+			sounds.buffers.put(name, buffer);
 		}
 		
 		return sounds;
@@ -90,36 +59,38 @@ public class SoundBank
 		return sounds;
 	}
 	
-	private static byte[] readFully(AudioInputStream ais) throws IOException
+	private void openLine(AudioFormat format) throws IOException
 	{
-		AudioFormat format = ais.getFormat();
-		int dataSize = (int) (format.getFrameRate() * ais.getFrameLength());
-		byte[] data = new byte[dataSize];
-		int bytesRead = 0;
-		int pos = 0;
-		
-		while ((bytesRead = ais.read(data, pos, data.length - pos)) >= 0)
-			pos += bytesRead;
-		
-		ais.close();
-		return data;
+		try
+		{
+			synchronized (lineLock)
+			{
+				line = AudioSystem.getSourceDataLine(format);
+				line.open(format);
+				outFormat = format;
+			}
+		}
+		catch (LineUnavailableException lue)
+		{
+			throw new IOException(lue);
+		}		
 	}
 	
-	private Map<String, Clip> clips, musics;
+	private AudioFormat outFormat;
+	private SourceDataLine line;
+	private Object lineLock = new Object();
 	private Map<String, SampleBuffer> buffers;
-	private Clip currentMusic;
+	private Collection<SampleStream> playList;
 	private boolean running;
 	private File rootDir;
 	private ModuleListener.Helper listenerHelper;
 	
 	private SoundBank()
 	{
-		clips   = new HashMap<String, Clip>();
-		musics  = new HashMap<String, Clip>();
 		running = false;
 		listenerHelper = new ModuleListener.Helper();
-		
 		buffers = new HashMap<String, SampleBuffer>();
+		playList = new LinkedList<SampleStream>();
 	}
 	
 	public void addModuleListener(ModuleListener listener)
@@ -137,25 +108,10 @@ public class SoundBank
 		try
 		{
 			File file = new File(rootDir, name + ".wav");
-			Clip clip = AudioSystem.getClip();
-			clip.open(AudioSystem.getAudioInputStream(file));
-			clips.put(name, clip);
-			listenerHelper.fireModuleLoaded(new ModuleEvent(this, name));
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	public void loadMusic(String name)
-	{
-		try
-		{
-			File file = new File(rootDir, "music/" + name + ".wav");
-			Clip clip = AudioSystem.getClip();
-			clip.open(AudioSystem.getAudioInputStream(file));
-			musics.put(name, clip);
+			SampleBuffer buffer = SampleBuffer.load(file);
+			buffer.rechannel(INCOMING_FORMAT.getChannels());
+			buffer.resample(INCOMING_FORMAT.getSampleRate());
+			buffers.put(name, buffer);
 			listenerHelper.fireModuleLoaded(new ModuleEvent(this, name));
 		}
 		catch (Exception e)
@@ -166,18 +122,14 @@ public class SoundBank
 	
 	public boolean isLoaded(String name)
 	{
-		return clips.containsKey(name) || musics.containsKey(name);
+		return buffers.containsKey(name);
 	}
 	
 	public boolean unloadModule(String name)
 	{
-		if (clips.containsKey(name))
+		if (buffers.containsKey(name))
 		{
-			clips.remove(name);
-		}
-		else if (musics.containsKey(name))
-		{
-			musics.remove(name);
+			buffers.remove(name);
 		}
 		else
 		{
@@ -190,10 +142,7 @@ public class SoundBank
 	
 	public Set<String> getLoadedModules()
 	{
-		Set<String> modules = new HashSet<String>();
-		modules.addAll(clips.keySet());
-		modules.addAll(musics.keySet());
-		return modules;
+		return buffers.keySet();
 	}
 	
 	/**
@@ -211,54 +160,26 @@ public class SoundBank
 		if (name == null)
 			return;
 		
-		Clip clip = clips.get(name);
+		SampleBuffer buffer = buffers.get(name);
 		
-		if (clip == null)
+		if (buffer == null)
 		{
 			loadModule(name);
-			clip = clips.get(name);
+			buffer = buffers.get(name);
 			
-			if (clip == null)
+			if (buffer == null)
 			{
 				System.err.println("soundbite " + name + " not found");
 				return;
 			}
 		}
 		
-		clip.stop();
-		clip.setFramePosition(0);
-		clip.start();
-	}
-	
-	public void killMusic()
-	{
-		currentMusic.stop();
-		currentMusic.setFramePosition(0);
-		currentMusic = null;
-	}
-	
-	public void playMusic(String name)
-	{
-		currentMusic = musics.get(name);
-		
-		if (currentMusic == null)
+		synchronized (playList)
 		{
-			loadMusic(name);
-			currentMusic = musics.get(name);
-			
-			if (currentMusic == null)
-			{
-				System.err.println("music " + name + " not found");
-				return;
-			}
+			SampleStream stream = new SampleStream(buffer);
+			System.out.println("sound stream added: " + name + "    " + stream);
+			playList.add(stream);
 		}
-		
-		currentMusic.loop(Clip.LOOP_CONTINUOUSLY);
-	}
-	
-	public boolean isMusicPlaying()
-	{
-		return currentMusic != null && currentMusic.isActive();
 	}
 	
 	public boolean isRunning()
@@ -266,48 +187,162 @@ public class SoundBank
 		return running;
 	}
 	
-	/**
-	 * Just sets running flag.
-	 * 
-	 * Should be called before playing any sound bites.
-	 */
-	public void start()
+	public boolean isActive()
 	{
+		return running && ! playList.isEmpty();
+	}
+	
+	public void setFormat(AudioFormat format)
+	{
+		stop();
+		outFormat = format;
+		start();
+	}
+	
+	/**
+	 * Should be called before playing any sound bites.
+	 * 
+	 * @return true If SoundBank is running at end of method call.
+	 */
+	public boolean start()
+	{
+		if (running)
+			return true;
+		
 		running = true;
 		
-		for (Clip clip : clips.values())
+		synchronized (lineLock)
 		{
-			if (clip.getFramePosition() > 0)
+			if (line == null)
 			{
-				clip.loop(Clip.LOOP_CONTINUOUSLY);
+				try
+				{
+					openLine(outFormat == null ? DEFAULT_FORMAT : outFormat);
+				}
+				catch (IOException ioe)
+				{
+					return false;
+				}
 			}
+			
+			line.start();
 		}
+		
+		Thread playThread = new Thread(new DoPlay());
+		playThread.setName("MP5-Sound");
+		playThread.setDaemon(true);
+		playThread.start();
+		return true;
 	}
 	
 	/**
 	 * Stops all playing clips at their current playback position.
+	 * 
+	 * @return true If SoundBank is stopped at end of method call.
 	 */
-	public void stop()
+	public boolean stop()
 	{
+		if (! running)
+			return true;
+		
 		running = false;
 		
-		for (Clip clip : clips.values())
+		synchronized (lineLock)
 		{
-			clip.stop();
+			line.stop();
 		}
+		
+		return true;
 	}
 	
 	/**
-	 * Stops all playing clips and resets their playback position. Should be
-	 * called after stop() to prevent left over data from being played back
-	 * with SoundBank is started.
+	 * Clears all remaining sound streams. The stop() method merely stops
+	 * feeding them to the mixer, unfinished playbacks will still be there.
 	 */
 	public void flush()
 	{
-		for (Clip clip : clips.values())
+		synchronized (lineLock)
 		{
-			clip.stop();
-			clip.setFramePosition(0);
+			line.flush();
+		}
+		
+		synchronized (playList)
+		{
+			playList.clear();
+		}
+	}
+	
+	private class DoPlay implements Runnable
+	{
+		public void run()
+		{
+			SampleBuffer buffer = new SampleBuffer(INCOMING_FORMAT, 4000);
+			byte[] data = new byte[buffer.getByteSize(DEFAULT_FORMAT)];
+			int len;
+			
+			while (running)
+			{
+				if (playList.isEmpty())
+				{
+					trySleep(50);
+					continue;
+				}
+				
+				buffer.makeSilence();
+				len = 0;
+				
+				synchronized (playList)
+				{
+					Iterator<SampleStream> streamItr = playList.iterator();
+					
+					while (streamItr.hasNext())
+					{
+						SampleStream stream = streamItr.next();
+						len = Math.max(len, stream.mix(buffer));
+						
+						if (stream.isDone())
+						{
+							streamItr.remove();
+
+							System.out.println("sound removed added: " + stream);
+						}
+					}
+				}
+				
+				if (len == 0)
+					continue;
+				
+				synchronized (lineLock)
+				{
+					buffer.getBytes(data, outFormat);
+					int byteLen = sampleToByteLen(len, outFormat);
+					int pos = 0;
+					
+					while (pos < byteLen)
+					{
+						pos += line.write(data, pos, byteLen - pos);
+					}
+				}
+			}
+		}
+		
+		private int sampleToByteLen(int len, AudioFormat format)
+		{
+			len *= format.getChannels();
+			len *= format.getSampleSizeInBits() / 8;
+			return len;
+		}
+		
+		private void trySleep(long millis)
+		{
+			try
+			{
+				Thread.sleep(millis);
+			}
+			catch (InterruptedException ie)
+			{
+				
+			}
 		}
 	}
 }
