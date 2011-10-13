@@ -87,6 +87,8 @@ public class Sandbox
 	private static Map<Integer, JMenuItem> playerMenuItems =
 		new HashMap<Integer, JMenuItem>();
 	
+	private static JFrame slViewer, utViewer, sbPlayer;
+	
 	// References moved here so they can be called by addPlayer(int)
 	private static JMenu playerMenu;
 	private static ButtonGroup playerSelectButtonGroup;
@@ -626,15 +628,19 @@ public class Sandbox
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				JFrame slViewer = new SpriteViewer(game);
-				
-				try
+				if (slViewer == null)
 				{
-					slViewer.setIconImages(getWindowIcons());
-				}
-				catch (IOException e1)
-				{
-					e1.printStackTrace();
+					slViewer = new SpriteViewer(game);
+					slViewer.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+					
+					try
+					{
+						slViewer.setIconImages(getWindowIcons());
+					}
+					catch (IOException e1)
+					{
+						e1.printStackTrace();
+					}
 				}
 				
 				slViewer.setVisible(true);
@@ -645,18 +651,22 @@ public class Sandbox
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				JFrame uViewer = new UnitTypeViewer(game);
-				
-				try
+				if (utViewer == null)
 				{
-					uViewer.setIconImages(getWindowIcons());
-				}
-				catch (IOException e1)
-				{
-					e1.printStackTrace();
+					utViewer = new UnitTypeViewer(game);
+					utViewer.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+				
+					try
+					{
+						utViewer.setIconImages(getWindowIcons());
+					}
+					catch (IOException e1)
+					{
+						e1.printStackTrace();
+					}
 				}
 				
-				uViewer.setVisible(true);
+				utViewer.setVisible(true);
 			}
 		});
 		
@@ -664,18 +674,22 @@ public class Sandbox
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				JFrame sPlayer = new SoundPlayer(game);
-				
-				try
+				if (sbPlayer == null)
 				{
-					sPlayer.setIconImages(getWindowIcons());
-				}
-				catch (IOException e1)
-				{
-					e1.printStackTrace();
+					sbPlayer = new SoundPlayer(game);
+					sbPlayer.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+					
+					try
+					{
+						sbPlayer.setIconImages(getWindowIcons());
+					}
+					catch (IOException e1)
+					{
+						e1.printStackTrace();
+					}
 				}
 				
-				sPlayer.setVisible(true);
+				sbPlayer.setVisible(true);
 			}
 		});
 		
