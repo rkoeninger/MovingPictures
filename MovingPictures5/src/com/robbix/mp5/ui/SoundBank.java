@@ -14,6 +14,7 @@ import javax.sound.sampled.Clip;
 
 import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ModuleListener;
+import com.robbix.mp5.basics.SampleBuffer;
 
 public class SoundBank
 {
@@ -34,14 +35,19 @@ public class SoundBank
 				if (! file.getName().endsWith(".wav"))
 					continue;
 				
-				Clip clip = AudioSystem.getClip();
 				AudioInputStream in = AudioSystem.getAudioInputStream(file);
 				byte[] data = readFully(in);
+				SampleBuffer buffer = new SampleBuffer(data, in.getFormat());
+				
+				Clip clip = AudioSystem.getClip();
 				clip.open(in.getFormat(), data, 0, data.length);
+				
 				String rawName = file.getName().toLowerCase();
 				int i = rawName.lastIndexOf(".wav");
 				String name = rawName.substring(0, i);
 				sounds.clips.put(name, clip);
+				
+				sounds.buffers.put(name, buffer);
 			}
 			
 			File musicDir = new File(rootDir, "music");
@@ -53,14 +59,19 @@ public class SoundBank
 					if (! file.getName().endsWith(".wav"))
 						continue;
 					
-					Clip clip = AudioSystem.getClip();
 					AudioInputStream in = AudioSystem.getAudioInputStream(file);
 					byte[] data = readFully(in);
+					SampleBuffer buffer = new SampleBuffer(data, in.getFormat());
+					
+					Clip clip = AudioSystem.getClip();
 					clip.open(in.getFormat(), data, 0, data.length);
+					
 					String rawName = file.getName().toLowerCase();
 					int i = rawName.lastIndexOf(".wav");
 					String name = rawName.substring(0, i);
 					sounds.musics.put(name, clip);
+					
+					sounds.buffers.put(name, buffer);
 				}
 			}
 		}
@@ -95,6 +106,7 @@ public class SoundBank
 	}
 	
 	private Map<String, Clip> clips, musics;
+	private Map<String, SampleBuffer> buffers;
 	private Clip currentMusic;
 	private boolean running;
 	private File rootDir;
@@ -106,6 +118,8 @@ public class SoundBank
 		musics  = new HashMap<String, Clip>();
 		running = false;
 		listenerHelper = new ModuleListener.Helper();
+		
+		buffers = new HashMap<String, SampleBuffer>();
 	}
 	
 	public void addModuleListener(ModuleListener listener)
