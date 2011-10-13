@@ -53,16 +53,10 @@ public class SampleBuffer implements Cloneable
 			throw new IllegalArgumentException("Must be PCM");
 		
 		if (off + len > data.length)
-			throw new IllegalArgumentException("buffer too small");
+			throw new IllegalArgumentException("off + len > data.length");
 		
-		if (! hasSampleSize(format))
-			throw new IllegalArgumentException("Sample size must be specified");
-		
-		if (! hasSampleRate(format))
-			throw new IllegalArgumentException("Sample rate must be specified");
-		
-		if (! hasChannelCount(format))
-			throw new IllegalArgumentException("Channels must be specified");
+		if (! isFullySpecified(format))
+			throw new IllegalArgumentException("Format must be fully specified");
 		
 		int bytesPerSample = format.getSampleSizeInBits() / 8;
 		int bytesPerFrame = bytesPerSample * format.getChannels();
@@ -84,16 +78,22 @@ public class SampleBuffer implements Cloneable
 			);
 	}
 	
-	public SampleBuffer(SampleBuffer source)
+	private SampleBuffer()
 	{
-		sampleRate  = source.sampleRate;
-		sampleCount = source.sampleCount;
-		channelList = copy(source.channelList, source.sampleCount);
+	}
+	
+	public SampleBuffer copy()
+	{
+		SampleBuffer copy = new SampleBuffer();
+		copy.sampleRate = sampleRate;
+		copy.sampleCount = sampleCount;
+		copy.channelList = copy(channelList, sampleCount);
+		return copy;
 	}
 	
 	public SampleBuffer clone()
 	{
-		return new SampleBuffer(this);
+		return copy();
 	}
 	
 	private List<float[]> newChannels(int channelCount, int length)
@@ -132,7 +132,8 @@ public class SampleBuffer implements Cloneable
 		
 		int bytesPerSample = format.getSampleSizeInBits() / 8;
 		int bytesPerFrame = bytesPerSample * format.getChannels();
-		return bytesPerFrame * length();
+		float rateRatio = format.getSampleRate() / sampleRate;
+		return (int) (bytesPerFrame * rateRatio * length());
 	}
 	
 	/**
@@ -141,21 +142,19 @@ public class SampleBuffer implements Cloneable
 	 */
 	public int getBytes(byte[] data, int off, AudioFormat format)
 	{
+		if (! isPCM(format))
+			throw new IllegalArgumentException("Must be PCM");
+		
 		int byteSize = getByteSize(format);
 		
 		if (off + byteSize > data.length)
-			throw new IllegalArgumentException("buffer too small");
+			throw new IllegalArgumentException("off + byteSize > data.length");
 		
 		List<float[]> channels = channelList;
 		int size = sampleCount;
 		
-		if (hasSampleRate(format) && format.getSampleRate() != sampleRate)
-		{
-			channels = copy(channelList, sampleCount);
-			size = convertSampleRate(channels, format.getSampleRate());
-		}
-		
-		if (hasChannelCount(format) && format.getChannels() != channels.size())
+		// Spread/downmix channels
+		if (! matchChannelCount(format, channels.size()))
 		{
 			if (channels == channelList)
 				channels = copy(channelList, sampleCount);
@@ -163,10 +162,20 @@ public class SampleBuffer implements Cloneable
 			convertChannelCount(channels, format.getChannels());
 		}
 		
+		// Convert sample rate
+		if (! matchSampleRate(format, sampleRate))
+		{
+			if (channels == channelList)
+				channels = copy(channelList, sampleCount);
+			
+			size = convertSampleRate(channels, format.getSampleRate());
+		}
+		
 		int bytesPerSample = format.getSampleSizeInBits() / 8;
 		int bytesPerFrame = bytesPerSample * format.getChannels();
 		SampleType formatType = SampleType.get(format);
 		
+		// Convert sample data to bytes
 		for (int ch = 0; ch < format.getChannels(); ch++, off += bytesPerSample)
 			convertFloatToByte(
 				channels.get(ch),
@@ -770,18 +779,22 @@ public class SampleBuffer implements Cloneable
 		return format.getEncoding().equals(Encoding.PCM_SIGNED);
 	}
 	
-	private static boolean hasSampleSize(AudioFormat format)
+	private static boolean isFullySpecified(AudioFormat format)
 	{
-		return format.getSampleSizeInBits() != AudioSystem.NOT_SPECIFIED;
+		return format.getSampleSizeInBits() > 0
+			&& format.getChannels() > 0
+			&& format.getSampleRate() > 0;
 	}
 	
-	private static boolean hasSampleRate(AudioFormat format)
+	private static boolean matchSampleRate(AudioFormat format, float rate)
 	{
-		return format.getSampleRate() != AudioSystem.NOT_SPECIFIED;
+		return format.getSampleRate() == rate
+			|| format.getSampleRate() == AudioSystem.NOT_SPECIFIED;
 	}
 	
-	private static boolean hasChannelCount(AudioFormat format)
+	private static boolean matchChannelCount(AudioFormat format, int channels)
 	{
-		return format.getChannels() != AudioSystem.NOT_SPECIFIED;
+		return format.getChannels() == channels
+			|| format.getChannels() == AudioSystem.NOT_SPECIFIED;
 	}
 }

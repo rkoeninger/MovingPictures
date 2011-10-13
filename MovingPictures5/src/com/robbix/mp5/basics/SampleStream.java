@@ -26,12 +26,12 @@ public class SampleStream
 		pos = 0;
 	}
 	
-	public synchronized int add(SampleBuffer out)
+	public synchronized int mix(SampleBuffer out)
 	{
-		return add(out, 0, out.length());
+		return mix(out, 0, out.length());
 	}
 	
-	public synchronized int add(SampleBuffer out, int off, int len)
+	public synchronized int mix(SampleBuffer out, int off, int len)
 	{
 		len = Math.min(len, available());
 		
