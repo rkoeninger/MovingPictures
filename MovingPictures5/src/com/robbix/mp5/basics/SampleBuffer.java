@@ -277,13 +277,13 @@ public class SampleBuffer implements Cloneable
 	
 	public void makeSilence()
 	{
-		for (int ch = 1; ch < getChannelCount(); ch++)
-			Arrays.fill(getChannel(ch), 0.0f);
+		for (int ch = 0; ch < channelList.size(); ch++)
+			Arrays.fill(channelList.get(ch), 0.0f);
 	}
 	
 	public void makeSilence(int channel)
 	{
-		Arrays.fill(getChannel(0), 0.0f);
+		Arrays.fill(channelList.get(channel), 0.0f);
 	}
 	
 	/**
@@ -533,6 +533,12 @@ public class SampleBuffer implements Cloneable
 	/*------------------------------------------------------------------------------------------[*]
 	 * Property setters/getters.
 	 */
+	
+	public boolean formatMatches(SampleBuffer buffer)
+	{
+		return sampleRate == buffer.sampleRate
+			&& channelList.size() == buffer.channelList.size();
+	}
 	
 	public int getChannelCount()
 	{

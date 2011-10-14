@@ -1,6 +1,8 @@
 package com.robbix.mp5.sb;
 
 import java.io.File;
+import java.util.Random;
+import java.util.Set;
 
 import com.robbix.mp5.ui.SoundBank;
 
@@ -12,18 +14,19 @@ public class SoundTest
 		SoundBank sounds = SoundBank.preload(new File("./res/sounds"));
 		System.out.println("Starting");
 		sounds.start();
-		hold();
-		System.out.println("Playing 1");
-		sounds.playAnyway("acidCloud");
-		hold();
-		System.out.println("Playing 2");
-//		sounds.playAnyway("commandCenter");
-		hold();
-		System.out.println("Playing 3");
-//		sounds.playAnyway("savant_meteorApproaching");
-		hold();
-		System.out.println("Playing 4");
-//		sounds.playAnyway("savant_communicationLinkEstablished");
+		
+		Set<String> nameSet = sounds.getLoadedModules();
+		String[] names = nameSet.toArray(new String[0]);
+		Random rand = new Random();
+		
+		for (int t = 0; t < 100; t++)
+		{
+			String toPlay = names[rand.nextInt(names.length)];
+			System.out.println("Playing \"" + toPlay + "\"");
+			sounds.playAnyway(toPlay);
+			hold();
+		}
+		
 		System.out.println("Waiting to finish");
 		while (sounds.isActive()) hold();
 		System.out.println("Stoping");

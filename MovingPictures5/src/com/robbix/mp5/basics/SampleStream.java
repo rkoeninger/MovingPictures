@@ -21,6 +21,16 @@ public class SampleStream
 		return pos >= buffer.length();
 	}
 	
+	public int getPosition()
+	{
+		return pos;
+	}
+	
+	public int length()
+	{
+		return buffer.length();
+	}
+	
 	public synchronized void reset()
 	{
 		pos = 0;
@@ -33,6 +43,9 @@ public class SampleStream
 	
 	public synchronized int mix(SampleBuffer out, int off, int len)
 	{
+		if (! buffer.formatMatches(out))
+			throw new IllegalArgumentException("Buffer formats do not match");
+		
 		len = Math.min(len, available());
 		
 		for (int c = 0; c < buffer.getChannelCount(); ++c)
@@ -45,7 +58,6 @@ public class SampleStream
 				float sample = outChannel[i];
 				sample += bufferChannel[pos];
 				outChannel[i] = Math.max(-1, Math.min(1, sample));
-				
 			}
 		}
 		

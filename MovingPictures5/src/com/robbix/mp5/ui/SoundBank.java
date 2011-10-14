@@ -176,9 +176,7 @@ public class SoundBank
 		
 		synchronized (playList)
 		{
-			SampleStream stream = new SampleStream(buffer);
-			System.out.println("sound stream added: " + name + "    " + stream);
-			playList.add(stream);
+			playList.add(new SampleStream(buffer));
 		}
 	}
 	
@@ -278,7 +276,7 @@ public class SoundBank
 		{
 			SampleBuffer buffer = new SampleBuffer(INCOMING_FORMAT, 4000);
 			byte[] data = new byte[buffer.getByteSize(DEFAULT_FORMAT)];
-			int len;
+			int len; // max of num samples copied this round
 			
 			while (running)
 			{
@@ -301,11 +299,7 @@ public class SoundBank
 						len = Math.max(len, stream.mix(buffer));
 						
 						if (stream.isDone())
-						{
 							streamItr.remove();
-
-							System.out.println("sound removed added: " + stream);
-						}
 					}
 				}
 				
@@ -315,22 +309,19 @@ public class SoundBank
 				synchronized (lineLock)
 				{
 					buffer.getBytes(data, outFormat);
-					int byteLen = sampleToByteLen(len, outFormat);
+					int byteLen = (int) (len * factor(outFormat) / buffer.getSampleRate());
 					int pos = 0;
 					
 					while (pos < byteLen)
-					{
 						pos += line.write(data, pos, byteLen - pos);
-					}
 				}
 			}
 		}
 		
-		private int sampleToByteLen(int len, AudioFormat format)
+		private float factor(AudioFormat format)
 		{
-			len *= format.getChannels();
-			len *= format.getSampleSizeInBits() / 8;
-			return len;
+			return (format.getSampleSizeInBits() / 8)
+				* format.getSampleRate() * format.getChannels();
 		}
 		
 		private void trySleep(long millis)
@@ -341,7 +332,6 @@ public class SoundBank
 			}
 			catch (InterruptedException ie)
 			{
-				
 			}
 		}
 	}
