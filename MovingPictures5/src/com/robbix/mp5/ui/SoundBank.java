@@ -145,17 +145,7 @@ public class SoundBank
 		return buffers.keySet();
 	}
 	
-	/**
-	 * Starts playing clip by the given name. If clip is already in the process
-	 * of being played, it will be restarted.
-	 */
 	public void play(String name)
-	{
-		if (running)
-			playAnyway(name);
-	}
-	
-	public void playAnyway(String name)
 	{
 		if (name == null)
 			return;
@@ -188,6 +178,11 @@ public class SoundBank
 	public boolean isActive()
 	{
 		return running && ! playList.isEmpty();
+	}
+	
+	public int getActiveStreamCount()
+	{
+		return playList.size();
 	}
 	
 	public void setFormat(AudioFormat format)
@@ -276,7 +271,7 @@ public class SoundBank
 		{
 			SampleBuffer buffer = new SampleBuffer(INCOMING_FORMAT, 4000);
 			byte[] data = new byte[buffer.getByteSize(DEFAULT_FORMAT)];
-			int len; // max of num samples copied this round
+			int numSamples; // max of num samples copied this round
 			
 			while (running)
 			{
@@ -287,7 +282,7 @@ public class SoundBank
 				}
 				
 				buffer.makeSilence();
-				len = 0;
+				numSamples = 0;
 				
 				synchronized (playList)
 				{
@@ -296,20 +291,20 @@ public class SoundBank
 					while (streamItr.hasNext())
 					{
 						SampleStream stream = streamItr.next();
-						len = Math.max(len, stream.mix(buffer));
+						numSamples = Math.max(numSamples, stream.mix(buffer));
 						
 						if (stream.isDone())
 							streamItr.remove();
 					}
 				}
 				
-				if (len == 0)
+				if (numSamples == 0)
 					continue;
 				
 				synchronized (lineLock)
 				{
-					buffer.getBytes(data, outFormat);
-					int byteLen = (int) (len * factor(outFormat) / buffer.getSampleRate());
+					buffer.getBytes(data, outFormat, numSamples);
+					int byteLen = buffer.getByteSize(outFormat, numSamples);
 					int pos = 0;
 					
 					while (pos < byteLen)
@@ -318,20 +313,16 @@ public class SoundBank
 			}
 		}
 		
-		private float factor(AudioFormat format)
-		{
-			return (format.getSampleSizeInBits() / 8)
-				* format.getSampleRate() * format.getChannels();
-		}
-		
-		private void trySleep(long millis)
+		private boolean trySleep(long millis)
 		{
 			try
 			{
 				Thread.sleep(millis);
+				return true;
 			}
 			catch (InterruptedException ie)
 			{
+				return false;
 			}
 		}
 	}

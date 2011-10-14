@@ -118,7 +118,7 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.sounds.play("railGunFire");
+					Mediator.playSound("railGunFire");
 				}
 			});
 		}
@@ -144,7 +144,7 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.sounds.play("railGunHit");
+					Mediator.playSound("railGunHit");
 				}
 			});
 			

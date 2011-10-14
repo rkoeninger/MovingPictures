@@ -121,6 +121,6 @@ public class CommandGroupOverlay extends InputOverlay
 	public void onLeftClick(int x, int y)
 	{
 		Mediator.doGroupMove(units, panel.getPosition(x, y));
-		Mediator.sounds.play("beep2");
+		Mediator.playSound("beep2");
 	}
 }

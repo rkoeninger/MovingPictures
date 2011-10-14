@@ -67,7 +67,7 @@ public class CommandTruckOverlay extends InputOverlay
 		for (Unit truck : trucks)		
 			Mediator.doMove(truck, panel.getPosition(x, y));
 		
-		Mediator.sounds.play("beep2");
+		Mediator.playSound("beep2");
 	}
 	
 	public void onRightClick(int x, int y)
@@ -99,7 +99,7 @@ public class CommandTruckOverlay extends InputOverlay
 			for (Unit truck : trucks)
 				if (!truck.isCargoEmpty())
 				{
-					Mediator.sounds.play("dump");
+					Mediator.playSound("dump");
 					truck.interrupt(new DumpTask());
 				}
 		}

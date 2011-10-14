@@ -200,7 +200,7 @@ public class Sandbox
 		engine = new Engine(game);
 		Mediator.initMediator(game);
 		
-		if (soundOn) Mediator.sounds.start();
+		if (soundOn) Mediator.soundOn(true);
 		
 		currentPlayer = game.getDefaultPlayer();
 		
@@ -747,7 +747,7 @@ public class Sandbox
 			public void actionPerformed(ActionEvent e)
 			{
 				game.getTriggers().add(new MeteorShowerTrigger(1, 300));
-				game.getSoundBank().play("savant_meteorApproaching");
+				Mediator.playSound("savant_meteorApproaching");
 			}
 		});
 		
@@ -763,15 +763,7 @@ public class Sandbox
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if (playSoundMenuItem.isSelected())
-				{
-					game.getSoundBank().start();
-				}
-				else
-				{
-					game.getSoundBank().stop();
-					game.getSoundBank().flush();
-				}
+				Mediator.soundOn(playSoundMenuItem.isSelected());
 			}
 		});
 		

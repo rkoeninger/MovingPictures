@@ -54,11 +54,11 @@ public class MineTask extends Task
 				
 				if (unit.getAnimationFrame() == 30)
 				{
-					Mediator.sounds.play("dockGrab");
+					Mediator.playSound("dockGrab");
 				}
 				else if (unit.getAnimationFrame() == 55)
 				{
-					Mediator.sounds.play("dockOpen");
+					Mediator.playSound("dockOpen");
 				}
 			}
 			

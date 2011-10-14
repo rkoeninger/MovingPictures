@@ -100,7 +100,8 @@ public class SoundPlayer extends JFrame
 	{
 		if (name != null)
 		{
-			sounds.playAnyway(name.toString());
+			sounds.start();
+			sounds.play(name.toString());
 		}
 	}
 	

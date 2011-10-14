@@ -80,7 +80,7 @@ public class BuildStructureOverlay extends InputOverlay
 			panel.getMap().putUnit(unit, pos);
 			unit.assignNow(new BuildTask(buildTime, 200));
 			unit.setActivity(BUILD);
-			Mediator.sounds.play("structureBuild");
+			Mediator.playSound("structureBuild");
 			panel.refresh();
 			
 			if (factory != null)

@@ -175,6 +175,22 @@ public class SampleBuffer implements Cloneable
 	 */
 	
 	/**
+	 * Computes the size in bytes of the first numSamples worth
+	 * of data in this buffer for the given raw (PCM) audio format.
+	 * Format must be PCM_SIGNED or PCM_UNSIGNED.
+	 */
+	public int getByteSize(AudioFormat format, int numSamples)
+	{
+		if (! isPCM(format))
+			throw new IllegalArgumentException("Format must be PCM");
+		
+		int bytesPerSample = format.getSampleSizeInBits() / 8;
+		int bytesPerFrame = bytesPerSample * format.getChannels();
+		float rateRatio = format.getSampleRate() / sampleRate;
+		return (int) (bytesPerFrame * rateRatio * numSamples);
+	}
+	
+	/**
 	 * Computes the size in bytes of the data in this buffer
 	 * for the given raw (PCM) audio format. Format must be
 	 * PCM_SIGNED or PCM_UNSIGNED.
@@ -190,22 +206,27 @@ public class SampleBuffer implements Cloneable
 		return (int) (bytesPerFrame * rateRatio * length());
 	}
 	
+	public int getBytes(byte[] data, AudioFormat format)
+	{
+		return getBytes(data, format, sampleCount);
+	}
+	
 	/**
 	 * Writes byte data of this buffer to given array, starting at off.
 	 * Samples are converted to byte data considering format.
 	 */
-	public int getBytes(byte[] data, int off, AudioFormat format)
+	public int getBytes(byte[] data, AudioFormat format, int numSamples)
 	{
 		if (! isPCM(format))
 			throw new IllegalArgumentException("Must be PCM");
 		
-		int byteSize = getByteSize(format);
+		int byteSize = getByteSize(format, numSamples);
 		
-		if (off + byteSize > data.length)
+		if (byteSize > data.length)
 			throw new IllegalArgumentException("off + byteSize > data.length");
 		
 		List<float[]> channels = channelList;
-		int size = sampleCount;
+		int len = numSamples;
 		
 		// Spread/downmix channels first if downmixing
 		if (! matchChannelCount(format, channels.size()) && format.getChannels() < channels.size())
@@ -222,7 +243,7 @@ public class SampleBuffer implements Cloneable
 			if (channels == channelList)
 				channels = copy(channelList, sampleCount);
 			
-			size = convertSampleRate(channels, format.getSampleRate());
+			len = convertSampleRate(channels, format.getSampleRate());
 		}
 
 		// Spread/downmix channels now if not done formerly
@@ -237,12 +258,13 @@ public class SampleBuffer implements Cloneable
 		int bytesPerSample = format.getSampleSizeInBits() / 8;
 		int bytesPerFrame = bytesPerSample * format.getChannels();
 		SampleType formatType = SampleType.get(format);
+		int off = 0;
 		
 		// Convert sample data to bytes
 		for (int ch = 0; ch < format.getChannels(); ch++, off += bytesPerSample)
 			convertFloatToByte(
 				channels.get(ch),
-				size,
+				len,
 				data,
 				off,
 				bytesPerFrame,
@@ -253,21 +275,13 @@ public class SampleBuffer implements Cloneable
 	}
 	
 	/**
-	 * Writes byte data of this buffer to given array considering format.
-	 */
-	public int getBytes(byte[] data, AudioFormat format)
-	{
-		return getBytes(data, 0, format);
-	}
-	
-	/**
 	 * Creates a precisely-sized byte array and writes sample data from this
 	 * buffer into it, considering format.
 	 */
 	public byte[] getBytes(AudioFormat format)
 	{
 		byte[] data = new byte[getByteSize(format)];
-		getBytes(data, 0, format);
+		getBytes(data, format);
 		return data;
 	}
 	

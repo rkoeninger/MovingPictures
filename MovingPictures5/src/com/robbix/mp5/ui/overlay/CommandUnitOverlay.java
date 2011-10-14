@@ -290,7 +290,7 @@ public class CommandUnitOverlay extends InputOverlay
 		if (!(unit.isStructure() || unit.getType().isGuardPostType()))
 		{
 			Mediator.doMove(unit, panel.getPosition(x, y));
-			Mediator.sounds.play("beep2");
+			Mediator.playSound("beep2");
 		}
 		else
 		{

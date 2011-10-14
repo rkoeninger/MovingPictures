@@ -125,7 +125,7 @@ public class RPGFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.sounds.play("rocketLaunch");
+					Mediator.playSound("rocketLaunch");
 				}
 			});
 		}
@@ -155,7 +155,7 @@ public class RPGFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.sounds.play("smallExplosion1");
+					Mediator.playSound("smallExplosion1");
 				}
 			});
 		}

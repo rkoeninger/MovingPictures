@@ -84,27 +84,27 @@ public class DockTask extends Task
 			{
 				if (state == 1 && unit.getAnimationFrame() == 0)
 				{
-					Mediator.sounds.play("dockOpen");
+					Mediator.playSound("dockOpen");
 				}
 				else if (state == 1 && unit.getAnimationFrame() == 30)
 				{
-					Mediator.sounds.play("dockGrab");
+					Mediator.playSound("dockGrab");
 				}
 				else if (state == 1 && unit.getAnimationFrame() == 80)
 				{
-					Mediator.sounds.play("dockLower");
+					Mediator.playSound("dockLower");
 				}
 				else if (state == 2 && upFrameCount - unit.getAnimationFrame() == 5)
 				{
-					Mediator.sounds.play("dockOpen");
+					Mediator.playSound("dockOpen");
 				}
 				else if (state == 2 && upFrameCount - unit.getAnimationFrame() == 45)
 				{
-					Mediator.sounds.play("dockGrab");
+					Mediator.playSound("dockGrab");
 				}
 				else if (state == 2 && upFrameCount - unit.getAnimationFrame() == 125)
 				{
-					Mediator.sounds.play("dockLower");
+					Mediator.playSound("dockLower");
 				}
 				
 				unit.incrementAnimationFrame();

@@ -248,7 +248,10 @@ public class UnitTypeViewer extends JFrame
 						String ack = type.getAcknowledgement();
 						
 						if (ack != null)
-							sounds.playAnyway(ack);
+						{
+							sounds.start();
+							sounds.play(ack);
+						}
 					}
 				}
 			});

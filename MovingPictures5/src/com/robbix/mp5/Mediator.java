@@ -49,6 +49,8 @@ public class Mediator
 	
 	private static PositionCache cache;
 	
+	private static boolean soundOn = false;
+	
 	public static void initMediator(Game game)
 	{
 		Mediator.map = game.getMap();
@@ -67,6 +69,24 @@ public class Mediator
 	public static Position getPosition(int x, int y)
 	{
 		return cache.get(x, y);
+	}
+	
+	public static void soundOn(boolean soundOn)
+	{
+		Mediator.soundOn = soundOn;
+		
+		if (soundOn)
+			sounds.start();
+	}
+	
+	public static boolean soundOn()
+	{
+		return soundOn;
+	}
+	
+	public static void playSound(String name)
+	{
+		sounds.play(name);
 	}
 	
 	public static void doAttack(Unit attacker, Unit target)
@@ -140,12 +160,12 @@ public class Mediator
 			if (newBracket == HealthBracket.YELLOW
 			 && bracket != HealthBracket.YELLOW)
 			{
-				sounds.play("structureCollapse1");
+				playSound("structureCollapse1");
 			}
 			else if (newBracket == HealthBracket.RED
 			 && bracket != HealthBracket.RED)
 			{
-				sounds.play("structureCollapse2");
+				playSound("structureCollapse2");
 			}
 		}
 	}
@@ -303,7 +323,7 @@ public class Mediator
 		unit.setActivity(BUILD);
 		unit.assignNow(new BuildTask(buildFrames, 100));
 		map.putUnit(unit, pos);
-		sounds.play("structureBuild");
+		playSound("structureBuild");
 	}
 	
 	public static boolean doBuildMine(Unit miner)
@@ -375,7 +395,7 @@ public class Mediator
 				2
 			));
 			map.remove(unit);
-			sounds.play("structureExplosion");
+			playSound("structureExplosion");
 			doSplashDamage(pos, 100, 1);
 		}
 		else if (unit.isStructure())
@@ -434,7 +454,7 @@ public class Mediator
 				2
 			));
 			map.remove(unit);
-			sounds.play("structureCollapse3");
+			playSound("structureCollapse3");
 		}
 		else
 		{
@@ -445,7 +465,7 @@ public class Mediator
 				new Point(unit.getAbsX(), unit.getAbsY()),
 				2
 			));
-			sounds.play("smallExplosion1");
+			playSound("smallExplosion1");
 		}
 	}
 	
@@ -471,7 +491,7 @@ public class Mediator
 			
 			if (unit.isStarflare())
 			{
-				sounds.play("smallExplosion2");
+				playSound("smallExplosion2");
 				setName = "aStarflareExplosion";
 				eventName = "explosion";
 				damage = unit.getTurret().getType().getDamage();
@@ -479,7 +499,7 @@ public class Mediator
 			}
 			else if (unit.isSupernova())
 			{
-				sounds.play("smallExplosion3");
+				playSound("smallExplosion3");
 				setName = "aSupernovaExplosion";
 				eventName = "explosion";
 				damage = unit.getTurret().getType().getDamage();
@@ -487,7 +507,7 @@ public class Mediator
 			}
 			else
 			{
-				sounds.play("smallExplosion1");
+				playSound("smallExplosion1");
 				setName = "aDeath";
 				eventName = "vehicleSelfDestruct";
 				damage = 50;
@@ -507,7 +527,7 @@ public class Mediator
 	public static void doSpawnMeteor(Position pos)
 	{
 		panel.cueAnimation(new MeteorAnimation(pos, panel.getSpriteLibrary()));
-		sounds.play("meteor");
-//		sounds.play("savant_meteorApproaching");
+		playSound("meteor");
+//		playSound("savant_meteorApproaching");
 	}
 }
