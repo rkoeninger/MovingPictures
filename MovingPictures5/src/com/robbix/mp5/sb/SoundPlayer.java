@@ -1,6 +1,7 @@
 package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -19,6 +20,8 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.Mediator;
@@ -44,10 +47,13 @@ public class SoundPlayer extends JFrame
 	private SoundBank sounds;
 	private JList soundList;
 	private DefaultListModel listModel;
+	private SoundWavePanel preview;
 	
 	public SoundPlayer(Game game)
 	{
 		super("Sound Player");
+		preview = new SoundWavePanel("Select a Sound Bite to preview");
+		preview.setPreferredSize(new Dimension(150, 100));
 		sounds = game.getSoundBank();
 		sounds.addModuleListener(new ModuleListener(){
 			public void moduleLoaded(ModuleEvent e){buildList();}
@@ -57,7 +63,18 @@ public class SoundPlayer extends JFrame
 		soundList = new JList(listModel);
 		soundList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		buildList();
-		final JButton playButton = new JButton("Play");
+		JButton playButton = new JButton("Play");
+		JToolBar controlPanel = new JToolBar();
+		controlPanel.setFloatable(false);
+		controlPanel.add(playButton);
+		setLayout(new BorderLayout());
+		add(controlPanel, BorderLayout.NORTH);
+		add(new JScrollPane(soundList), BorderLayout.CENTER);
+		add(preview, BorderLayout.SOUTH);
+		setSize(200, 250);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
 		playButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -65,6 +82,7 @@ public class SoundPlayer extends JFrame
 				play(soundList.getSelectedValue());
 			}
 		});
+		
 		soundList.addMouseListener(new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent e)
@@ -75,6 +93,18 @@ public class SoundPlayer extends JFrame
 				}
 			}
 		});
+		
+		preview.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.getClickCount() == 2)
+				{
+					play(soundList.getSelectedValue());
+				}
+			}
+		});
+		
 		soundList.addKeyListener(new KeyAdapter()
 		{
 			public void keyTyped(KeyEvent e)
@@ -85,15 +115,17 @@ public class SoundPlayer extends JFrame
 				}
 			}
 		});
-		JToolBar controlPanel = new JToolBar();
-		controlPanel.setFloatable(false);
-		controlPanel.add(playButton);
-		setLayout(new BorderLayout());
-		add(controlPanel, BorderLayout.NORTH);
-		add(new JScrollPane(soundList), BorderLayout.CENTER);
-		setSize(200, 250);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
+		soundList.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				Object selected = soundList.getSelectedValue();
+				
+				if (selected != null)
+					preview.show(sounds.getData(selected.toString()));
+			}
+		});
 	}
 	
 	private void play(Object name)
@@ -101,7 +133,7 @@ public class SoundPlayer extends JFrame
 		if (name != null)
 		{
 			sounds.start();
-			sounds.play(name.toString());
+			sounds.play(name.toString(), preview.getCallback());
 		}
 	}
 	

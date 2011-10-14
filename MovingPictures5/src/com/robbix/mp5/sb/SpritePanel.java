@@ -14,8 +14,10 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.ui.EnumSpriteGroup;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
+import com.robbix.mp5.unit.HealthBracket;
 
 public class SpritePanel extends JComponent
 {
@@ -78,6 +80,17 @@ public class SpritePanel extends JComponent
 	
 	public void show(SpriteGroup group, int fpWidth, int fpHeight)
 	{
+		if (group instanceof EnumSpriteGroup)
+		{
+			EnumSpriteGroup<?> enumGroup = (EnumSpriteGroup<?>) group;
+			
+			if (enumGroup.getEnumType().equals(HealthBracket.class))
+			{
+				show(group.getFrame(HealthBracket.GREEN.ordinal()), fpWidth, fpHeight);
+				return;
+			}
+		}
+		
 		this.group = group;
 		message = null;
 		sprites = null;
@@ -111,7 +124,7 @@ public class SpritePanel extends JComponent
 			
 			if (timer.isRunning())
 			{
-				drawTimer(g);
+				drawTimer(g, timer);
 			}
 		}
 		else if (sprites != null)
@@ -192,7 +205,7 @@ public class SpritePanel extends JComponent
 	
 	private static DecimalFormat formatter = new DecimalFormat("0.00");
 	
-	private void drawTimer(Graphics g)
+	private void drawTimer(Graphics g, Timer timer)
 	{
 		String fpsString = timer.getDelay() == 0
 			? "Unlimited"

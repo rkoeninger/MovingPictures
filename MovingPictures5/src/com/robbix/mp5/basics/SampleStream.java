@@ -2,8 +2,16 @@ package com.robbix.mp5.basics;
 
 public class SampleStream
 {
+	public static interface Callback
+	{
+		public void starting();
+		public void progress(double progress);
+		public void complete();
+	}
+	
 	private SampleBuffer buffer;
 	private int pos;
+	private Callback callback;
 	
 	public SampleStream(SampleBuffer buffer)
 	{
@@ -11,6 +19,12 @@ public class SampleStream
 		this.pos = 0;
 	}
 	
+	public SampleStream(SampleBuffer buffer, Callback callback)
+	{
+		this(buffer);
+		this.callback = callback;
+	}
+		
 	public int available()
 	{
 		return buffer.length() - pos;
@@ -46,6 +60,9 @@ public class SampleStream
 		if (! buffer.formatMatches(out))
 			throw new IllegalArgumentException("Buffer formats do not match");
 		
+		if (pos == 0 && callback != null)
+			callback.starting();
+		
 		len = Math.min(len, available());
 		
 		for (int c = 0; c < buffer.getChannelCount(); ++c)
@@ -58,6 +75,18 @@ public class SampleStream
 				float sample = outChannel[i];
 				sample += bufferChannel[pos];
 				outChannel[i] = Math.max(-1, Math.min(1, sample));
+			}
+		}
+		
+		if (callback != null)
+		{
+			if (available() > 0)
+			{
+				callback.progress(pos / (double) buffer.length());
+			}
+			else
+			{
+				callback.complete();
 			}
 		}
 		

@@ -262,6 +262,13 @@ public class SpriteLibrary
 		return spriteArgs == null ? null : set.get(spriteArgs).getFirst();
 	}
 	
+	public Sprite getDefaultAmbientSprite(String setName)
+	{
+		SpriteSet set = getAmbientSpriteSet(setName);
+		SpriteGroup group = set.get(set.getArgumentList()[0]);
+		return group.getFirst();
+	}
+	
 	public Sprite getDefaultSprite(Unit unit)
 	{
 		return getDefaultSprite(unit.getType());

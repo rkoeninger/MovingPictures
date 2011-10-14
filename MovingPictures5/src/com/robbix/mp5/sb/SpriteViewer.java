@@ -339,6 +339,33 @@ public class SpriteViewer extends JFrame
 						fp == null ? 0 : fp.getHeight()
 					);
 				}
+				else if (currentNode.has(SpriteSet.class))
+				{
+					SpriteSet set = currentNode.get(SpriteSet.class);
+					String setName = set.getName();
+					UnitType unitType = factory.getType(setName);
+					Sprite sprite = null;
+					Footprint fp = null;
+					
+					if (unitType != null)
+					{
+						sprite = lib.getDefaultSprite(unitType);
+						fp = unitType.getFootprint();
+						
+						if (fp == null)
+							fp = Footprint.VEHICLE;
+					}
+					else
+					{
+						sprite = lib.getDefaultAmbientSprite(setName);
+					}
+					
+					preview.show(
+						sprite,
+						fp == null ? 0 : fp.getWidth(),
+						fp == null ? 0 : fp.getHeight()
+					);
+				}
 				else
 				{
 					preview.showNothing();

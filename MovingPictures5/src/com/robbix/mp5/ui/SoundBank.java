@@ -145,7 +145,31 @@ public class SoundBank
 		return buffers.keySet();
 	}
 	
+	public SampleBuffer getData(String name)
+	{
+		SampleBuffer buffer = buffers.get(name);
+		
+		if (buffer == null)
+		{
+			loadModule(name);
+			buffer = buffers.get(name);
+			
+			if (buffer == null)
+			{
+				System.err.println("soundbite " + name + " not found");
+				return null;
+			}
+		}
+		
+		return buffer.copy();
+	}
+	
 	public void play(String name)
+	{
+		play(name, null);
+	}
+	
+	public void play(String name, SampleStream.Callback callback)
 	{
 		if (name == null)
 			return;
@@ -166,7 +190,7 @@ public class SoundBank
 		
 		synchronized (playList)
 		{
-			playList.add(new SampleStream(buffer));
+			playList.add(new SampleStream(buffer, callback));
 		}
 	}
 	
