@@ -7,8 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -180,16 +178,18 @@ public class SpriteViewer extends JFrame
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		splitPane.setLeftComponent(new JScrollPane(tree));
 		splitPane.setRightComponent(rightSidePanel);
+		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu moduleMenu = new JMenu("Module");
-		final JMenuItem loadByNameMenuItem = new JMenuItem("By Name...");
-		final JMenuItem loadFromFileMenuItem = new JMenuItem("From File...");
-		final JMenuItem unloadMenuItem = new JMenuItem("Unload...");
+		JMenuItem loadByNameMenuItem = new JMenuItem("By Name...");
+		JMenuItem loadFromFileMenuItem = new JMenuItem("From File...");
+		JMenuItem unloadMenuItem = new JMenuItem("Unload...");
 		moduleMenu.add(loadByNameMenuItem);
 		moduleMenu.add(loadFromFileMenuItem);
 		moduleMenu.addSeparator();
 		moduleMenu.add(unloadMenuItem);
 		menuBar.add(moduleMenu);
+		
 		setJMenuBar(menuBar);
 		setLayout(new BorderLayout());
 		add(splitPane, BorderLayout.CENTER);
@@ -197,14 +197,6 @@ public class SpriteViewer extends JFrame
 		splitPane.setDividerLocation(200);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		addWindowListener(new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
-			{
-				preview.dispose();
-			}
-		});
 		
 		loadByNameMenuItem.addActionListener(new ActionListener()
 		{
@@ -372,6 +364,11 @@ public class SpriteViewer extends JFrame
 				}
 			}
 		});
+	}
+	
+	public void dispose()
+	{
+		preview.dispose();
 	}
 	
 	private void buildTree()

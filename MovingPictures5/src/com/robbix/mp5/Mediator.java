@@ -86,7 +86,8 @@ public class Mediator
 	
 	public static void playSound(String name)
 	{
-		sounds.play(name);
+		if (soundOn)
+			sounds.play(name);
 	}
 	
 	public static void doAttack(Unit attacker, Unit target)

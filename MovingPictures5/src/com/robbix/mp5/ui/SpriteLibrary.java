@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Modular;
 import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.Utils;
@@ -21,7 +22,7 @@ import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
 
-public class SpriteLibrary
+public class SpriteLibrary implements Modular
 {
 	public static SpriteLibrary load(File rootDir, boolean lazy) throws IOException
 	{
@@ -81,7 +82,7 @@ public class SpriteLibrary
 		listenerHelper.remove(listener);
 	}
 	
-	public SpriteSet loadModule(File xmlFile) throws IOException
+	public void loadModule(File xmlFile) throws IOException
 	{
 		String moduleName = 
 			xmlFile.isDirectory()
@@ -89,7 +90,7 @@ public class SpriteLibrary
 			: xmlFile.getParentFile().getName();
 		
 		if (loadedModules.contains(moduleName))
-			return getSpriteSet(moduleName);
+			return;
 		
 		SpriteSet set = new SpriteSetXMLLoader(xmlFile).load();
 		Class<?>[] params = set.getParameterList();
@@ -106,12 +107,11 @@ public class SpriteLibrary
 		
 		loadedModules.add(moduleName);
 		listenerHelper.fireModuleLoaded(new ModuleEvent(this, moduleName));
-		return set;
 	}
 	
-	public SpriteSet loadModule(String name) throws IOException
+	public void loadModule(String name) throws IOException
 	{
-		return loadModule(new File(rootDir, name));
+		loadModule(new File(rootDir, name));
 	}
 	
 	public boolean isLoaded(String module)

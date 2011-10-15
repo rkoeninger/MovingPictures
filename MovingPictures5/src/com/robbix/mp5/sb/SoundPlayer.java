@@ -2,6 +2,7 @@ package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -15,13 +16,21 @@ import java.util.Set;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.Mediator;
@@ -33,8 +42,10 @@ public class SoundPlayer extends JFrame
 {
 	public static void main(String[] args) throws IOException
 	{
+		boolean lazy = Arrays.asList(args).contains("-lazyLoadSounds");
+		
 		Sandbox.trySystemLookAndFeel();
-		SoundBank sounds = SoundBank.preload(new File("./res/sounds"));
+		SoundBank sounds = SoundBank.load(new File("./res/sounds"), lazy);
 		Mediator.sounds = sounds;
 		JFrame sPlayer = new SoundPlayer(Game.of(sounds));
 		sPlayer.setIconImages(Sandbox.getWindowIcons());
@@ -48,10 +59,12 @@ public class SoundPlayer extends JFrame
 	private JList soundList;
 	private DefaultListModel listModel;
 	private SoundWavePanel preview;
+	private JPopupMenu unloadPopup;
 	
 	public SoundPlayer(Game game)
 	{
 		super("Sound Player");
+		unloadPopup = new JPopupMenu();
 		preview = new SoundWavePanel("Select a Sound Bite to preview");
 		preview.setPreferredSize(new Dimension(150, 100));
 		sounds = game.getSoundBank();
@@ -67,11 +80,26 @@ public class SoundPlayer extends JFrame
 		JToolBar controlPanel = new JToolBar();
 		controlPanel.setFloatable(false);
 		controlPanel.add(playButton);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		splitPane.setTopComponent(new JScrollPane(soundList));
+		splitPane.setBottomComponent(preview);
+		
+		JMenuBar menuBar = new JMenuBar();
+		JMenu moduleMenu = new JMenu("Module");
+		JMenuItem loadByNameMenuItem = new JMenuItem("By Name...");
+		JMenuItem loadFromFileMenuItem = new JMenuItem("From File...");
+		JMenuItem unloadMenuItem = new JMenuItem("Unload...");
+		moduleMenu.add(loadByNameMenuItem);
+		moduleMenu.add(loadFromFileMenuItem);
+		moduleMenu.addSeparator();
+		moduleMenu.add(unloadMenuItem);
+		menuBar.add(moduleMenu);
+		setJMenuBar(menuBar);
+		
 		setLayout(new BorderLayout());
 		add(controlPanel, BorderLayout.NORTH);
-		add(new JScrollPane(soundList), BorderLayout.CENTER);
-		add(preview, BorderLayout.SOUTH);
-		setSize(200, 250);
+		add(splitPane, BorderLayout.CENTER);
+		setSize(300, 450);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -87,9 +115,31 @@ public class SoundPlayer extends JFrame
 		{
 			public void mouseClicked(MouseEvent e)
 			{
-				if (e.getClickCount() == 2)
+				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1)
 				{
 					play(soundList.getSelectedValue());
+				}
+				else if (e.getButton() == MouseEvent.BUTTON3)
+				{
+					int selectedIndex = soundList.locationToIndex(e.getPoint());
+					soundList.setSelectedIndex(selectedIndex);
+					final Object selected = listModel.getElementAt(selectedIndex);
+					Point p = soundList.getPopupLocation(e);
+					JMenuItem unloadMenuItem = new JMenuItem("Unload");
+					unloadMenuItem.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							sounds.unloadModule(selected.toString());
+						}
+					});
+					unloadPopup.removeAll();
+					unloadPopup.add(unloadMenuItem);
+					
+					if (p == null)
+						p = e.getPoint();
+					
+					unloadPopup.show(soundList, p.x, p.y);
 				}
 			}
 		});
@@ -98,7 +148,7 @@ public class SoundPlayer extends JFrame
 		{
 			public void mouseClicked(MouseEvent e)
 			{
-				if (e.getClickCount() == 2)
+				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1)
 				{
 					play(soundList.getSelectedValue());
 				}
@@ -124,6 +174,109 @@ public class SoundPlayer extends JFrame
 				
 				if (selected != null)
 					preview.show(sounds.getData(selected.toString()));
+			}
+		});
+		
+		loadByNameMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String moduleList = JOptionPane.showInputDialog(
+					SoundPlayer.this,
+					"Module Name (separate multiple names with commas):",
+					"Load Module(s)",
+					JOptionPane.QUESTION_MESSAGE
+				);
+				
+				if (moduleList == null)
+					return;
+				
+				try
+				{
+					for (String moduleName : moduleList.split(","))
+					{
+						moduleName = moduleName.trim();
+						sounds.loadModule(moduleName);
+					}
+					buildList();
+					SoundPlayer.this.repaint();
+				}
+				catch (IOException ioe)
+				{
+					JOptionPane.showMessageDialog(
+						SoundPlayer.this,
+						"Could not load module(s): " + moduleList + "\n" +
+						ioe.getMessage(),
+						"Load Error",
+						JOptionPane.ERROR_MESSAGE
+					);
+				}
+			}
+		});
+		
+		loadFromFileMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JFileChooser chooser = new JFileChooser();
+				chooser.setDialogTitle("Load Module");
+				chooser.setCurrentDirectory(new File("./res/sounds"));
+				chooser.setFileFilter(new FileFilter(){
+					public boolean accept(File file) {
+						return file.getName().endsWith(".wav") ||
+							file.isDirectory();
+					}
+					public String getDescription() {
+						return "Sound Files (*.wav)";
+					}
+				});
+				int result = chooser.showOpenDialog(SoundPlayer.this);
+				
+				if (result != JFileChooser.APPROVE_OPTION)
+					return;
+				
+				File file = chooser.getSelectedFile();
+				try
+				{
+					sounds.loadModule(file);
+					buildList();
+					SoundPlayer.this.repaint();
+				}
+				catch (IOException ioe)
+				{
+					JOptionPane.showMessageDialog(
+						SoundPlayer.this,
+						"Could not load file: " + file + "\n" +
+						ioe.getMessage(),
+						"Load Error",
+						JOptionPane.ERROR_MESSAGE
+					);
+				}
+			}
+		});
+		
+		unloadMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String moduleList = JOptionPane.showInputDialog(
+					SoundPlayer.this,
+					"Module Name (separate multiple names with commas):",
+					"Unload Module(s)",
+					JOptionPane.QUESTION_MESSAGE
+				);
+				
+				if (moduleList == null)
+					return;
+				
+				for (String moduleName : moduleList.split(","))
+				{
+					moduleName = moduleName.trim();
+					sounds.unloadModule(moduleName);
+				}
+				
+				buildList();
+				SoundPlayer.this.repaint();
 			}
 		});
 	}

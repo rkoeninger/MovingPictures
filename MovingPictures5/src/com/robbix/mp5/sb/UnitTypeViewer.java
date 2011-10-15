@@ -6,8 +6,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -113,14 +111,6 @@ public class UnitTypeViewer extends JFrame
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
-		addWindowListener(new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
-			{
-				infoPanel.dispose();
-			}
-		});
-		
 		tree.addTreeSelectionListener(new TreeSelectionListener()
 		{
 			public void valueChanged(TreeSelectionEvent e)
@@ -141,6 +131,11 @@ public class UnitTypeViewer extends JFrame
 				}
 			}
 		});
+	}
+	
+	public void dispose()
+	{
+		infoPanel.preview.dispose();
 	}
 	
 	private void buildTree()
@@ -361,11 +356,6 @@ public class UnitTypeViewer extends JFrame
 			type = null;
 			clearTable();
 			preview.showNothing();
-		}
-		
-		public void dispose()
-		{
-			preview.dispose();
 		}
 	}
 }

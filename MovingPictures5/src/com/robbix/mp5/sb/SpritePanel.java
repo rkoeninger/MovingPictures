@@ -254,6 +254,7 @@ public class SpritePanel extends JComponent
 	public void setGridVisible(boolean grid)
 	{
 		this.grid = grid;
+		repaint();
 	}
 	
 	public boolean isGridVisible()

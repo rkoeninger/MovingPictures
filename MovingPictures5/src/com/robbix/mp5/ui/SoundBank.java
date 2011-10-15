@@ -14,12 +14,13 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import com.robbix.mp5.Modular;
 import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.basics.SampleBuffer;
 import com.robbix.mp5.basics.SampleStream;
 
-public class SoundBank
+public class SoundBank implements Modular
 {
 	private static AudioFormat INCOMING_FORMAT = new AudioFormat(22050.0f, 8, 1, false, false);
 	private static AudioFormat DEFAULT_FORMAT = new AudioFormat(44100.0f, 16, 2, true, false);
@@ -103,11 +104,17 @@ public class SoundBank
 		listenerHelper.remove(listener);
 	}
 	
-	public void loadModule(String name)
+	public void loadModule(String name) throws IOException
+	{
+		loadModule(new File(rootDir, name + ".wav"));
+	}
+	
+	public void loadModule(File file) throws IOException
 	{
 		try
 		{
-			File file = new File(rootDir, name + ".wav");
+			String name = file.getName();
+			name = name.substring(0, name.lastIndexOf('.'));
 			SampleBuffer buffer = SampleBuffer.load(file);
 			buffer.rechannel(INCOMING_FORMAT.getChannels());
 			buffer.resample(INCOMING_FORMAT.getSampleRate());
@@ -116,7 +123,7 @@ public class SoundBank
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			throw new IOException(e);
 		}
 	}
 	
@@ -151,10 +158,12 @@ public class SoundBank
 		
 		if (buffer == null)
 		{
-			loadModule(name);
-			buffer = buffers.get(name);
-			
-			if (buffer == null)
+			try
+			{
+				loadModule(name);
+				buffer = buffers.get(name);
+			}
+			catch (IOException ioe)
 			{
 				System.err.println("soundbite " + name + " not found");
 				return null;
@@ -178,10 +187,12 @@ public class SoundBank
 		
 		if (buffer == null)
 		{
-			loadModule(name);
-			buffer = buffers.get(name);
-			
-			if (buffer == null)
+			try
+			{
+				loadModule(name);
+				buffer = buffers.get(name);
+			}
+			catch (IOException ioe)
 			{
 				System.err.println("soundbite " + name + " not found");
 				return;
