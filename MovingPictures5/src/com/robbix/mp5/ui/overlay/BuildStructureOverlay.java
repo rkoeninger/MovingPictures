@@ -27,6 +27,11 @@ public class BuildStructureOverlay extends InputOverlay
 		this.structure = structure;
 	}
 	
+	public void init()
+	{
+		panel.setAnimatedCursor(null);
+	}
+	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		g.translate(rect.x, rect.y);

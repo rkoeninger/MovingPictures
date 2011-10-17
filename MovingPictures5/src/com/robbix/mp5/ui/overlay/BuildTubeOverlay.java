@@ -22,6 +22,11 @@ public class BuildTubeOverlay extends InputOverlay
 		this.earthworker = earthworker;
 	}
 	
+	public void init()
+	{
+		panel.setAnimatedCursor(null);
+	}
+	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		InputOverlay.paintSelectedUnitBox(g, earthworker);
