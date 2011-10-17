@@ -26,6 +26,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 {
 	public static final Font OVERLAY_FONT = Font.decode("Arial-12");
 	public static final Color TRANS_RED = new Color(255, 0, 0, 127);
+	public static final Color TRANS_WHITE = new Color(255, 255, 255, 127);
 	
 	private static int DRAG_THRESHOLD = 16;
 	private static final int LEFT   = MouseEvent.BUTTON1;
@@ -37,7 +38,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	private Point pressedPoint = null;
 	private Rectangle dragArea = null;
 	
-	public void paintOverTerrian(Graphics g, Rectangle rect){}
+	public void paintOverTerrain(Graphics g, Rectangle rect){}
 	public void paintOverUnits(Graphics g, Rectangle rect){}
 	
 	public void setDisplay(DisplayPanel panel)

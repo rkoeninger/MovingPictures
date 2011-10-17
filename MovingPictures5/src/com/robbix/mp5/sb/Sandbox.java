@@ -59,7 +59,6 @@ import com.robbix.mp5.ui.PlayerStatus;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.TitleBar;
 import com.robbix.mp5.ui.UnitStatus;
-import com.robbix.mp5.ui.overlay.BuildStructureOverlay;
 import com.robbix.mp5.ui.overlay.PlaceBulldozeOverlay;
 import com.robbix.mp5.ui.overlay.PlaceGeyserOverlay;
 import com.robbix.mp5.ui.overlay.PlaceResourceOverlay;
@@ -71,7 +70,6 @@ import com.robbix.mp5.ui.overlay.SpawnMeteorOverlay;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
-import com.robbix.mp5.unit.UnitType;
 
 /**
  * Test code for MovingPictures 5.
@@ -400,7 +398,6 @@ public class Sandbox
 		final JMenuItem setAudioFormatMenuItem = new JMenuItem("Set Format...");
 		playSoundMenuItem.setSelected(game.getSoundBank().isRunning());
 		final JMenu addUnitMenu = new JMenu("Add");
-		final JMenu buildStructureMenu = new JMenu("Build");
 		final JMenuItem removeAllUnitsMenuItem = new JMenuItem("Remove All");
 		final JMenuItem addPlayerMenuItem = new JMenuItem("Add Player...");
 		playerMenu.add(addPlayerMenuItem);
@@ -481,34 +478,6 @@ public class Sandbox
 		}
 		
 		/*-------------------------------------------------------------------*
-		 * Add build structure menu items
-		 */
-		final ActionListener buildStructureListener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				game.getUnitFactory().setDefaultOwner(currentPlayer);
-				panel.pushOverlay(new BuildStructureOverlay(
-					game.getUnitFactory(),
-					e.getActionCommand()
-				));
-			}
-		};
-		
-		for (int i = 0; i < types.size(); ++i)
-		{
-			UnitType unitType = game.getUnitFactory().getType(types.get(i));
-			
-			if (unitType.isStructureType() || unitType.isGuardPostType())
-			{
-				final JMenuItem buildStructureMenuItem = new JMenuItem(names.get(i));
-				buildStructureMenu.add(buildStructureMenuItem);
-				buildStructureMenuItem.setActionCommand(types.get(i));
-				buildStructureMenuItem.addActionListener(buildStructureListener);
-			}
-		}
-
-		/*-------------------------------------------------------------------*
 		 * Add display option menu items
 		 */
 		final List<String> options = panel.getOptionNames();
@@ -580,7 +549,6 @@ public class Sandbox
 		disastersMenu.add(spawnMeteorMenuItem);
 		disastersMenu.add(meteorShowerMenuItem);
 		unitMenu.add(addUnitMenu);
-		unitMenu.add(buildStructureMenu);
 		unitMenu.addSeparator();
 		unitMenu.add(removeAllUnitsMenuItem);
 		

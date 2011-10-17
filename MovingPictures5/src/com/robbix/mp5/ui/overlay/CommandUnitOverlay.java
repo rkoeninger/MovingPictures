@@ -17,6 +17,7 @@ import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
+import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
 
@@ -181,7 +182,24 @@ public class CommandUnitOverlay extends InputOverlay
 			}
 			else if (edge == Edge.NE)
 			{
-				Mediator.doConVecConstruct(unit);
+				if (unit.isCargoEmpty())
+					return;
+				
+				Player owner = unit.getOwner();
+				String structTypeName = unit.getCargo().getStructureType();
+				UnitType structType = Mediator.factory.getType(structTypeName);
+				Footprint fp = structType.getFootprint();
+				Position unitPos = unit.getPosition();
+				Position structPos = unitPos.shift(
+					-fp.getWidth(),
+					-fp.getHeight()
+				);
+				
+				if (!panel.getMap().canPlaceUnit(structPos, structType.getFootprint()))
+					return;
+				
+				Unit struct = Mediator.factory.newUnit(structTypeName, owner);
+				panel.pushOverlay(new BuildStructureOverlay(unit, struct));
 			}
 		}
 		else if (unit.hasTurret())

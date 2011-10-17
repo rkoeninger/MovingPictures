@@ -8,7 +8,6 @@ import java.util.Set;
 import com.robbix.mp5.ai.AStar;
 import com.robbix.mp5.ai.task.AttackTask;
 import com.robbix.mp5.ai.task.BuildTask;
-import com.robbix.mp5.ai.task.ConVecConstructTask;
 import com.robbix.mp5.ai.task.EarthworkerConstructTask;
 import com.robbix.mp5.ai.task.PathTask;
 import com.robbix.mp5.ai.task.RotateTask;
@@ -17,7 +16,6 @@ import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.PositionCache;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.LayeredMap.Fixture;
-import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.SoundBank;
 import com.robbix.mp5.ui.SpriteGroup;
@@ -31,12 +29,9 @@ import com.robbix.mp5.ui.ani.SpriteSequenceAnimation;
 import com.robbix.mp5.ui.ani.WeaponFireAnimation;
 import static com.robbix.mp5.unit.Activity.*;
 
-import com.robbix.mp5.unit.Cargo;
-import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
-import com.robbix.mp5.unit.UnitType;
 
 public class Mediator
 {
@@ -349,36 +344,6 @@ public class Mediator
 		Unit mine = Mediator.factory.newUnit("eCommonMine", miner.getOwner());
 		Mediator.doBuild(mine, minePos);
 		return true;
-	}
-	
-	public static void doConVecConstruct(Unit conVec)
-	{
-		if (!conVec.getType().getName().contains("ConVec"))
-			throw new IllegalArgumentException();
-		
-		if (conVec.isCargoEmpty())
-			return;
-		
-		Player owner = conVec.getOwner();
-		String structTypeName = conVec.getCargo().getStructureType();
-		UnitType structType = factory.getType(structTypeName);
-		Footprint fp = structType.getFootprint();
-		Position unitPos = conVec.getPosition();
-		Position structPos = unitPos.shift(
-			-fp.getWidth(),
-			-fp.getHeight()
-		);
-		
-		if (!map.canPlaceUnit(structPos, structType.getFootprint()))
-			return;
-		
-		Unit struct = factory.newUnit(structTypeName, owner);
-		doBuild(struct, structPos);
-		
-		conVec.assignNow(new ConVecConstructTask(struct));
-		conVec.setCargo(Cargo.EMPTY);
-		
-		panel.refresh();
 	}
 	
 	public static void kill(Unit unit)

@@ -1012,7 +1012,7 @@ public class DisplayPanel extends JComponent
 		 * Draw input overlay
 		 */
 		if (! overlays.isEmpty())
-			overlays.getFirst().paintOverTerrian(g, overlayRect);
+			overlays.getFirst().paintOverTerrain(g, overlayRect);
 		
 		/*
 		 * Draw units.
