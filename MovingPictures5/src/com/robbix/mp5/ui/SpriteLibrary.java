@@ -142,6 +142,13 @@ public class SpriteLibrary implements Modular
 		return false;
 	}
 	
+	public Set<String> getLoadedModules()
+	{
+		Set<String> modules = getLoadedUnitModules();
+		modules.addAll(getLoadedAmbientModules());
+		return modules;
+	}
+	
 	public Set<String> getLoadedUnitModules()
 	{
 		Set<String> moduleNames = new HashSet<String>();

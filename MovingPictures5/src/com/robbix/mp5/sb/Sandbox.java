@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.Line;
+import javax.sound.sampled.SourceDataLine;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
@@ -392,6 +397,7 @@ public class Sandbox
 		final JMenu soundMenu = new JMenu("Sound");
 		final JMenuItem playSoundMenuItem = new JCheckBoxMenuItem("Play Sounds");
 //		final JMenuItem playMusicMenuItem = new JCheckBoxMenuItem("Play Music");
+		final JMenuItem setAudioFormatMenuItem = new JMenuItem("Set Format...");
 		playSoundMenuItem.setSelected(game.getSoundBank().isRunning());
 		final JMenu addUnitMenu = new JMenu("Add");
 		final JMenu buildStructureMenu = new JMenu("Build");
@@ -564,6 +570,8 @@ public class Sandbox
 		engineMenu.add(exitMenuItem);
 		soundMenu.add(playSoundMenuItem);
 //		soundMenu.add(playMusicMenuItem);
+		soundMenu.addSeparator();
+		soundMenu.add(setAudioFormatMenuItem);
 		terrainMenu.add(placeWallMenuItem);
 		terrainMenu.add(placeTubeMenuItem);
 		terrainMenu.add(placeGeyserMenuItem);
@@ -699,10 +707,12 @@ public class Sandbox
 			{
 				for (;;)
 				{
+					int scrollSpeed = game.getView().getScrollSpeed();
+					
 					String result = JOptionPane.showInputDialog(
 						frame,
 						"Scroll Speed (1+)",
-						String.valueOf(game.getView().getScrollSpeed())
+						String.valueOf(scrollSpeed)
 					);
 					
 					if (result == null)
@@ -710,7 +720,8 @@ public class Sandbox
 					
 					try
 					{
-						game.getView().setScrollSpeed(Integer.parseInt(result));
+						scrollSpeed = Integer.parseInt(result);
+						game.getView().setScrollSpeed(scrollSpeed);
 						break;
 					}
 					catch (NumberFormatException nfe)
@@ -782,6 +793,30 @@ public class Sandbox
 //			}
 //		});
 		
+		setAudioFormatMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				AudioFormat format = game.getSoundBank().getFormat();
+				
+				for (;;)
+				{
+					format = AudioFormatDialog.showDialog(frame, format);
+					
+					if (format == null)
+						return;
+					
+					Line.Info info = new DataLine.Info(SourceDataLine.class, format);
+					
+					if (! AudioSystem.isLineSupported(info))
+						continue;
+					
+					game.getSoundBank().setFormat(format);
+					return;
+				}
+			}
+		});
+		
 		placeCommon1.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -846,7 +881,6 @@ public class Sandbox
 			}
 		});
 		
-		
 		placeWallMenuItem.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -872,7 +906,8 @@ public class Sandbox
 					"Are you sure?",
 					"Remove All Units",
 					JOptionPane.YES_NO_OPTION,
-					JOptionPane.WARNING_MESSAGE);
+					JOptionPane.WARNING_MESSAGE
+				);
 				
 				if (result != JOptionPane.YES_OPTION)
 					return;

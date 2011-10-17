@@ -187,7 +187,8 @@ public class SampleBuffer implements Cloneable
 		int bytesPerSample = format.getSampleSizeInBits() / 8;
 		int bytesPerFrame = bytesPerSample * format.getChannels();
 		float rateRatio = format.getSampleRate() / sampleRate;
-		return (int) (bytesPerFrame * rateRatio * numSamples);
+		int size = (int) (bytesPerFrame * rateRatio * numSamples);
+		return round(size, bytesPerFrame);
 	}
 	
 	/**
@@ -197,18 +198,7 @@ public class SampleBuffer implements Cloneable
 	 */
 	public int getByteSize(AudioFormat format)
 	{
-		if (! isPCM(format))
-			throw new IllegalArgumentException("Format must be PCM");
-		
-		int bytesPerSample = format.getSampleSizeInBits() / 8;
-		int bytesPerFrame = bytesPerSample * format.getChannels();
-		float rateRatio = format.getSampleRate() / sampleRate;
-		return (int) (bytesPerFrame * rateRatio * length());
-	}
-	
-	public int getBytes(byte[] data, AudioFormat format)
-	{
-		return getBytes(data, format, sampleCount);
+		return getByteSize(format, sampleCount);
 	}
 	
 	/**
@@ -226,7 +216,6 @@ public class SampleBuffer implements Cloneable
 			throw new IllegalArgumentException("off + byteSize > data.length");
 		
 		List<float[]> channels = channelList;
-		int len = numSamples;
 		
 		// Spread/downmix channels first if downmixing
 		if (! matchChannelCount(format, channels.size()) && format.getChannels() < channels.size())
@@ -243,7 +232,7 @@ public class SampleBuffer implements Cloneable
 			if (channels == channelList)
 				channels = copy(channelList, sampleCount);
 			
-			len = convertSampleRate(channels, format.getSampleRate());
+			numSamples = convertSampleRate(channels, format.getSampleRate());
 		}
 
 		// Spread/downmix channels now if not done formerly
@@ -264,7 +253,7 @@ public class SampleBuffer implements Cloneable
 		for (int ch = 0; ch < format.getChannels(); ch++, off += bytesPerSample)
 			convertFloatToByte(
 				channels.get(ch),
-				len,
+				numSamples,
 				data,
 				off,
 				bytesPerFrame,
@@ -272,6 +261,11 @@ public class SampleBuffer implements Cloneable
 			);
 		
 		return byteSize;
+	}
+	
+	public int getBytes(byte[] data, AudioFormat format)
+	{
+		return getBytes(data, format, sampleCount);
 	}
 	
 	/**
@@ -868,5 +862,10 @@ public class SampleBuffer implements Cloneable
 	{
 		return format.getChannels() == channels
 			|| format.getChannels() == NS;
+	}
+	
+	private static int round(int value, int multiple)
+	{
+		return value - (value % multiple);
 	}
 }

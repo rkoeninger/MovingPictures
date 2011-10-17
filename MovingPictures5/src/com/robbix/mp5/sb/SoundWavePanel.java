@@ -18,34 +18,12 @@ public class SoundWavePanel extends JComponent
 	private String defaultMessage;
 	private String message;
 	private SampleBuffer buffer;
-	private SampleStream.Callback callback;
 	private double playbackProgress = -100;
 	private boolean grid = true;
 	
 	public SoundWavePanel(String defaultMessage)
 	{
 		this.defaultMessage = defaultMessage;
-		
-		callback = new SampleStream.Callback()
-		{
-			public void starting()
-			{
-				playbackProgress = 0;
-				repaint();
-			}
-			
-			public void progress(double progress)
-			{
-				playbackProgress = progress;
-				repaint();
-			}
-			
-			public void complete()
-			{
-				playbackProgress = -100;
-				repaint();
-			}
-		};
 	}
 	
 	public void show(String message)
@@ -78,7 +56,26 @@ public class SoundWavePanel extends JComponent
 	
 	public SampleStream.Callback getCallback()
 	{
-		return callback;
+		return new SampleStream.Callback()
+		{
+			public void starting()
+			{
+				playbackProgress = 0;
+				repaint();
+			}
+			
+			public void progress(double progress)
+			{
+				playbackProgress = progress;
+				repaint();
+			}
+			
+			public void complete()
+			{
+				playbackProgress = -100;
+				repaint();
+			}
+		};
 	}
 	
 	public void paintComponent(Graphics g)

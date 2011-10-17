@@ -56,7 +56,7 @@ public class SoundPlayer extends JFrame
 	private static final long serialVersionUID = 1L;
 	
 	private SoundBank sounds;
-	private JList soundList;
+	private JList list;
 	private DefaultListModel listModel;
 	private SoundWavePanel preview;
 	private JPopupMenu unloadPopup;
@@ -73,15 +73,15 @@ public class SoundPlayer extends JFrame
 			public void moduleUnloaded(ModuleEvent e){buildList();}
 		});
 		listModel = new DefaultListModel();
-		soundList = new JList(listModel);
-		soundList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list = new JList(listModel);
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		buildList();
 		JButton playButton = new JButton("Play");
 		JToolBar controlPanel = new JToolBar();
 		controlPanel.setFloatable(false);
 		controlPanel.add(playButton);
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		splitPane.setTopComponent(new JScrollPane(soundList));
+		splitPane.setTopComponent(new JScrollPane(list));
 		splitPane.setBottomComponent(preview);
 		
 		JMenuBar menuBar = new JMenuBar();
@@ -100,6 +100,7 @@ public class SoundPlayer extends JFrame
 		add(controlPanel, BorderLayout.NORTH);
 		add(splitPane, BorderLayout.CENTER);
 		setSize(300, 450);
+		splitPane.setDividerLocation(250);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -107,30 +108,32 @@ public class SoundPlayer extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				play(soundList.getSelectedValue());
+				play(list.getSelectedValue());
 			}
 		});
 		
-		soundList.addMouseListener(new MouseAdapter()
+		list.addMouseListener(new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent e)
 			{
 				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1)
 				{
-					play(soundList.getSelectedValue());
+					play(list.getSelectedValue());
 				}
 				else if (e.getButton() == MouseEvent.BUTTON3)
 				{
-					int selectedIndex = soundList.locationToIndex(e.getPoint());
-					soundList.setSelectedIndex(selectedIndex);
+					int selectedIndex = list.locationToIndex(e.getPoint());
+					list.setSelectedIndex(selectedIndex);
 					final Object selected = listModel.getElementAt(selectedIndex);
-					Point p = soundList.getPopupLocation(e);
+					Point p = list.getPopupLocation(e);
 					JMenuItem unloadMenuItem = new JMenuItem("Unload");
 					unloadMenuItem.addActionListener(new ActionListener()
 					{
 						public void actionPerformed(ActionEvent e)
 						{
 							sounds.unloadModule(selected.toString());
+							list.setSelectedIndices(new int[0]);
+							preview.showNothing();
 						}
 					});
 					unloadPopup.removeAll();
@@ -139,7 +142,7 @@ public class SoundPlayer extends JFrame
 					if (p == null)
 						p = e.getPoint();
 					
-					unloadPopup.show(soundList, p.x, p.y);
+					unloadPopup.show(list, p.x, p.y);
 				}
 			}
 		});
@@ -148,29 +151,29 @@ public class SoundPlayer extends JFrame
 		{
 			public void mouseClicked(MouseEvent e)
 			{
-				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1)
+				if (e.getButton() == MouseEvent.BUTTON1)
 				{
-					play(soundList.getSelectedValue());
+					play(list.getSelectedValue());
 				}
 			}
 		});
 		
-		soundList.addKeyListener(new KeyAdapter()
+		list.addKeyListener(new KeyAdapter()
 		{
 			public void keyTyped(KeyEvent e)
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					play(soundList.getSelectedValue());
+					play(list.getSelectedValue());
 				}
 			}
 		});
 		
-		soundList.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		list.getSelectionModel().addListSelectionListener(new ListSelectionListener()
 		{
 			public void valueChanged(ListSelectionEvent e)
 			{
-				Object selected = soundList.getSelectedValue();
+				Object selected = list.getSelectedValue();
 				
 				if (selected != null)
 					preview.show(sounds.getData(selected.toString()));

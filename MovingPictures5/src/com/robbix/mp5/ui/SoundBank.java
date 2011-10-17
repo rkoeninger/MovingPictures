@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -22,9 +23,6 @@ import com.robbix.mp5.basics.SampleStream;
 
 public class SoundBank implements Modular
 {
-	private static AudioFormat INCOMING_FORMAT = new AudioFormat(22050.0f, 8, 1, false, false);
-	private static AudioFormat DEFAULT_FORMAT = new AudioFormat(44100.0f, 16, 2, true, false);
-	
 	public static SoundBank load(File rootDir, boolean lazy) throws IOException
 	{
 		return lazy ? loadLazy(rootDir) : preload(rootDir);
@@ -34,7 +32,6 @@ public class SoundBank implements Modular
 	{
 		SoundBank sounds = new SoundBank();
 		sounds.rootDir = rootDir;
-		sounds.openLine(DEFAULT_FORMAT);
 		
 		for (File file : rootDir.listFiles())
 		{
@@ -45,8 +42,8 @@ public class SoundBank implements Modular
 			int i = rawName.lastIndexOf(".");
 			String name = rawName.substring(0, i);
 			SampleBuffer buffer = SampleBuffer.load(file);
-			buffer.rechannel(INCOMING_FORMAT.getChannels());
-			buffer.resample(INCOMING_FORMAT.getSampleRate());
+			buffer.rechannel(DEFAULT_IN_FORMAT.getChannels());
+			buffer.resample(DEFAULT_IN_FORMAT.getSampleRate());
 			sounds.buffers.put(name, buffer);
 		}
 		
@@ -77,21 +74,36 @@ public class SoundBank implements Modular
 		}		
 	}
 	
+	/**
+	 * Default input format as sound effects from OP2 are formatted:
+	 * 22.05 kHz, 8-bit, mono, unsigned
+	 */
+	public static final AudioFormat DEFAULT_IN_FORMAT =
+		new AudioFormat(22050.0f, 8, 1, false, false);
+	
+	/**
+	 * Default output format used by SoundBank. Conforms to CD audio standard,
+	 * as it is probably the most supported format by hardware:
+	 * 44.1 kHz, 16-bit, stereo, signed, little-endian
+	 */
+	public static final AudioFormat DEFAULT_OUT_FORMAT =
+		new AudioFormat(44100.0f, 16, 2, true, false);
+	
 	private AudioFormat outFormat;
 	private SourceDataLine line;
 	private Object lineLock = new Object();
 	private Map<String, SampleBuffer> buffers;
 	private Collection<SampleStream> playList;
-	private boolean running;
 	private File rootDir;
 	private ModuleListener.Helper listenerHelper;
+	private DoPlay doPlay;
 	
 	private SoundBank()
 	{
-		running = false;
 		listenerHelper = new ModuleListener.Helper();
 		buffers = new HashMap<String, SampleBuffer>();
 		playList = new LinkedList<SampleStream>();
+		outFormat = DEFAULT_OUT_FORMAT;
 	}
 	
 	public void addModuleListener(ModuleListener listener)
@@ -116,8 +128,8 @@ public class SoundBank implements Modular
 			String name = file.getName();
 			name = name.substring(0, name.lastIndexOf('.'));
 			SampleBuffer buffer = SampleBuffer.load(file);
-			buffer.rechannel(INCOMING_FORMAT.getChannels());
-			buffer.resample(INCOMING_FORMAT.getSampleRate());
+			buffer.rechannel(DEFAULT_IN_FORMAT.getChannels());
+			buffer.resample(DEFAULT_IN_FORMAT.getSampleRate());
 			buffers.put(name, buffer);
 			listenerHelper.fireModuleLoaded(new ModuleEvent(this, name));
 		}
@@ -207,12 +219,12 @@ public class SoundBank implements Modular
 	
 	public boolean isRunning()
 	{
-		return running;
+		return doPlay != null;
 	}
 	
 	public boolean isActive()
 	{
-		return running && ! playList.isEmpty();
+		return doPlay != null && ! playList.isEmpty();
 	}
 	
 	public int getActiveStreamCount()
@@ -227,39 +239,36 @@ public class SoundBank implements Modular
 		start();
 	}
 	
+	public AudioFormat getFormat()
+	{
+		return outFormat;
+	}
+	
 	/**
 	 * Should be called before playing any sound bites.
 	 * 
 	 * @return true If SoundBank is running at end of method call.
 	 */
-	public boolean start()
+	public synchronized boolean start()
 	{
-		if (running)
+		if (doPlay != null)
 			return true;
 		
-		running = true;
-		
-		synchronized (lineLock)
+		try
 		{
-			if (line == null)
+			synchronized (lineLock)
 			{
-				try
-				{
-					openLine(outFormat == null ? DEFAULT_FORMAT : outFormat);
-				}
-				catch (IOException ioe)
-				{
-					return false;
-				}
+				openLine(outFormat);
+				line.start();
 			}
-			
-			line.start();
+		}
+		catch (IOException ioe)
+		{
+			return false;
 		}
 		
-		Thread playThread = new Thread(new DoPlay());
-		playThread.setName("MP5-Sound");
-		playThread.setDaemon(true);
-		playThread.start();
+		doPlay = new DoPlay();
+		doPlay.start();
 		return true;
 	}
 	
@@ -268,16 +277,18 @@ public class SoundBank implements Modular
 	 * 
 	 * @return true If SoundBank is stopped at end of method call.
 	 */
-	public boolean stop()
+	public synchronized boolean stop()
 	{
-		if (! running)
+		if (doPlay == null)
 			return true;
 		
-		running = false;
+		doPlay.end();
+		doPlay = null;
 		
 		synchronized (lineLock)
 		{
 			line.stop();
+			line = null;
 		}
 		
 		return true;
@@ -300,12 +311,28 @@ public class SoundBank implements Modular
 		}
 	}
 	
-	private class DoPlay implements Runnable
+	private static final AtomicInteger serial = new AtomicInteger();
+	
+	private class DoPlay extends Thread
 	{
+		private boolean running;
+		
+		public DoPlay()
+		{
+			setName("MP5-Sound-" + serial.getAndIncrement());
+			setDaemon(true);
+			running = true;
+		}
+		
+		public void end()
+		{
+			running = false;
+		}
+		
 		public void run()
 		{
-			SampleBuffer buffer = new SampleBuffer(INCOMING_FORMAT, 4000);
-			byte[] data = new byte[buffer.getByteSize(DEFAULT_FORMAT)];
+			SampleBuffer buffer = new SampleBuffer(DEFAULT_IN_FORMAT, 4000);
+			byte[] data = new byte[buffer.getByteSize(outFormat)];
 			int numSamples; // max of num samples copied this round
 			
 			while (running)
@@ -338,8 +365,7 @@ public class SoundBank implements Modular
 				
 				synchronized (lineLock)
 				{
-					buffer.getBytes(data, outFormat, numSamples);
-					int byteLen = buffer.getByteSize(outFormat, numSamples);
+					int byteLen = buffer.getBytes(data, outFormat, numSamples);
 					int pos = 0;
 					
 					while (pos < byteLen)
