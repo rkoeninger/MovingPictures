@@ -27,6 +27,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public static final Font OVERLAY_FONT = Font.decode("Arial-12");
 	public static final Color TRANS_RED = new Color(255, 0, 0, 127);
 	public static final Color TRANS_WHITE = new Color(255, 255, 255, 127);
+	public static final Color TRANS_GREEN = new Color(0, 255, 0, 127);
 	
 	private static int DRAG_THRESHOLD = 16;
 	private static final int LEFT   = MouseEvent.BUTTON1;
@@ -230,14 +231,13 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		Point p = new Point(x, y);
 		panel.addViewOffset(p);
 		
-//		int hSpace = panel.getHorizontalLetterBoxSpace();
-//		int vSpace = panel.getVerticalLetterBoxSpace();
-//		
-//		return p.x >= hSpace
-//			&& p.y >= vSpace
-//			&& p.x <  panel.getWidth()  - hSpace
-//			&& p.y <  panel.getHeight() - vSpace;
-		return panel.getDisplayRect().contains(p);
+		int hSpace = panel.getHorizontalLetterBoxSpace();
+		int vSpace = panel.getVerticalLetterBoxSpace();
+		
+		return p.x >= hSpace
+			&& p.y >= vSpace
+			&& p.x <  panel.getWidth()  - hSpace
+			&& p.y <  panel.getHeight() - vSpace;
 	}
 	
 	private void prepCursorPoint(int x, int y) // in terms of relative co-ords

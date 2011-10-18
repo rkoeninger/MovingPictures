@@ -145,9 +145,34 @@ public class ResourceDeposit implements Cloneable
 		return type;
 	}
 	
+	public boolean isCommon()
+	{
+		return type == ResourceType.COMMON_ORE;
+	}
+	
+	public boolean isRare()
+	{
+		return type == ResourceType.RARE_ORE;
+	}
+	
 	public YieldRange getYieldRange()
 	{
 		return range;
+	}
+	
+	public boolean isLow()
+	{
+		return range == YieldRange.LOW;
+	}
+	
+	public boolean isMedium()
+	{
+		return range == YieldRange.MEDIUM;
+	}
+	
+	public boolean isHigh()
+	{
+		return range == YieldRange.HIGH;
 	}
 	
 	public int getLoadCount()

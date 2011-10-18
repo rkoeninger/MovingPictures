@@ -17,7 +17,6 @@ import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
-import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
 
@@ -187,17 +186,6 @@ public class CommandUnitOverlay extends InputOverlay
 				
 				Player owner = unit.getOwner();
 				String structTypeName = unit.getCargo().getStructureType();
-				UnitType structType = Mediator.factory.getType(structTypeName);
-				Footprint fp = structType.getFootprint();
-				Position unitPos = unit.getPosition();
-				Position structPos = unitPos.shift(
-					-fp.getWidth(),
-					-fp.getHeight()
-				);
-				
-				if (!panel.getMap().canPlaceUnit(structPos, structType.getFootprint()))
-					return;
-				
 				Unit struct = Mediator.factory.newUnit(structTypeName, owner);
 				panel.pushOverlay(new BuildStructureOverlay(unit, struct));
 			}
@@ -213,10 +201,9 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			if (edge == Edge.NE)
 			{
-				if (Mediator.doBuildMine(unit))
-				{
-					complete();
-				}
+				Player owner = unit.getOwner();
+				Unit mine = Mediator.factory.newUnit("eCommonMine", owner);
+				panel.pushOverlay(new BuildMineOverlay(unit, mine));
 			}
 		}
 		else if (unit.getType().getName().contains("Dozer"))
