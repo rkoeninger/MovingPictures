@@ -8,9 +8,9 @@ import com.robbix.mp5.Mediator;
 
 public class SpawnMeteorOverlay extends InputOverlay
 {
-	public void init()
+	public SpawnMeteorOverlay()
 	{
-		panel.setAnimatedCursor("attack");
+		super("attack");
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)

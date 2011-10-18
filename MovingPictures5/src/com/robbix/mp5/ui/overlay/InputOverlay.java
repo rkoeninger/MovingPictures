@@ -40,6 +40,17 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	private Point pressedPoint = null;
 	private Rectangle dragArea = null;
 	
+	private String animatedCursor = null;
+	
+	protected InputOverlay()
+	{
+	}
+	
+	protected InputOverlay(String animatedCursor)
+	{
+		this.animatedCursor = animatedCursor;
+	}
+	
 	public void paintOverTerrain(Graphics g, Rectangle rect){}
 	public void paintOverUnits(Graphics g, Rectangle rect){}
 	
@@ -126,12 +137,21 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		return Edge.values()[((x - x0) / (w / 3)) + (((y - y0) / (h / 3)) * 3)];
 	}
 	
+	public void push(InputOverlay overlay)
+	{
+		panel.pushOverlay(overlay);
+	}
+	
 	public void complete()
 	{
 		panel.completeOverlay(this);
 	}
 	
-	public void init(){}
+	public void init()
+	{
+		panel.setAnimatedCursor(animatedCursor);
+	}
+	
 	public void dispose(){}
 	
 	public void onLeftClick(int x, int y){}
@@ -232,13 +252,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		Point p = new Point(x, y);
 		panel.addViewOffset(p);
 		
-		int hSpace = panel.getHorizontalLetterBoxSpace();
-		int vSpace = panel.getVerticalLetterBoxSpace();
-		
-		return p.x >= hSpace
-			&& p.y >= vSpace
-			&& p.x <  panel.getWidth()  - hSpace
-			&& p.y <  panel.getHeight() - vSpace;
+		return panel.getDisplayRect().contains(p);
 	}
 	
 	private void prepCursorPoint(int x, int y) // in terms of relative co-ords

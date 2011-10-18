@@ -400,6 +400,11 @@ public class UnitType
 		return name.contains("GuardPost");
 	}
 	
+	public boolean is(String phrase)
+	{
+		return name.contains(phrase);
+	}
+	
 	public Object[] getDefaultSpriteArgs()
 	{
 		return spriteArgs;

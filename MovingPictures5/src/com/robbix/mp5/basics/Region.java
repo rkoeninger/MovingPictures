@@ -11,7 +11,6 @@ import java.util.NoSuchElementException;
  * 
  * @author bort
  */
-//TODO: cache Region objects - have a static getRegion(x, y, w, h) method
 public class Region implements Iterable<Position>
 {
 	/**

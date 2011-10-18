@@ -26,13 +26,9 @@ public class CommandUnitOverlay extends InputOverlay
 	
 	public CommandUnitOverlay(Unit unit)
 	{
+		super((!unit.isStructure() && !unit.getType().isGuardPostType()) ? "move" : null);
+		
 		this.unit = unit;
-	}
-	
-	public void init()
-	{
-		if (!unit.isStructure() && !unit.getType().isGuardPostType())
-			panel.setAnimatedCursor("move");
 	}
 	
 	public void dispose()
@@ -42,7 +38,7 @@ public class CommandUnitOverlay extends InputOverlay
 	
 	public void onRightClick(int x, int y)
 	{
-		panel.completeOverlay(this);
+		complete();
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
@@ -104,7 +100,7 @@ public class CommandUnitOverlay extends InputOverlay
 	{
 		if (command.equals("attack"))
 		{
-			panel.pushOverlay(new SelectAttackTargetOverlay(unit.getTurret()));
+			push(new SelectAttackTargetOverlay(unit.getTurret()));
 		}
 		else if (command.equals("stop"))
 		{
@@ -113,7 +109,7 @@ public class CommandUnitOverlay extends InputOverlay
 		else if (command.equals("selfDestruct"))
 		{
 			Mediator.selfDestruct(unit);
-			panel.completeOverlay(this);
+			complete();
 		}
 		else if (command.equals("bulldoze") && unit.getType().getName().contains("Dozer"))
 		{
@@ -151,7 +147,7 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			if (edge == Edge.E)
 			{
-				panel.pushOverlay(new BuildTubeOverlay(unit));
+				push(new BuildTubeOverlay(unit));
 			}
 		}
 		else if (unit.getType().getName().contains("ConVec"))
@@ -187,14 +183,14 @@ public class CommandUnitOverlay extends InputOverlay
 				Player owner = unit.getOwner();
 				String structTypeName = unit.getCargo().getStructureType();
 				Unit struct = Mediator.factory.newUnit(structTypeName, owner);
-				panel.pushOverlay(new BuildStructureOverlay(unit, struct));
+				push(new BuildStructureOverlay(unit, struct));
 			}
 		}
 		else if (unit.hasTurret())
 		{
 			if (edge == Edge.NE)
 			{
-				panel.pushOverlay(new SelectAttackTargetOverlay(unit.getTurret()));
+				push(new SelectAttackTargetOverlay(unit.getTurret()));
 			}
 		}
 		else if (unit.isMiner())
@@ -203,14 +199,14 @@ public class CommandUnitOverlay extends InputOverlay
 			{
 				Player owner = unit.getOwner();
 				Unit mine = Mediator.factory.newUnit("eCommonMine", owner);
-				panel.pushOverlay(new BuildMineOverlay(unit, mine));
+				push(new BuildMineOverlay(unit, mine));
 			}
 		}
 		else if (unit.getType().getName().contains("Dozer"))
 		{
 			if (edge == Edge.NE)
 			{
-				panel.pushOverlay(new SelectBulldozeOverlay(unit));
+				push(new SelectBulldozeOverlay(unit));
 			}
 		}
 		else if (unit.getType().getName().contains("VehicleFactory"))

@@ -24,17 +24,14 @@ public class CommandTruckOverlay extends InputOverlay
 	
 	public CommandTruckOverlay(Unit truck)
 	{
-		this.trucks = Utils.asSet(truck);
+		this(Utils.asSet(truck));
 	}
 	
 	public CommandTruckOverlay(Set<Unit> trucks)
 	{
+		super("move");
+		
 		this.trucks = trucks;
-	}
-	
-	public void init()
-	{
-		panel.setAnimatedCursor("move");
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
@@ -105,7 +102,7 @@ public class CommandTruckOverlay extends InputOverlay
 		}
 		else if (edge == Edge.E)
 		{
-			panel.pushOverlay(new SelectMineRouteOverlay(trucks));
+			push(new SelectMineRouteOverlay(trucks));
 		}
 		else if (edge == Edge.SE && trucks.size() == 1)
 		{

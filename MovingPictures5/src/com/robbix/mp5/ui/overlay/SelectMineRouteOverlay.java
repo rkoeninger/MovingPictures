@@ -21,12 +21,9 @@ public class SelectMineRouteOverlay extends InputOverlay
 	
 	public SelectMineRouteOverlay(Set<Unit> trucks)
 	{
+		super("dock");
+		
 		this.trucks = trucks;
-	}
-	
-	public void init()
-	{
-		panel.setAnimatedCursor("dock");
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)

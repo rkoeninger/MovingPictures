@@ -422,6 +422,11 @@ public class Unit
 		return type.isGuardPostType();
 	}
 	
+	public boolean is(String phrase)
+	{
+		return type.is(phrase);
+	}
+	
 	public boolean isTruck()
 	{
 		return type.getName().contains("Truck");

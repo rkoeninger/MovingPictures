@@ -273,6 +273,16 @@ public class SpriteLibrary implements Modular
 		return buildGroup.getFrameCount();
 	}
 	
+	public int getDumpGroupLength(Unit unit)
+	{
+		if (!unit.isTruck())
+			throw new IllegalArgumentException("Must be truck");
+		
+		SpriteSet set = getUnitSpriteSet(unit.getType());
+		SpriteGroup dumpGroup = set.get(unit.getCargo().getType(), Activity.DUMP, unit.getDirection());
+		return dumpGroup.getFrameCount();
+	}
+	
 	public Sprite getDefaultSprite(UnitType unitType)
 	{
 		SpriteSet set = getUnitSpriteSet(unitType);
@@ -320,6 +330,8 @@ public class SpriteLibrary implements Modular
 			return group.getFrame(unit.getAnimationFrame()
 				% group.getFrameCount());
 			//FIXME: temporary, group looping should take care of this
+			//
+			//         - linear sequences are running one frame over.
 		}
 	}
 	

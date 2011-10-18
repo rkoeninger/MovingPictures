@@ -1,13 +1,14 @@
 package com.robbix.mp5.ai.task;
 
 import static com.robbix.mp5.unit.Activity.*;
+
+import com.robbix.mp5.Mediator;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 
 public class DumpTask extends Task
 {
-	private int frameCount = 15; // TODO: get frame count somehow
-	
+	private int frameCount;
 	private boolean incrementThisTime = false;
 	
 	public DumpTask()
@@ -21,6 +22,7 @@ public class DumpTask extends Task
 		{
 			unit.setActivity(DUMP);
 			unit.resetAnimationFrame();
+			frameCount = Mediator.game.getSpriteLibrary().getDumpGroupLength(unit);
 		}
 		else
 		{

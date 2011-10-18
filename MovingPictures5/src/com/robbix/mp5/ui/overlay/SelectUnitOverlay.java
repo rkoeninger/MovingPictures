@@ -42,7 +42,7 @@ public class SelectUnitOverlay extends InputOverlay
 		if (selected != null)
 		{
 			Mediator.playSound(selected.getType().getAcknowledgement());
-			panel.pushOverlay(selected.isTruck()
+			push(selected.isTruck()
 				? new CommandTruckOverlay(selected)
 				: new CommandUnitOverlay(selected));
 			panel.showStatus(selected);
@@ -63,8 +63,7 @@ public class SelectUnitOverlay extends InputOverlay
 				filterNonStructure(selected);
 				Unit leadUnit = getLeadUnit(selected);
 				Mediator.playSound(leadUnit.getType().getAcknowledgement());
-				panel.pushOverlay(
-					areAllTrucks(selected)
+				push(areAllTrucks(selected)
 					? new CommandTruckOverlay(selected)
 					: new CommandGroupOverlay(selected)
 				);
@@ -75,7 +74,7 @@ public class SelectUnitOverlay extends InputOverlay
 			{
 				Unit struct = getLeadUnit(selected);
 				Mediator.playSound(struct.getType().getAcknowledgement());
-				panel.pushOverlay(new CommandUnitOverlay(struct));
+				push(new CommandUnitOverlay(struct));
 				panel.showStatus(struct);
 				panel.showStatus(struct.getOwner());
 			}

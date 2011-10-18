@@ -28,11 +28,6 @@ public class BuildMineOverlay extends InputOverlay
 		this.mine = mine;
 	}
 	
-	public void init()
-	{
-		panel.setAnimatedCursor(null);
-	}
-	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		g.translate(rect.x, rect.y);

@@ -17,6 +17,8 @@ public class CommandGroupOverlay extends InputOverlay
 	
 	public CommandGroupOverlay(Set<Unit> units)
 	{
+		super("move");
+		
 		this.units = units;
 		
 		trucks = false;
@@ -31,11 +33,6 @@ public class CommandGroupOverlay extends InputOverlay
 		}
 	}
 	
-	public void init()
-	{
-		panel.setAnimatedCursor("move");
-	}
-	
 	public void dispose()
 	{
 		panel.showStatus((Unit)null);
@@ -43,7 +40,7 @@ public class CommandGroupOverlay extends InputOverlay
 	
 	public void onRightClick(int x, int y)
 	{
-		panel.completeOverlay(this);
+		complete();
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
@@ -111,7 +108,7 @@ public class CommandGroupOverlay extends InputOverlay
 				}
 			}
 			
-			panel.pushOverlay(new SelectMineRouteOverlay(trucks));
+			push(new SelectMineRouteOverlay(trucks));
 			return;
 		}
 		

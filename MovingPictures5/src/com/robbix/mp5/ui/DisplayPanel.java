@@ -405,7 +405,7 @@ public class DisplayPanel extends JComponent
 		addMouseWheelListener(overlay);
 		addKeyListener(overlay);
 	}
-
+	
 	public void setShowBackground(boolean showBackground)
 	{
 		this.showBackground = showBackground;

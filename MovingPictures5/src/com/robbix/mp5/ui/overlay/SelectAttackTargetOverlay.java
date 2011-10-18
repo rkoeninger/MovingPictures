@@ -9,21 +9,18 @@ import com.robbix.mp5.unit.Unit;
 
 public class SelectAttackTargetOverlay extends InputOverlay
 {
-	private Unit unit;
+	private Unit attacker;
 	
 	public SelectAttackTargetOverlay(Unit unit)
 	{
-		this.unit = unit;
-	}
-	
-	public void init()
-	{
-		panel.setAnimatedCursor("attack");
+		super("attack");
+		
+		this.attacker = unit;
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		InputOverlay.paintSelectedUnitBox(g, unit.getChassis());
+		InputOverlay.paintSelectedUnitBox(g, attacker.getChassis());
 		
 		g.translate(rect.x, rect.y);
 		g.setColor(Color.RED);
@@ -37,9 +34,9 @@ public class SelectAttackTargetOverlay extends InputOverlay
 	{
 		Unit target = panel.getMap().getUnitAbsolute(x, y);
 		
-		if (target != null && !target.isAt(unit.getPosition()))
+		if (target != null && !target.isAt(attacker.getPosition()))
 		{
-			Mediator.doAttack(unit, target);
+			Mediator.doAttack(attacker, target);
 			complete();
 		}
 	}

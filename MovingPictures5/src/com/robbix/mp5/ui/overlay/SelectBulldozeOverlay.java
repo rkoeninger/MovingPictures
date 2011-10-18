@@ -21,11 +21,6 @@ public class SelectBulldozeOverlay extends InputOverlay
 		this.dozer = dozer;
 	}
 	
-	public void init()
-	{
-		panel.setAnimatedCursor(null);
-	}
-	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		InputOverlay.paintSelectedUnitBox(g, dozer);
