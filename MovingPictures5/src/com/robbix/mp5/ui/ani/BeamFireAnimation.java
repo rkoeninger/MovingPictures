@@ -56,7 +56,7 @@ public class BeamFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.playSound(soundBite);
+					Mediator.playSound(soundBite, getAttacker().getPosition());
 				}
 			});
 		}

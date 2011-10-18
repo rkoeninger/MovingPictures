@@ -136,7 +136,7 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.playSound("rocketLaunch");
+					Mediator.playSound("rocketLaunch", getAttacker().getPosition());
 				}
 			});
 		}
@@ -166,7 +166,7 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.playSound("acidCloud");
+					Mediator.playSound("acidCloud", targetPos);
 				}
 			});
 		}

@@ -85,6 +85,17 @@ public class Mediator
 			sounds.play(name);
 	}
 	
+	public static void playSound(String name, Position pos)
+	{
+		if (game.getDisplay().getDisplayRegion().contains(pos))
+			playSound(name);
+	}
+	
+	public static void playSound(String name, int x, int y)
+	{
+		playSound(name, getPosition(x, y));
+	}
+	
 	public static void doAttack(Unit attacker, Unit target)
 	{
 		if (attacker.getCharge() < attacker.getType().getWeaponChargeCost())
@@ -156,12 +167,12 @@ public class Mediator
 			if (newBracket == HealthBracket.YELLOW
 			 && bracket != HealthBracket.YELLOW)
 			{
-				playSound("structureCollapse1");
+				playSound("structureCollapse1", target.getPosition());
 			}
 			else if (newBracket == HealthBracket.RED
 			 && bracket != HealthBracket.RED)
 			{
-				playSound("structureCollapse2");
+				playSound("structureCollapse2", target.getPosition());
 			}
 		}
 	}
@@ -319,7 +330,7 @@ public class Mediator
 		unit.setActivity(BUILD);
 		unit.assignNow(new BuildTask(buildFrames, 100));
 		map.putUnit(unit, pos);
-		playSound("structureBuild");
+		playSound("structureBuild", pos);
 	}
 	
 	public static boolean doBuildMine(Unit miner)
@@ -361,7 +372,7 @@ public class Mediator
 				2
 			));
 			map.remove(unit);
-			playSound("structureExplosion");
+			playSound("structureExplosion", pos);
 			doSplashDamage(pos, 100, 1);
 		}
 		else if (unit.isStructure())
@@ -457,7 +468,7 @@ public class Mediator
 			
 			if (unit.isStarflare())
 			{
-				playSound("smallExplosion2");
+				playSound("smallExplosion2", pos);
 				setName = "aStarflareExplosion";
 				eventName = "explosion";
 				damage = unit.getTurret().getType().getDamage();
@@ -465,7 +476,7 @@ public class Mediator
 			}
 			else if (unit.isSupernova())
 			{
-				playSound("smallExplosion3");
+				playSound("smallExplosion3", pos);
 				setName = "aSupernovaExplosion";
 				eventName = "explosion";
 				damage = unit.getTurret().getType().getDamage();
@@ -473,7 +484,7 @@ public class Mediator
 			}
 			else
 			{
-				playSound("smallExplosion1");
+				playSound("smallExplosion1", pos);
 				setName = "aDeath";
 				eventName = "vehicleSelfDestruct";
 				damage = 50;
@@ -493,7 +504,7 @@ public class Mediator
 	public static void doSpawnMeteor(Position pos)
 	{
 		panel.cueAnimation(new MeteorAnimation(pos, panel.getSpriteLibrary()));
-		playSound("meteor");
+		playSound("meteor", pos);
 //		playSound("savant_meteorApproaching");
 	}
 }

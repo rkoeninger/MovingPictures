@@ -99,7 +99,7 @@ public class CommandTruckOverlay extends InputOverlay
 			for (Unit truck : trucks)
 				if (!truck.isCargoEmpty())
 				{
-					Mediator.playSound("dump");
+					Mediator.playSound("dump", truck.getPosition());
 					truck.interrupt(new DumpTask());
 				}
 		}

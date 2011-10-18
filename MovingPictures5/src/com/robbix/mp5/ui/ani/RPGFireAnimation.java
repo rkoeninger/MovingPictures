@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Direction;
+import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
@@ -125,7 +126,7 @@ public class RPGFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.playSound("rocketLaunch");
+					Mediator.playSound("rocketLaunch", getAttacker().getPosition());
 				}
 			});
 		}
@@ -155,7 +156,10 @@ public class RPGFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.playSound("smallExplosion1");
+					Position pos = getTarget().getPosition();
+					
+					if (pos != null)
+						Mediator.playSound("smallExplosion1", pos);
 				}
 			});
 		}

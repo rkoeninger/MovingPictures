@@ -120,7 +120,7 @@ public class MeteorAnimation extends AmbientAnimation
 					public void run()
 					{
 						Mediator.doSplashDamage(target, 300, 2);
-						Mediator.playSound("smallExplosion2");
+						Mediator.playSound("smallExplosion2", target);
 					}
 				});
 				

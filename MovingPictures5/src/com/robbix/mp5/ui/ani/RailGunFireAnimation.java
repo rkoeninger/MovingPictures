@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Direction;
+import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
@@ -118,7 +119,7 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.playSound("railGunFire");
+					Mediator.playSound("railGunFire", getAttacker().getPosition());
 				}
 			});
 		}
@@ -144,7 +145,10 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 			{
 				public void run()
 				{
-					Mediator.playSound("railGunHit");
+					Position pos = getTarget().getPosition();
+					
+					if (pos != null)
+						Mediator.playSound("railGunHit", pos);
 				}
 			});
 			
@@ -205,10 +209,6 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 				y + rocketSprite.getYOffset(),
 				null
 			);
-		}
-		else
-		{
-			
 		}
 	}
 }

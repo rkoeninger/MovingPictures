@@ -2,6 +2,8 @@ package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.basics.Direction;
+import com.robbix.mp5.basics.Position;
+
 import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
@@ -45,6 +47,8 @@ public class MineTask extends Task
 		}
 		else
 		{
+			Position pos = unit.getPosition();
+			
 			/*
 			 * Increment animation frame every other step to slow animation
 			 */
@@ -54,11 +58,11 @@ public class MineTask extends Task
 				
 				if (unit.getAnimationFrame() == 30)
 				{
-					Mediator.playSound("dockGrab");
+					Mediator.playSound("dockGrab", pos);
 				}
 				else if (unit.getAnimationFrame() == 55)
 				{
-					Mediator.playSound("dockOpen");
+					Mediator.playSound("dockOpen", pos);
 				}
 			}
 			
