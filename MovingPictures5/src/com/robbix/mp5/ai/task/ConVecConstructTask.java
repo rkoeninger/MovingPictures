@@ -7,7 +7,7 @@ import com.robbix.mp5.basics.Position;
 
 import static com.robbix.mp5.unit.Activity.*;
 
-import com.robbix.mp5.unit.Activity;
+import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 
@@ -42,8 +42,12 @@ public class ConVecConstructTask extends Task
 			unit.setDirection(Direction.SW);
 			unit.setCargo(Cargo.EMPTY);
 			unit.getMap().putUnit(target, targetPos);
-			int buildFrames = Mediator.game.getSpriteLibrary().getUnitSpriteSet(target.getType()).get(Activity.BUILD).getFrameCount();
-			target.assignNow(new BuildTask(buildFrames, 50));
+			
+			SpriteLibrary lib = Mediator.game.getSpriteLibrary();
+			int buildFrames = lib.getBuildGroupLength(target.getType());
+			
+			target.setActivity(BUILD);
+			target.assignNow(new BuildTask(buildFrames, target.getType().getBuildTime()));
 		}
 		else if (target.getActivity() != BUILD)
 		{

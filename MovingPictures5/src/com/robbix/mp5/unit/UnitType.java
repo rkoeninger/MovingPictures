@@ -47,6 +47,7 @@ public class UnitType
 		String civ,
 		Cost cost,
 		int maxHP,
+		int buildTime,
 		Armor armor,
 		double sightRange,
 		Footprint fp,
@@ -64,8 +65,43 @@ public class UnitType
 		type.armor = armor;
 		type.sightRange = sightRange;
 		type.fp = fp;
+		type.buildTime = 150;
 		type.connectionSource = connectionSource;
 		type.needsConnection = needsConnection;
+		type.initSpriteArgs();
+		
+		return type;
+	}
+	
+	public static UnitType newGuardPostType(
+		String name,
+		String displayName,
+		String ack,
+		String civ,
+		Cost cost,
+		int maxHP,
+		int buildTime,
+		Armor armor,
+		double sightRange,
+		double damage,
+		double attackRange,
+		int weaponChargeCost)
+	{
+		UnitType type = new UnitType();
+		
+		type.name = name;
+		type.displayName = displayName;
+		type.ack = ack;
+		type.civ = civ;
+		type.cost = cost;
+		type.maxHP = maxHP;
+		type.armor = armor;
+		type.sightRange = sightRange;
+		type.damage = damage;
+		type.attackRange = attackRange;
+		type.weaponChargeCost = weaponChargeCost;
+		type.fp = Footprint.STRUCT_1_BY_1;
+		type.buildTime = 50;
 		type.initSpriteArgs();
 		
 		return type;
@@ -142,38 +178,6 @@ public class UnitType
 		return type;
 	}
 	
-	public static UnitType newGuardPostType(
-		String name,
-		String displayName,
-		String ack,
-		String civ,
-		Cost cost,
-		int maxHP,
-		Armor armor,
-		double sightRange,
-		double damage,
-		double attackRange,
-		int weaponChargeCost)
-	{
-		UnitType type = new UnitType();
-		
-		type.name = name;
-		type.displayName = displayName;
-		type.ack = ack;
-		type.civ = civ;
-		type.cost = cost;
-		type.maxHP = maxHP;
-		type.armor = armor;
-		type.sightRange = sightRange;
-		type.damage = damage;
-		type.attackRange = attackRange;
-		type.weaponChargeCost = weaponChargeCost;
-		type.fp = Footprint.STRUCT_1_BY_1;
-		type.initSpriteArgs();
-		
-		return type;
-	}
-	
 	private static AtomicInteger nextSerial = new AtomicInteger();
 	
 	private int serial;
@@ -183,6 +187,7 @@ public class UnitType
 	private String civ;
 	private Cost cost;
 	private Armor armor;
+	private int buildTime;
 	private int maxHP;
 	private double sightRange;
 	private double speed;
@@ -273,6 +278,11 @@ public class UnitType
 	public Footprint getFootprint()
 	{
 		return fp;
+	}
+	
+	public int getBuildTime()
+	{
+		return buildTime;
 	}
 	
 	public String getCiv()

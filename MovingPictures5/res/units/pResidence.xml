@@ -6,6 +6,6 @@
 		<Resource type="common ore" amount="400"/>
 	</Cost>
 	<Staff workers="1" scientists="0"/>
-	<Stats hp="800" sightRange="5" armor="none" needsConnection="true"/>
+	<Stats hp="800" buildTime="500" sightRange="5" armor="none" needsConnection="true"/>
 	<Footprint>STRUCT_2_BY_2</Footprint>
 </UnitType>

@@ -296,6 +296,7 @@ public class UnitFactory
 		{
 			XNode statsNode         = rootNode.getNode("Stats");
 			int maxHP               = statsNode.getIntAttribute("hp");
+			int buildTime           = statsNode.getIntAttribute("buildTime");
 			double sightRange       = statsNode.getFloatAttribute("sightRange");
 			String armorString      = statsNode.getAttribute("armor");
 			Armor armor             = getArmor(armorString, xmlFile);
@@ -314,6 +315,7 @@ public class UnitFactory
 				civ,
 				cost,
 				maxHP,
+				buildTime,
 				armor,
 				sightRange,
 				footprint,
@@ -325,6 +327,7 @@ public class UnitFactory
 		{
 			XNode statsNode    = rootNode.getNode("Stats");
 			int maxHP          = statsNode.getIntAttribute("hp");
+			int buildTime      = statsNode.getIntAttribute("buildTime");
 			double sightRange  = statsNode.getFloatAttribute("sightRange");
 			String armorString = statsNode.getAttribute("armor");
 			Armor armor        = getArmor(armorString, xmlFile);
@@ -342,6 +345,7 @@ public class UnitFactory
 				civ,
 				cost,
 				maxHP,
+				buildTime,
 				armor,
 				sightRange,
 				damage,

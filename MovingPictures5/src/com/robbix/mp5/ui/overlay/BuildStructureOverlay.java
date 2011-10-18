@@ -63,13 +63,24 @@ public class BuildStructureOverlay extends InputOverlay
 			Footprint fp = structure.getFootprint();
 			Region innerRegion = fp.getInnerRegion().move(cursorPos);
 			Region outerRegion = innerRegion.stretch(1);
+			LayeredMap map = panel.getMap();
 			
-			if (panel.getMap().canPlaceUnit(cursorPos, fp))
+			if (map.getBounds().contains(innerRegion) && map.canPlaceUnit(cursorPos, fp))
 			{
-				g.setColor(TRANS_GREEN);
-				panel.fill(g, innerRegion);
-				g.setColor(Color.GREEN);
-				panel.draw(g, innerRegion);
+				if (!structure.needsConnection() || map.willConnect(cursorPos, fp))
+				{
+					g.setColor(TRANS_GREEN);
+					panel.fill(g, innerRegion);
+					g.setColor(Color.GREEN);
+					panel.draw(g, innerRegion);
+				}
+				else
+				{
+					g.setColor(TRANS_YELLOW);
+					panel.fill(g, innerRegion);
+					g.setColor(Color.YELLOW);
+					panel.draw(g, innerRegion);
+				}
 			}
 			else
 			{

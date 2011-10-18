@@ -4,6 +4,7 @@ import com.robbix.mp5.Mediator;
 import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
+import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Unit;
 
@@ -28,15 +29,14 @@ public class BuildMineTask extends Task
 	{
 		Position pos = unit.getPosition();
 		LayeredMap map = unit.getMap();
-
-		int buildFrames = Mediator.game.getSpriteLibrary()
-									   .getUnitSpriteSet(mine.getType())
-									   .get(Activity.BUILD)
-									   .getFrameCount();
+		
+		SpriteLibrary lib = Mediator.game.getSpriteLibrary();
+		int buildFrames = lib.getBuildGroupLength(mine.getType());
 		
 		map.remove(unit);
 		map.putUnit(mine, pos.shift(-1, 0));
-		mine.assignNow(new BuildTask(buildFrames, 50));
+		mine.setActivity(Activity.BUILD);
+		mine.assignNow(new BuildTask(buildFrames, mine.getType().getBuildTime()));
 		unit.completeTask(this);
 	}
 }

@@ -9,6 +9,7 @@ import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.BuildMineTask;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
+import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Footprint;
@@ -63,8 +64,11 @@ public class BuildMineOverlay extends InputOverlay
 			Footprint fp = mine.getFootprint();
 			Region innerRegion = fp.getInnerRegion().move(cursorPos);
 			Region outerRegion = innerRegion.stretch(1);
+			LayeredMap map = panel.getMap();
 			
-			if (canPlaceMine(cursorPos))
+			if (map.getBounds().contains(innerRegion)
+			 && map.canPlaceUnit(cursorPos, fp)
+			 && canPlaceMine(cursorPos))
 			{
 				g.setColor(TRANS_GREEN);
 				panel.fill(g, innerRegion);
@@ -81,10 +85,6 @@ public class BuildMineOverlay extends InputOverlay
 			
 			g.setColor(Color.WHITE);
 			panel.draw(g, outerRegion);
-			g.setColor(TRANS_WHITE);
-			
-			for (Position tubePos : fp.getTubePositions())
-				panel.fill(g, tubePos.shift(innerRegion.x, innerRegion.y));
 		}
 	}
 	

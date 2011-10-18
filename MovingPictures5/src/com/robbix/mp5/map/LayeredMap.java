@@ -545,6 +545,21 @@ public class LayeredMap
 		return true;
 	}
 	
+	public boolean willConnect(Position pos, Footprint fp)
+	{
+		for (Position occupied : fp.iterator(pos))
+			for (Position neighbor : occupied.get4Neighbors())
+				if (getBounds().contains(neighbor) && isAlive(neighbor))
+					return true;
+		
+		for (Position relativeTubePos : fp.getTubePositions())
+			for (Position neighbor : relativeTubePos.shift(pos.x, pos.y).get4Neighbors())
+				if (getBounds().contains(neighbor) && isAlive(neighbor))
+					return true;
+		
+		return false;
+	}
+	
 	public void putUnit(Unit unit, Position pos)
 	{
 		if (!canPlaceUnit(pos, unit.getFootprint()))

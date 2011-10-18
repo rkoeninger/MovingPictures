@@ -78,6 +78,7 @@ public class DisplayPanel extends JComponent
 		"Grid",
 		"Background",
 		"Unit Layer State",
+		"Tube Connectivity",
 		"Terrain Cost Map",
 		"Terrain Cost Values",
 		"Cost Values as Factors",
@@ -86,6 +87,7 @@ public class DisplayPanel extends JComponent
 	
 	private boolean showGrid = false;
 	private boolean showUnitLayerState = false;
+	private boolean showTubeConnectivity = false;
 	private boolean showTerrainCostMap = false;
 	private boolean showTerrainCostValues = false;
 	private boolean showCostValuesAsFactors = false;
@@ -145,6 +147,10 @@ public class DisplayPanel extends JComponent
 		{
 			return showBackground;
 		}
+		else if (name.equals("Tube Connectivity"))
+		{
+			return showTubeConnectivity;
+		}
 		else if (name.equals("Unit Layer State"))
 		{
 			return showUnitLayerState;
@@ -180,6 +186,11 @@ public class DisplayPanel extends JComponent
 		{
 			showBackground = isSet;
 			refresh();
+		}
+		else if (name.equals("Tube Connectivity"))
+		{
+			showTubeConnectivity = isSet;
+			repaint();
 		}
 		else if (name.equals("Unit Layer State"))
 		{
@@ -1015,6 +1026,12 @@ public class DisplayPanel extends JComponent
 			overlays.getFirst().paintOverTerrain(g, overlayRect);
 		
 		/*
+		 * Draw tube connectivity
+		 */
+		if (showTubeConnectivity)
+			drawTubes(g, region);
+		
+		/*
 		 * Draw units.
 		 * 
 		 * Units are returned by UnitLayer iterator already in z-order.
@@ -1166,6 +1183,33 @@ public class DisplayPanel extends JComponent
 			}
 			
 			dirty.set(pos, false);
+		}
+	}
+	
+	/**
+	 * Highlights tubes and buildings as active/potentially active or disabled.
+	 */
+	private void drawTubes(Graphics g, Region region)
+	{
+		for (int x = region.x; x < region.getMaxX(); ++x)
+		for (int y = region.y; y < region.getMaxY(); ++y)
+		{
+			Position pos = Mediator.getPosition(x, y);
+			
+			Unit occupant = map.getUnit(pos);
+			boolean structNeedsConnection = occupant != null && occupant.needsConnection();
+			boolean structHasConnection = occupant != null && occupant.isConnected();
+			
+			if (map.hasTube(pos) || structNeedsConnection)
+			{
+				g.setColor(
+					map.isAlive(pos) || structHasConnection
+					? InputOverlay.TRANS_GREEN
+					: InputOverlay.TRANS_RED
+				);
+				
+				fill(g, pos);
+			}
 		}
 	}
 	

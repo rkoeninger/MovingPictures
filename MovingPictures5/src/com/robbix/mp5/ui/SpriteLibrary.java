@@ -18,6 +18,7 @@ import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.AutoArrayList;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
@@ -260,6 +261,16 @@ public class SpriteLibrary implements Modular
 	public SpriteGroup getAmbientSpriteGroup(String setName, String eventName)
 	{
 		return getAmbientSpriteSet(setName).get(eventName);
+	}
+	
+	public int getBuildGroupLength(UnitType unitType)
+	{
+		if (!unitType.isStructureType() && !unitType.isGuardPostType())
+			throw new IllegalArgumentException(unitType + " has no build sequence");
+		
+		SpriteSet set = getUnitSpriteSet(unitType);
+		SpriteGroup buildGroup = set.get(Activity.BUILD);
+		return buildGroup.getFrameCount();
 	}
 	
 	public Sprite getDefaultSprite(UnitType unitType)
