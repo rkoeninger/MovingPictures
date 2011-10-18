@@ -376,4 +376,37 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		g.setColor(Color.WHITE);
 		g.drawRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);
 	}
+	
+	public static class ListenerAdapter
+	implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener
+	{
+		private InputOverlay overlay;
+		
+		public void setOverlay(InputOverlay overlay)
+		{
+			this.overlay = overlay;
+		}
+		
+		public boolean hasOverlay()
+		{
+			return overlay != null;
+		}
+		
+		public InputOverlay getOverlay()
+		{
+			return overlay;
+		}
+		
+		public void mouseWheelMoved(MouseWheelEvent e) { if (hasOverlay()) overlay.mouseWheelMoved(e); }
+		public void mouseDragged   (MouseEvent e)      { if (hasOverlay()) overlay.mouseDragged(e);    }
+		public void mouseMoved     (MouseEvent e)      { if (hasOverlay()) overlay.mouseMoved(e);      }
+		public void mouseClicked   (MouseEvent e)      { if (hasOverlay()) overlay.mouseClicked(e);    }
+		public void mouseEntered   (MouseEvent e)      { if (hasOverlay()) overlay.mouseEntered(e);    }
+		public void mouseExited    (MouseEvent e)      { if (hasOverlay()) overlay.mouseExited(e);     }
+		public void mousePressed   (MouseEvent e)      { if (hasOverlay()) overlay.mousePressed(e);    }
+		public void mouseReleased  (MouseEvent e)      { if (hasOverlay()) overlay.mouseReleased(e);   }
+		public void keyPressed     (KeyEvent e)        { if (hasOverlay()) overlay.keyPressed(e);      }
+		public void keyReleased    (KeyEvent e)        { if (hasOverlay()) overlay.keyReleased(e);     }
+		public void keyTyped       (KeyEvent e)        { if (hasOverlay()) overlay.keyTyped(e);        }
+	}
 }

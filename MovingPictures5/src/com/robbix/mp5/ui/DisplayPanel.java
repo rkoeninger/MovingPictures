@@ -70,6 +70,7 @@ public class DisplayPanel extends JComponent
 	private Player currentPlayer;
 	
 	private LinkedList<InputOverlay> overlays;
+	private InputOverlay.ListenerAdapter adapter;
 	
 	private List<AmbientAnimation> animations =
 		new LinkedList<AmbientAnimation>();
@@ -130,6 +131,11 @@ public class DisplayPanel extends JComponent
 		addMouseWheelListener(mouseEvents);
 		addMouseMotionListener(mouseEvents);
 		addMouseListener(mouseEvents);
+		this.adapter = new InputOverlay.ListenerAdapter();
+		addKeyListener(adapter);
+		addMouseListener(adapter);
+		addMouseMotionListener(adapter);
+		addMouseWheelListener(adapter);
 	}
 	
 	public List<String> getOptionNames()
@@ -347,17 +353,8 @@ public class DisplayPanel extends JComponent
 	
 	public void completeOverlays()
 	{
-		while (overlays.size() > 1)
-		{
-			InputOverlay overlay = overlays.removeFirst();
-			overlay.dispose();
-			overlay.setDisplay(null);
-			removeMouseListener(overlay);
-			removeMouseMotionListener(overlay);
-			removeMouseWheelListener(overlay);
-			removeKeyListener(overlay);
-		}
-		
+		overlays.clear();
+		adapter.setOverlay(null);
 		setAnimatedCursor(null);
 	}
 	
@@ -369,41 +366,25 @@ public class DisplayPanel extends JComponent
 		overlays.removeFirst();
 		overlay.dispose();
 		overlay.setDisplay(null);
-		setAnimatedCursor(null);
-		removeMouseListener(overlay);
-		removeMouseMotionListener(overlay);
-		removeMouseWheelListener(overlay);
-		removeKeyListener(overlay);
 		
 		if (!overlays.isEmpty())
 		{
 			InputOverlay oldOverlay = overlays.getFirst();
 			oldOverlay.init();
-			addMouseListener(oldOverlay);
-			addMouseMotionListener(oldOverlay);
-			addMouseWheelListener(oldOverlay);
-			addKeyListener(oldOverlay);
+			adapter.setOverlay(oldOverlay);
+		}
+		else
+		{
+			adapter.setOverlay(null);
 		}
 	}
 	
 	public void pushOverlay(InputOverlay overlay)
 	{
-		if (!overlays.isEmpty())
-		{
-			InputOverlay oldOverlay = overlays.getFirst();
-			removeMouseListener(oldOverlay);
-			removeMouseMotionListener(oldOverlay);
-			removeMouseWheelListener(oldOverlay);
-			removeKeyListener(oldOverlay);
-		}
-		
 		overlays.addFirst(overlay);
 		overlay.setDisplay(this);
 		overlay.init();
-		addMouseListener(overlay);
-		addMouseMotionListener(overlay);
-		addMouseWheelListener(overlay);
-		addKeyListener(overlay);
+		adapter.setOverlay(overlay);
 	}
 	
 	public void setShowBackground(boolean showBackground)
