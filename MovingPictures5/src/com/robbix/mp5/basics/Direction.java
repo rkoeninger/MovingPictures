@@ -1,7 +1,6 @@
 package com.robbix.mp5.basics;
 
 import static java.lang.Math.PI;
-import java.util.NoSuchElementException;
 
 /**
  * For this class, it is safe to use the equality operator ( == ), as there
@@ -43,7 +42,7 @@ public enum Direction
 	 * Returns an Iterator that will list off all 16 Directions starting
 	 * with East and ending with East-South-East.
 	 */
-	public static IterableIterator<Direction> getIterator()
+	public static RIterator<Direction> getIterator()
 	{
 		return new DirectionIterator(Direction.E, 1);
 	}
@@ -57,7 +56,7 @@ public enum Direction
 	 * of counter-clockwise, but it must be a divisor of 16. So acceptable
 	 * step values are {1, 2, 4, 8, 16} and their negatives.
 	 */
-	public static IterableIterator<Direction> getIterator(
+	public static RIterator<Direction> getIterator(
 		Direction start,
 		int step)
 	{
@@ -89,7 +88,7 @@ public enum Direction
 	 *     South      -- Reverse last
 	 * </pre>
 	 */
-	public static IterableIterator<Direction> getAlternatives(Direction start)
+	public static RIterator<Direction> getAlternatives(Direction start)
 	{
 		if (start == null)
 			throw new IllegalArgumentException("Starting direction is null");
@@ -476,7 +475,7 @@ public enum Direction
 	 * Iterator that lists off Directions from given starting direction
 	 * and rotation increment.
 	 */
-	private static class DirectionIterator extends IterableIterator<Direction>
+	private static class DirectionIterator extends RIterator<Direction>
 	{
 		private final Direction start;
 		private Direction next;
@@ -498,8 +497,7 @@ public enum Direction
 		
 		public Direction next()
 		{
-			if (next == start && !stillOnFirst)
-				throw new NoSuchElementException();
+			checkHasNext();
 			
 			stillOnFirst = false;
 			
@@ -512,7 +510,7 @@ public enum Direction
 	 * Iterator that lists off Directions alternative to the starting direction
 	 * listing the closest ones first and the reverse last.
 	 */
-	private static class AlternativeIterator extends IterableIterator<Direction>
+	private static class AlternativeIterator extends RIterator<Direction>
 	{
 		private final Direction start;
 		private int alternative = 0;
@@ -530,8 +528,7 @@ public enum Direction
 		
 		public Direction next()
 		{
-			if (alternative > alternativeMax)
-				throw new NoSuchElementException();
+			checkHasNext();
 			
 			if (alternative % 2 == 0)
 			{

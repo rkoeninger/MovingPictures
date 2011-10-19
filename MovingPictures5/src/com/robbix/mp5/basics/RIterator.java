@@ -1,33 +1,43 @@
 package com.robbix.mp5.basics;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-public abstract class IterableIterator<T> implements Iterable<T>, Iterator<T>
+public abstract class RIterator<T> implements Iterable<T>, Iterator<T>
 {
 	/**
 	 * Creates a new IterableIterator wrapped around the given Iterator.
-	 * The methods {@code hasNext()} and {@code next()} are delegated to
-	 * the given Iterator - the methods {@code remove()} and {@code iterator()}
-	 * use the default implementations of the IterableIterator class.
+	 * All methods from the Iterator class are delegated to
+	 * the given Iterator.
 	 */
-	public static <E> IterableIterator<E> wrap(final Iterator<E> itr)
+	public static <E> RIterator<E> wrap(final Iterator<E> itr)
 	{
 		if (itr == null)
-			throw new IllegalArgumentException("null Iterator");
+			throw new IllegalArgumentException("null");
 		
-		return new IterableIterator<E>()
+		return new RIterator<E>()
 		{
 			public boolean hasNext() { return itr.hasNext(); }
 			public E next()          { return itr.next();    }
+			public void remove()     { itr.remove();         }
 		};
 	}
 	
 	/**
 	 * Creates a new IterableIterator for the given Iterable collection.
 	 */
-	public static <E> IterableIterator<E> iterate(Iterable<E> collection)
+	public static <E> RIterator<E> iterate(Iterable<E> collection)
 	{
 		return wrap(collection.iterator());
+	}
+	
+	/**
+	 * Throws a NoSuchElementException if hasNext() returns false.
+	 */
+	protected void checkHasNext()
+	{
+		if (! hasNext())
+			throw new NoSuchElementException();
 	}
 	
 	/**
@@ -42,7 +52,7 @@ public abstract class IterableIterator<T> implements Iterable<T>, Iterator<T>
 	/**
 	 * Returns this Iterator.
 	 */
-	public Iterator<T> iterator()
+	public RIterator<T> iterator()
 	{
 		return this;
 	}

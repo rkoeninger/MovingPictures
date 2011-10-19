@@ -18,7 +18,7 @@ import com.robbix.mp5.basics.CostMap;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.basics.Grid;
-import com.robbix.mp5.basics.IterableIterator;
+import com.robbix.mp5.basics.RIterator;
 import com.robbix.mp5.basics.Neighbors;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
@@ -927,18 +927,18 @@ public class LayeredMap
 		return unit.getReservations();
 	}
 	
-	public IterableIterator<Unit> getUnitIterator()
+	public RIterator<Unit> getUnitIterator()
 	{
 		return getUnitIterator(false);
 	}
 	
-	public IterableIterator<Unit> getUnitIterator(boolean zorder)
+	public RIterator<Unit> getUnitIterator(boolean zorder)
 	{
 		Set<Unit> copy = zorder ? new TreeSet<Unit>(Utils.Z_ORDER_UNIT)
 								: new HashSet<Unit>();
 		
 		copy.addAll(units);
-		return IterableIterator.iterate(copy);
+		return RIterator.iterate(copy);
 	}
 	
 	// unused - as it should be for optimality's sake

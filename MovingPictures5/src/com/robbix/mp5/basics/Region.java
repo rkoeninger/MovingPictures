@@ -1,7 +1,5 @@
 package com.robbix.mp5.basics;
 
-import java.util.NoSuchElementException;
-
 /**
  * An immutable rectangular region on a grid.
  * Measured in relative grid co-ordinates.
@@ -313,7 +311,7 @@ public class Region implements Iterable<Position>
 	 * Returns an Iterator that lists off all Positions
 	 * contained by this Region.
 	 */
-	public IterableIterator<Position> iterator()
+	public RIterator<Position> iterator()
 	{
 		return new PositionIterator();
 	}
@@ -322,7 +320,7 @@ public class Region implements Iterable<Position>
 	 * Returns an Iterator that lists off all Positions
 	 * contained by this Region offset by {@code &lt;dx, dy&gt;}.
 	 */
-	public IterableIterator<Position> iterator(int dx, int dy)
+	public RIterator<Position> iterator(int dx, int dy)
 	{
 		return new PositionIterator(dx, dy);
 	}
@@ -331,7 +329,7 @@ public class Region implements Iterable<Position>
 	 * Returns an Iterator that lists off all Positions
 	 * contained by this Region offset by {@code origin}.
 	 */
-	public IterableIterator<Position> iterator(Position origin)
+	public RIterator<Position> iterator(Position origin)
 	{
 		return new PositionIterator(origin.x, origin.y);
 	}
@@ -340,7 +338,7 @@ public class Region implements Iterable<Position>
 	 * Iterator wrapper that shifts all Position objects returned by
 	 * underlying Iterator.
 	 */
-	private class PositionIterator extends IterableIterator<Position>
+	private class PositionIterator extends RIterator<Position>
 	{
 		private int dx, dy;
 		private int index = 0;
@@ -364,8 +362,7 @@ public class Region implements Iterable<Position>
 		
 		public Position next()
 		{
-			if (index >= a)
-				throw new NoSuchElementException();
+			checkHasNext();
 			
 			int xPrime = index % w;
 			int yPrime = index / w;

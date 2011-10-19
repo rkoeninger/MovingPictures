@@ -3,7 +3,6 @@ package com.robbix.mp5.basics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import com.robbix.mp5.Mediator;
 
@@ -608,7 +607,7 @@ public class Grid<T> implements Iterable<T>
 	 * are null and its hasNext() method will return true even if all
 	 * remaining elements are null.
 	 */
-	public IterableIterator<T> iterator()
+	public RIterator<T> iterator()
 	{
 		return new ElementIterator();
 	}
@@ -626,7 +625,7 @@ public class Grid<T> implements Iterable<T>
 	 * @throws IndexOutOfBoundsException If reg is not contained by this Grid's
 	 *                                   bounding Region.
 	 */
-	public IterableIterator<T> iterator(Region reg)
+	public RIterator<T> iterator(Region reg)
 	{
 		if (! this.bounds.contains(reg))
 			throw new IndexOutOfBoundsException(reg.toString());
@@ -668,7 +667,7 @@ public class Grid<T> implements Iterable<T>
 	 * Interal class that iterates over the elements contained in a
 	 * sub-Region of this Grid.
 	 */
-	private class ElementIterator extends IterableIterator<T>
+	private class ElementIterator extends RIterator<T>
 	{
 		private int index = 0;
 		private Region reg;
@@ -690,8 +689,7 @@ public class Grid<T> implements Iterable<T>
 		
 		public T next()
 		{
-			if (index >= reg.a)
-				throw new NoSuchElementException();
+			checkHasNext();
 			
 			final int xPrime = (index % reg.w) + reg.x;
 			final int yPrime = (index / reg.w) + reg.y;

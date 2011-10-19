@@ -2,7 +2,7 @@ package com.robbix.mp5.basics;
 
 import java.util.Iterator;
 
-public class ShiftingIterator extends IterableIterator<Position>
+public class ShiftingIterator extends RIterator<Position>
 {
 	private Iterator<Position> itr;
 	private int dx, dy;

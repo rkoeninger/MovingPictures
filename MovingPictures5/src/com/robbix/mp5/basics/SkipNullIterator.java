@@ -1,9 +1,8 @@
 package com.robbix.mp5.basics;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
-public class SkipNullIterator<T> extends IterableIterator<T>
+public class SkipNullIterator<T> extends RIterator<T>
 {
 	private Iterator<T> itr;
 	private T next;
@@ -20,8 +19,7 @@ public class SkipNullIterator<T> extends IterableIterator<T>
 
 	public T next()
 	{
-		if (next == null && !getNext())
-			throw new NoSuchElementException();
+		checkHasNext();
 		
 		try     { return next; }
 		finally { next = null; }

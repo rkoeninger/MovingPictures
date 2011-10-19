@@ -8,7 +8,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.IterableIterator;
+import com.robbix.mp5.basics.RIterator;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.basics.ShiftingIterator;
@@ -218,9 +218,9 @@ public class Footprint implements Iterable<Position>
 	 * The Positions returned by this Iterator should be the same Positions
 	 * in the UnitLayer that the Unit with this Footprint occupies.
 	 */
-	public IterableIterator<Position> iterator()
+	public RIterator<Position> iterator()
 	{
-		return IterableIterator.iterate(occupiedSet);
+		return RIterator.iterate(occupiedSet);
 	}
 	
 	/**
@@ -230,7 +230,7 @@ public class Footprint implements Iterable<Position>
 	 * The Positions returned by this Iterator should be the same Positions
 	 * in the UnitLayer that the Unit with this Footprint occupies.
 	 */
-	public IterableIterator<Position> iterator(int dx, int dy)
+	public RIterator<Position> iterator(int dx, int dy)
 	{
 		return new ShiftingIterator(occupiedSet.iterator(), dx, dy);
 	}
@@ -242,7 +242,7 @@ public class Footprint implements Iterable<Position>
 	 * The Positions returned by this Iterator should be the same Positions
 	 * in the UnitLayer that the Unit with this Footprint occupies.
 	 */
-	public IterableIterator<Position> iterator(Position origin)
+	public RIterator<Position> iterator(Position origin)
 	{
 		return new ShiftingIterator(
 			occupiedSet.iterator(),
