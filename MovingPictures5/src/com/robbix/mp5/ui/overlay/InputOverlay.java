@@ -15,6 +15,7 @@ import java.awt.event.MouseWheelListener;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.basics.LinearRegion;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.ui.DisplayPanel;
@@ -100,7 +101,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		return dragArea == null ? null : panel.getEnclosedRegion(dragArea);
 	}
 	
-	public Region getLinearDragRegion()
+	public LinearRegion getLinearDragRegion()
 	{
 		Position origin = panel.getPosition(pressedPoint);
 		Region fullRegion = panel.getRegion(dragArea);
@@ -122,7 +123,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 				: fullRegion.getMaxY() - 1;
 		}
 		
-		return new Region(origin, Mediator.getPosition(endX, endY));
+		return new LinearRegion(origin, Mediator.getPosition(endX, endY));
 	}
 	
 	public static enum Edge {NW,N,NE,W,C,E,SW,S,SE;}

@@ -80,6 +80,15 @@ public class Position
 	}
 	
 	/**
+	 * Returns true if this Position and that Position are aligned
+	 * vertically or horizontally.
+	 */
+	public boolean isColinear(Position that)
+	{
+		return this.x == that.x || this.y == that.y;
+	}
+	
+	/**
 	 * Finds the distance between two Positions as a floating-point value.
 	 */
 	public double getDistance(Position that)
