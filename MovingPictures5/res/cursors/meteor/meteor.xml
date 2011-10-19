@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AnimatedCursor name="meteor"
+				duration="38"
+				bgcolor="#ff00ff"
+				hotspotX="6"
+				hotspotY="24">
+	<Frame image="meteor0.bmp"/>
+	<Frame image="meteor1.bmp"/>
+	<Frame image="meteor2.bmp"/>
+	<Frame image="meteor3.bmp"/>
+</AnimatedCursor>

@@ -10,7 +10,7 @@ public class SpawnMeteorOverlay extends InputOverlay
 {
 	public SpawnMeteorOverlay()
 	{
-		super("attack");
+		super("meteor");
 	}
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
