@@ -1226,6 +1226,10 @@ public class Sandbox
 			lib.loadModule("eConVec");
 			lib.loadModule("eEarthworker");
 			lib.loadModule("pRoboDozer");
+			lib.loadModule("eVehicleFactory");
+			lib.loadModule("eStructureFactory");
+			lib.loadModule("eCommonSmelter");
+			lib.loadModule("eCommandCenter");
 		}
 		catch (IOException ioe)
 		{

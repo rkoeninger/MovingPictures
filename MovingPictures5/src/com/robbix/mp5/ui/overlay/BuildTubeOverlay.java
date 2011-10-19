@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.ai.task.EarthworkerConstructRowTask;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap.Fixture;
@@ -56,13 +55,13 @@ public class BuildTubeOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Mediator.doEarthworkerBuild(earthworker, panel.getPosition(x, y), Fixture.TUBE);
-		panel.completeOverlay(this);
+		Mediator.doEarthworkerBuild(earthworker, getCursorPosition(), Fixture.TUBE);
+		complete();
 	}
 	
 	public void onRightClick(int x, int y)
 	{
-		panel.completeOverlay(this);
+		complete();
 	}
 	
 	public void onAreaDragged(int x, int y, int w, int h)
@@ -73,7 +72,7 @@ public class BuildTubeOverlay extends InputOverlay
 		for (Position rowPos : dragRegion)
 			tubeRow.add(rowPos);
 		
-		earthworker.assignNow(new EarthworkerConstructRowTask(tubeRow, Fixture.TUBE));
-		panel.completeOverlay(this);
+		Mediator.doEarthworkerBuildRow(earthworker, tubeRow, Fixture.TUBE);
+		complete();
 	}
 }

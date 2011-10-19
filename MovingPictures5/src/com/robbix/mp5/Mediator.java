@@ -11,6 +11,7 @@ import com.robbix.mp5.ai.task.BuildTask;
 import com.robbix.mp5.ai.task.EarthworkerConstructTask;
 import com.robbix.mp5.ai.task.PathTask;
 import com.robbix.mp5.ai.task.RotateTask;
+import com.robbix.mp5.ai.task.SteerTask;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.PositionCache;
@@ -244,9 +245,20 @@ public class Mediator
 		panel.refresh();
 	}
 	
+	public static void doEarthworkerBuildRow(Unit unit, List<Position> row, Fixture fixture)
+	{
+		unit.cancelAssignments();
+		
+		for (Position pos : row)
+		{
+			unit.interrupt(new EarthworkerConstructTask(pos, fixture, 48));
+			unit.interrupt(new SteerTask(pos));
+		}
+	}
+	
 	public static void doEarthworkerBuild(Unit unit, Position pos, Fixture fixture)
 	{
-		doApproach(unit, pos);
+		doMove(unit, pos, false);
 		unit.assignLater(new EarthworkerConstructTask(pos, fixture, 48));
 	}
 	
@@ -505,6 +517,6 @@ public class Mediator
 	{
 		panel.cueAnimation(new MeteorAnimation(pos, panel.getSpriteLibrary()));
 		playSound("meteor", pos);
-//		playSound("savant_meteorApproaching");
+		playSound("savant_meteorApproaching");
 	}
 }

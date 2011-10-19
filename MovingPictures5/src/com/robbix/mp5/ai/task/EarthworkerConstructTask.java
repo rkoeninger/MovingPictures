@@ -1,6 +1,5 @@
 package com.robbix.mp5.ai.task;
 
-import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.basics.Position;
 import static com.robbix.mp5.map.LayeredMap.*;
@@ -37,11 +36,8 @@ public class EarthworkerConstructTask extends Task
 	{
 		if (unit.getActivity() != BULLDOZE)
 		{
-			Position pos = unit.getPosition();
-			
 			unit.setActivity(BULLDOZE);
 			unit.resetAnimationFrame();
-			unit.setDirection(Direction.getMoveDirection(pos, target));
 		}
 		
 		if (buildProgress >= buildTime)
