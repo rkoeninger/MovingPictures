@@ -21,7 +21,30 @@ public enum Neighbors
 	 * *** The order in which the values are declared is relevant! ***
 	 */
 	NONE, S, W, SW, N, NS, NW, NSW, E, SE, EW, SEW, NE, NSE, NEW, NSEW;
-
+	
+	public static Neighbors allBut(Neighbors neighbors)
+	{
+		return NSEW.remove(neighbors);
+	}
+	
+	public static Neighbors allBut(Direction dir)
+	{
+		return NSEW.remove(dir);
+	}
+	
+	public static Neighbors getNeighbors(Direction dir)
+	{
+		switch (dir)
+		{
+		case N: return N;
+		case S: return S;
+		case E: return E;
+		case W: return W;
+		}
+		
+		throw new IllegalArgumentException("Direction not quarter-turn");
+	}
+	
 	/**
 	 * Returns the set of neighbors held by either this or the given Neighbors.
 	 * Also known as a <b>union</b>.
@@ -58,14 +81,31 @@ public enum Neighbors
 	}
 	
 	/**
+	 * Returns a set of neighbors that contains all those held by this set,
+	 * with additionally the one in the given Direction, if not already present.
+	 * Only works for North, South, East and West.
+	 */
+	public Neighbors add(Direction dir)
+	{
+		return add(getNeighbors(dir));
+	}
+	
+	/**
+	 * Returns a set of neighbors that contains all those held by this set,
+	 * less the one in the given Direction.
+	 * Only works for North, South, East and West.
+	 */
+	public Neighbors remove(Direction dir)
+	{
+		return remove(getNeighbors(dir));
+	}
+	
+	/**
 	 * Determines if tis set of Neighbors contains a neighbor in the given
 	 * Direction. Only works for North, South, East and West.
 	 */
 	public boolean has(Direction dir)
 	{
-		return (dir == Direction.N && has(Neighbors.N))
-			|| (dir == Direction.S && has(Neighbors.S))
-			|| (dir == Direction.E && has(Neighbors.E))
-			|| (dir == Direction.W && has(Neighbors.W));
+		return has(getNeighbors(dir));
 	}
 }

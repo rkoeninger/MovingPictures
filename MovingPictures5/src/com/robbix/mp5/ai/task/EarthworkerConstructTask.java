@@ -34,6 +34,12 @@ public class EarthworkerConstructTask extends Task
 	
 	public void step(Unit unit)
 	{
+		if (unit.getMap().hasFixture(target))
+		{
+			unit.completeTask(this);
+			return;
+		}
+		
 		if (unit.getActivity() != BULLDOZE)
 		{
 			unit.setActivity(BULLDOZE);

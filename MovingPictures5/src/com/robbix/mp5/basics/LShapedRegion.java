@@ -39,7 +39,13 @@ public class LShapedRegion implements RIterable<Position>
 	public LShapedRegion(Position begin, Position elbow, Position end)
 	{
 		leg1Dir = Direction.getDirection(begin, elbow);
-		leg2Dir = Direction.getDirection(elbow, end);
+		leg2Dir = Direction.getDirection(end, elbow);
+		
+		if (leg1Dir == null)
+			leg1Dir = Direction.E;
+		
+		if (leg2Dir == null)
+			leg2Dir = Direction.E;
 		
 		leg1Len = max(abs(begin.x - elbow.x), abs(begin.y - elbow.y)) - 1;
 		leg2Len = max(abs(elbow.x - end.x), abs(elbow.y - end.y)) - 1;
@@ -49,7 +55,7 @@ public class LShapedRegion implements RIterable<Position>
 		for (Position current = begin; ! current.equals(elbow); current = leg1Dir.apply(current))
 			elements.add(current);
 		
-		for (Position current = elbow; ! current.equals(end); current = leg2Dir.apply(current))
+		for (Position current = elbow; ! current.equals(end); current = leg2Dir.reverse().apply(current))
 			elements.add(current);
 		
 		elements.add(end);

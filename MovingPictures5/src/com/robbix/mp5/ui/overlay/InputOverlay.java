@@ -1,8 +1,10 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
+import java.awt.DefaultKeyboardFocusManager;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.KeyEventPostProcessor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
@@ -15,6 +17,7 @@ import java.awt.event.MouseWheelListener;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.basics.BorderRegion;
 import com.robbix.mp5.basics.LShapedRegion;
 import com.robbix.mp5.basics.LinearRegion;
 import com.robbix.mp5.basics.Position;
@@ -24,7 +27,7 @@ import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 
 public abstract class InputOverlay
-implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
+implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, KeyEventPostProcessor
 {
 	public static final Font OVERLAY_FONT = Font.decode("Arial-12");
 	public static final Color TRANS_RED = new Color(255, 0, 0, 127);
@@ -41,7 +44,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	private Point currentPoint = null;
 	private Point pressedPoint = null;
 	private Rectangle dragArea = null;
-	
+	private boolean shift;
+	private boolean control;
 	private String animatedCursor = null;
 	
 	protected InputOverlay()
@@ -102,6 +106,12 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		return dragArea == null ? null : panel.getEnclosedRegion(dragArea);
 	}
 	
+	public boolean isDragRegionLinear()
+	{
+		Region fullRegion = panel.getRegion(dragArea);
+		return fullRegion.w == 1 || fullRegion.h == 1;
+	}
+	
 	public LinearRegion getLinearDragRegion()
 	{
 		Position origin = panel.getPosition(pressedPoint);
@@ -139,7 +149,16 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			? fullRegion.getMaxY() - 1
 			: fullRegion.getY();
 		
-		return new LShapedRegion(origin, Mediator.getPosition(farX, farY));
+		Position farEnd = Mediator.getPosition(farX, farY);
+		Position elbow = isShiftDown()
+			? Mediator.getPosition(origin.x, farEnd.y)
+			: Mediator.getPosition(farEnd.x, origin.y);
+		return new LShapedRegion(origin, elbow, farEnd);
+	}
+	
+	public BorderRegion getBorderDragRegion()
+	{
+		return new BorderRegion(panel.getRegion(dragArea));
 	}
 	
 	public static enum Edge {NW,N,NE,W,C,E,SW,S,SE;}
@@ -152,6 +171,16 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		int y0 = 0;
 		
 		return Edge.values()[((x - x0) / (w / 3)) + (((y - y0) / (h / 3)) * 3)];
+	}
+	
+	public boolean isShiftDown()
+	{
+		return shift;
+	}
+	
+	public boolean isControlDown()
+	{
+		return control;
 	}
 	
 	public void push(InputOverlay overlay)
@@ -167,9 +196,22 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public void init()
 	{
 		panel.setAnimatedCursor(animatedCursor);
+		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager()
+								   .addKeyEventPostProcessor(this);
 	}
 	
-	public void dispose(){}
+	public void dispose()
+	{
+		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager()
+								   .removeKeyEventPostProcessor(this);
+	}
+	
+	public boolean postProcessKeyEvent(KeyEvent e)
+	{
+		shift = e.isShiftDown();
+		control = e.isControlDown();
+		return false;
+	}
 	
 	public void onLeftClick(int x, int y){}
 	public void onRightClick(int x, int y){}
@@ -180,6 +222,14 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public void onCommand(String command){}
 	
 	public final void keyPressed(KeyEvent e)
+	{
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+		{
+			complete();
+		}
+	}
+	
+	public final void keyTyped(KeyEvent e)
 	{
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
 		{
@@ -232,6 +282,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public final void mouseDragged(MouseEvent e)
 	{
+		shift = e.isShiftDown();
+		
 		if (pressedPoint != null)
 		{
 			prepNormalDragArea(e.getX(), e.getY());
@@ -261,7 +313,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public final void mouseClicked(MouseEvent e){}
 	public final void mouseWheelMoved(MouseWheelEvent e){}
-	public final void keyTyped(KeyEvent e){}
 	public final void keyReleased(KeyEvent e){}
 	
 	private boolean panelContains(int x, int y) // in terms of relative co-ords

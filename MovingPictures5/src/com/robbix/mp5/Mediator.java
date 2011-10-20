@@ -3,6 +3,7 @@ package com.robbix.mp5;
 import java.awt.Point;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 import com.robbix.mp5.ai.AStar;
@@ -248,9 +249,15 @@ public class Mediator
 	public static void doEarthworkerBuildRow(Unit unit, List<Position> row, Fixture fixture)
 	{
 		unit.cancelAssignments();
+		ListIterator<Position> itr = row.listIterator(row.size());
 		
-		for (Position pos : row)
+		while (itr.hasPrevious())
 		{
+			Position pos = itr.previous();
+			
+			if (map.hasFixture(pos))
+				continue;
+			
 			unit.interrupt(new EarthworkerConstructTask(pos, fixture, 48));
 			unit.interrupt(new SteerTask(pos));
 		}

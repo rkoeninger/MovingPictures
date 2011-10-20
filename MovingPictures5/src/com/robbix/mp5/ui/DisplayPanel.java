@@ -27,9 +27,14 @@ import javax.swing.Timer;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.CostMap;
+import com.robbix.mp5.basics.Direction;
+import static com.robbix.mp5.basics.Direction.*;
+
+import com.robbix.mp5.basics.BorderRegion;
 import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.basics.Grid;
 import com.robbix.mp5.basics.LShapedRegion;
+import com.robbix.mp5.basics.Neighbors;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
@@ -832,6 +837,30 @@ public class DisplayPanel extends JComponent
 		return getRegion(getDisplayRect());
 	}
 	
+	public void drawEdge(Graphics g, Position pos, Direction dir)
+	{
+		int x0 = pos.x * tileSize;
+		int y0 = pos.y * tileSize;
+		int x1 = (pos.x + 1) * tileSize;
+		int y1 = (pos.y + 1) * tileSize;
+		
+		switch (dir)
+		{
+		case N: g.drawLine(x0, y0, x1, y0); break;
+		case S: g.drawLine(x0, y1, x1, y1); break;
+		case E: g.drawLine(x1, y0, x1, y1); break;
+		case W: g.drawLine(x0, y0, x0, y1); break;
+		}
+	}
+	
+	public void drawEdges(Graphics g, Position pos, Neighbors neighbors)
+	{
+		if (neighbors.has(N)) drawEdge(g, pos, N);
+		if (neighbors.has(S)) drawEdge(g, pos, S);
+		if (neighbors.has(E)) drawEdge(g, pos, E);
+		if (neighbors.has(W)) drawEdge(g, pos, W);
+	}
+	
 	public void draw(Graphics g, Position pos)
 	{
 		g.drawRect(pos.x * tileSize, pos.y * tileSize, tileSize, tileSize);
@@ -874,14 +903,118 @@ public class DisplayPanel extends JComponent
 	
 	public void draw(Graphics g, LShapedRegion region)
 	{
-		draw(g, new Region(region.getFirstEnd(), region.getElbow()));
-		draw(g, new Region(region.getSecondEnd(), region.getElbow()));
+		Direction leg1Dir = region.getFirstLegDirection();
+		Direction leg2Dir = region.getSecondLegDirection();
+		Position end1 = region.getFirstEnd();
+		Position end2 = region.getSecondEnd();
+		Position elbow = region.getElbow();
+		
+		drawEdges(g, end1, Neighbors.allBut(leg1Dir));
+		drawEdges(g, end2, Neighbors.allBut(leg2Dir));
+		drawEdge(g, elbow, leg1Dir);
+		drawEdge(g, elbow, leg2Dir);
+		
+		connectFacingCorners(g, elbow, end1, leg1Dir);
+		connectFacingCorners(g, elbow, end2, leg2Dir);
+	}
+	
+	private void connectFacingCorners(Graphics g, Position to, Position from, Direction dir)
+	{
+		int tx0 = to.x * tileSize;
+		int ty0 = to.y * tileSize;
+		int tx1 = (to.x + 1) * tileSize;
+		int ty1 = (to.y + 1) * tileSize;
+		
+		int fx0 = from.x * tileSize;
+		int fy0 = from.y * tileSize;
+		int fx1 = (from.x + 1) * tileSize;
+		int fy1 = (from.y + 1) * tileSize;
+		
+		switch (dir)
+		{
+		case N:
+			g.drawLine(fx0, fy0, tx0, ty1);
+			g.drawLine(fx1, fy0, tx1, ty1);
+			break;
+		case S:
+			g.drawLine(fx0, fy1, tx0, ty0);
+			g.drawLine(fx1, fy1, tx1, ty0);
+			break;
+		case E:
+			g.drawLine(fx1, fy0, tx0, ty0);
+			g.drawLine(fx1, fy1, tx0, ty1);
+			break;
+		case W:
+			g.drawLine(fx0, fy0, tx1, ty0);
+			g.drawLine(fx0, fy1, tx1, ty1);
+			break;
+		}
 	}
 	
 	public void fill(Graphics g, LShapedRegion region)
 	{
 		for (Position pos : region)
 			fill(g, pos);
+	}
+	
+	public void draw(Graphics g, BorderRegion region)
+	{
+		g.drawRect(
+			region.x * tileSize,
+			region.y * tileSize,
+			region.w * tileSize,
+			region.h * tileSize
+		);
+		
+		if (region.w > 2 && region.h > 2)
+		{
+			g.drawRect(
+				(region.x + 1) * tileSize,
+				(region.y + 1) * tileSize,
+				(region.w - 2) * tileSize,
+				(region.h - 2) * tileSize
+			);
+		}
+	}
+	
+	public void fill(Graphics g, BorderRegion region)
+	{
+		g.fillRect(
+			region.x * tileSize,
+			region.y * tileSize,
+			region.w * tileSize,
+			tileSize
+		);
+		
+		if (region.h > 1)
+		{
+			g.fillRect(
+				region.x * tileSize,
+				(region.y + region.h - 1) * tileSize,
+				region.w * tileSize,
+				tileSize
+			);
+		}
+		
+		if (region.h > 2)
+		{
+			g.fillRect(
+				region.x * tileSize,
+				(region.y + 1) * tileSize,
+				tileSize,
+				(region.h - 2) * tileSize
+			);
+			
+			if (region.w > 1)
+			{
+				g.fillRect(
+					(region.x + region.w - 1) * tileSize,
+					(region.y + 1) * tileSize,
+					tileSize,
+					(region.h - 2) * tileSize
+				);
+			}
+		}
 	}
 	
 	public void draw(Graphics g, Rectangle rect)

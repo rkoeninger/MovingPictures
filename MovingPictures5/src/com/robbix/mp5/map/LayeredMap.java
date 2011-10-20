@@ -424,6 +424,11 @@ public class LayeredMap
 		assessConnections();
 	}
 	
+	public boolean hasFixture(Position pos)
+	{
+		return grid.get(pos).fixture != null;
+	}
+	
 	public boolean hasWall(Position pos)
 	{
 		return grid.get(pos).fixture == Fixture.WALL;
