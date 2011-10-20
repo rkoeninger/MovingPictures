@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -14,12 +13,7 @@ public class PlaceTubeOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		g.setFont(OVERLAY_FONT);
-		g.drawString("Left Click to Place Tube", rect.width / 2 - 35, 30);
-		g.drawString("Right Click to Cancel", rect.width / 2 - 35, 50);
-		g.translate(-rect.x, -rect.y);
+		drawInstructions(g, rect, "Place Tube", "Cancel");
 		
 		if (isCursorOnGrid())
 		{

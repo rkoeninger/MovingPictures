@@ -21,14 +21,11 @@ public class SelectUnitOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		g.setFont(OVERLAY_FONT);
-		g.drawString("Left Click to Select", rect.width / 2 - 35, 30);
-		g.translate(-rect.x, -rect.y);
+		drawInstructions(g, rect, "Select");
 		
 		if (isDragging())
 		{
+			g.setColor(Color.RED);
 			panel.draw(g, getDragArea());
 			g.setColor(TRANS_RED);
 			panel.fill(g, getDragArea());

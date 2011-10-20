@@ -26,12 +26,7 @@ public class SelectBulldozeOverlay extends InputOverlay
 	{
 		InputOverlay.paintSelectedUnitBox(g, dozer);
 		
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		g.setFont(OVERLAY_FONT);
-		g.drawString("Left Click to Select Bulldoze Area", rect.width / 2 - 55, 30);
-		g.drawString("Right Click to Cancel", rect.width / 2 - 35, 50);
-		g.translate(-rect.x, -rect.y);
+		drawInstructions(g, rect, "Select Bulldoze Area", "Cancel");
 		
 		if (isCursorOnGrid())
 		{
@@ -41,12 +36,14 @@ public class SelectBulldozeOverlay extends InputOverlay
 			{
 				Region dragRegion = getDragRegion();
 				
+				g.setColor(Color.RED);
 				panel.draw(g, dragRegion);
 				g.setColor(TRANS_RED);
 				panel.fill(g, dragRegion);
 			}
 			else
 			{
+				g.setColor(Color.RED);
 				panel.draw(g, pos);
 				g.setColor(TRANS_RED);
 				panel.fill(g, pos);

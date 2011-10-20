@@ -48,15 +48,12 @@ public class CommandUnitOverlay extends InputOverlay
 		
 		InputOverlay.paintSelectedUnitBox(g, unit);
 		
-		g.translate(rect.x, rect.y);
-		final int w = rect.width;
-		final int h = rect.height;
-		g.setColor(Color.RED);
+		drawInstructions(g, rect, "Move", "Command", "Cancel");
 		
-		g.setFont(OVERLAY_FONT);
-		g.drawString("Left Click to Move", w / 2 - 25, 30);
-		g.drawString("Middle Click on Command", w / 2 - 25, 50);
-		g.drawString("Right Click to Cancel", w / 2 - 25, 70);
+		g.translate(rect.x, rect.y);
+		g.setColor(Color.RED);
+		int w = rect.width;
+		int h = rect.height;
 		
 		g.setFont(Font.decode("Arial-bold-20"));
 		g.drawString("Kill", 20, h - 30);

@@ -10,15 +10,11 @@ public class PlaceBulldozeOverlay extends InputOverlay
 {
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		g.setFont(OVERLAY_FONT);
-		g.drawString("Left Click to Bulldoze", rect.width / 2 - 35, 30);
-		g.drawString("Right Click to Cancel", rect.width / 2 - 35, 50);
-		g.translate(-rect.x, -rect.y);
+		drawInstructions(g, rect, "Bulldoze", "Cancel");
 		
 		if (isCursorOnGrid())
 		{
+			g.setColor(Color.RED);
 			panel.draw(g, getCursorPosition());
 			g.setColor(TRANS_RED);
 			panel.fill(g, getCursorPosition());

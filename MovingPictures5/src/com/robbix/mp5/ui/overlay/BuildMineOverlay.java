@@ -30,12 +30,7 @@ public class BuildMineOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		g.setFont(OVERLAY_FONT);
-		g.drawString("Left Click to Build", rect.width / 2 - 35, 30);
-		g.drawString("Right Click to Cancel", rect.width / 2 - 35, 50);
-		g.translate(-rect.x, -rect.y);
+		drawInstructions(g, rect, "Build", "Cancel");
 		
 		if (isCursorOnGrid())
 		{

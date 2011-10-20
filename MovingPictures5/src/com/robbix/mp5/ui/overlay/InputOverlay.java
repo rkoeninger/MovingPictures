@@ -3,6 +3,7 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.DefaultKeyboardFocusManager;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.KeyEventPostProcessor;
 import java.awt.Point;
@@ -14,6 +15,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.Rectangle2D;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
@@ -59,6 +61,41 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 	
 	public void paintOverTerrain(Graphics g, Rectangle rect){}
 	public void paintOverUnits(Graphics g, Rectangle rect){}
+	
+	public void drawInstructions(Graphics g, Rectangle rect, String... lines)
+	{
+		FontMetrics metrics = g.getFontMetrics();
+		
+		g.translate(rect.x, rect.y);
+		g.setColor(Color.RED);
+		g.setFont(OVERLAY_FONT);
+		int y = 0;
+		int i = 0;
+		
+		for (String line : lines)
+		{
+			if (i == 0)
+			{
+				line = "Left Click to " + line;
+			}
+			else if (i == 1 && lines.length == 2 || i == 2)
+			{
+				line = "Right Click to " + line;
+			}
+			else if (i == 1 && lines.length == 3)
+			{
+				line = "Middle Click to " + line;
+			}
+			
+			Rectangle2D bounds = metrics.getStringBounds(line, g);
+			int x = (int) (rect.width / 2 - bounds.getCenterX());
+			y += bounds.getHeight() + 4;
+			g.drawString(line, x, y);
+			i++;
+		}
+		
+		g.translate(-rect.x, -rect.y);
+	}
 	
 	public void setDisplay(DisplayPanel panel)
 	{

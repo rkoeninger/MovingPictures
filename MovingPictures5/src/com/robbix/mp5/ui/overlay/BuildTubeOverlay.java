@@ -28,12 +28,7 @@ public class BuildTubeOverlay extends InputOverlay
 	{
 		InputOverlay.paintSelectedUnitBox(g, crane);
 		
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		g.setFont(OVERLAY_FONT);
-		g.drawString("Left Click to Build Tube", rect.width / 2 - 35, 30);
-		g.drawString("Right Click to Cancel", rect.width / 2 - 35, 50);
-		g.translate(-rect.x, -rect.y);
+		drawInstructions(g, rect, "Build Tube", "Cancel");
 		
 		if (isCursorOnGrid())
 		{
@@ -45,6 +40,7 @@ public class BuildTubeOverlay extends InputOverlay
 				{
 					LinearRegion dragRegion = getLinearDragRegion();
 					
+					g.setColor(Color.RED);
 					panel.draw(g, dragRegion);
 					g.setColor(TRANS_RED);
 					panel.fill(g, dragRegion);
@@ -53,6 +49,7 @@ public class BuildTubeOverlay extends InputOverlay
 				{
 					BorderRegion dragRegion = getBorderDragRegion();
 					
+					g.setColor(Color.RED);
 					panel.draw(g, dragRegion);
 					g.setColor(TRANS_RED);
 					panel.fill(g, dragRegion);
@@ -61,6 +58,7 @@ public class BuildTubeOverlay extends InputOverlay
 				{
 					LShapedRegion dragRegion = getLShapedDragRegion();
 					
+					g.setColor(Color.RED);
 					panel.draw(g, dragRegion);
 					g.setColor(TRANS_RED);
 					panel.fill(g, dragRegion);
@@ -68,6 +66,7 @@ public class BuildTubeOverlay extends InputOverlay
 			}
 			else
 			{
+				g.setColor(Color.RED);
 				panel.draw(g, pos);
 				g.setColor(TRANS_RED);
 				panel.fill(g, pos);

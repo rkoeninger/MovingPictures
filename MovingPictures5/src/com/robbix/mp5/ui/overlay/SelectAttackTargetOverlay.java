@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -22,12 +21,7 @@ public class SelectAttackTargetOverlay extends InputOverlay
 	{
 		InputOverlay.paintSelectedUnitBox(g, attacker.getChassis());
 		
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		g.setFont(OVERLAY_FONT);
-		g.drawString("Left Click to Select Target", rect.width / 2 - 35, 30);
-		g.drawString("Right Click to Cancel", rect.width / 2 - 35, 50);
-		g.translate(-rect.x, -rect.y);
+		drawInstructions(g, rect, "Select Target", "Cancel");
 	}
 	
 	public void onLeftClick(int x, int y)
