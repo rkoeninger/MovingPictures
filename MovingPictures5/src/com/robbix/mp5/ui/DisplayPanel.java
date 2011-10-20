@@ -29,6 +29,7 @@ import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.CostMap;
 import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.basics.Grid;
+import com.robbix.mp5.basics.LShapedRegion;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
@@ -864,11 +865,23 @@ public class DisplayPanel extends JComponent
 	public void fill(Graphics g, Region region)
 	{
 		g.fillRect(
-				region.x * tileSize,
-				region.y * tileSize,
-				region.w * tileSize,
-				region.h * tileSize
-			);
+			region.x * tileSize,
+			region.y * tileSize,
+			region.w * tileSize,
+			region.h * tileSize
+		);
+	}
+	
+	public void draw(Graphics g, LShapedRegion region)
+	{
+		draw(g, new Region(region.getFirstEnd(), region.getElbow()));
+		draw(g, new Region(region.getSecondEnd(), region.getElbow()));
+	}
+	
+	public void fill(Graphics g, LShapedRegion region)
+	{
+		for (Position pos : region)
+			fill(g, pos);
 	}
 	
 	public void draw(Graphics g, Rectangle rect)

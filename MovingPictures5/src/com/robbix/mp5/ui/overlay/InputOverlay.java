@@ -15,6 +15,7 @@ import java.awt.event.MouseWheelListener;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.basics.LShapedRegion;
 import com.robbix.mp5.basics.LinearRegion;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
@@ -124,6 +125,21 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		}
 		
 		return new LinearRegion(origin, Mediator.getPosition(endX, endY));
+	}
+	
+	public LShapedRegion getLShapedDragRegion()
+	{
+		Position origin = panel.getPosition(pressedPoint);
+		Region fullRegion = panel.getRegion(dragArea);
+		
+		int farX = origin.x == fullRegion.x
+			? fullRegion.getMaxX() - 1
+			: fullRegion.getX();
+		int farY = origin.y == fullRegion.y
+			? fullRegion.getMaxY() - 1
+			: fullRegion.getY();
+		
+		return new LShapedRegion(origin, Mediator.getPosition(farX, farY));
 	}
 	
 	public static enum Edge {NW,N,NE,W,C,E,SW,S,SE;}

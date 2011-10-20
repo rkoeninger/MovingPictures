@@ -56,9 +56,7 @@ public enum Direction
 	 * of counter-clockwise, but it must be a divisor of 16. So acceptable
 	 * step values are {1, 2, 4, 8, 16} and their negatives.
 	 */
-	public static RIterator<Direction> getIterator(
-		Direction start,
-		int step)
+	public static RIterator<Direction> getIterator(Direction start, int step)
 	{
 		if (start == null)
 			throw new IllegalArgumentException("Starting direction is null");

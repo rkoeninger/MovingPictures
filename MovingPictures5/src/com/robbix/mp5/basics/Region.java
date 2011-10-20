@@ -9,7 +9,7 @@ package com.robbix.mp5.basics;
  * 
  * @author bort
  */
-public class Region implements Iterable<Position>
+public class Region implements RIterable<Position>
 {
 	/**
 	 * The x-coordinate of the upper-left corner of this Region.

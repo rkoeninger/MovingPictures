@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.robbix.mp5.Mediator;
+import com.robbix.mp5.basics.LShapedRegion;
 import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.unit.Unit;
 
@@ -38,7 +38,7 @@ public class BuildTubeOverlay extends InputOverlay
 			
 			if (isDragging())
 			{
-				Region dragRegion = getLinearDragRegion();
+				LShapedRegion dragRegion = getLShapedDragRegion();
 				
 				panel.draw(g, dragRegion);
 				g.setColor(TRANS_RED);
@@ -66,7 +66,7 @@ public class BuildTubeOverlay extends InputOverlay
 	
 	public void onAreaDragged(int x, int y, int w, int h)
 	{
-		Region dragRegion = getLinearDragRegion();
+		LShapedRegion dragRegion = getLShapedDragRegion();
 		List<Position> tubeRow = new ArrayList<Position>();
 		
 		for (Position rowPos : dragRegion)

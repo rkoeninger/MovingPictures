@@ -24,7 +24,7 @@ import com.robbix.mp5.Mediator;
  * 
  * @author bort
  */
-public class Grid<T> implements Iterable<T>
+public class Grid<T> implements RIterable<T>
 {
 	/**
 	 * One-dimensional array that contains the elements of this Grid.
