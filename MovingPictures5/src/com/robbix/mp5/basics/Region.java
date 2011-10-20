@@ -315,7 +315,12 @@ public class Region implements RIterable<Position>
 	{
 		return new PositionIterator();
 	}
-
+	
+	public RIterator<Position> zigZagIterator()
+	{
+		return new ZigZagIterator();
+	}
+	
 	/**
 	 * Returns an Iterator that lists off all Positions
 	 * contained by this Region offset by {@code &lt;dx, dy&gt;}.
@@ -369,6 +374,30 @@ public class Region implements RIterable<Position>
 			index++;
 			
 			return new Position(x + xPrime + dx, y + yPrime + dy);
+		}
+	}
+	
+	private class ZigZagIterator extends RIterator<Position>
+	{
+		private int index = 0;
+		
+		public boolean hasNext()
+		{
+			return index < a;
+		}
+		
+		public Position next()
+		{
+			checkHasNext();
+			
+			int xPrime = index % w;
+			int yPrime = index / w;
+			index++;
+			
+			if (yPrime % 2 == 1)
+				xPrime = w - 1 - xPrime;
+			
+			return new Position(x + xPrime, y + yPrime);
 		}
 	}
 }
