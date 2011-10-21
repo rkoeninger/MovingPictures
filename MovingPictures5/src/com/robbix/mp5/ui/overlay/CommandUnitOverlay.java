@@ -3,6 +3,8 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -114,6 +116,24 @@ public class CommandUnitOverlay extends InputOverlay
 		else if (command.equals("bulldoze") && unit.is("Dozer"))
 		{
 			push(new SelectBulldozeOverlay(unit));
+		}
+		else if (command.equals("transfer"))
+		{
+			Collection<Player> players = Mediator.game.getPlayers();
+			players = new ArrayList<Player>(players);
+			players.remove(unit.getOwner());
+			
+			if (players.isEmpty())
+				return;
+			
+			Object result = JListDialog.showDialog(players.toArray());
+			
+			if (result == null)
+				return;
+			
+			Player player = (Player) result;
+			unit.setOwner(player);
+			complete();
 		}
 	}
 	

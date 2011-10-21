@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
@@ -331,7 +332,6 @@ public class Sandbox
 		final JToolBar commandBar = new JToolBar();
 		commandBar.setFloatable(false);
 		commandBar.setRollover(true);
-		commandBar.setOrientation(JToolBar.VERTICAL);
 		
 		for (File iconDir : new File(RES_DIR, "art/commandButtons").listFiles())
 		{
@@ -387,6 +387,7 @@ public class Sandbox
 		final JMenuItem scrollBarsMenuItem = new JMenuItem("Scroll Bars");
 		final JMenuItem frameRateMenuItem = new JMenuItem("Frame Rate");
 		final JMenuItem scrollSpeedMenuItem = new JMenuItem("Scroll Speed");
+		final JMenuItem commandButtonsMenuItem = new JMenuItem("Command Buttons");
 		final JMenu disastersMenu = new JMenu("Disasters");
 		final JMenuItem spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
 		final JMenuItem meteorShowerMenuItem = new JMenuItem("Meteor Shower");
@@ -522,6 +523,7 @@ public class Sandbox
 		displayMenu.add(scrollBarsMenuItem);
 		displayMenu.add(frameRateMenuItem);
 		displayMenu.add(scrollSpeedMenuItem);
+		displayMenu.add(commandButtonsMenuItem);
 		
 		pauseMenuItem.setAccelerator(
 			KeyStroke.getKeyStroke(KeyEvent.VK_PAUSE, 0)
@@ -581,7 +583,10 @@ public class Sandbox
 		frame.setLayout(new BorderLayout());
 		
 		if (showButtons)
-			frame.add(commandBar, BorderLayout.EAST);
+		{
+			commandBar.setOrientation(SwingConstants.HORIZONTAL);
+			frame.add(commandBar, BorderLayout.NORTH);
+		}
 		
 		frame.add(game.getView(), BorderLayout.CENTER);
 		frame.add(statusesPanel, BorderLayout.SOUTH);
@@ -681,6 +686,24 @@ public class Sandbox
 			}
 		});
 		
+		commandButtonsMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (commandBar.getParent() == frame.getRootPane())
+				{
+					frame.remove(commandBar);
+					frame.validate();
+				}
+				else
+				{
+					commandBar.setOrientation(SwingConstants.HORIZONTAL);
+					frame.add(commandBar, BorderLayout.NORTH);
+					frame.validate();
+				}
+			}
+		});
+		
 		scrollSpeedMenuItem.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -717,6 +740,7 @@ public class Sandbox
 			public void actionPerformed(ActionEvent e)
 			{
 				game.getView().showScrollBars(! game.getView().areScrollBarsVisible());
+				frame.validate();
 			}
 		});
 		

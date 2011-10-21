@@ -127,4 +127,9 @@ public class Player
 		return "[" + id + "] " + name + " " +
 		commonOre + " common, " + rareOre + " rare";
 	}
+	
+	public String toString()
+	{
+		return "Player " + id + ", \"" + name + "\"";
+	}
 }
