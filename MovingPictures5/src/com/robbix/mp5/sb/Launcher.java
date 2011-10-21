@@ -35,15 +35,18 @@ public class Launcher
 		soundOnCheckBox.setSelected(false);
 		final JCheckBox musicOnCheckBox = new JCheckBox("Music On");
 		musicOnCheckBox.setSelected(false);
+		final JCheckBox commandButtonsCheckBox = new JCheckBox("Command Buttons");
+		commandButtonsCheckBox.setSelected(false);
 		final JButton launchButton = new JButton("Launch");
 		
-		dialog.setLayout(new GridLayout(7, 1));
+		dialog.setLayout(new GridLayout(8, 1));
 		dialog.add(mapComboBox);
 		dialog.add(tileSetBox);
 		dialog.add(lazySpritesCheckBox);
 		dialog.add(lazySoundsCheckBox);
 		dialog.add(soundOnCheckBox);
 		dialog.add(musicOnCheckBox);
+		dialog.add(commandButtonsCheckBox);
 		dialog.add(launchButton);
 		dialog.setResizable(false);
 		dialog.pack();
@@ -80,6 +83,11 @@ public class Launcher
 				argsList.add(musicOnCheckBox.isSelected()
 					? "-musicOn"
 					: "-musicOff"
+				);
+				
+				argsList.add(commandButtonsCheckBox.isSelected()
+					? "-showCommandButtons"
+					: "-hideCommandButtons"
 				);
 				
 				argsList.add("-" + mapComboBox.getSelectedItem());

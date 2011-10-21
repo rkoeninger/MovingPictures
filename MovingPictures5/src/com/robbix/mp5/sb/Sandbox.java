@@ -109,6 +109,7 @@ public class Sandbox
 		boolean lazyLoadSounds  = true;
 		boolean soundOn         = false;
 //		boolean musicOn         = false;
+		boolean showButtons     = false;
 		String demoName         = null;
 		String mapName          = null;
 		String tileSetName      = null;
@@ -133,6 +134,14 @@ public class Sandbox
 			else if (args[a].equals("-soundOff"))
 			{
 				soundOn = false;
+			}
+			else if (args[a].equals("-showCommandButtons"))
+			{
+				showButtons = true;
+			}
+			else if (args[a].equals("-hideCommandButtons"))
+			{
+				showButtons = false;
 			}
 //			else if (args[a].equals("-musicOn"))
 //			{
@@ -570,7 +579,10 @@ public class Sandbox
 		frame = new JFrame("Moving Pictures");
 		frame.setJMenuBar(menuBar);
 		frame.setLayout(new BorderLayout());
-//		frame.add(commandBar, BorderLayout.EAST);
+		
+		if (showButtons)
+			frame.add(commandBar, BorderLayout.EAST);
+		
 		frame.add(game.getView(), BorderLayout.CENTER);
 		frame.add(statusesPanel, BorderLayout.SOUTH);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

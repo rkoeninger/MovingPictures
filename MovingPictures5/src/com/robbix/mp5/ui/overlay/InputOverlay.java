@@ -108,6 +108,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		g.setFont(COMMAND_FONT);
 		FontMetrics metrics = g.getFontMetrics();
 		Rectangle2D bounds = metrics.getStringBounds(command, g);
+		int w0 = 4;
+		int h0 = (int) (4 + bounds.getHeight());
 		int w2 = (int) (rect.width  / 2 - bounds.getCenterX());
 		int h2 = (int) (rect.height / 2 - bounds.getCenterY());
 		int wN = rect.width  - (int) bounds.getMaxX() - 4;
@@ -115,13 +117,13 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		
 		switch (edge)
 		{
-		case N:  g.drawString(command, w2, 4);  break;
+		case N:  g.drawString(command, w2, h0);  break;
 		case S:  g.drawString(command, w2, hN); break;
 		case E:  g.drawString(command, wN, h2); break;
-		case W:  g.drawString(command, 4,  h2); break;
-		case NE: g.drawString(command, wN, 4);  break;
-		case NW: g.drawString(command, 4,  4);  break;
-		case SW: g.drawString(command, 4,  hN); break;
+		case W:  g.drawString(command, w0, h2); break;
+		case NE: g.drawString(command, wN, h0);  break;
+		case NW: g.drawString(command, w0, h0);  break;
+		case SW: g.drawString(command, w0, hN); break;
 		case SE: g.drawString(command, wN, hN); break;
 		case C:  g.drawString(command, w2, h2); break;
 		}

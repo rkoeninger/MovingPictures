@@ -8,7 +8,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.ai.task.BulldozeTask;
 import com.robbix.mp5.ai.task.DockTask;
 import com.robbix.mp5.basics.JListDialog;
 import com.robbix.mp5.basics.Position;
@@ -96,9 +95,25 @@ public class CommandUnitOverlay extends InputOverlay
 			Mediator.selfDestruct(unit);
 			complete();
 		}
-		else if (command.equals("bulldoze") && unit.getType().getName().contains("Dozer"))
+		else if (command.equals("bulldoze") && unit.is("Dozer"))
 		{
-			unit.interrupt(new BulldozeTask(19 * 4)); // Four strokes
+			push(new SelectBulldozeOverlay(unit));
+		}
+		else if (command.equals("tube") && unit.is("Earthworker"))
+		{
+			push(new BuildTubeOverlay(unit));
+		}
+		else if (command.equals("construct") && unit.is("ConVec"))
+		{
+			convecConstruct();
+		}
+		else if (command.equals("construct") && unit.isMiner())
+		{
+			minerConstruct();
+		}
+		else if (command.equals("bulldoze") && unit.is("Dozer"))
+		{
+			push(new SelectBulldozeOverlay(unit));
 		}
 	}
 	
@@ -162,13 +177,7 @@ public class CommandUnitOverlay extends InputOverlay
 			}
 			else if (edge == Edge.NE)
 			{
-				if (unit.isCargoEmpty())
-					return;
-				
-				Player owner = unit.getOwner();
-				String structTypeName = unit.getCargo().getStructureType();
-				Unit struct = Mediator.factory.newUnit(structTypeName, owner);
-				push(new BuildStructureOverlay(unit, struct));
+				convecConstruct();
 			}
 		}
 		else if (unit.hasTurret())
@@ -182,9 +191,7 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			if (edge == Edge.NE)
 			{
-				Player owner = unit.getOwner();
-				Unit mine = Mediator.factory.newUnit("eCommonMine", owner);
-				push(new BuildMineOverlay(unit, mine));
+				minerConstruct();
 			}
 		}
 		else if (unit.is("Dozer"))
@@ -282,5 +289,23 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			complete();
 		}
+	}
+	
+	private void convecConstruct()
+	{
+		if (unit.isCargoEmpty())
+			return;
+		
+		Player owner = unit.getOwner();
+		String structTypeName = unit.getCargo().getStructureType();
+		Unit struct = Mediator.factory.newUnit(structTypeName, owner);
+		push(new BuildStructureOverlay(unit, struct));
+	}
+	
+	private void minerConstruct()
+	{
+		Player owner = unit.getOwner();
+		Unit mine = Mediator.factory.newUnit("eCommonMine", owner);
+		push(new BuildMineOverlay(unit, mine));
 	}
 }
