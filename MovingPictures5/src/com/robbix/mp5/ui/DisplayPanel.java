@@ -364,9 +364,14 @@ public class DisplayPanel extends JComponent
 		setAnimatedCursor(null);
 	}
 	
+	public InputOverlay getCurrentOverlay()
+	{
+		return overlays.isEmpty() ? null : overlays.getFirst();
+	}
+	
 	public void completeOverlay(InputOverlay overlay)
 	{
-		if (!overlay.equals(overlays.getFirst()))
+		if (overlay != overlays.getFirst())
 			throw new IllegalArgumentException();
 		
 		overlays.removeFirst();
@@ -387,6 +392,9 @@ public class DisplayPanel extends JComponent
 	
 	public void pushOverlay(InputOverlay overlay)
 	{
+		if (!overlays.isEmpty())
+			overlays.getFirst().dispose();
+		
 		overlays.addFirst(overlay);
 		overlay.setDisplay(this);
 		overlay.init();

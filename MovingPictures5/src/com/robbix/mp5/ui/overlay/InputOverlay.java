@@ -29,7 +29,7 @@ import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 
 public abstract class InputOverlay
-implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, KeyEventPostProcessor
+implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 {
 	public static final Font OVERLAY_FONT = Font.decode("Arial-12");
 	public static final Font COMMAND_FONT = Font.decode("Arial-bold-20");
@@ -47,9 +47,13 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 	private Point currentPoint = null;
 	private Point pressedPoint = null;
 	private Rectangle dragArea = null;
-	private boolean shift;
-	private boolean control;
+	private boolean shiftOption;
+	private boolean controlOption;
+	private boolean shiftDown;
+	private boolean controlDown;
 	private String animatedCursor = null;
+	
+	protected boolean closesOnEscape = true;
 	
 	protected InputOverlay()
 	{
@@ -65,13 +69,12 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 	
 	public void drawInstructions(Graphics g, Rectangle rect, String... lines)
 	{
-		FontMetrics metrics = g.getFontMetrics();
-		
 		g.translate(rect.x, rect.y);
 		g.setColor(Color.RED);
 		g.setFont(OVERLAY_FONT);
 		int y = 0;
 		int i = 0;
+		FontMetrics metrics = g.getFontMetrics();
 		
 		for (String line : lines)
 		{
@@ -100,18 +103,15 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 	
 	public void drawCommand(Graphics g, Rectangle rect, Edge edge, String command)
 	{
+		g.translate(rect.x, rect.y);
 		g.setColor(Color.RED);
 		g.setFont(COMMAND_FONT);
 		FontMetrics metrics = g.getFontMetrics();
 		Rectangle2D bounds = metrics.getStringBounds(command, g);
-		int w = rect.width;
-		int h = rect.height;
-		int w2 = (int) (w / 2 - bounds.getCenterX());
-		int h2 = (int) (h / 2 - bounds.getCenterY());
-		int wN = w - (int) bounds.getMaxX() - 4;
-		int hN = h - (int) bounds.getMaxY() - 4;
-		
-		g.translate(rect.x, rect.y);
+		int w2 = (int) (rect.width  / 2 - bounds.getCenterX());
+		int h2 = (int) (rect.height / 2 - bounds.getCenterY());
+		int wN = rect.width  - (int) bounds.getMaxX() - 4;
+		int hN = rect.height - (int) bounds.getMaxY() - 4;
 		
 		switch (edge)
 		{
@@ -123,6 +123,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 		case NW: g.drawString(command, 4,  4);  break;
 		case SW: g.drawString(command, 4,  hN); break;
 		case SE: g.drawString(command, wN, hN); break;
+		case C:  g.drawString(command, w2, h2); break;
 		}
 		
 		g.translate(-rect.x, -rect.y);
@@ -218,7 +219,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 			: fullRegion.getY();
 		
 		Position farEnd = Mediator.getPosition(farX, farY);
-		Position elbow = isShiftDown()
+		Position elbow = isShiftOptionSet()
 			? Mediator.getPosition(origin.x, farEnd.y)
 			: Mediator.getPosition(farEnd.x, origin.y);
 		return new LShapedRegion(origin, elbow, farEnd);
@@ -243,12 +244,22 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 	
 	public boolean isShiftDown()
 	{
-		return shift;
+		return shiftDown;
 	}
 	
 	public boolean isControlDown()
 	{
-		return control;
+		return controlDown;
+	}
+	
+	public boolean isShiftOptionSet()
+	{
+		return shiftOption;
+	}
+	
+	public boolean isControlOptionSet()
+	{
+		return controlOption;
 	}
 	
 	public void push(InputOverlay overlay)
@@ -264,20 +275,25 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 	public void init()
 	{
 		panel.setAnimatedCursor(animatedCursor);
-		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager()
-								   .addKeyEventPostProcessor(this);
 	}
 	
 	public void dispose()
 	{
-		DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager()
-								   .removeKeyEventPostProcessor(this);
 	}
 	
 	public boolean postProcessKeyEvent(KeyEvent e)
 	{
-		shift = e.isShiftDown();
-		control = e.isControlDown();
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+			System.out.println(getClass());
+		
+		if (!shiftDown && e.isShiftDown())
+			shiftOption = !shiftOption;
+		
+		if (!controlDown && e.isControlDown())
+			controlOption = !controlOption;
+		
+		shiftDown = e.isShiftDown();
+		controlDown = e.isControlDown();
 		return false;
 	}
 	
@@ -288,22 +304,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 	public void onAreaDragging(int x, int y, int w, int h){}
 	public void onAreaDragCancelled(){}
 	public void onCommand(String command){}
-	
-	public final void keyPressed(KeyEvent e)
-	{
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
-		{
-			complete();
-		}
-	}
-	
-	public final void keyTyped(KeyEvent e)
-	{
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
-		{
-			complete();
-		}
-	}
 	
 	public final void mousePressed(MouseEvent e)
 	{
@@ -350,7 +350,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 	
 	public final void mouseDragged(MouseEvent e)
 	{
-		shift = e.isShiftDown();
+		shiftDown = e.isShiftDown();
 		
 		if (pressedPoint != null)
 		{
@@ -382,6 +382,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 	public final void mouseClicked(MouseEvent e){}
 	public final void mouseWheelMoved(MouseWheelEvent e){}
 	public final void keyReleased(KeyEvent e){}
+	public final void keyPressed(KeyEvent e){}
+	public final void keyTyped(KeyEvent e){}
 	
 	private boolean panelContains(int x, int y) // in terms of relative co-ords
 	{
@@ -514,9 +516,16 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 	}
 	
 	public static class ListenerAdapter
-	implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener
+	implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener,
+			   KeyEventPostProcessor
 	{
 		private InputOverlay overlay;
+		
+		public ListenerAdapter()
+		{
+			DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager()
+									   .addKeyEventPostProcessor(this);
+		}
 		
 		public void setOverlay(InputOverlay overlay)
 		{
@@ -533,16 +542,40 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 			return overlay;
 		}
 		
-		public void mouseWheelMoved(MouseWheelEvent e) { if (hasOverlay()) overlay.mouseWheelMoved(e); }
-		public void mouseDragged   (MouseEvent e)      { if (hasOverlay()) overlay.mouseDragged(e);    }
-		public void mouseMoved     (MouseEvent e)      { if (hasOverlay()) overlay.mouseMoved(e);      }
-		public void mouseClicked   (MouseEvent e)      { if (hasOverlay()) overlay.mouseClicked(e);    }
-		public void mouseEntered   (MouseEvent e)      { if (hasOverlay()) overlay.mouseEntered(e);    }
-		public void mouseExited    (MouseEvent e)      { if (hasOverlay()) overlay.mouseExited(e);     }
-		public void mousePressed   (MouseEvent e)      { if (hasOverlay()) overlay.mousePressed(e);    }
-		public void mouseReleased  (MouseEvent e)      { if (hasOverlay()) overlay.mouseReleased(e);   }
-		public void keyPressed     (KeyEvent e)        { if (hasOverlay()) overlay.keyPressed(e);      }
-		public void keyReleased    (KeyEvent e)        { if (hasOverlay()) overlay.keyReleased(e);     }
-		public void keyTyped       (KeyEvent e)        { if (hasOverlay()) overlay.keyTyped(e);        }
+		public boolean postProcessKeyEvent(KeyEvent e)
+		{
+			if (overlay == null)
+				return false;
+			
+			if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+				if (e.getID() == KeyEvent.KEY_PRESSED)
+					if (overlay.closesOnEscape)
+						if (overlay.panel.getCurrentOverlay() == overlay)
+							overlay.complete();
+			
+			if (!overlay.shiftDown && e.isShiftDown())
+				overlay.shiftOption = !overlay.shiftOption;
+			
+			if (!overlay.controlDown && e.isControlDown())
+				overlay.controlOption = !overlay.controlOption;
+			
+			overlay.shiftDown = e.isShiftDown();
+			overlay.controlDown = e.isControlDown();
+			return false;
+		}
+		
+		private boolean ho() { return hasOverlay(); }
+		
+		public void mouseWheelMoved(MouseWheelEvent e) { if (ho()) overlay.mouseWheelMoved(e); }
+		public void mouseDragged   (MouseEvent e)      { if (ho()) overlay.mouseDragged(e);    }
+		public void mouseMoved     (MouseEvent e)      { if (ho()) overlay.mouseMoved(e);      }
+		public void mouseClicked   (MouseEvent e)      { if (ho()) overlay.mouseClicked(e);    }
+		public void mouseEntered   (MouseEvent e)      { if (ho()) overlay.mouseEntered(e);    }
+		public void mouseExited    (MouseEvent e)      { if (ho()) overlay.mouseExited(e);     }
+		public void mousePressed   (MouseEvent e)      { if (ho()) overlay.mousePressed(e);    }
+		public void mouseReleased  (MouseEvent e)      { if (ho()) overlay.mouseReleased(e);   }
+		public void keyPressed     (KeyEvent e)        { if (ho()) overlay.keyPressed(e);      }
+		public void keyReleased    (KeyEvent e)        { if (ho()) overlay.keyReleased(e);     }
+		public void keyTyped       (KeyEvent e)        { if (ho()) overlay.keyTyped(e);        }
 	}
 }

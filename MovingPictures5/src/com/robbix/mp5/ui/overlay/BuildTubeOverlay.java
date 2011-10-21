@@ -45,7 +45,7 @@ public class BuildTubeOverlay extends InputOverlay
 					g.setColor(TRANS_RED);
 					panel.fill(g, dragRegion);
 				}
-				else if (isControlDown())
+				else if (isControlOptionSet())
 				{
 					BorderRegion dragRegion = getBorderDragRegion();
 					
@@ -96,7 +96,7 @@ public class BuildTubeOverlay extends InputOverlay
 			
 			reverseForCloserEnd(tubeRow, crane.getPosition());
 		}
-		else if (isControlDown())
+		else if (isControlOptionSet())
 		{
 			for (Position rowPos : getBorderDragRegion())
 				tubeRow.add(rowPos);

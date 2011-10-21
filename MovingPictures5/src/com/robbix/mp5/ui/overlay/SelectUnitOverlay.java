@@ -14,6 +14,11 @@ import com.robbix.mp5.unit.Unit;
 
 public class SelectUnitOverlay extends InputOverlay
 {
+	public SelectUnitOverlay()
+	{
+		super.closesOnEscape = false;
+	}
+	
 	public void dispose()
 	{
 		panel.showStatus((Unit)null);
