@@ -32,6 +32,7 @@ public abstract class InputOverlay
 implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, KeyEventPostProcessor
 {
 	public static final Font OVERLAY_FONT = Font.decode("Arial-12");
+	public static final Font COMMAND_FONT = Font.decode("Arial-bold-20");
 	public static final Color TRANS_RED = new Color(255, 0, 0, 127);
 	public static final Color TRANS_YELLOW = new Color(255, 255, 0, 127);
 	public static final Color TRANS_GREEN = new Color(0, 255, 0, 127);
@@ -92,6 +93,36 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, 
 			y += bounds.getHeight() + 4;
 			g.drawString(line, x, y);
 			i++;
+		}
+		
+		g.translate(-rect.x, -rect.y);
+	}
+	
+	public void drawCommand(Graphics g, Rectangle rect, Edge edge, String command)
+	{
+		g.setColor(Color.RED);
+		g.setFont(COMMAND_FONT);
+		FontMetrics metrics = g.getFontMetrics();
+		Rectangle2D bounds = metrics.getStringBounds(command, g);
+		int w = rect.width;
+		int h = rect.height;
+		int w2 = (int) (w / 2 - bounds.getCenterX());
+		int h2 = (int) (h / 2 - bounds.getCenterY());
+		int wN = w - (int) bounds.getMaxX() - 4;
+		int hN = h - (int) bounds.getMaxY() - 4;
+		
+		g.translate(rect.x, rect.y);
+		
+		switch (edge)
+		{
+		case N:  g.drawString(command, w2, 4);  break;
+		case S:  g.drawString(command, w2, hN); break;
+		case E:  g.drawString(command, wN, h2); break;
+		case W:  g.drawString(command, 4,  h2); break;
+		case NE: g.drawString(command, wN, 4);  break;
+		case NW: g.drawString(command, 4,  4);  break;
+		case SW: g.drawString(command, 4,  hN); break;
+		case SE: g.drawString(command, wN, hN); break;
 		}
 		
 		g.translate(-rect.x, -rect.y);

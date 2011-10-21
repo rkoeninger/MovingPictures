@@ -1,7 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -30,7 +28,6 @@ public class CommandTruckOverlay extends InputOverlay
 	public CommandTruckOverlay(Set<Unit> trucks)
 	{
 		super("move");
-		
 		this.trucks = trucks;
 	}
 	
@@ -38,23 +35,15 @@ public class CommandTruckOverlay extends InputOverlay
 	{
 		for (Unit truck : trucks)
 			InputOverlay.paintSelectedUnitBox(g, truck);
-
-		drawInstructions(g, rect, "Move", "Command", "Cancel");
 		
-		int w = rect.width;
-		int h = rect.height;
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		g.setFont(Font.decode("Arial-bold-20"));
-		g.drawString("Kill", 20, h - 30);
-		g.drawString("SD", 20, h / 2 + 10);
-		g.drawString("Dump", 20, 25);
-		g.drawString("Route", w - 70, h / 2 - 30);
+		drawInstructions(g, rect, "Move", "Command", "Cancel");
+		drawCommand(g, rect, Edge.SW, "Kill");
+		drawCommand(g, rect, Edge.W,  "SD");
+		drawCommand(g, rect, Edge.NW, "Dump");
+		drawCommand(g, rect, Edge.E,  "Route");
 		
 		if (trucks.size() == 1)
-			g.drawString("Dock", w - 50, h - 30);
-		
-		g.translate(-rect.x, -rect.y);
+			drawCommand(g, rect, Edge.SE, "Dock");
 	}
 	
 	public void onLeftClick(int x, int y)

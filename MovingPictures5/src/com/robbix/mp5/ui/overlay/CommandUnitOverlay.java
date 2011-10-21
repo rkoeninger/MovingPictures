@@ -1,7 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -33,6 +31,7 @@ public class CommandUnitOverlay extends InputOverlay
 	
 	public void dispose()
 	{
+		super.dispose();
 		panel.showStatus((Unit)null);
 	}
 	
@@ -49,48 +48,37 @@ public class CommandUnitOverlay extends InputOverlay
 		InputOverlay.paintSelectedUnitBox(g, unit);
 		
 		drawInstructions(g, rect, "Move", "Command", "Cancel");
-		
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		int w = rect.width;
-		int h = rect.height;
-		
-		g.setFont(Font.decode("Arial-bold-20"));
-		g.drawString("Kill", 20, h - 30);
-		g.drawString("SD", 20, h / 2 + 10);
+		drawCommand(g, rect, Edge.SW, "Kill");
+		drawCommand(g, rect, Edge.W,  "SD");
 		
 		if (unit.isStructure())
-		{
-			g.drawString("Idle", w / 2 - 20, h - 30);
-		}
+			drawCommand(g, rect, Edge.S, "Idle");
 		
-		if (unit.getType().getName().contains("ConVec"))
+		if (unit.is("ConVec"))
 		{
-			g.drawString("Construct", w - 100, 25);
-			g.drawString("Dock", w - 50, h - 30);
+			drawCommand(g, rect, Edge.NE, "Construct");
+			drawCommand(g, rect, Edge.SE, "Dock");
 		}
-		else if (unit.getType().getName().contains("Earthworker"))
+		else if (unit.is("Earthworker"))
 		{
-			g.drawString("Build Tube", w - 115, h / 2 - 30);
+			drawCommand(g, rect, Edge.E, "Build Tube");
 		}
 		else if (unit.hasTurret())
 		{
-			g.drawString("Attack", w - 60, 25);
+			drawCommand(g, rect, Edge.NE, "Attack");
 		}
-		else if (unit.getType().getName().contains("Miner"))
+		else if (unit.is("Miner"))
 		{
-			g.drawString("Build Mine", w - 100, 25);
+			drawCommand(g, rect, Edge.NE, "Build Mine");
 		}
-		else if (unit.getType().getName().contains("Dozer"))
+		else if (unit.is("Dozer"))
 		{
-			g.drawString("Bulldoze", w - 100, 25);
+			drawCommand(g, rect, Edge.NE, "Bulldoze");
 		}
-		else if (unit.getType().getName().contains("Factory"))
+		else if (unit.is("Factory"))
 		{
-			g.drawString("Build", w - 100, 25);
+			drawCommand(g, rect, Edge.NE, "Build");
 		}
-		
-		g.translate(-rect.x, -rect.y);
 	}
 	
 	public void onCommand(String command)
@@ -140,14 +128,14 @@ public class CommandUnitOverlay extends InputOverlay
 				unit.idle();
 			}
 		}
-		else if (unit.getType().getName().contains("Earthworker"))
+		else if (unit.is("Earthworker"))
 		{
 			if (edge == Edge.E)
 			{
 				push(new BuildTubeOverlay(unit));
 			}
 		}
-		else if (unit.getType().getName().contains("ConVec"))
+		else if (unit.is("ConVec"))
 		{
 			if (edge == Edge.SE)
 			{
@@ -159,7 +147,7 @@ public class CommandUnitOverlay extends InputOverlay
 					Unit sFactory = map.getUnit(adj);
 					
 					if (sFactory != null
-				&& sFactory.getType().getName().contains("StructureFactory")
+				&& sFactory.is("StructureFactory")
 				&& !sFactory.isDead()
 				&& !sFactory.isDisabled())
 					{
@@ -199,14 +187,14 @@ public class CommandUnitOverlay extends InputOverlay
 				push(new BuildMineOverlay(unit, mine));
 			}
 		}
-		else if (unit.getType().getName().contains("Dozer"))
+		else if (unit.is("Dozer"))
 		{
 			if (edge == Edge.NE)
 			{
 				push(new SelectBulldozeOverlay(unit));
 			}
 		}
-		else if (unit.getType().getName().contains("VehicleFactory"))
+		else if (unit.is("VehicleFactory"))
 		{
 			if (edge == Edge.NE)
 			{
@@ -249,7 +237,7 @@ public class CommandUnitOverlay extends InputOverlay
 				JOptionPane.showMessageDialog(panel, "can't exit");
 			}
 		}
-		else if (unit.getType().getName().contains("StructureFactory"))
+		else if (unit.is("StructureFactory"))
 		{
 			if (edge == Edge.NE)
 			{

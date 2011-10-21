@@ -1,7 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.HashSet;
@@ -18,23 +16,20 @@ public class CommandGroupOverlay extends InputOverlay
 	public CommandGroupOverlay(Set<Unit> units)
 	{
 		super("move");
-		
 		this.units = units;
-		
 		trucks = false;
 		
 		for (Unit unit : units)
-		{
 			if (unit.isTruck())
 			{
 				trucks = true;
 				break;
 			}
-		}
 	}
 	
 	public void dispose()
 	{
+		super.dispose();
 		panel.showStatus((Unit)null);
 	}
 	
@@ -46,53 +41,35 @@ public class CommandGroupOverlay extends InputOverlay
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		for (Unit unit : units)
-		{
 			InputOverlay.paintSelectedUnitBox(g, unit);
-		}
 		
 		drawInstructions(g, rect, "Move", "Give Command", "Cancel");
-		
-		g.translate(rect.x, rect.y);
-		int w = rect.width;
-		int h = rect.height;
-		g.setColor(Color.RED);
-		g.setFont(Font.decode("Arial-bold-20"));
-		g.drawString("Kill", 20, h - 30);
-		g.drawString("SD", 20, h / 2 + 10);
+		drawCommand(g, rect, Edge.SW, "Kill");
+		drawCommand(g, rect, Edge.W,  "SD");
 		
 		if (trucks)
-		{
-			g.drawString("Route", w - 70, h / 2 - 30);
-		}
-		
-		g.translate(-rect.x, -rect.y);
+			drawCommand(g, rect, Edge.E, "Route");
 	}
 	
 	public void onMiddleClick(int x, int y)
 	{
-		Rectangle rect = panel.getVisibleRect();
-		int w = rect.width;
-		int h = rect.height;
-		int x0 = rect.x;
-		int y0 = rect.y;
+		Edge edge = getPointEdge(x, y);
 		
-		int edge = ((x - x0) / (w / 3)) + (((y - y0) / (h / 3)) * 3);
-		
-		if (edge == 6)
+		if (edge == Edge.SW)
 		{
 			for (Unit unit : units)
 			{
 				Mediator.kill(unit);
 			}
 		}
-		else if (edge == 3)
+		else if (edge == Edge.W)
 		{
 			for (Unit unit : units)
 			{
 				Mediator.selfDestruct(unit);
 			}
 		}
-		else if (edge == 5)
+		else if (edge == Edge.E)
 		{
 			Set<Unit> trucks = new HashSet<Unit>();
 			
