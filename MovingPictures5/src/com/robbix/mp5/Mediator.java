@@ -524,6 +524,6 @@ public class Mediator
 	{
 		panel.cueAnimation(new MeteorAnimation(pos, panel.getSpriteLibrary()));
 		playSound("meteor", pos);
-		playSound("savant_meteorApproaching");
+//		playSound("savant_meteorApproaching");
 	}
 }

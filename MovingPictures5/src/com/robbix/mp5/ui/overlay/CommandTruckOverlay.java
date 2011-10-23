@@ -38,7 +38,7 @@ public class CommandTruckOverlay extends InputOverlay
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		for (Unit truck : trucks)
-			InputOverlay.paintSelectedUnitBox(g, truck);
+			drawSelectedUnitBox(g, truck);
 		
 		drawInstructions(g, rect, "Move", "Command", "Cancel");
 		drawCommand(g, rect, Edge.SW, "Kill");
@@ -111,7 +111,7 @@ public class CommandTruckOverlay extends InputOverlay
 	public void onMiddleClick(int x, int y)
 	{
 		Point p = panel.subtractViewOffset(new Point(x, y));
-		Edge edge = getPointEdge(p.x, p.y);
+		Edge edge = getViewEdge(p.x, p.y);
 		
 		if (edge == Edge.SW)
 		{

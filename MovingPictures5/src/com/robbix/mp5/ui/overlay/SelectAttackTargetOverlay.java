@@ -19,8 +19,7 @@ public class SelectAttackTargetOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		InputOverlay.paintSelectedUnitBox(g, attacker.getChassis());
-		
+		drawSelectedUnitBox(g, attacker.getChassis());
 		drawInstructions(g, rect, "Select Target", "Cancel");
 	}
 	

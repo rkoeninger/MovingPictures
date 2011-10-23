@@ -64,6 +64,35 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		this.animatedCursor = animatedCursor;
 	}
 	
+	public void setDisplay(DisplayPanel panel)
+	{
+		this.panel = panel;
+	}
+	
+	public DisplayPanel getDisplay()
+	{
+		return panel;
+	}
+	
+	public void push(InputOverlay overlay)
+	{
+		panel.pushOverlay(overlay);
+	}
+	
+	public void complete()
+	{
+		panel.completeOverlay(this);
+	}
+	
+	public void init()
+	{
+		panel.setAnimatedCursor(animatedCursor);
+	}
+	
+	public void dispose()
+	{
+	}
+	
 	public void paintOverTerrain(Graphics g, Rectangle rect){}
 	public void paintOverUnits(Graphics g, Rectangle rect){}
 	
@@ -117,12 +146,12 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		
 		switch (edge)
 		{
-		case N:  g.drawString(command, w2, h0);  break;
+		case N:  g.drawString(command, w2, h0); break;
 		case S:  g.drawString(command, w2, hN); break;
 		case E:  g.drawString(command, wN, h2); break;
 		case W:  g.drawString(command, w0, h2); break;
-		case NE: g.drawString(command, wN, h0);  break;
-		case NW: g.drawString(command, w0, h0);  break;
+		case NE: g.drawString(command, wN, h0); break;
+		case NW: g.drawString(command, w0, h0); break;
 		case SW: g.drawString(command, w0, hN); break;
 		case SE: g.drawString(command, wN, hN); break;
 		case C:  g.drawString(command, w2, h2); break;
@@ -131,15 +160,83 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		g.translate(-rect.x, -rect.y);
 	}
 	
-	public void setDisplay(DisplayPanel panel)
+	public void drawSelectedUnitBox(Graphics g, Unit unit)
 	{
-		this.panel = panel;
+		if (unit.isDead() || unit.isFloating() || panel.getScale() < 0) return;
+		
+		int tileSize = panel.getTileSize();
+		int absWidth = unit.getWidth() * tileSize;
+		int absHeight = unit.getHeight() * tileSize;
+		
+		/*
+		 * Draw borders
+		 */
+		int nwCornerX = unit.getAbsX();
+		int nwCornerY = unit.getAbsY();
+		int neCornerX = nwCornerX + absWidth;
+		int neCornerY = nwCornerY;
+		int swCornerX = nwCornerX;
+		int swCornerY = nwCornerY + absHeight;
+		int seCornerX = nwCornerX + absWidth;
+		int seCornerY = nwCornerY + absHeight;
+		
+		g.setColor(Color.WHITE);
+		g.drawLine(nwCornerX, nwCornerY, nwCornerX + 4, nwCornerY);
+		g.drawLine(nwCornerX, nwCornerY, nwCornerX,     nwCornerY + 4);
+		g.drawLine(neCornerX, neCornerY, neCornerX - 4, neCornerY);
+		g.drawLine(neCornerX, neCornerY, neCornerX,     neCornerY + 4);
+		g.drawLine(swCornerX, swCornerY, swCornerX + 4, swCornerY);
+		g.drawLine(swCornerX, swCornerY, swCornerX,     swCornerY - 4);
+		g.drawLine(seCornerX, seCornerY, seCornerX - 4, seCornerY);
+		g.drawLine(seCornerX, seCornerY, seCornerX,     seCornerY - 4);
+		
+		/*
+		 * Draw health bar
+		 */
+		double hpFactor = unit.getHP() / (double) unit.getType().getMaxHP();
+		hpFactor = Math.min(hpFactor, 1.0f);
+		hpFactor = Math.max(hpFactor, 0.0f);
+		
+		boolean isRed = unit.getHealthBracket() == HealthBracket.RED;
+		
+		int hpBarLength = absWidth - 14;
+		int hpLength = (int) (hpBarLength * hpFactor);
+		
+		double hpHue = 1.0 - hpFactor;
+		hpHue *= 0.333;
+		hpHue = 0.333 - hpHue;
+		
+		double hpAlpha = 2.0 - hpFactor;
+		hpAlpha *= 127.0;
+		
+		Color hpColor = Color.getHSBColor((float) hpHue, 1.0f, 1.0f);
+		hpColor = new Color(
+			hpColor.getRed(),
+			hpColor.getGreen(),
+			hpColor.getBlue(),
+			(int) hpAlpha
+		);
+		
+		g.setColor(Color.BLACK);
+		g.fillRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);
+		
+		if (Utils.getTimeBasedSwitch(300, 2) || !isRed)
+		{
+			g.setColor(hpColor);
+			g.fillRect(nwCornerX + 8, nwCornerY - 1, hpLength - 1, 3);
+		}
+		
+		g.setColor(Color.WHITE);
+		g.drawRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);
 	}
 	
-	public DisplayPanel getDisplay()
-	{
-		return panel;
-	}
+	public void onLeftClick(int x, int y){}
+	public void onRightClick(int x, int y){}
+	public void onMiddleClick(int x, int y){}
+	public void onAreaDragged(int x, int y, int w, int h){}
+	public void onAreaDragging(int x, int y, int w, int h){}
+	public void onAreaDragCancelled(){}
+	public void onCommand(String command){}
 	
 	public boolean isCursorOnGrid()
 	{
@@ -234,7 +331,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public static enum Edge {NW,N,NE,W,C,E,SW,S,SE;}
 	
-	public Edge getPointEdge(int x, int y)
+	public Edge getViewEdge(int x, int y)
 	{
 		int w  = panel.getWidth();
 		int h  = panel.getHeight();
@@ -242,6 +339,11 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		int y0 = 0;
 		
 		return Edge.values()[((x - x0) / (w / 3)) + (((y - y0) / (h / 3)) * 3)];
+	}
+	
+	public Edge getViewEdge()
+	{
+		return pressedPoint == null ? null : getViewEdge(pressedPoint.x, pressedPoint.y);
 	}
 	
 	public boolean isShiftDown()
@@ -263,49 +365,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	{
 		return controlOption;
 	}
-	
-	public void push(InputOverlay overlay)
-	{
-		panel.pushOverlay(overlay);
-	}
-	
-	public void complete()
-	{
-		panel.completeOverlay(this);
-	}
-	
-	public void init()
-	{
-		panel.setAnimatedCursor(animatedCursor);
-	}
-	
-	public void dispose()
-	{
-	}
-	
-	public boolean postProcessKeyEvent(KeyEvent e)
-	{
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
-			System.out.println(getClass());
-		
-		if (!shiftDown && e.isShiftDown())
-			shiftOption = !shiftOption;
-		
-		if (!controlDown && e.isControlDown())
-			controlOption = !controlOption;
-		
-		shiftDown = e.isShiftDown();
-		controlDown = e.isControlDown();
-		return false;
-	}
-	
-	public void onLeftClick(int x, int y){}
-	public void onRightClick(int x, int y){}
-	public void onMiddleClick(int x, int y){}
-	public void onAreaDragged(int x, int y, int w, int h){}
-	public void onAreaDragging(int x, int y, int w, int h){}
-	public void onAreaDragCancelled(){}
-	public void onCommand(String command){}
 	
 	public final void mousePressed(MouseEvent e)
 	{
@@ -447,78 +506,11 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		
 	}
 	
-	public static void paintSelectedUnitBox(Graphics g, Unit unit)
-	{
-		if (unit.isDead() || unit.isFloating()) return;
-		
-		int tileSize = unit.getMap().getDisplayPanel().getTileSize();
-		int absWidth = unit.getWidth() * tileSize;
-		int absHeight = unit.getHeight() * tileSize;
-		
-		/*
-		 * Draw borders
-		 */
-		int nwCornerX = unit.getAbsX();
-		int nwCornerY = unit.getAbsY();
-		int neCornerX = nwCornerX + absWidth;
-		int neCornerY = nwCornerY;
-		int swCornerX = nwCornerX;
-		int swCornerY = nwCornerY + absHeight;
-		int seCornerX = nwCornerX + absWidth;
-		int seCornerY = nwCornerY + absHeight;
-		
-		g.setColor(Color.WHITE);
-		g.drawLine(nwCornerX, nwCornerY, nwCornerX + 4, nwCornerY);
-		g.drawLine(nwCornerX, nwCornerY, nwCornerX,     nwCornerY + 4);
-		g.drawLine(neCornerX, neCornerY, neCornerX - 4, neCornerY);
-		g.drawLine(neCornerX, neCornerY, neCornerX,     neCornerY + 4);
-		g.drawLine(swCornerX, swCornerY, swCornerX + 4, swCornerY);
-		g.drawLine(swCornerX, swCornerY, swCornerX,     swCornerY - 4);
-		g.drawLine(seCornerX, seCornerY, seCornerX - 4, seCornerY);
-		g.drawLine(seCornerX, seCornerY, seCornerX,     seCornerY - 4);
-		
-		/*
-		 * Draw health bar
-		 */
-		double hpFactor = unit.getHP() / (double) unit.getType().getMaxHP();
-		hpFactor = Math.min(hpFactor, 1.0f);
-		hpFactor = Math.max(hpFactor, 0.0f);
-		
-		boolean isRed = unit.getHealthBracket() == HealthBracket.RED;
-		
-		int hpBarLength = absWidth - 14;
-		int hpLength = (int) (hpBarLength * hpFactor);
-		
-		double hpHue = 1.0 - hpFactor;
-		hpHue *= 0.333;
-		hpHue = 0.333 - hpHue;
-		
-		double hpAlpha = 2.0 - hpFactor;
-		hpAlpha *= 127.0;
-		
-		Color hpColor = Color.getHSBColor((float) hpHue, 1.0f, 1.0f);
-		hpColor = new Color(
-			hpColor.getRed(),
-			hpColor.getGreen(),
-			hpColor.getBlue(),
-			(int) hpAlpha
-		);
-		
-		g.setColor(Color.BLACK);
-		g.fillRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);
-		
-		if (Utils.getTimeBasedSwitch(300, 2) || !isRed)
-		{
-			g.setColor(hpColor);
-			g.fillRect(nwCornerX + 8, nwCornerY - 1, hpLength - 1, 3);
-		}
-		
-		g.setColor(Color.WHITE);
-		g.drawRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);
-	}
-	
 	public static class ListenerAdapter
-	implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener,
+	implements KeyListener,
+			   MouseListener,
+			   MouseMotionListener,
+			   MouseWheelListener,
 			   KeyEventPostProcessor
 	{
 		private InputOverlay overlay;

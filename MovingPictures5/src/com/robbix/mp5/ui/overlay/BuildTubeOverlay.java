@@ -26,8 +26,7 @@ public class BuildTubeOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		InputOverlay.paintSelectedUnitBox(g, crane);
-		
+		drawSelectedUnitBox(g, crane);
 		drawInstructions(g, rect, "Build Tube", "Cancel");
 		
 		if (isCursorOnGrid())

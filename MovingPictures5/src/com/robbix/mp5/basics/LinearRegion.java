@@ -13,7 +13,6 @@ public class LinearRegion extends Region
 {
 	public final Position begin;
 	public final Position end;
-	public final Direction dir;
 	public final int length;
 	
 	public LinearRegion(Position begin, Position end)
@@ -26,31 +25,6 @@ public class LinearRegion extends Region
 		this.begin = begin;
 		this.end = end;
 		
-		dir = Direction.getDirection(begin, end);
 		length = max(abs(begin.x - end.x), abs(begin.y - end.y)) + 1;
-	}
-	
-	public RIterator<Position> iterator()
-	{
-		return new RIterator<Position>()
-		{
-			private Position current = begin;
-			private int index;
-			
-			public boolean hasNext()
-			{
-				return index < length;
-			}
-			
-			public Position next()
-			{
-				checkHasNext();
-				
-				index++;
-				
-				try     { return current;               }
-				finally { current = dir.apply(current); }
-			}
-		};
 	}
 }

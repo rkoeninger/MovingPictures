@@ -46,8 +46,7 @@ public class CommandUnitOverlay extends InputOverlay
 		if (unit.getPosition() == null)
 			return;
 		
-		InputOverlay.paintSelectedUnitBox(g, unit);
-		
+		drawSelectedUnitBox(g, unit);
 		drawInstructions(g, rect, "Move", "Command", "Cancel");
 		drawCommand(g, rect, Edge.SW, "Kill");
 		drawCommand(g, rect, Edge.W,  "SD");
@@ -140,7 +139,7 @@ public class CommandUnitOverlay extends InputOverlay
 	public void onMiddleClick(int x, int y)
 	{
 		Point p = panel.subtractViewOffset(new Point(x, y));
-		Edge edge = getPointEdge(p.x, p.y);
+		Edge edge = getViewEdge(p.x, p.y);
 		
 		if (edge == Edge.SW)
 		{

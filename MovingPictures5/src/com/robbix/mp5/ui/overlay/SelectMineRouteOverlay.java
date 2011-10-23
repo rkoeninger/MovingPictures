@@ -28,7 +28,7 @@ public class SelectMineRouteOverlay extends InputOverlay
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		for (Unit truck : trucks)
-			InputOverlay.paintSelectedUnitBox(g, truck);
+			drawSelectedUnitBox(g, truck);
 		
 		String leftClick = "Select ";
 		

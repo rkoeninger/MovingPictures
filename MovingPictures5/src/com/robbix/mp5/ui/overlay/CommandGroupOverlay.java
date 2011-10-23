@@ -35,7 +35,7 @@ public class CommandGroupOverlay extends InputOverlay
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		for (Unit unit : units)
-			InputOverlay.paintSelectedUnitBox(g, unit);
+			drawSelectedUnitBox(g, unit);
 		
 		drawInstructions(g, rect, "Move", "Give Command", "Cancel");
 		drawCommand(g, rect, Edge.SW, "Kill");
@@ -81,7 +81,7 @@ public class CommandGroupOverlay extends InputOverlay
 	
 	public void onMiddleClick(int x, int y)
 	{
-		Edge edge = getPointEdge(x, y);
+		Edge edge = getViewEdge(x, y);
 		
 		if (edge == Edge.SW)
 		{

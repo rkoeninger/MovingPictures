@@ -24,8 +24,7 @@ public class SelectBulldozeOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		InputOverlay.paintSelectedUnitBox(g, dozer);
-		
+		drawSelectedUnitBox(g, dozer);
 		drawInstructions(g, rect, "Select Bulldoze Area", "Cancel");
 		
 		if (isCursorOnGrid())
