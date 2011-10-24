@@ -31,9 +31,9 @@ public class SelectUnitOverlay extends InputOverlay
 		if (isDragging())
 		{
 			g.setColor(Color.RED);
-			panel.draw(g, getDragArea());
+			panel.draw(g, getDragRegion());
 			g.setColor(TRANS_RED);
-			panel.fill(g, getDragArea());
+			panel.fill(g, getDragRegion());
 		}
 	}
 	

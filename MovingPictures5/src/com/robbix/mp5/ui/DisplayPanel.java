@@ -57,7 +57,7 @@ public class DisplayPanel extends JComponent
 	private Grid<Boolean> dirty;
 	private Filter<Boolean> trueFilter = Filter.getTrueFilter();
 	
-	private Point scrollPoint = new Point();
+	private Point scroll = new Point();
 	private int tileSize = 32;
 	private int scale = 0;
 	private final int minScale, maxScale;
@@ -487,8 +487,8 @@ public class DisplayPanel extends JComponent
 			if (e.isControlDown())
 			{
 				Point zoomPoint = e.getPoint();
-				zoomPoint.x -= scrollPoint.x;
-				zoomPoint.y -= scrollPoint.y;
+				zoomPoint.x -= scroll.x;
+				zoomPoint.y -= scroll.y;
 				
 				if (e.getWheelRotation() > 0) zoomIn(zoomPoint);
 				else                          zoomOut(zoomPoint);
@@ -506,8 +506,8 @@ public class DisplayPanel extends JComponent
 				else
 				{
 					Point zoomPoint = e.getPoint();
-					zoomPoint.x -= scrollPoint.x;
-					zoomPoint.y -= scrollPoint.y;
+					zoomPoint.x -= scroll.x;
+					zoomPoint.y -= scroll.y;
 					zoomNormal(zoomPoint);
 				}
 			}
@@ -536,43 +536,43 @@ public class DisplayPanel extends JComponent
 	
 	public Point getViewPosition()
 	{
-		return new Point(scrollPoint);
+		return new Point(scroll);
 	}
 	
 	public Point getViewCenterPosition()
 	{
 		return new Point(
-			 (getWidth()  / 2) - scrollPoint.x,
-			 (getHeight() / 2) - scrollPoint.y
+			 (getWidth()  / 2) - scroll.x,
+			 (getHeight() / 2) - scroll.y
 		);
 	}
 	
 	public int getViewX()
 	{
-		return scrollPoint.x;
+		return scroll.x;
 	}
 	
 	public int getViewY()
 	{
-		return scrollPoint.y;
+		return scroll.y;
 	}
 	
 	public Point addViewOffset(Point p)
 	{
-		p.translate(-scrollPoint.x, -scrollPoint.y);
+		p.translate(-scroll.x, -scroll.y);
 		return p;
 	}
 	
 	public Point subtractViewOffset(Point p)
 	{
-		p.translate(scrollPoint.x, scrollPoint.y);
+		p.translate(scroll.x, scroll.y);
 		return p;
 	}
 	
 	public void setViewPosition(int x, int y)
 	{
-		scrollPoint.x = x;
-		scrollPoint.y = y;
+		scroll.x = x;
+		scroll.y = y;
 		centerAsNeeded();
 		refresh(getDisplayRegion());
 	}
@@ -580,8 +580,8 @@ public class DisplayPanel extends JComponent
 	public void shiftViewPosition(int dx, int dy)
 	{
 		setViewPosition(
-			scrollPoint.x + dx,
-			scrollPoint.y + dy
+			scroll.x + dx,
+			scroll.y + dy
 		);
 	}
 	
@@ -606,13 +606,13 @@ public class DisplayPanel extends JComponent
 		int diffWidth  = getWidth()  - getTotalWidth();
 		int diffHeight = getHeight() - getTotalHeight();
 		
-		scrollPoint.x = (diffWidth > 0)
+		scroll.x = (diffWidth > 0)
 			? diffWidth / 2
-			: Math.max(Math.min(scrollPoint.x, 0), diffWidth);
+			: Math.max(Math.min(scroll.x, 0), diffWidth);
 		
-		scrollPoint.y = (diffHeight > 0)
+		scroll.y = (diffHeight > 0)
 			? diffHeight / 2
-			: Math.max(Math.min(scrollPoint.y, 0), diffHeight);
+			: Math.max(Math.min(scroll.y, 0), diffHeight);
 		
 		refresh(getDisplayRegion());
 	}
@@ -750,9 +750,13 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Translates a pixel Point on the panel to a grid Position on the map.
 	 */
+	// FIXME: scroll/scaling offsets?!
 	public Position getPosition(Point point)
 	{
-		return Mediator.getPosition(point.x / tileSize, point.y / tileSize);
+		return Mediator.getPosition(
+			point.x / tileSize + scroll.x,
+			point.y / tileSize + scroll.y
+		);
 	}
 	
 	/**
@@ -761,7 +765,10 @@ public class DisplayPanel extends JComponent
 	 */
 	public Position getPosition(int absX, int absY)
 	{
-		return Mediator.getPosition(absX / tileSize, absY / tileSize);
+		return Mediator.getPosition(
+			absX / tileSize + scroll.x,
+			absY / tileSize + scroll.y
+		);
 	}
 	
 	/**
@@ -817,8 +824,8 @@ public class DisplayPanel extends JComponent
 	public Rectangle getRectangle(Region region)
 	{
 		return new Rectangle(
-			region.x * tileSize,
-			region.y * tileSize,
+			region.x * tileSize + scroll.x,
+			region.y * tileSize + scroll.y,
 			region.w * tileSize,
 			region.h * tileSize
 		);
@@ -830,8 +837,8 @@ public class DisplayPanel extends JComponent
 	public Rectangle getDisplayRect()
 	{
 		return new Rectangle(
-			Math.max(0, -scrollPoint.x),
-			Math.max(0, -scrollPoint.y),
+			Math.max(0, -scroll.x),
+			Math.max(0, -scroll.y),
 			Math.min(getTotalWidth(),  getWidth()),
 			Math.min(getTotalHeight(), getHeight())
 		);
@@ -845,255 +852,15 @@ public class DisplayPanel extends JComponent
 		return getRegion(getDisplayRect());
 	}
 	
-	public void drawEdge(Graphics g, Position pos, Direction dir)
-	{
-		int x0 = pos.x * tileSize;
-		int y0 = pos.y * tileSize;
-		int x1 = (pos.x + 1) * tileSize;
-		int y1 = (pos.y + 1) * tileSize;
-		
-		switch (dir)
-		{
-		case N: g.drawLine(x0, y0, x1, y0); break;
-		case S: g.drawLine(x0, y1, x1, y1); break;
-		case E: g.drawLine(x1, y0, x1, y1); break;
-		case W: g.drawLine(x0, y0, x0, y1); break;
-		}
-	}
-	
-	public void drawEdges(Graphics g, Position pos, Neighbors neighbors)
-	{
-		if (neighbors.has(N)) drawEdge(g, pos, N);
-		if (neighbors.has(S)) drawEdge(g, pos, S);
-		if (neighbors.has(E)) drawEdge(g, pos, E);
-		if (neighbors.has(W)) drawEdge(g, pos, W);
-	}
-	
-	public void draw(Graphics g, Position pos)
-	{
-		g.drawRect(pos.x * tileSize, pos.y * tileSize, tileSize, tileSize);
-	}
-	
-	public void fill(Graphics g, Position pos)
-	{
-		g.fillRect(pos.x * tileSize, pos.y * tileSize, tileSize, tileSize);
-	}
-	
-	public void drawPosition(Graphics g, int x, int y)
-	{
-		g.drawRect(x * tileSize, y * tileSize, tileSize, tileSize);
-	}
-	
-	public void fillPosition(Graphics g, int x, int y)
-	{
-		g.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-	}
-	
-	public void draw(Graphics g, Region region)
-	{
-		g.drawRect(
-			region.x * tileSize,
-			region.y * tileSize,
-			region.w * tileSize,
-			region.h * tileSize
-		);
-	}
-	
-	public void fill(Graphics g, Region region)
-	{
-		g.fillRect(
-			region.x * tileSize,
-			region.y * tileSize,
-			region.w * tileSize,
-			region.h * tileSize
-		);
-	}
-	
-	public void draw(Graphics g, LShapedRegion region)
-	{
-		Direction leg1Dir = region.getFirstLegDirection();
-		Direction leg2Dir = region.getSecondLegDirection();
-		Position end1 = region.getFirstEnd();
-		Position end2 = region.getSecondEnd();
-		Position elbow = region.getElbow();
-		
-		drawEdges(g, end1, Neighbors.allBut(leg1Dir));
-		drawEdges(g, end2, Neighbors.allBut(leg2Dir));
-		drawEdge(g, elbow, leg1Dir);
-		drawEdge(g, elbow, leg2Dir);
-		
-		connectFacingCorners(g, elbow, end1, leg1Dir);
-		connectFacingCorners(g, elbow, end2, leg2Dir);
-	}
-	
-	private void connectFacingCorners(Graphics g, Position to, Position from, Direction dir)
-	{
-		int tx0 = to.x * tileSize;
-		int ty0 = to.y * tileSize;
-		int tx1 = (to.x + 1) * tileSize;
-		int ty1 = (to.y + 1) * tileSize;
-		
-		int fx0 = from.x * tileSize;
-		int fy0 = from.y * tileSize;
-		int fx1 = (from.x + 1) * tileSize;
-		int fy1 = (from.y + 1) * tileSize;
-		
-		switch (dir)
-		{
-		case N:
-			g.drawLine(fx0, fy0, tx0, ty1);
-			g.drawLine(fx1, fy0, tx1, ty1);
-			break;
-		case S:
-			g.drawLine(fx0, fy1, tx0, ty0);
-			g.drawLine(fx1, fy1, tx1, ty0);
-			break;
-		case E:
-			g.drawLine(fx1, fy0, tx0, ty0);
-			g.drawLine(fx1, fy1, tx0, ty1);
-			break;
-		case W:
-			g.drawLine(fx0, fy0, tx1, ty0);
-			g.drawLine(fx0, fy1, tx1, ty1);
-			break;
-		}
-	}
-	
-	public void fill(Graphics g, LShapedRegion region)
-	{
-		for (Position pos : region)
-			fill(g, pos);
-	}
-	
-	public void draw(Graphics g, BorderRegion region)
-	{
-		g.drawRect(
-			region.x * tileSize,
-			region.y * tileSize,
-			region.w * tileSize,
-			region.h * tileSize
-		);
-		
-		if (region.w > 2 && region.h > 2)
-		{
-			g.drawRect(
-				(region.x + 1) * tileSize,
-				(region.y + 1) * tileSize,
-				(region.w - 2) * tileSize,
-				(region.h - 2) * tileSize
-			);
-		}
-	}
-	
-	public void fill(Graphics g, BorderRegion region)
-	{
-		g.fillRect(
-			region.x * tileSize,
-			region.y * tileSize,
-			region.w * tileSize,
-			tileSize
-		);
-		
-		if (region.h > 1)
-		{
-			g.fillRect(
-				region.x * tileSize,
-				(region.y + region.h - 1) * tileSize,
-				region.w * tileSize,
-				tileSize
-			);
-		}
-		
-		if (region.h > 2)
-		{
-			g.fillRect(
-				region.x * tileSize,
-				(region.y + 1) * tileSize,
-				tileSize,
-				(region.h - 2) * tileSize
-			);
-			
-			if (region.w > 1)
-			{
-				g.fillRect(
-					(region.x + region.w - 1) * tileSize,
-					(region.y + 1) * tileSize,
-					tileSize,
-					(region.h - 2) * tileSize
-				);
-			}
-		}
-	}
-	
-	public void draw(Graphics g, Rectangle rect)
-	{
-		g.drawRect(rect.x, rect.y, rect.width, rect.height);
-	}
-	
-	public void fill(Graphics g, Rectangle rect)
-	{
-		g.fillRect(rect.x, rect.y, rect.width, rect.height);
-	}
-	
-	public void draw(Graphics g, Image img, Point point)
-	{
-		g.drawImage(img, point.x, point.y, null);
-	}
-	
-	public void draw(Graphics g, Image img, Rectangle rect)
-	{
-		g.drawImage(
-			img,
-			rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
-			rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
-			null
-		);
-	}
-	
-	public void draw(Graphics g, Image img, Position pos)
-	{
-		g.drawImage(img, pos.x * tileSize, pos.y * tileSize, null);
-	}
-	
-	public void draw(Graphics g, Sprite sprite, Position pos)
-	{
-		Image img = sprite.getImage();
-		int x = pos.x * tileSize + sprite.getXOffset(scale);
-		int y = pos.y * tileSize + sprite.getYOffset(scale);
-		int w = img.getWidth(null);
-		int h = img.getHeight(null);
-		int w2 = scale < 0 ? w >> -scale : w << scale;
-		int h2 = scale < 0 ? h >> -scale : h << scale;
-		g.drawImage(
-			img,
-			x, y, x + w2, y + h2,
-			0, 0, w, h,
-			null
-		);
-	}
-	
-	public void draw(Graphics g, Sprite sprite, Point point, Player owner)
-	{
-		Image img = sprite.getImage(owner == null ? -1 : owner.getColorHue());
-		int x = point.x + sprite.getXOffset(scale);
-		int y = point.y + sprite.getYOffset(scale);
-		int w = img.getWidth(null);
-		int h = img.getHeight(null);
-		int w2 = scale < 0 ? w >> -scale : w << scale;
-		int h2 = scale < 0 ? h >> -scale : h << scale;
-		g.drawImage(
-			img,
-			x, y, x + w2, y + h2,
-			0, 0, w, h,
-			null
-		);
-	}
-	
 	public void translate(Graphics g, int dx, int dy)
 	{
 		Rectangle bounds = g.getClipBounds();
 		g.translate(bounds.x + dx, bounds.y + dy);
 	}
+	
+	/*------------------------------------------------------------------------------------------[*]
+	 * Paint method and delegates.
+	 */
 	
 	/**
 	 * Paints the visible rect of the map, including terrain, units and
@@ -1101,33 +868,11 @@ public class DisplayPanel extends JComponent
 	 */
 	public void paintComponent(Graphics g)
 	{
-		/*
-		 * Draw letter-box around display when panel is bigger
-		 * than visible area.
-		 */
-		g.setColor(getBackground());
-		int hEdgeSpace = getHorizontalLetterBoxSpace();
-		int vEdgeSpace = getVerticalLetterBoxSpace();
-		g.fillRect(0, 0, hEdgeSpace, getHeight());
-		g.fillRect(getWidth() - 1 - hEdgeSpace, 0, hEdgeSpace, getHeight());
-		g.fillRect(0, 0, getWidth(), vEdgeSpace);
-		g.fillRect(0, getHeight() - 1 - vEdgeSpace, getWidth(), vEdgeSpace);
-		
-		Rectangle overlayRect = new Rectangle(
-			-scrollPoint.x,
-			-scrollPoint.y,
-			getWidth(),
-			getHeight()
-		);
+		drawLetterBox(g);
+		Rectangle overlayRect = new Rectangle(getSize());
 		Rectangle rect = getDisplayRect();
 		Region region = getRegion(rect);
-		translate(g, scrollPoint.x, scrollPoint.y);
 		
-		/*
-		 * Draw terrian.
-		 * 
-		 * Draw cached terrian/costMap image unless changes have been made.
-		 */
 		if (showBackground)
 		{
 			drawTerrain(g, rect);
@@ -1138,46 +883,19 @@ public class DisplayPanel extends JComponent
 			fill(g, rect);
 		}
 		
-		/*
-		 * Draw grid
-		 */
 		if (showGrid && tileSize >= 8)
-		{
-			g.setColor(Color.BLACK);
-			int w = getTotalWidth();
-			int h = getTotalHeight();
-			
-			for (int x = Math.max(1, region.x); x < region.getMaxX(); ++x)
-				g.drawLine(x * tileSize, 0, x * tileSize, h - 1);
-			
-			for (int y = Math.max(1, region.y); y < region.getMaxY(); ++y)
-				g.drawLine(0, y * tileSize, w - 1, y * tileSize);
-		}
+			drawGrid(g, rect, region);
 		
-		/*
-		 * Draw input overlay
-		 */
 		if (! overlays.isEmpty())
 			overlays.getFirst().paintOverTerrain(g, overlayRect);
 		
-		/*
-		 * Draw tube connectivity
-		 */
 		if (showTubeConnectivity)
-			drawTubes(g, region);
+			drawTubeConnectivity(g, region);
 		
-		/*
-		 * Draw units.
-		 * 
-		 * Units are returned by UnitLayer iterator already in z-order.
-		 */
 		for (Unit unit : map.getUnitIterator(true))
 			if (region.intersects(unit.getOccupiedBounds()))
 				drawUnit(g, unit);
 		
-		/*
-		 * Draw ambient animations
-		 */
 		synchronized (animations)
 		{
 			for (AmbientAnimation animation : animations)
@@ -1185,49 +903,61 @@ public class DisplayPanel extends JComponent
 					animation.paint(g);
 		}
 		
-		/*
-		 * Draw resource deposits.
-		 */
-		for (ResourceDeposit deposit : map.getResourceDeposits())
-		{
-			Point resPoint = getPoint(deposit.getPosition());
-			resPoint.translate(tileSize / 2, tileSize / 2);
-			
-			if (!rect.contains(resPoint))
-				continue;
-			
-			if (scale < -1)
-			{
-				g.setColor(deposit.getType() == ResourceType.COMMON_ORE
-					? new Color(255, 92, 0)
-					: new Color(255, 255, 106));
-				fill(g, deposit.getPosition());
-				continue;
-			}
-			
-			Sprite sprite = deposit.isSurveyedBy(currentPlayer)
-				? sprites.getSprite(deposit)
-				: sprites.getUnknownDepositSprite();
-			
-			draw(g, sprite, deposit.getPosition());
-		}
+		for (ResourceDeposit res : map.getResourceDeposits())
+			if (region.contains(res.getPosition()))
+				drawResourceDeposit(g, res);
 		
-		/*
-		 * Draw night overlay
-		 */
 		if (night)
 		{
 			g.setColor(TRANS_GRAY);
 			fill(g, rect);
 		}
 		
-		/*
-		 * Draw input overlay
-		 */
 		if (! overlays.isEmpty())
 			overlays.getFirst().paintOverUnits(g, overlayRect);
+	}
+	
+	/**
+	 * Draws the background-colored letterboxes around the
+	 * map display area.
+	 */
+	private void drawLetterBox(Graphics g)
+	{
+		g.setColor(getBackground());
+		int hEdgeSpace = getHorizontalLetterBoxSpace();
+		int vEdgeSpace = getVerticalLetterBoxSpace();
 		
-		translate(g, -scrollPoint.x, -scrollPoint.y);
+		// Left side, including corners
+		g.fillRect(0, 0, hEdgeSpace, getHeight());
+		
+		// Right side, including corners
+		g.fillRect(getWidth() - hEdgeSpace, 0, hEdgeSpace, getHeight());
+		
+		// Top side
+		g.fillRect(hEdgeSpace, 0, getWidth() - hEdgeSpace * 2, vEdgeSpace);
+		
+		// Bottom side
+		g.fillRect(hEdgeSpace, getHeight() - vEdgeSpace, getWidth() - hEdgeSpace * 2, vEdgeSpace);
+	}
+	
+	/**
+	 * Draws grid of size tileSize over Region in Color.BLACK.
+	 */
+	private void drawGrid(Graphics g, Rectangle rect, Region region)
+	{
+		g.setColor(Color.BLACK);
+		int x0 = rect.x;
+		int y0 = rect.y;
+		int w = getTotalWidth();
+		int h = getTotalHeight();
+		
+		// Vertical lines
+		for (int x = Math.max(1, region.x); x < region.getMaxX(); ++x)
+			g.drawLine(x0 + x * tileSize, y0, x0 + x * tileSize, y0 + h - 1);
+		
+		// Horizontal lines
+		for (int y = Math.max(1, region.y); y < region.getMaxY(); ++y)
+			g.drawLine(x0, y0 + y * tileSize, x0 + w - 1, y0 + y * tileSize);
 	}
 	
 	/**
@@ -1324,7 +1054,7 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Highlights tubes and buildings as active/potentially active or disabled.
 	 */
-	private void drawTubes(Graphics g, Region region)
+	private void drawTubeConnectivity(Graphics g, Region region)
 	{
 		for (int x = region.x; x < region.getMaxX(); ++x)
 		for (int y = region.y; y < region.getMaxY(); ++y)
@@ -1417,5 +1147,300 @@ public class DisplayPanel extends JComponent
 				draw(g, sprites.getSprite("aStructureStatus", "active"), pos);
 			}
 		}
+	}
+	
+	/**
+	 * Draws a ResourceDeposit at that deposit's position.
+	 */
+	private void drawResourceDeposit(Graphics g, ResourceDeposit res)
+	{
+		if (scale < -1)
+		{
+			g.setColor(res.getType() == ResourceType.COMMON_ORE
+				? new Color(255, 92, 0)
+				: new Color(255, 255, 106));
+			fill(g, res.getPosition());
+			return;
+		}
+		
+		Sprite sprite = res.isSurveyedBy(currentPlayer)
+			? sprites.getSprite(res)
+			: sprites.getUnknownDepositSprite();
+		
+		draw(g, sprite, res.getPosition());
+	}
+	
+	/*------------------------------------------------------------------------------------------[*]
+	 * Draw helpers. Helpers account for tileSize and scrollPoint.
+	 */
+	
+	public void drawEdge(Graphics g, Position pos, Direction dir)
+	{
+		int x0 = pos.x * tileSize + scroll.x;
+		int y0 = pos.y * tileSize + scroll.y;
+		int x1 = (pos.x + 1) * tileSize + scroll.x;
+		int y1 = (pos.y + 1) * tileSize + scroll.y;
+		
+		switch (dir)
+		{
+		case N: g.drawLine(x0, y0, x1, y0); break;
+		case S: g.drawLine(x0, y1, x1, y1); break;
+		case E: g.drawLine(x1, y0, x1, y1); break;
+		case W: g.drawLine(x0, y0, x0, y1); break;
+		}
+	}
+	
+	public void drawEdges(Graphics g, Position pos, Neighbors neighbors)
+	{
+		if (neighbors.has(N)) drawEdge(g, pos, N);
+		if (neighbors.has(S)) drawEdge(g, pos, S);
+		if (neighbors.has(E)) drawEdge(g, pos, E);
+		if (neighbors.has(W)) drawEdge(g, pos, W);
+	}
+	
+	public void draw(Graphics g, Position pos)
+	{
+		g.drawRect(
+			pos.x * tileSize + scroll.x,
+			pos.y * tileSize + scroll.y,
+			tileSize,
+			tileSize
+		);
+	}
+	
+	public void fill(Graphics g, Position pos)
+	{
+		g.fillRect(
+			pos.x * tileSize + scroll.x,
+			pos.y * tileSize + scroll.y,
+			tileSize,
+			tileSize
+		);
+	}
+	
+	public void drawPosition(Graphics g, int x, int y)
+	{
+		g.drawRect(
+			x * tileSize + scroll.x,
+			y * tileSize + scroll.y,
+			tileSize,
+			tileSize
+		);
+	}
+	
+	public void fillPosition(Graphics g, int x, int y)
+	{
+		g.fillRect(
+			x * tileSize + scroll.x,
+			y * tileSize + scroll.y,
+			tileSize,
+			tileSize
+		);
+	}
+	
+	public void draw(Graphics g, Region region)
+	{
+		g.drawRect(
+			region.x * tileSize + scroll.x,
+			region.y * tileSize + scroll.y,
+			region.w * tileSize,
+			region.h * tileSize
+		);
+	}
+	
+	public void fill(Graphics g, Region region)
+	{
+		g.fillRect(
+			region.x * tileSize + scroll.x,
+			region.y * tileSize + scroll.y,
+			region.w * tileSize,
+			region.h * tileSize
+		);
+	}
+	
+	public void draw(Graphics g, LShapedRegion region)
+	{
+		Direction leg1Dir = region.getFirstLegDirection();
+		Direction leg2Dir = region.getSecondLegDirection();
+		Position end1 = region.getFirstEnd();
+		Position end2 = region.getSecondEnd();
+		Position elbow = region.getElbow();
+		
+		drawEdges(g, end1, Neighbors.allBut(leg1Dir));
+		drawEdges(g, end2, Neighbors.allBut(leg2Dir));
+		drawEdge(g, elbow, leg1Dir);
+		drawEdge(g, elbow, leg2Dir);
+		
+		connectFacingCorners(g, elbow, end1, leg1Dir);
+		connectFacingCorners(g, elbow, end2, leg2Dir);
+	}
+	
+	private void connectFacingCorners(Graphics g, Position to, Position from, Direction dir)
+	{
+		int tx0 = to.x * tileSize + scroll.x;
+		int ty0 = to.y * tileSize + scroll.y;
+		int tx1 = tx0 + tileSize;
+		int ty1 = ty0 + tileSize;
+		
+		int fx0 = from.x * tileSize + scroll.x;
+		int fy0 = from.y * tileSize + scroll.y;
+		int fx1 = fx0 + tileSize;
+		int fy1 = fy0 + tileSize;
+		
+		switch (dir)
+		{
+		case N:
+			g.drawLine(fx0, fy0, tx0, ty1);
+			g.drawLine(fx1, fy0, tx1, ty1);
+			break;
+		case S:
+			g.drawLine(fx0, fy1, tx0, ty0);
+			g.drawLine(fx1, fy1, tx1, ty0);
+			break;
+		case E:
+			g.drawLine(fx1, fy0, tx0, ty0);
+			g.drawLine(fx1, fy1, tx0, ty1);
+			break;
+		case W:
+			g.drawLine(fx0, fy0, tx1, ty0);
+			g.drawLine(fx0, fy1, tx1, ty1);
+			break;
+		}
+	}
+	
+	public void fill(Graphics g, LShapedRegion region)
+	{
+		for (Position pos : region)
+			fill(g, pos);
+	}
+	
+	public void draw(Graphics g, BorderRegion region)
+	{
+		g.drawRect(
+			region.x * tileSize + scroll.x,
+			region.y * tileSize + scroll.y,
+			region.w * tileSize,
+			region.h * tileSize
+		);
+		
+		if (region.w > 2 && region.h > 2)
+		{
+			g.drawRect(
+				(region.x + 1) * tileSize + scroll.x,
+				(region.y + 1) * tileSize + scroll.y,
+				(region.w - 2) * tileSize,
+				(region.h - 2) * tileSize
+			);
+		}
+	}
+	
+	public void fill(Graphics g, BorderRegion region)
+	{
+		g.fillRect(
+			region.x * tileSize + scroll.x,
+			region.y * tileSize + scroll.y,
+			region.w * tileSize,
+			tileSize
+		);
+		
+		if (region.h > 1)
+		{
+			g.fillRect(
+				region.x * tileSize + scroll.x,
+				(region.y + region.h - 1) * tileSize + scroll.y,
+				region.w * tileSize,
+				tileSize
+			);
+		}
+		
+		if (region.h > 2)
+		{
+			g.fillRect(
+				region.x * tileSize + scroll.x,
+				(region.y + 1) * tileSize + scroll.y,
+				tileSize,
+				(region.h - 2) * tileSize
+			);
+			
+			if (region.w > 1)
+			{
+				g.fillRect(
+					(region.x + region.w - 1) * tileSize + scroll.x,
+					(region.y + 1) * tileSize + scroll.y,
+					tileSize,
+					(region.h - 2) * tileSize
+				);
+			}
+		}
+	}
+	
+	// TODO: scrolling/scaling?
+	public void draw(Graphics g, Rectangle rect)
+	{
+		g.drawRect(rect.x, rect.y, rect.width, rect.height);
+	}
+	
+	// TODO: scrolling/scaling?
+	public void fill(Graphics g, Rectangle rect)
+	{
+		g.fillRect(rect.x, rect.y, rect.width, rect.height);
+	}
+	
+	// TODO: scrolling/scaling?
+	public void draw(Graphics g, Image img, Point point)
+	{
+		g.drawImage(img, point.x, point.y, null);
+	}
+	
+	// TODO: scrolling/scaling?
+	public void draw(Graphics g, Image img, Rectangle rect)
+	{
+		g.drawImage(
+			img,
+			rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
+			rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
+			null
+		);
+	}
+	
+	// TODO: scrolling/scaling?
+	public void draw(Graphics g, Image img, Position pos)
+	{
+		g.drawImage(img, pos.x * tileSize, pos.y * tileSize, null);
+	}
+	
+	public void draw(Graphics g, Sprite sprite, Position pos)
+	{
+		Image img = sprite.getImage();
+		int x = pos.x * tileSize + scroll.x + sprite.getXOffset(scale);
+		int y = pos.y * tileSize + scroll.y + sprite.getYOffset(scale);
+		int w = img.getWidth(null);
+		int h = img.getHeight(null);
+		int w2 = scale < 0 ? w >> -scale : w << scale;
+		int h2 = scale < 0 ? h >> -scale : h << scale;
+		g.drawImage(
+			img,
+			x, y, x + w2, y + h2,
+			0, 0, w, h,
+			null
+		);
+	}
+	
+	// TODO: scrolling/scaling?
+	public void draw(Graphics g, Sprite sprite, Point point, Player owner)
+	{
+		Image img = sprite.getImage(owner == null ? -1 : owner.getColorHue());
+		int x = point.x + scroll.x + sprite.getXOffset(scale);
+		int y = point.y + scroll.y + sprite.getYOffset(scale);
+		int w = img.getWidth(null);
+		int h = img.getHeight(null);
+		int w2 = scale < 0 ? w >> -scale : w << scale;
+		int h2 = scale < 0 ? h >> -scale : h << scale;
+		g.drawImage(
+			img,
+			x, y, x + w2, y + h2,
+			0, 0, w, h,
+			null
+		);
 	}
 }
