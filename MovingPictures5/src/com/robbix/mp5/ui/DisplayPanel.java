@@ -857,12 +857,6 @@ public class DisplayPanel extends JComponent
 		return getRegion(getDisplayRect());
 	}
 	
-	public void translate(Graphics g, int dx, int dy)
-	{
-		Rectangle bounds = g.getClipBounds();
-		g.translate(bounds.x + dx, bounds.y + dy);
-	}
-	
 	/*------------------------------------------------------------------------------------------[*]
 	 * Paint method and delegates.
 	 */
@@ -877,6 +871,9 @@ public class DisplayPanel extends JComponent
 		Rectangle overlayRect = new Rectangle(getSize());
 		Rectangle rect = getDisplayRect();
 		Region region = getRegion(rect);
+		
+//		System.out.println(rect);
+//		System.out.println(region);
 		
 		if (showBackground)
 		{
@@ -996,7 +993,7 @@ public class DisplayPanel extends JComponent
 							   else drawSurface(cg, dirtySpots);
 			
 			cg.dispose();
-			draw(g, cachedBackground, new Rectangle(new Point(scroll.x, scroll.y), rect.getSize()));
+			draw(g, cachedBackground, new Rectangle(scroll.x, scroll.y, getTotalWidth(), getTotalHeight()));
 		}
 	}
 	
@@ -1276,12 +1273,15 @@ public class DisplayPanel extends JComponent
 		drawEdge(g, elbow, leg1Dir);
 		drawEdge(g, elbow, leg2Dir);
 		
-		connectFacingCorners(g, elbow, end1, leg1Dir);
-		connectFacingCorners(g, elbow, end2, leg2Dir);
+		connectFacingCorners(g, end1, elbow);
+		connectFacingCorners(g, end2, elbow);
 	}
 	
-	private void connectFacingCorners(Graphics g, Position to, Position from, Direction dir)
+	private void connectFacingCorners(Graphics g, Position from, Position to)
 	{
+		if (! to.isColinear(from))
+			throw new IllegalArgumentException("not colinear");
+		
 		int tx0 = to.x * tileSize + scroll.x;
 		int ty0 = to.y * tileSize + scroll.y;
 		int tx1 = tx0 + tileSize;
@@ -1292,7 +1292,7 @@ public class DisplayPanel extends JComponent
 		int fx1 = fx0 + tileSize;
 		int fy1 = fy0 + tileSize;
 		
-		switch (dir)
+		switch (Direction.getDirection(from, to))
 		{
 		case N:
 			g.drawLine(fx0, fy0, tx0, ty1);
@@ -1315,8 +1315,48 @@ public class DisplayPanel extends JComponent
 	
 	public void fill(Graphics g, LShapedRegion region)
 	{
-		for (Position pos : region)
-			fill(g, pos);
+		Position end1 = region.getFirstEnd();
+		Position end2 = region.getSecondEnd();
+		Position elbow = region.getElbow();
+		
+		fill(g, end1);
+		fill(g, end2);
+		fill(g, elbow);
+		
+		fillSpaceBetween(g, end1, elbow);
+		fillSpaceBetween(g, end2, elbow);
+	}
+	
+	private void fillSpaceBetween(Graphics g, Position from, Position to)
+	{
+		if (! to.isColinear(from))
+			throw new IllegalArgumentException("not colinear");
+		
+		int tx0 = to.x * tileSize + scroll.x;
+		int ty0 = to.y * tileSize + scroll.y;
+		int tx1 = tx0 + tileSize;
+		int ty1 = ty0 + tileSize;
+		
+		int fx0 = from.x * tileSize + scroll.x;
+		int fy0 = from.y * tileSize + scroll.y;
+		int fx1 = fx0 + tileSize;
+		int fy1 = fy0 + tileSize;
+		
+		switch (Direction.getDirection(from, to))
+		{
+		case N:
+			g.fillRect(tx0, ty1, fx1 - fx0, fy0 - ty1);
+			break;
+		case S:
+			g.fillRect(fx0, fy1, fx1 - fx0, ty0 - fy1);
+			break;
+		case E:
+			g.fillRect(fx1, fy0, tx0 - fx1, ty1 - ty0);
+			break;
+		case W:
+			g.fillRect(tx1, ty0, fx0 - tx1, ty1 - ty0);
+			break;
+		}
 	}
 	
 	public void draw(Graphics g, BorderRegion region)

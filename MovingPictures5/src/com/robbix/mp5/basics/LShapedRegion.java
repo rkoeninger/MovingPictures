@@ -38,6 +38,12 @@ public class LShapedRegion implements RIterable<Position>
 	
 	public LShapedRegion(Position begin, Position elbow, Position end)
 	{
+		if (! begin.isColinear(elbow))
+			throw new IllegalArgumentException("must be colinear");
+		
+		if (! end.isColinear(elbow))
+			throw new IllegalArgumentException("must be colinear");
+		
 		leg1Dir = Direction.getDirection(begin, elbow);
 		leg2Dir = Direction.getDirection(end, elbow);
 		
@@ -74,11 +80,32 @@ public class LShapedRegion implements RIterable<Position>
 	
 	public boolean contains(Position pos)
 	{
-		return elements.contains(pos);
+		if (! pos.isColinear(elbow))
+			return false;
+		
+		if (pos.x == begin.x)
+		{
+			return isBetween(pos.y, elbow.y, begin.y);
+		}
+		else if (pos.y == begin.y)
+		{
+			return isBetween(pos.x, elbow.x, begin.x);
+		}
+		else if (pos.x == end.x)
+		{
+			return isBetween(pos.y, elbow.y, end.y);
+		}
+		else
+		{
+			return isBetween(pos.x, elbow.x, end.x);
+		}
 	}
 	
 	public boolean contains(Region region)
 	{
+		if (region.a == 0)
+			return true;
+		
 		return elements.contains(region.getUpperLeftCorner())
 			&& elements.contains(region.getUpperRightCorner())
 			&& elements.contains(region.getLowerLeftCorner())
@@ -88,5 +115,12 @@ public class LShapedRegion implements RIterable<Position>
 	public RIterator<Position> iterator()
 	{
 		return RIterator.iterate(elements);
+	}
+	
+	private static boolean isBetween(int val, int end1, int end2)
+	{
+		return end1 < end2
+			? val >= end1 && val <= end2
+			: val >= end2 && val <= end1;
 	}
 }
