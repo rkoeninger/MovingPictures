@@ -164,6 +164,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	{
 		if (unit.isDead() || unit.isFloating() || panel.getScale() < 0) return;
 		
+		g.translate(panel.getViewX(), panel.getViewY());
+		
 		int tileSize = panel.getTileSize();
 		int absWidth = unit.getWidth() * tileSize;
 		int absHeight = unit.getHeight() * tileSize;
@@ -228,6 +230,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		
 		g.setColor(Color.WHITE);
 		g.drawRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);
+		
+		g.translate(-panel.getViewX(), -panel.getViewY());
 	}
 	
 	public void onLeftClick(int x, int y){}

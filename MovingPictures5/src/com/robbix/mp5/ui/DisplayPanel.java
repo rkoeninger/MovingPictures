@@ -750,12 +750,11 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Translates a pixel Point on the panel to a grid Position on the map.
 	 */
-	// FIXME: scroll/scaling offsets?!
 	public Position getPosition(Point point)
 	{
 		return Mediator.getPosition(
-			point.x / tileSize + scroll.x,
-			point.y / tileSize + scroll.y
+			(point.x - scroll.x) / tileSize,
+			(point.y - scroll.y) / tileSize
 		);
 	}
 	
@@ -763,11 +762,11 @@ public class DisplayPanel extends JComponent
 	 * Translates a pair of pixel co-ordinates on the panel
 	 * to a grid Position on the map.
 	 */
-	public Position getPosition(int absX, int absY)
+	public Position getPosition(int x, int y)
 	{
 		return Mediator.getPosition(
-			absX / tileSize + scroll.x,
-			absY / tileSize + scroll.y
+			(x - scroll.x) / tileSize,
+			(y - scroll.y) / tileSize
 		);
 	}
 	
@@ -777,9 +776,12 @@ public class DisplayPanel extends JComponent
 	 */
 	public Point getPoint(Position pos)
 	{
-		return new Point(pos.x * tileSize, pos.y * tileSize);
+		return new Point(
+			pos.x * tileSize + scroll.x,
+			pos.y * tileSize + scroll.y
+		);
 	}
-
+	
 	/**
 	 * Translates a grid Position on the map to a pixel Point on the panel
 	 * that is in the center of that grid Position as drawn.
@@ -787,7 +789,10 @@ public class DisplayPanel extends JComponent
 	public Point getCenteredPoint(Position pos)
 	{
 		int half = tileSize / 2;
-		return new Point(pos.x * tileSize + half, pos.y * tileSize + half);
+		return new Point(
+			pos.x * tileSize + half + scroll.x,
+			pos.y * tileSize + half + scroll.y
+		);
 	}
 	
 	/**
@@ -991,7 +996,7 @@ public class DisplayPanel extends JComponent
 							   else drawSurface(cg, dirtySpots);
 			
 			cg.dispose();
-			draw(g, cachedBackground, rect);
+			draw(g, cachedBackground, new Rectangle(new Point(scroll.x, scroll.y), rect.getSize()));
 		}
 	}
 	
@@ -1374,25 +1379,19 @@ public class DisplayPanel extends JComponent
 		}
 	}
 	
-	// TODO: scrolling/scaling?
-	public void draw(Graphics g, Rectangle rect)
-	{
-		g.drawRect(rect.x, rect.y, rect.width, rect.height);
-	}
-	
-	// TODO: scrolling/scaling?
+	/**
+	 * Does not account for scale/scroll,
+	 * draws literally to Graphics.
+	 */
 	public void fill(Graphics g, Rectangle rect)
 	{
 		g.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 	
-	// TODO: scrolling/scaling?
-	public void draw(Graphics g, Image img, Point point)
-	{
-		g.drawImage(img, point.x, point.y, null);
-	}
-	
-	// TODO: scrolling/scaling?
+	/**
+	 * Does not account for scale/scroll,
+	 * draws literally to Graphics.
+	 */
 	public void draw(Graphics g, Image img, Rectangle rect)
 	{
 		g.drawImage(
