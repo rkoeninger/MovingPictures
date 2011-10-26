@@ -16,10 +16,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.Timer;
@@ -31,8 +29,6 @@ import com.robbix.mp5.basics.Direction;
 import static com.robbix.mp5.basics.Direction.*;
 
 import com.robbix.mp5.basics.BorderRegion;
-import com.robbix.mp5.basics.Filter;
-import com.robbix.mp5.basics.Grid;
 import com.robbix.mp5.basics.LShapedRegion;
 import com.robbix.mp5.basics.Neighbors;
 import com.robbix.mp5.basics.Position;
@@ -54,15 +50,12 @@ public class DisplayPanel extends JComponent
 	private TileSet tiles;
 	private CursorSet cursors;
 	
-	private Grid<Boolean> dirty;
-	private Filter<Boolean> trueFilter = Filter.getTrueFilter();
-	
 	private Point scroll = new Point();
 	private int tileSize = 32;
 	private int scale = 0;
 	private final int minScale, maxScale;
 	
-	private Map<Integer, BufferedImage> cachedBackgrounds = null;
+	private BufferedImage cachedBackground = null;
 	private Object cacheLock = new Object();
 	
 	private static Font costMapFont = Font.decode("Arial-9");
@@ -116,7 +109,6 @@ public class DisplayPanel extends JComponent
 		
 		this.map = map;
 		map.setDisplayPanel(this);
-		dirty = new Grid<Boolean>(map.getBounds(), true);
 		this.sprites = sprites;
 		this.tiles = tiles;
 		this.tileSize = tiles.getTileSize();
@@ -132,7 +124,6 @@ public class DisplayPanel extends JComponent
 			map.getHeight() * tileSize
 		);
 		setPreferredSize(size);
-		this.cachedBackgrounds = new HashMap<Integer, BufferedImage>();
 		MouseEvents mouseEvents = new MouseEvents();
 		addMouseWheelListener(mouseEvents);
 		addMouseMotionListener(mouseEvents);
@@ -239,7 +230,7 @@ public class DisplayPanel extends JComponent
 	{
 		synchronized (cacheLock)
 		{
-			dirty.fill(true);
+			cachedBackground = null;
 		}
 		
 		repaint();
@@ -247,22 +238,12 @@ public class DisplayPanel extends JComponent
 	
 	public void refresh(Position pos)
 	{
-		synchronized (cacheLock)
-		{
-			dirty.set(pos, true);
-		}
-		
-		repaint();
+		refresh();
 	}
 	
 	public void refresh(Region region)
 	{
-		synchronized (cacheLock)
-		{
-			dirty.fill(map.getBounds().getIntersection(region), true);
-		}
-		
-		repaint();
+		refresh();
 	}
 	
 	public void fireCommandButton(String command)
@@ -689,6 +670,10 @@ public class DisplayPanel extends JComponent
 	{
 		super.reshape(x, y, width, height);
 		centerAsNeeded();
+		
+		System.out.println("resize():");
+		System.out.println(getDisplayRect());
+		System.out.println(scroll);
 	}
 	
 	/**
@@ -842,8 +827,8 @@ public class DisplayPanel extends JComponent
 	public Rectangle getDisplayRect()
 	{
 		return new Rectangle(
-			Math.max(0, -scroll.x),
-			Math.max(0, -scroll.y),
+			scroll.x,
+			scroll.y,
 			Math.min(getTotalWidth(),  getWidth()),
 			Math.min(getTotalHeight(), getHeight())
 		);
@@ -871,9 +856,6 @@ public class DisplayPanel extends JComponent
 		Rectangle overlayRect = new Rectangle(getSize());
 		Rectangle rect = getDisplayRect();
 		Region region = getRegion(rect);
-		
-//		System.out.println(rect);
-//		System.out.println(region);
 		
 		if (showBackground)
 		{
@@ -926,20 +908,20 @@ public class DisplayPanel extends JComponent
 	private void drawLetterBox(Graphics g)
 	{
 		g.setColor(getBackground());
-		int hEdgeSpace = getHorizontalLetterBoxSpace();
-		int vEdgeSpace = getVerticalLetterBoxSpace();
+		int hSpace = getHorizontalLetterBoxSpace();
+		int vSpace = getVerticalLetterBoxSpace();
 		
 		// Left side, including corners
-		g.fillRect(0, 0, hEdgeSpace, getHeight());
+		g.fillRect(0, 0, hSpace, getHeight());
 		
 		// Right side, including corners
-		g.fillRect(getWidth() - hEdgeSpace, 0, hEdgeSpace, getHeight());
+		g.fillRect(getWidth() - hSpace, 0, hSpace, getHeight());
 		
 		// Top side
-		g.fillRect(hEdgeSpace, 0, getWidth() - hEdgeSpace * 2, vEdgeSpace);
+		g.fillRect(hSpace, 0, getWidth() - hSpace * 2, vSpace);
 		
 		// Bottom side
-		g.fillRect(hEdgeSpace, getHeight() - vEdgeSpace, getWidth() - hEdgeSpace * 2, vEdgeSpace);
+		g.fillRect(hSpace, getHeight() - vSpace, getWidth() - hSpace * 2, vSpace);
 	}
 	
 	/**
@@ -972,40 +954,38 @@ public class DisplayPanel extends JComponent
 		{
 			Region region = getDisplayRegion();
 			region = map.getBounds().getIntersection(region);
-			List<Position> dirtySpots = dirty.findAll(trueFilter, region);
-			
-			BufferedImage cachedBackground = cachedBackgrounds.get(tileSize);
 			
 			if (cachedBackground == null)
 			{
 				cachedBackground = new BufferedImage(
-					map.getWidth() * tileSize,
-					map.getHeight() * tileSize,
+					rect.width,
+					rect.height,
 					BufferedImage.TYPE_INT_RGB
 				);
-				
-				cachedBackgrounds.put(tileSize, cachedBackground);
 			}
 			
 			Graphics cg = cachedBackground.getGraphics();
 			
-			if (showTerrainCostMap) drawCostMap(cg, dirtySpots);
-							   else drawSurface(cg, dirtySpots);
+			if (showTerrainCostMap) drawCostMap(cg, region);
+							   else drawSurface(cg, region);
 			
 			cg.dispose();
-			draw(g, cachedBackground, new Rectangle(scroll.x, scroll.y, getTotalWidth(), getTotalHeight()));
+			Rectangle r = new Rectangle(getHorizontalLetterBoxSpace(), getVerticalLetterBoxSpace(), rect.width, rect.height);
+			draw(g, cachedBackground, r.getLocation());
+			g.setColor(Color.RED);
+			draw(g, r);
 		}
 	}
 	
 	/**
 	 * Draws the terrain costmap using Graphics g with in given visible Region.
 	 */
-	private void drawCostMap(Graphics g, List<Position> dirtySpots)
+	private void drawCostMap(Graphics g, Region region)
 	{
 		CostMap terrainCost = map.getTerrainCostMap();
 		g.setFont(costMapFont);
 		
-		for (Position pos : dirtySpots)
+		for (Position pos : region)
 		{
 			g.setColor(Utils.getGrayscale(terrainCost.getScaleFactor(pos)));
 			fill(g, pos);
@@ -1026,17 +1006,15 @@ public class DisplayPanel extends JComponent
 					pos.y * tileSize + 11
 				);
 			}
-			
-			dirty.set(pos, false);
 		}
 	}
 	
 	/**
 	 * Draws the terrain surface image using Graphics g in the visible Region.
 	 */
-	private void drawSurface(Graphics g, List<Position> dirtySpots)
+	private void drawSurface(Graphics g, Region region)
 	{
-		for (Position pos : dirtySpots)
+		for (Position pos : region)
 		{
 			draw(g, tiles.getTile(map.getTileCode(pos)).getImage(scale), pos);
 			
@@ -1048,8 +1026,6 @@ public class DisplayPanel extends JComponent
 			{
 				draw(g, sprites.getSprite("aGeyser", "geyser"), pos);
 			}
-			
-			dirty.set(pos, false);
 		}
 	}
 	
@@ -1419,6 +1395,11 @@ public class DisplayPanel extends JComponent
 		}
 	}
 	
+	public void draw(Graphics g, Rectangle rect)
+	{
+		g.drawRect(rect.x, rect.y, rect.width, rect.height);
+	}
+	
 	/**
 	 * Does not account for scale/scroll,
 	 * draws literally to Graphics.
@@ -1438,6 +1419,15 @@ public class DisplayPanel extends JComponent
 			img,
 			rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
 			rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
+			null
+		);
+	}
+	
+	public void draw(Graphics g, Image img, Point point)
+	{
+		g.drawImage(
+			img,
+			point.x, point.y,
 			null
 		);
 	}
