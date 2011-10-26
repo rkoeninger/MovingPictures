@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,27 +39,7 @@ public class CommandTruckOverlay extends InputOverlay
 		for (Unit truck : trucks)
 			drawSelectedUnitBox(g, truck);
 		
-		drawInstructions(g, rect, "Move", "Command", "Cancel");
-		drawCommand(g, rect, Edge.SW, "Kill");
-		drawCommand(g, rect, Edge.W,  "SD");
-		drawCommand(g, rect, Edge.NW, "Dump");
-		drawCommand(g, rect, Edge.E,  "Route");
-		
-		if (trucks.size() == 1)
-			drawCommand(g, rect, Edge.SE, "Dock");
-	}
-	
-	public void onLeftClick(int x, int y)
-	{
-		for (Unit truck : trucks)		
-			Mediator.doMove(truck, panel.getPosition(x, y));
-		
-		Mediator.playSound("beep2");
-	}
-	
-	public void onRightClick(int x, int y)
-	{
-		complete();
+		drawInstructions(g, rect, "Move", "Cancel");
 	}
 	
 	public void onCommand(String command)
@@ -69,6 +48,13 @@ public class CommandTruckOverlay extends InputOverlay
 		{
 			for (Unit truck : trucks)
 				Mediator.selfDestruct(truck);
+			
+			complete();
+		}
+		else if (command.equals("kill"))
+		{
+			for (Unit truck : trucks)
+				Mediator.kill(truck);
 			
 			complete();
 		}
@@ -106,41 +92,7 @@ public class CommandTruckOverlay extends InputOverlay
 			
 			complete();
 		}
-	}
-	
-	public void onMiddleClick(int x, int y)
-	{
-		Point p = panel.subtractViewOffset(new Point(x, y));
-		Edge edge = getViewEdge(p.x, p.y);
-		
-		if (edge == Edge.SW)
-		{
-			for (Unit truck : trucks)
-				Mediator.kill(truck);
-			
-			complete();
-		}
-		else if (edge == Edge.W)
-		{
-			for (Unit truck : trucks)
-				Mediator.selfDestruct(truck);
-			
-			complete();
-		}
-		else if (edge == Edge.NW)
-		{
-			for (Unit truck : trucks)
-				if (!truck.isCargoEmpty())
-				{
-					Mediator.playSound("dump", truck.getPosition());
-					truck.interrupt(new DumpTask());
-				}
-		}
-		else if (edge == Edge.E)
-		{
-			push(new SelectMineRouteOverlay(trucks));
-		}
-		else if (edge == Edge.SE && trucks.size() == 1)
+		else if (command.equals("dock") && trucks.size() == 1)
 		{
 			Unit truck = trucks.iterator().next();
 			
@@ -163,7 +115,7 @@ public class CommandTruckOverlay extends InputOverlay
 				}
 			}
 		}
-		else if (edge == Edge.NE && trucks.size() == 1)
+		else if (command.equals("mine") && trucks.size() == 1)
 		{
 			Unit truck = trucks.iterator().next();
 			
@@ -190,5 +142,18 @@ public class CommandTruckOverlay extends InputOverlay
 				}
 			}
 		}
+	}
+	
+	public void onLeftClick(int x, int y)
+	{
+		for (Unit truck : trucks)		
+			Mediator.doMove(truck, panel.getPosition(x, y));
+		
+		Mediator.playSound("beep2");
+	}
+	
+	public void onRightClick(int x, int y)
+	{
+		complete();
 	}
 }

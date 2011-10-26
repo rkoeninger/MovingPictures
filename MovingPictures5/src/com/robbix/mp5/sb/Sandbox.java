@@ -348,8 +348,17 @@ public class Sandbox
 			if (icons.isEmpty())
 				continue;
 			
-			CommandButton button = new CommandButton(icons);
-			button.setActionCommand(iconDir.getName());
+			CommandButton button = new CommandButton(iconDir.getName(), icons);
+			button.addActionListener(commandButtonListener);
+			button.setFocusable(false);
+			commandBar.add(button);
+		}
+		
+		String[] extraCommands = {"kill", "idle", "build", "dock", "mine"};
+		
+		for (String commandName : extraCommands)
+		{
+			CommandButton button = new CommandButton(commandName);
 			button.addActionListener(commandButtonListener);
 			button.setFocusable(false);
 			commandBar.add(button);

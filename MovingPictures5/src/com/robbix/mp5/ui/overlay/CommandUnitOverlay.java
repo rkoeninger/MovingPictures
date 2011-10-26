@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,49 +35,13 @@ public class CommandUnitOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void onRightClick(int x, int y)
-	{
-		complete();
-	}
-	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		if (unit.getPosition() == null)
 			return;
 		
 		drawSelectedUnitBox(g, unit);
-		drawInstructions(g, rect, "Move", "Command", "Cancel");
-		drawCommand(g, rect, Edge.SW, "Kill");
-		drawCommand(g, rect, Edge.W,  "SD");
-		
-		if (unit.isStructure())
-			drawCommand(g, rect, Edge.S, "Idle");
-		
-		if (unit.is("ConVec"))
-		{
-			drawCommand(g, rect, Edge.NE, "Construct");
-			drawCommand(g, rect, Edge.SE, "Dock");
-		}
-		else if (unit.is("Earthworker"))
-		{
-			drawCommand(g, rect, Edge.E, "Build Tube");
-		}
-		else if (unit.hasTurret())
-		{
-			drawCommand(g, rect, Edge.NE, "Attack");
-		}
-		else if (unit.is("Miner"))
-		{
-			drawCommand(g, rect, Edge.NE, "Build Mine");
-		}
-		else if (unit.is("Dozer"))
-		{
-			drawCommand(g, rect, Edge.NE, "Bulldoze");
-		}
-		else if (unit.is("Factory"))
-		{
-			drawCommand(g, rect, Edge.NE, "Build");
-		}
+		drawInstructions(g, rect, "Move", "Cancel");
 	}
 	
 	public void onCommand(String command)
@@ -134,24 +97,104 @@ public class CommandUnitOverlay extends InputOverlay
 			unit.setOwner(player);
 			complete();
 		}
-	}
-	
-	public void onMiddleClick(int x, int y)
-	{
-		Point p = panel.subtractViewOffset(new Point(x, y));
-		Edge edge = getViewEdge(p.x, p.y);
-		
-		if (edge == Edge.SW)
+		else if (command.equals("kill"))
 		{
 			Mediator.kill(unit);
 			complete();
 		}
-		else if (edge == Edge.W)
+		else if (command.equals("build") && unit.is("VehicleFactory"))
 		{
-			Mediator.selfDestruct(unit);
-			complete();
+			List<UnitType> vehicleTypes = Mediator.factory.getVehicleTypes();
+			Object option = JListDialog.showDialog(vehicleTypes.toArray());
+			
+			if (option == null)
+				return;
+			
+			UnitType type = (UnitType) option;
+			Player owner = unit.getOwner();
+			
+			if (type.getCost() == null)
+				return;
+			
+			if (!owner.canAfford(type.getCost()))
+			{
+				JOptionPane.showMessageDialog(
+					panel,
+					"can't afford it",
+					"not enough monies",
+					JOptionPane.ERROR_MESSAGE
+				);
+				
+				return;
+			}
+			
+			owner.spend(type.getCost());
+			Unit newVehicle = Mediator.factory.newUnit(type, owner);
+			
+			for (Position exitPos : unit.getFootprint().getFactoryExits(unit.getPosition()))
+			{
+				if (panel.getMap().canPlaceUnit(exitPos))
+				{
+					panel.getMap().putUnit(newVehicle, exitPos);
+					return;
+				}
+			}
+			
+			JOptionPane.showMessageDialog(panel, "can't exit");
 		}
-		else if (unit.isStructure() && edge == Edge.S)
+		else if (command.equals("build") && unit.is("StructureFactory"))
+		{
+			List<UnitType> structTypes = Mediator.factory.getStructureTypes();
+			Object option = JListDialog.showDialog(structTypes.toArray());
+			
+			if (option == null)
+				return;
+			
+			UnitType type = (UnitType) option;
+			Player owner = unit.getOwner();
+			
+			if (type.getCost() == null)
+				return;
+			
+			if (!owner.canAfford(type.getCost()))
+			{
+				JOptionPane.showMessageDialog(
+					panel,
+					"can't afford it",
+					"not enough monies",
+					JOptionPane.ERROR_MESSAGE
+				);
+				
+				return;
+			}
+			
+			owner.spend(type.getCost());
+			unit.setStructureKit(type.getName());
+		}
+		else if (command.equals("dock") && unit.is("ConVec"))
+		{
+			Position adj = unit.getPosition().shift(0, -1);
+			LayeredMap map = panel.getMap();
+			
+			if (map.getBounds().contains(adj))
+			{
+				Unit sFactory = map.getUnit(adj);
+				
+				if (sFactory != null
+			&& sFactory.is("StructureFactory")
+			&& !sFactory.isDead()
+			&& !sFactory.isDisabled())
+				{
+					String kit = sFactory.getStructureKit();
+					sFactory.setStructureKit(null);
+					Cargo cargo = kit != null
+						? Cargo.newConVecCargo(kit)
+						: Cargo.EMPTY;
+					unit.assignNow(new DockTask(sFactory, cargo));
+				}
+			}
+		}
+		else if (command.equals("idle") && unit.isStructure())
 		{
 			if (unit.isIdle())
 			{
@@ -160,139 +203,6 @@ public class CommandUnitOverlay extends InputOverlay
 			else
 			{
 				unit.idle();
-			}
-		}
-		else if (unit.is("Earthworker"))
-		{
-			if (edge == Edge.E)
-			{
-				push(new BuildTubeOverlay(unit));
-			}
-		}
-		else if (unit.is("ConVec"))
-		{
-			if (edge == Edge.SE)
-			{
-				Position adj = unit.getPosition().shift(0, -1);
-				LayeredMap map = panel.getMap();
-				
-				if (map.getBounds().contains(adj))
-				{
-					Unit sFactory = map.getUnit(adj);
-					
-					if (sFactory != null
-				&& sFactory.is("StructureFactory")
-				&& !sFactory.isDead()
-				&& !sFactory.isDisabled())
-					{
-						String kit = sFactory.getStructureKit();
-						sFactory.setStructureKit(null);
-						Cargo cargo = kit != null
-							? Cargo.newConVecCargo(kit)
-							: Cargo.EMPTY;
-						unit.assignNow(new DockTask(sFactory, cargo));
-					}
-				}
-			}
-			else if (edge == Edge.NE)
-			{
-				convecConstruct();
-			}
-		}
-		else if (unit.hasTurret())
-		{
-			if (edge == Edge.NE)
-			{
-				push(new SelectAttackTargetOverlay(unit.getTurret()));
-			}
-		}
-		else if (unit.isMiner())
-		{
-			if (edge == Edge.NE)
-			{
-				minerConstruct();
-			}
-		}
-		else if (unit.is("Dozer"))
-		{
-			if (edge == Edge.NE)
-			{
-				push(new SelectBulldozeOverlay(unit));
-			}
-		}
-		else if (unit.is("VehicleFactory"))
-		{
-			if (edge == Edge.NE)
-			{
-				List<UnitType> vehicleTypes = Mediator.factory.getVehicleTypes();
-				Object option = JListDialog.showDialog(vehicleTypes.toArray());
-				
-				if (option == null)
-					return;
-				
-				UnitType type = (UnitType) option;
-				Player owner = unit.getOwner();
-				
-				if (type.getCost() == null)
-					return;
-				
-				if (!owner.canAfford(type.getCost()))
-				{
-					JOptionPane.showMessageDialog(
-						panel,
-						"can't afford it",
-						"not enough monies",
-						JOptionPane.ERROR_MESSAGE
-					);
-					
-					return;
-				}
-				
-				owner.spend(type.getCost());
-				Unit newVehicle = Mediator.factory.newUnit(type, owner);
-				
-				for (Position exitPos : unit.getFootprint().getFactoryExits(unit.getPosition()))
-				{
-					if (panel.getMap().canPlaceUnit(exitPos))
-					{
-						panel.getMap().putUnit(newVehicle, exitPos);
-						return;
-					}
-				}
-				
-				JOptionPane.showMessageDialog(panel, "can't exit");
-			}
-		}
-		else if (unit.is("StructureFactory"))
-		{
-			if (edge == Edge.NE)
-			{
-				List<UnitType> structTypes = Mediator.factory.getStructureTypes();
-				Object option = JListDialog.showDialog(structTypes.toArray());
-				
-				if (option == null)
-					return;
-				
-				UnitType type = (UnitType) option;
-				Player owner = unit.getOwner();
-				
-				if (type.getCost() == null)
-					return;
-				
-				if (!owner.canAfford(type.getCost()))
-				{
-					JOptionPane.showMessageDialog(
-						panel,
-						"can't afford it",
-						"not enough monies",
-						JOptionPane.ERROR_MESSAGE
-					);
-					
-					return;
-				}
-				
-				owner.spend(type.getCost());
-				unit.setStructureKit(type.getName());
 			}
 		}
 	}
@@ -308,6 +218,11 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			complete();
 		}
+	}
+	
+	public void onRightClick(int x, int y)
+	{
+		complete();
 	}
 	
 	private void convecConstruct()

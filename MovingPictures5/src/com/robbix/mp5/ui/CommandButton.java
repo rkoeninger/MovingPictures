@@ -22,7 +22,13 @@ public class CommandButton extends JButton
 	private int frame;
 	private int frameCount;
 	
-	public CommandButton(List<ImageIcon> icons)
+	public CommandButton(String name)
+	{
+		super(name);
+		setActionCommand(name);
+	}
+	
+	public CommandButton(String name, List<ImageIcon> icons)
 	{
 		super(icons.get(0));
 		
@@ -30,7 +36,8 @@ public class CommandButton extends JButton
 		this.disabled = new ImageIcon(Utils.getGrayscale(icons.get(0)));
 		this.timer = new Timer(60, new RotateIcons());
 		
-		addMouseListener(new Listener());
+		setActionCommand(name);
+		addMouseListener(new RolloverListener());
 		
 		frame = 0;
 		frameCount = icons.size();
@@ -38,7 +45,8 @@ public class CommandButton extends JButton
 	
 	public void setEnabled(boolean enabled)
 	{
-		setIcon(enabled ? icons.get(0) : disabled);
+		if (icons != null)
+			setIcon(enabled ? icons.get(0) : disabled);
 		
 		super.setEnabled(enabled);
 	}
@@ -52,7 +60,7 @@ public class CommandButton extends JButton
 		}
 	}
 	
-	private class Listener extends MouseAdapter
+	private class RolloverListener extends MouseAdapter
 	{
 		public void mouseEntered(MouseEvent e)
 		{

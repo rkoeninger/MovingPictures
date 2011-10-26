@@ -27,19 +27,12 @@ public class CommandGroupOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void onRightClick(int x, int y)
-	{
-		complete();
-	}
-	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		for (Unit unit : units)
 			drawSelectedUnitBox(g, unit);
 		
-		drawInstructions(g, rect, "Move", "Give Command", "Cancel");
-		drawCommand(g, rect, Edge.SW, "Kill");
-		drawCommand(g, rect, Edge.W,  "SD");
+		drawInstructions(g, rect, "Move", "Cancel");
 	}
 	
 	public void onCommand(String command)
@@ -48,6 +41,13 @@ public class CommandGroupOverlay extends InputOverlay
 		{
 			for (Unit unit : units)
 				Mediator.selfDestruct(unit);
+			
+			complete();
+		}
+		else if (command.equals("kill"))
+		{
+			for (Unit unit : units)
+				Mediator.kill(unit);
 			
 			complete();
 		}
@@ -79,29 +79,14 @@ public class CommandGroupOverlay extends InputOverlay
 		}
 	}
 	
-	public void onMiddleClick(int x, int y)
-	{
-		Edge edge = getViewEdge(x, y);
-		
-		if (edge == Edge.SW)
-		{
-			for (Unit unit : units)
-				Mediator.kill(unit);
-			
-			complete();
-		}
-		else if (edge == Edge.W)
-		{
-			for (Unit unit : units)
-				Mediator.selfDestruct(unit);
-			
-			complete();
-		}
-	}
-	
 	public void onLeftClick(int x, int y)
 	{
 		Mediator.doGroupMove(units, panel.getPosition(x, y));
 		Mediator.playSound("beep2");
+	}
+	
+	public void onRightClick(int x, int y)
+	{
+		complete();
 	}
 }

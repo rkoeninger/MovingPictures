@@ -11,10 +11,13 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
+import static java.lang.Math.ceil;
+import static java.lang.Math.floor;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +30,6 @@ import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.CostMap;
 import com.robbix.mp5.basics.Direction;
 import static com.robbix.mp5.basics.Direction.*;
-
 import com.robbix.mp5.basics.BorderRegion;
 import com.robbix.mp5.basics.LShapedRegion;
 import com.robbix.mp5.basics.Neighbors;
@@ -507,12 +509,12 @@ public class DisplayPanel extends JComponent
 	
 	public int getVerticalLetterBoxSpace()
 	{
-		return Math.max(0, (getHeight() - getTotalHeight()) / 2);
+		return max(0, (getHeight() - getTotalHeight()) / 2);
 	}
 	
 	public int getHorizontalLetterBoxSpace()
 	{
-		return Math.max(0, (getWidth() - getTotalWidth()) / 2);
+		return max(0, (getWidth() - getTotalWidth()) / 2);
 	}
 	
 	public Point getViewPosition()
@@ -589,11 +591,11 @@ public class DisplayPanel extends JComponent
 		
 		scroll.x = (diffWidth > 0)
 			? diffWidth / 2
-			: Math.max(Math.min(scroll.x, 0), diffWidth);
+			: max(min(scroll.x, 0), diffWidth);
 		
 		scroll.y = (diffHeight > 0)
 			? diffHeight / 2
-			: Math.max(Math.min(scroll.y, 0), diffHeight);
+			: max(min(scroll.y, 0), diffHeight);
 		
 		refresh(getDisplayRegion());
 	}
@@ -737,10 +739,11 @@ public class DisplayPanel extends JComponent
 	 */
 	public Position getPosition(Point point)
 	{
-		return Mediator.getPosition(
-			(point.x - scroll.x) / tileSize,
-			(point.y - scroll.y) / tileSize
+		Position pos = Mediator.getPosition(
+			(point.x + scroll.x) / tileSize,
+			(point.y + scroll.y) / tileSize
 		);
+		return map.getBounds().contains(pos) ? pos : null;
 	}
 	
 	/**
@@ -749,10 +752,11 @@ public class DisplayPanel extends JComponent
 	 */
 	public Position getPosition(int x, int y)
 	{
-		return Mediator.getPosition(
+		Position pos = Mediator.getPosition(
 			(x - scroll.x) / tileSize,
 			(y - scroll.y) / tileSize
 		);
+		return map.getBounds().contains(pos) ? pos : null;
 	}
 	
 	/**
@@ -786,12 +790,14 @@ public class DisplayPanel extends JComponent
 	 */
 	public Region getRegion(Rectangle rect)
 	{
-		int minX = (int) Math.floor(rect.x / (double) tileSize);
-		int minY = (int) Math.floor(rect.y / (double) tileSize);
-		int maxX = (int) Math.ceil((rect.x + rect.width) / (double) tileSize);
-		int maxY = (int) Math.ceil((rect.y + rect.height) / (double) tileSize);
+		int minX = (int) floor(rect.x / (double) tileSize);
+		int minY = (int) floor(rect.y / (double) tileSize);
+		int maxX = (int) ceil((rect.x + rect.width) / (double) tileSize);
+		int maxY = (int) ceil((rect.y + rect.height) / (double) tileSize);
 		
-		return new Region(minX, minY, maxX - minX, maxY - minY);
+		return map.getBounds().getIntersection(
+			new Region(minX, minY, maxX - minX, maxY - minY)
+		);
 	}
 	
 	/**
@@ -800,12 +806,14 @@ public class DisplayPanel extends JComponent
 	 */
 	public Region getEnclosedRegion(Rectangle rect)
 	{
-		int minX = (int) Math.ceil(rect.x / (double) tileSize);
-		int minY = (int) Math.ceil(rect.y / (double) tileSize);
-		int maxX = (int) Math.floor((rect.x + rect.width) / (double) tileSize);
-		int maxY = (int) Math.floor((rect.y + rect.height) / (double) tileSize);
+		int minX = (int) ceil(rect.x / (double) tileSize);
+		int minY = (int) ceil(rect.y / (double) tileSize);
+		int maxX = (int) floor((rect.x + rect.width) / (double) tileSize);
+		int maxY = (int) floor((rect.y + rect.height) / (double) tileSize);
 		
-		return new Region(minX, minY, maxX - minX, maxY - minY);
+		return map.getBounds().getIntersection(
+			new Region(minX, minY, maxX - minX, maxY - minY)
+		);
 	}
 	
 	/**
@@ -829,8 +837,8 @@ public class DisplayPanel extends JComponent
 		return new Rectangle(
 			scroll.x,
 			scroll.y,
-			Math.min(getTotalWidth(),  getWidth()),
-			Math.min(getTotalHeight(), getHeight())
+			min(getTotalWidth(),  getWidth()),
+			min(getTotalHeight(), getHeight())
 		);
 	}
 	
@@ -840,6 +848,16 @@ public class DisplayPanel extends JComponent
 	public Region getDisplayRegion()
 	{
 		return getRegion(getDisplayRect());
+	}
+	
+	public Region getVisibleRegion()
+	{
+		return getRegion(new Rectangle(
+			max(0, -scroll.x),
+			max(0, -scroll.y),
+			min(getTotalWidth(),  getWidth()),
+			min(getTotalHeight(), getHeight())
+		));
 	}
 	
 	/*------------------------------------------------------------------------------------------[*]
@@ -936,11 +954,11 @@ public class DisplayPanel extends JComponent
 		int h = getTotalHeight();
 		
 		// Vertical lines
-		for (int x = Math.max(1, region.x); x < region.getMaxX(); ++x)
+		for (int x = max(1, region.x); x < region.getMaxX(); ++x)
 			g.drawLine(x0 + x * tileSize, y0, x0 + x * tileSize, y0 + h - 1);
 		
 		// Horizontal lines
-		for (int y = Math.max(1, region.y); y < region.getMaxY(); ++y)
+		for (int y = max(1, region.y); y < region.getMaxY(); ++y)
 			g.drawLine(x0, y0 + y * tileSize, x0 + w - 1, y0 + y * tileSize);
 	}
 	
@@ -952,7 +970,7 @@ public class DisplayPanel extends JComponent
 	{
 		synchronized (cacheLock)
 		{
-			Region region = getDisplayRegion();
+			Region region = getVisibleRegion();
 			region = map.getBounds().getIntersection(region);
 			
 			if (cachedBackground == null)
@@ -973,7 +991,7 @@ public class DisplayPanel extends JComponent
 			Rectangle r = new Rectangle(getHorizontalLetterBoxSpace(), getVerticalLetterBoxSpace(), rect.width, rect.height);
 			draw(g, cachedBackground, r.getLocation());
 			g.setColor(Color.RED);
-			draw(g, r);
+			draw(g, new Rectangle(r.x, r.y, r.width-1, r.height-1));
 		}
 	}
 	
