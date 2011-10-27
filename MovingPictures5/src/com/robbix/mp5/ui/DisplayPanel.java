@@ -540,11 +540,11 @@ public class DisplayPanel extends JComponent
 		return scroll.y;
 	}
 	
-	public Point addViewOffset(Point p)
-	{
-		p.translate(-scroll.x, -scroll.y);
-		return p;
-	}
+//	public Point addViewOffset(Point p)
+//	{
+//		p.translate(-scroll.x, -scroll.y);
+//		return p;
+//	}
 	
 	public Point subtractViewOffset(Point p)
 	{
@@ -672,10 +672,6 @@ public class DisplayPanel extends JComponent
 	{
 		super.reshape(x, y, width, height);
 		centerAsNeeded();
-		
-		System.out.println("resize():");
-		System.out.println(getDisplayRect());
-		System.out.println(scroll);
 	}
 	
 	/**

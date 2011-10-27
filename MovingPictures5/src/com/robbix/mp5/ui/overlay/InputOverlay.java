@@ -130,36 +130,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		g.translate(-rect.x, -rect.y);
 	}
 	
-	public void drawCommand(Graphics g, Rectangle rect, Edge edge, String command)
-	{
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		g.setFont(COMMAND_FONT);
-		FontMetrics metrics = g.getFontMetrics();
-		Rectangle2D bounds = metrics.getStringBounds(command, g);
-		int w0 = 4;
-		int h0 = (int) (4 + bounds.getHeight());
-		int w2 = (int) (rect.width  / 2 - bounds.getCenterX());
-		int h2 = (int) (rect.height / 2 - bounds.getCenterY());
-		int wN = rect.width  - (int) bounds.getMaxX() - 4;
-		int hN = rect.height - (int) bounds.getMaxY() - 4;
-		
-		switch (edge)
-		{
-		case N:  g.drawString(command, w2, h0); break;
-		case S:  g.drawString(command, w2, hN); break;
-		case E:  g.drawString(command, wN, h2); break;
-		case W:  g.drawString(command, w0, h2); break;
-		case NE: g.drawString(command, wN, h0); break;
-		case NW: g.drawString(command, w0, h0); break;
-		case SW: g.drawString(command, w0, hN); break;
-		case SE: g.drawString(command, wN, hN); break;
-		case C:  g.drawString(command, w2, h2); break;
-		}
-		
-		g.translate(-rect.x, -rect.y);
-	}
-	
 	public void drawSelectedUnitBox(Graphics g, Unit unit)
 	{
 		if (unit.isDead() || unit.isFloating() || panel.getScale() < 0) return;
@@ -245,7 +215,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public boolean isCursorOnGrid()
 	{
 		return currentPoint != null
-			&& panelContains(currentPoint.x, currentPoint.y);
+			&& panel.getPosition(currentPoint) != null;
 	}
 	
 	public Point getCursorPoint()
@@ -333,23 +303,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		return new BorderRegion(panel.getRegion(dragArea));
 	}
 	
-	public static enum Edge {NW,N,NE,W,C,E,SW,S,SE;}
-	
-	public Edge getViewEdge(int x, int y)
-	{
-		int w  = panel.getWidth();
-		int h  = panel.getHeight();
-		int x0 = 0;
-		int y0 = 0;
-		
-		return Edge.values()[((x - x0) / (w / 3)) + (((y - y0) / (h / 3)) * 3)];
-	}
-	
-	public Edge getViewEdge()
-	{
-		return pressedPoint == null ? null : getViewEdge(pressedPoint.x, pressedPoint.y);
-	}
-	
 	public boolean isShiftDown()
 	{
 		return shiftDown;
@@ -373,12 +326,13 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public final void mousePressed(MouseEvent e)
 	{
 		pressedPoint = e.getPoint();
-		panel.addViewOffset(pressedPoint);
+//		panel.addViewOffset(pressedPoint);
 	}
 	
 	public final void mouseReleased(MouseEvent e)
 	{
-		Point mousePoint = panel.addViewOffset(e.getPoint());
+//		Point mousePoint = panel.addViewOffset(e.getPoint());
+		Point mousePoint = e.getPoint();
 		
 		if (pressedPoint != null)
 		{
@@ -453,9 +407,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	private boolean panelContains(int x, int y) // in terms of relative co-ords
 	{
 		Point p = new Point(x, y);
-		panel.addViewOffset(p);
-		
-		return panel.getDisplayRect().contains(p);
+//		panel.addViewOffset(p);
+		return panel.getPosition(p) != null;
 	}
 	
 	private void prepCursorPoint(int x, int y) // in terms of relative co-ords
@@ -469,7 +422,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			
 			currentPoint.x = x;
 			currentPoint.y = y;
-			panel.addViewOffset(currentPoint);
+//			panel.addViewOffset(currentPoint);
 		}
 		else
 		{

@@ -1361,16 +1361,9 @@ public class Sandbox
 			lib.loadModule("eAcidCloudSingleTurret");
 			lib.loadModule("pMicrowaveSingleTurret");
 			lib.loadModule("pRPGSingleTurret");
-			lib.loadModule("pSupernovaSingleTurret");
-			lib.loadModule("pMicrowaveGuardPost");
-			lib.loadModule("eStructureFactory");
-			lib.loadModule("eVehicleFactory");
-			lib.loadModule("eCommonSmelter");
 			lib.loadModule("aDeath");
 			lib.loadModule("aRocket");
 			lib.loadModule("aAcidCloud");
-			lib.loadModule("aSupernovaExplosion");
-			lib.loadModule("aStructureStatus");
 		}
 		catch (IOException ioe)
 		{
