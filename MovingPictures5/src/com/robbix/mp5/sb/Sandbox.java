@@ -88,6 +88,8 @@ public class Sandbox
 	private static Game game;
 	private static Engine engine;
 	private static JFrame frame;
+	private static DisplayPanel panel;
+	private static JToolBar commandBar;
 	private static Map<Integer, JMenuItem> playerMenuItems =
 		new HashMap<Integer, JMenuItem>();
 	
@@ -98,6 +100,35 @@ public class Sandbox
 	private static ButtonGroup playerSelectButtonGroup;
 	private static ActionListener playerSelectListener;
 	private static boolean showFrameRate = false;
+	
+	private static JMenuItem pauseMenuItem;
+	private static JMenuItem stepMenuItem;
+	private static JMenuItem spriteLibMenuItem;
+	private static JMenuItem unitLibMenuItem;
+	private static JMenuItem soundPlayerMenuItem;
+	private static JMenuItem throttleMenuItem;
+	private static JMenuItem exitMenuItem;
+	private static JMenuItem scrollBarsMenuItem;
+	private static JMenuItem frameRateMenuItem;
+	private static JMenuItem scrollSpeedMenuItem;
+	private static JMenuItem commandButtonsMenuItem;
+	private static JMenuItem spawnMeteorMenuItem;
+	private static JMenuItem meteorShowerMenuItem;
+	private static JMenuItem placeGeyserMenuItem;
+	private static JMenuItem placeWallMenuItem;
+	private static JMenuItem placeTubeMenuItem;
+	private static JMenuItem placeBulldozeMenuItem;
+	private static JMenuItem placeCommon1;
+	private static JMenuItem placeCommon2;
+	private static JMenuItem placeCommon3;
+	private static JMenuItem placeRare1;
+	private static JMenuItem placeRare2;
+	private static JMenuItem placeRare3;
+	private static JMenuItem playSoundMenuItem;
+//	private static JMenuItem playMusicMenuItem;
+	private static JMenuItem setAudioFormatMenuItem;
+	private static JMenuItem removeAllUnitsMenuItem;
+	private static JMenuItem addPlayerMenuItem;
 	
 	public static void main(String[] args) throws IOException
 	{
@@ -110,7 +141,6 @@ public class Sandbox
 		boolean lazyLoadSounds  = true;
 		boolean soundOn         = false;
 //		boolean musicOn         = false;
-		boolean showButtons     = false;
 		String demoName         = null;
 		String mapName          = null;
 		String tileSetName      = null;
@@ -135,14 +165,6 @@ public class Sandbox
 			else if (args[a].equals("-soundOff"))
 			{
 				soundOn = false;
-			}
-			else if (args[a].equals("-showCommandButtons"))
-			{
-				showButtons = true;
-			}
-			else if (args[a].equals("-hideCommandButtons"))
-			{
-				showButtons = false;
 			}
 //			else if (args[a].equals("-musicOn"))
 //			{
@@ -220,88 +242,8 @@ public class Sandbox
 		/*-------------------------------------------------------------------*
 		 * Prepare live-updating status labels
 		 */
-		final JLabel unitStatusLabel = new JLabel();
-		unitStatusLabel.setText("Args: " + Arrays.toString(args));
-		unitStatusLabel.setPreferredSize(new Dimension(100, 20));
-		
-		final UnitStatus unitStatus = new UnitStatus()
-		{
-			Unit myUnit = null;
-			
-			Object lock = new Object();
-			
-			/* Init */
-			{
-				new Timer(100, new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						synchronized(lock)
-						{
-							if (myUnit != null)
-							{
-								unitStatusLabel.setText(
-									myUnit.getStatusString());
-							}
-							else
-							{
-								unitStatusLabel.setText("");
-							}
-						}
-					}
-				}).start();
-			}
-			
-			public void showStatus(Unit unit)
-			{
-				synchronized(lock)
-				{
-					myUnit = unit;
-				}
-			}
-		};
-		
-		final JLabel playerStatusLabel = new JLabel();
-		playerStatusLabel.setText(currentPlayer.getStatusString());
-		playerStatusLabel.setPreferredSize(new Dimension(100, 20));
-		
-		final PlayerStatus playerStatus = new PlayerStatus()
-		{
-			Player myPlayer = null;
-			
-			Object lock = new Object();
-			
-			/* Init */
-			{
-				new Timer(100, new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						synchronized (lock)
-						{
-							if (myPlayer != null)
-							{
-								playerStatusLabel.setText(
-									myPlayer.getStatusString());
-								selectPlayer(myPlayer.getID());
-							}
-							else
-							{
-								playerStatusLabel.setText("");
-							}
-						}
-					}
-				}).start();
-			}
-			
-			public void showStatus(Player player)
-			{
-				synchronized (lock)
-				{
-					myPlayer = player;
-				}
-			}
-		};
+		UnitStatusLabel unitStatusLabel = new UnitStatusLabel();
+		PlayerStatusLabel playerStatusLabel = new PlayerStatusLabel();
 		
 		TitleBar titleBar = new TitleBar()
 		{
@@ -329,7 +271,8 @@ public class Sandbox
 			}
 		};
 		
-		final JToolBar commandBar = new JToolBar();
+		commandBar = new JToolBar();
+		commandBar.setOrientation(SwingConstants.HORIZONTAL);
 		commandBar.setFloatable(false);
 		commandBar.setRollover(true);
 		
@@ -367,9 +310,9 @@ public class Sandbox
 		/*-------------------------------------------------------------------*
 		 * Build UI
 		 */
-		final DisplayPanel panel = game.getDisplay();
-		panel.setUnitStatus(unitStatus);
-		panel.setPlayerStatus(playerStatus);
+		panel = game.getDisplay();
+		panel.setUnitStatus(unitStatusLabel);
+		panel.setPlayerStatus(playerStatusLabel);
 		panel.setTitleBar(titleBar);
 		panel.setShowGrid(false);
 		panel.setShowUnitLayerState(false);
@@ -378,47 +321,48 @@ public class Sandbox
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
 		
+		pauseMenuItem = new JMenuItem("Pause");
+		stepMenuItem = new JMenuItem("Step Once");
+		spriteLibMenuItem = new JMenuItem("Sprite Library");
+		unitLibMenuItem = new JMenuItem("Unit Library");
+		soundPlayerMenuItem = new JMenuItem("Sound Player");
+		throttleMenuItem = new JMenuItem("Unthrottle");
+		exitMenuItem = new JMenuItem("Exit");
+		scrollBarsMenuItem = new JMenuItem("Scroll Bars");
+		frameRateMenuItem = new JMenuItem("Frame Rate");
+		scrollSpeedMenuItem = new JMenuItem("Scroll Speed");
+		commandButtonsMenuItem = new JMenuItem("Command Buttons");
+		spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
+		meteorShowerMenuItem = new JMenuItem("Meteor Shower");
+		placeGeyserMenuItem = new JMenuItem("Place Geyser");
+		placeWallMenuItem = new JMenuItem("Place Wall");
+		placeTubeMenuItem = new JMenuItem("Place Tube");
+		placeBulldozeMenuItem = new JMenuItem("Bulldoze");
+		placeCommon1 = new JMenuItem("Common Low");
+		placeCommon2 = new JMenuItem("Common Med");
+		placeCommon3 = new JMenuItem("Common High");
+		placeRare1 = new JMenuItem("Rare Low");
+		placeRare2 = new JMenuItem("Rare Med");
+		placeRare3 = new JMenuItem("Rare High");
+		playSoundMenuItem = new JCheckBoxMenuItem("Play Sounds");
+//		playMusicMenuItem = new JCheckBoxMenuItem("Play Music");
+		setAudioFormatMenuItem = new JMenuItem("Set Format...");
+		removeAllUnitsMenuItem = new JMenuItem("Remove All");
+		addPlayerMenuItem = new JMenuItem("Add Player...");
+		
 		final JMenuBar menuBar = new JMenuBar();
 		final JMenu engineMenu = new JMenu("Engine");
 		final JMenu displayMenu = new JMenu("Display");
 		final JMenu terrainMenu = new JMenu("Terrain");
 		final JMenu unitMenu = new JMenu("Units");
 		playerMenu = new JMenu("Players");
-		final JMenuItem pauseMenuItem = new JMenuItem("Pause");
-		final JMenuItem stepMenuItem = new JMenuItem("Step Once");
 		stepMenuItem.setEnabled(false);
-		final JMenuItem spriteLibMenuItem = new JMenuItem("Sprite Library");
-		final JMenuItem unitLibMenuItem = new JMenuItem("Unit Library");
-		final JMenuItem soundPlayerMenuItem = new JMenuItem("Sound Player");
-		final JMenuItem throttleMenuItem = new JMenuItem("Unthrottle");
 		throttleMenuItem.setEnabled(engine.isThrottled());
-		final JMenuItem exitMenuItem = new JMenuItem("Exit");
-		final JMenuItem scrollBarsMenuItem = new JMenuItem("Scroll Bars");
-		final JMenuItem frameRateMenuItem = new JMenuItem("Frame Rate");
-		final JMenuItem scrollSpeedMenuItem = new JMenuItem("Scroll Speed");
-		final JMenuItem commandButtonsMenuItem = new JMenuItem("Command Buttons");
 		final JMenu disastersMenu = new JMenu("Disasters");
-		final JMenuItem spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
-		final JMenuItem meteorShowerMenuItem = new JMenuItem("Meteor Shower");
-		final JMenuItem placeGeyserMenuItem = new JMenuItem("Place Geyser");
-		final JMenuItem placeWallMenuItem = new JMenuItem("Place Wall");
-		final JMenuItem placeTubeMenuItem = new JMenuItem("Place Tube");
-		final JMenuItem placeBulldozeMenuItem = new JMenuItem("Bulldoze");
 		final JMenu placeResourceMenu = new JMenu("Add Ore");
-		final JMenuItem placeCommon1 = new JMenuItem("Common Low");
-		final JMenuItem placeCommon2 = new JMenuItem("Common Med");
-		final JMenuItem placeCommon3 = new JMenuItem("Common High");
-		final JMenuItem placeRare1 = new JMenuItem("Rare Low");
-		final JMenuItem placeRare2 = new JMenuItem("Rare Med");
-		final JMenuItem placeRare3 = new JMenuItem("Rare High");
 		final JMenu soundMenu = new JMenu("Sound");
-		final JMenuItem playSoundMenuItem = new JCheckBoxMenuItem("Play Sounds");
-//		final JMenuItem playMusicMenuItem = new JCheckBoxMenuItem("Play Music");
-		final JMenuItem setAudioFormatMenuItem = new JMenuItem("Set Format...");
 		playSoundMenuItem.setSelected(game.getSoundBank().isRunning());
 		final JMenu addUnitMenu = new JMenu("Add");
-		final JMenuItem removeAllUnitsMenuItem = new JMenuItem("Remove All");
-		final JMenuItem addPlayerMenuItem = new JMenuItem("Add Player...");
 		playerMenu.add(addPlayerMenuItem);
 		playerMenu.addSeparator();
 		
@@ -529,10 +473,35 @@ public class Sandbox
 			panelOptionMenuItem.addActionListener(displayOptionListener);
 		}
 		
-		displayMenu.add(scrollBarsMenuItem);
-		displayMenu.add(frameRateMenuItem);
-		displayMenu.add(scrollSpeedMenuItem);
-		displayMenu.add(commandButtonsMenuItem);
+		MenuItemListener miListener = new MenuItemListener();
+		spriteLibMenuItem.addActionListener(miListener);
+		unitLibMenuItem.addActionListener(miListener);
+		soundPlayerMenuItem.addActionListener(miListener);
+		commandButtonsMenuItem.addActionListener(miListener);
+		scrollSpeedMenuItem.addActionListener(miListener);
+		scrollBarsMenuItem.addActionListener(miListener);
+		frameRateMenuItem.addActionListener(miListener);
+		meteorShowerMenuItem.addActionListener(miListener);
+		spawnMeteorMenuItem.addActionListener(miListener);
+		playSoundMenuItem.addActionListener(miListener);
+//		playMusicMenuItem.addActionListener(miListener);
+		setAudioFormatMenuItem.addActionListener(miListener);
+		placeCommon1.addActionListener(miListener);
+		placeCommon2.addActionListener(miListener);
+		placeCommon3.addActionListener(miListener);
+		placeRare1.addActionListener(miListener);
+		placeRare2.addActionListener(miListener);
+		placeRare3.addActionListener(miListener);
+		placeBulldozeMenuItem.addActionListener(miListener);
+		placeGeyserMenuItem.addActionListener(miListener);
+		placeWallMenuItem.addActionListener(miListener);
+		placeTubeMenuItem.addActionListener(miListener);
+		removeAllUnitsMenuItem.addActionListener(miListener);
+		pauseMenuItem.addActionListener(miListener);
+		throttleMenuItem.addActionListener(miListener);
+		stepMenuItem.addActionListener(miListener);
+		exitMenuItem.addActionListener(miListener);
+		addPlayerMenuItem.addActionListener(miListener);
 		
 		pauseMenuItem.setAccelerator(
 			KeyStroke.getKeyStroke(KeyEvent.VK_PAUSE, 0)
@@ -540,13 +509,6 @@ public class Sandbox
 		stepMenuItem.setAccelerator(
 			KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0)
 		);
-		
-		placeResourceMenu.add(placeCommon1);
-		placeResourceMenu.add(placeCommon2);
-		placeResourceMenu.add(placeCommon3);
-		placeResourceMenu.add(placeRare1);
-		placeResourceMenu.add(placeRare2);
-		placeResourceMenu.add(placeRare3);
 		
 		engineMenu.add(pauseMenuItem);
 		engineMenu.add(throttleMenuItem);
@@ -557,6 +519,10 @@ public class Sandbox
 		engineMenu.add(soundPlayerMenuItem);
 		engineMenu.addSeparator();
 		engineMenu.add(exitMenuItem);
+		displayMenu.add(scrollBarsMenuItem);
+		displayMenu.add(frameRateMenuItem);
+		displayMenu.add(scrollSpeedMenuItem);
+		displayMenu.add(commandButtonsMenuItem);
 		soundMenu.add(playSoundMenuItem);
 //		soundMenu.add(playMusicMenuItem);
 		soundMenu.addSeparator();
@@ -565,6 +531,12 @@ public class Sandbox
 		terrainMenu.add(placeTubeMenuItem);
 		terrainMenu.add(placeGeyserMenuItem);
 		terrainMenu.add(placeBulldozeMenuItem);
+		placeResourceMenu.add(placeCommon1);
+		placeResourceMenu.add(placeCommon2);
+		placeResourceMenu.add(placeCommon3);
+		placeResourceMenu.add(placeRare1);
+		placeResourceMenu.add(placeRare2);
+		placeResourceMenu.add(placeRare3);
 		terrainMenu.add(placeResourceMenu);
 		disastersMenu.add(spawnMeteorMenuItem);
 		disastersMenu.add(meteorShowerMenuItem);
@@ -590,13 +562,7 @@ public class Sandbox
 		frame = new JFrame("Moving Pictures");
 		frame.setJMenuBar(menuBar);
 		frame.setLayout(new BorderLayout());
-		
-		if (showButtons)
-		{
-			commandBar.setOrientation(SwingConstants.HORIZONTAL);
-			frame.add(commandBar, BorderLayout.NORTH);
-		}
-		
+		frame.add(commandBar, BorderLayout.NORTH);
 		frame.add(game.getView(), BorderLayout.CENTER);
 		frame.add(statusesPanel, BorderLayout.SOUTH);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -620,15 +586,44 @@ public class Sandbox
 		{
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		}
-		
-		frame.setLocation(
-			windowBounds.x + (windowBounds.width  - frame.getWidth())  / 2,
-			windowBounds.y + (windowBounds.height - frame.getHeight()) / 2
-		);
-		
-		spriteLibMenuItem.addActionListener(new ActionListener()
+		else
 		{
-			public void actionPerformed(ActionEvent e)
+			frame.setLocation(
+				windowBounds.x + (windowBounds.width  - frame.getWidth())  / 2,
+				windowBounds.y + (windowBounds.height - frame.getHeight()) / 2
+			);
+		}
+		
+		/*--------------------------------------------------------------------*
+		 * Setup demo
+		 * Start mechanics
+		 */
+		if (demoName != null)
+		{
+			Method setupDemo = demos.get(demoName);
+			
+			if (setupDemo == null)
+				throw new IllegalArgumentException(demoName + " not found");
+			
+			try
+			{
+				setupDemo.invoke(null, game);
+			}
+			catch (Exception exc)
+			{
+				throw new Error("Failed to setup demo", exc);
+			}
+		}
+		
+		engine.play();
+		frame.setVisible(true);
+	}
+	
+	private static class MenuItemListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			if (e.getSource() == spriteLibMenuItem)
 			{
 				if (slViewer == null)
 				{
@@ -647,11 +642,7 @@ public class Sandbox
 				
 				slViewer.setVisible(true);
 			}
-		});
-		
-		unitLibMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == unitLibMenuItem)
 			{
 				if (utViewer == null)
 				{
@@ -670,11 +661,7 @@ public class Sandbox
 				
 				utViewer.setVisible(true);
 			}
-		});
-		
-		soundPlayerMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == soundPlayerMenuItem)
 			{
 				if (sbPlayer == null)
 				{
@@ -693,11 +680,7 @@ public class Sandbox
 				
 				sbPlayer.setVisible(true);
 			}
-		});
-		
-		commandButtonsMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == commandButtonsMenuItem)
 			{
 				if (commandBar.getParent() == frame.getRootPane())
 				{
@@ -711,11 +694,7 @@ public class Sandbox
 					frame.validate();
 				}
 			}
-		});
-		
-		scrollSpeedMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == scrollSpeedMenuItem)
 			{
 				for (;;)
 				{
@@ -742,20 +721,12 @@ public class Sandbox
 					}
 				}
 			}
-		});
-		
-		scrollBarsMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == scrollBarsMenuItem)
 			{
 				game.getView().showScrollBars(! game.getView().areScrollBarsVisible());
 				frame.validate();
 			}
-		});
-		
-		frameRateMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == frameRateMenuItem)
 			{
 				showFrameRate = !showFrameRate;
 				
@@ -764,36 +735,20 @@ public class Sandbox
 					frame.setTitle("Moving Pictures");
 				}
 			}
-		});
-		
-		meteorShowerMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == meteorShowerMenuItem)
 			{
 				game.getTriggers().add(new MeteorShowerTrigger(1, 300));
 				Mediator.playSound("savant_meteorApproaching");
 			}
-		});
-		
-		spawnMeteorMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == spawnMeteorMenuItem)
 			{
 				panel.pushOverlay(new SpawnMeteorOverlay());
 			}
-		});
-		
-		playSoundMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == playSoundMenuItem)
 			{
 				Mediator.soundOn(playSoundMenuItem.isSelected());
 			}
-		});
-		
-//		playMusicMenuItem.addActionListener(new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
+//			else if (e.getSource() == playMusicMenuItem)
 //			{
 //				if (playMusicMenuItem.isSelected())
 //				{
@@ -804,11 +759,7 @@ public class Sandbox
 //					
 //				}
 //			}
-//		});
-		
-		setAudioFormatMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == setAudioFormatMenuItem)
 			{
 				AudioFormat format = game.getSoundBank().getFormat();
 				
@@ -828,91 +779,74 @@ public class Sandbox
 					return;
 				}
 			}
-		});
-		
-		placeCommon1.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == placeCommon1)
 			{
 				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get1BarCommon()));
 			}
-		});
-		
-		placeCommon2.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == placeCommon2)
 			{
 				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get2BarCommon()));
 			}
-		});
-		
-		placeCommon3.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == placeCommon3)
 			{
 				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get3BarCommon()));
 			}
-		});
-		
-		placeRare1.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == placeRare1)
 			{
 				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get1BarRare()));
 			}
-		});
-		
-		placeRare2.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == placeRare2)
 			{
 				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get2BarRare()));
 			}
-		});
-		
-		placeRare3.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == placeRare3)
 			{
 				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get3BarRare()));
 			}
-		});
-		
-		placeBulldozeMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == placeBulldozeMenuItem)
 			{
 				panel.pushOverlay(new PlaceBulldozeOverlay());
 			}
-		});
-		
-		placeGeyserMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == placeGeyserMenuItem)
 			{
 				panel.pushOverlay(new PlaceGeyserOverlay());
 			}
-		});
-		
-		placeWallMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == placeWallMenuItem)
 			{
 				panel.pushOverlay(new PlaceWallOverlay());
 			}
-		});
-		
-		placeTubeMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == placeTubeMenuItem)
 			{
 				panel.pushOverlay(new PlaceTubeOverlay());
 			}
-		});
-		
-		removeAllUnitsMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == pauseMenuItem)
+			{
+				engine.pause();
+				stepMenuItem.setEnabled(!engine.isRunning());
+				pauseMenuItem.setText(
+					engine.isRunning()
+					? "Pause"
+					: "Resume"
+				);
+			}
+			else if (e.getSource() == throttleMenuItem)
+			{
+				engine.toggleThrottle();
+				throttleMenuItem.setText(
+					engine.isThrottled()
+					? "Unthrottle"
+					: "Throttle"
+				);
+			}
+			else if (e.getSource() == stepMenuItem)
+			{
+				engine.step();
+			}
+			else if (e.getSource() == exitMenuItem)
+			{
+				System.exit(0);
+			}
+			else if (e.getSource() == removeAllUnitsMenuItem)
 			{
 				int result = JOptionPane.showConfirmDialog(
 					frame,
@@ -927,54 +861,7 @@ public class Sandbox
 				
 				game.getMap().clearAllUnits();
 			}
-		});
-		
-		pauseMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				engine.pause();
-				stepMenuItem.setEnabled(!engine.isRunning());
-				pauseMenuItem.setText(
-					engine.isRunning()
-					? "Pause"
-					: "Resume"
-				);
-			}
-		});
-		
-		throttleMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				engine.toggleThrottle();
-				throttleMenuItem.setText(
-					engine.isThrottled()
-					? "Unthrottle"
-					: "Throttle"
-				);
-			}
-		});
-		
-		stepMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				engine.step();
-			}
-		});
-		
-		exitMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				System.exit(0);
-			}
-		});
-		
-		addPlayerMenuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			else if (e.getSource() == addPlayerMenuItem)
 			{
 				String name = JOptionPane.showInputDialog(frame, "Player Name");
 				
@@ -1019,31 +906,61 @@ public class Sandbox
 				currentPlayer = newPlayer;
 				game.getUnitFactory().setDefaultOwner(currentPlayer);
 			}
-		});
+		}
+	}
+	
+	private static class UnitStatusLabel extends JLabel
+	implements UnitStatus, ActionListener
+	{
+		private static final long serialVersionUID = 1L;
+		Unit myUnit = null;
+		Timer timer;
 		
-		/*--------------------------------------------------------------------*
-		 * Setup demo
-		 * Start mechanics
-		 */
-		if (demoName != null)
+		public UnitStatusLabel()
 		{
-			Method setupDemo = demos.get(demoName);
-			
-			if (setupDemo == null)
-				throw new IllegalArgumentException(demoName + " not found");
-			
-			try
-			{
-				setupDemo.invoke(null, game);
-			}
-			catch (Exception exc)
-			{
-				throw new Error("Failed to setup demo", exc);
-			}
+			setPreferredSize(new Dimension(100, 20));
+			timer = new Timer(100, this);
+			timer.start();
 		}
 		
-		engine.play();
-		frame.setVisible(true);
+		public synchronized void actionPerformed(ActionEvent e)
+		{
+			setText(myUnit != null ? myUnit.getStatusString() : "");
+		}
+		
+		public synchronized void showStatus(Unit unit)
+		{
+			myUnit = unit;
+		}
+	}
+	
+	private static class PlayerStatusLabel extends JLabel
+	implements PlayerStatus, ActionListener
+	{
+		private static final long serialVersionUID = 1L;
+		Player myPlayer = null;
+		Timer timer;
+		
+		public PlayerStatusLabel()
+		{
+			setPreferredSize(new Dimension(100, 20));
+			timer = new Timer(100, this);
+			timer.start();
+		}
+		
+		public synchronized void actionPerformed(ActionEvent e)
+		{
+			setText(myPlayer != null ? myPlayer.getStatusString() : "");
+		}
+		
+		public synchronized void showStatus(Player player)
+		{
+			Player oldMyPlayer = myPlayer;
+			myPlayer = player;
+			
+			if (player != null && !player.equals(oldMyPlayer))
+				selectPlayer(player.getID());
+		}
 	}
 	
 	// Call after Game.addPlayer() to sync with sandbox UI
