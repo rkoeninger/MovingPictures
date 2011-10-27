@@ -98,8 +98,9 @@ public class Sandbox
 	// References moved here so they can be called by addPlayer(int)
 	private static JMenu playerMenu;
 	private static ButtonGroup playerSelectButtonGroup;
-	private static ActionListener playerSelectListener;
 	private static boolean showFrameRate = false;
+	
+	private static ActionListener miListener = new MenuItemListener();
 	
 	private static JMenuItem pauseMenuItem;
 	private static JMenuItem stepMenuItem;
@@ -263,14 +264,6 @@ public class Sandbox
 		/*-------------------------------------------------------------------*
 		 * Load command button icons
 		 */
-		final ActionListener commandButtonListener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				game.getDisplay().fireCommandButton(e.getActionCommand());
-			}
-		};
-		
 		commandBar = new JToolBar();
 		commandBar.setOrientation(SwingConstants.HORIZONTAL);
 		commandBar.setFloatable(false);
@@ -292,7 +285,8 @@ public class Sandbox
 				continue;
 			
 			CommandButton button = new CommandButton(iconDir.getName(), icons);
-			button.addActionListener(commandButtonListener);
+			button.setActionCommand("commandButton-" + iconDir.getName());
+			button.addActionListener(miListener);
 			button.setFocusable(false);
 			commandBar.add(button);
 		}
@@ -302,7 +296,8 @@ public class Sandbox
 		for (String commandName : extraCommands)
 		{
 			CommandButton button = new CommandButton(commandName);
-			button.addActionListener(commandButtonListener);
+			button.setActionCommand("commandButton-" + commandName);
+			button.addActionListener(miListener);
 			button.setFocusable(false);
 			commandBar.add(button);
 		}
@@ -371,14 +366,6 @@ public class Sandbox
 		 */
 		playerSelectButtonGroup = new ButtonGroup();
 		
-		playerSelectListener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				selectPlayer(Integer.valueOf(e.getActionCommand()));
-			}
-		};
-		
 		for (Player player : game.getPlayers())
 		{
 			final JMenuItem playerSelectMenuItem =
@@ -389,10 +376,10 @@ public class Sandbox
 				playerSelectMenuItem.setSelected(true);
 			
 			playerSelectMenuItem.setActionCommand(
-				String.valueOf(player.getID())
+				"selectPlayer-" + String.valueOf(player.getID())
 			);
 			playerMenu.add(playerSelectMenuItem);
-			playerSelectMenuItem.addActionListener(playerSelectListener);
+			playerSelectMenuItem.addActionListener(miListener);
 			playerMenuItems.put(player.getID(), playerSelectMenuItem);
 		}
 		
@@ -420,24 +407,12 @@ public class Sandbox
 			}
 		}
 		
-		final ActionListener addUnitListener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				game.getUnitFactory().setDefaultOwner(currentPlayer);
-				panel.pushOverlay(new PlaceUnitOverlay(
-					game.getUnitFactory(),
-					e.getActionCommand()
-				));
-			}
-		};
-		
 		for (int i = 0; i < types.size(); ++i)
 		{
 			final JMenuItem addUnitMenuItem = new JMenuItem(names.get(i));
 			addUnitMenu.add(addUnitMenuItem);
-			addUnitMenuItem.setActionCommand(types.get(i));
-			addUnitMenuItem.addActionListener(addUnitListener);
+			addUnitMenuItem.setActionCommand("addUnit-" + types.get(i));
+			addUnitMenuItem.addActionListener(miListener);
 		}
 		
 		/*-------------------------------------------------------------------*
@@ -445,22 +420,11 @@ public class Sandbox
 		 */
 		final List<String> options = panel.getOptionNames();
 		
-		ActionListener displayOptionListener = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				panel.setOptionValue(
-					e.getActionCommand(),
-					!panel.getOptionValue(e.getActionCommand())
-				);
-			}
-		};
-		
 		for (int i = 0; i < options.size(); ++i)
 		{
 			final JMenuItem panelOptionMenuItem = new JMenuItem(options.get(i));
 			displayMenu.add(panelOptionMenuItem);
-			panelOptionMenuItem.setActionCommand(options.get(i));
+			panelOptionMenuItem.setActionCommand("displayOption-" + options.get(i));
 			
 			if (options.get(i).equals("Grid"))
 			{
@@ -470,10 +434,9 @@ public class Sandbox
 				));
 			}
 			
-			panelOptionMenuItem.addActionListener(displayOptionListener);
+			panelOptionMenuItem.addActionListener(miListener);
 		}
 		
-		MenuItemListener miListener = new MenuItemListener();
 		spriteLibMenuItem.addActionListener(miListener);
 		unitLibMenuItem.addActionListener(miListener);
 		soundPlayerMenuItem.addActionListener(miListener);
@@ -503,12 +466,8 @@ public class Sandbox
 		exitMenuItem.addActionListener(miListener);
 		addPlayerMenuItem.addActionListener(miListener);
 		
-		pauseMenuItem.setAccelerator(
-			KeyStroke.getKeyStroke(KeyEvent.VK_PAUSE, 0)
-		);
-		stepMenuItem.setAccelerator(
-			KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0)
-		);
+		pauseMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PAUSE, 0));
+		stepMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
 		
 		engineMenu.add(pauseMenuItem);
 		engineMenu.add(throttleMenuItem);
@@ -895,16 +854,33 @@ public class Sandbox
 				
 				Player newPlayer = new Player(game.getPlayers().size(), name, colorHue);
 				game.addPlayer(newPlayer);
-				final JMenuItem playerSelectMenuItem =
-					new JRadioButtonMenuItem(name);
-				playerSelectButtonGroup.add(playerSelectMenuItem);
-				playerSelectMenuItem.setActionCommand(
-					String.valueOf(newPlayer.getID()));
-				playerMenu.add(playerSelectMenuItem);
-				playerSelectMenuItem.addActionListener(playerSelectListener);
-				playerSelectMenuItem.setSelected(true);
-				currentPlayer = newPlayer;
+				addPlayer(newPlayer.getID());
+				selectPlayer(newPlayer.getID());
+			}
+			else if (e.getActionCommand().startsWith("selectPlayer-"))
+			{
+				selectPlayer(Integer.valueOf(e.getActionCommand().substring("selectPlayer-".length())));
+			}
+			else if (e.getActionCommand().startsWith("addUnit-"))
+			{
 				game.getUnitFactory().setDefaultOwner(currentPlayer);
+				panel.pushOverlay(new PlaceUnitOverlay(
+					game.getUnitFactory(),
+					 e.getActionCommand().substring("addUnit-".length())
+				));
+			}
+			else if (e.getActionCommand().startsWith("displayOption-"))
+			{
+				panel.setOptionValue(
+					e.getActionCommand().substring("displayOption-".length()),
+					! panel.getOptionValue(
+						e.getActionCommand().substring("displayOption-".length())
+					)
+				);
+			}
+			else if (e.getActionCommand().startsWith("commandButton-"))
+			{
+				game.getDisplay().fireCommandButton(e.getActionCommand().substring("commandButton-".length()));
 			}
 		}
 	}
@@ -985,7 +961,7 @@ public class Sandbox
 		playerSelectButtonGroup.add(playerSelectMenuItem);
 		playerSelectMenuItem.setActionCommand(String.valueOf(playerID));
 		playerMenu.add(playerSelectMenuItem);
-		playerSelectMenuItem.addActionListener(playerSelectListener);
+		playerSelectMenuItem.addActionListener(miListener);
 		playerSelectMenuItem.setSelected(true);
 		playerMenuItems.put(playerID, playerSelectMenuItem);
 	}

@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -60,21 +59,14 @@ public class BuildMineOverlay extends InputOverlay
 			 && map.canPlaceUnit(cursorPos, fp)
 			 && canPlaceMine(cursorPos))
 			{
-				g.setColor(TRANS_GREEN);
-				panel.fill(g, innerRegion);
-				g.setColor(Color.GREEN);
-				panel.draw(g, innerRegion);
+				panel.draw(g, GREEN, innerRegion);
 			}
 			else
 			{
-				g.setColor(TRANS_RED);
-				panel.fill(g, innerRegion);
-				g.setColor(Color.RED);
-				panel.draw(g, innerRegion);
+				panel.draw(g, RED, innerRegion);
 			}
 			
-			g.setColor(Color.WHITE);
-			panel.draw(g, outerRegion);
+			panel.draw(g, WHITE, outerRegion);
 		}
 	}
 	

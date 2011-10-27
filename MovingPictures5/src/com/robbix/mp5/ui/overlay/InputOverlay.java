@@ -20,6 +20,7 @@ import java.awt.geom.Rectangle2D;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.BorderRegion;
+import com.robbix.mp5.basics.ColorScheme;
 import com.robbix.mp5.basics.LShapedRegion;
 import com.robbix.mp5.basics.LinearRegion;
 import com.robbix.mp5.basics.Position;
@@ -37,6 +38,11 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public static final Color TRANS_YELLOW = new Color(255, 255, 0, 127);
 	public static final Color TRANS_GREEN = new Color(0, 255, 0, 127);
 	public static final Color TRANS_WHITE = new Color(255, 255, 255, 127);
+	
+	public static final ColorScheme RED    = ColorScheme.withTranslucentBody(Color.RED);
+	public static final ColorScheme YELLOW = ColorScheme.withTranslucentBody(Color.YELLOW);
+	public static final ColorScheme GREEN  = ColorScheme.withTranslucentBody(Color.GREEN);
+	public static final ColorScheme WHITE  = ColorScheme.withTranslucentBody(Color.WHITE);
 	
 	private static int DRAG_THRESHOLD = 16;
 	private static final int LEFT   = MouseEvent.BUTTON1;
@@ -225,7 +231,10 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public Position getCursorPosition()
 	{
-		return currentPoint == null ? null : panel.getPosition(currentPoint);
+		if (currentPoint == null)
+			return null;
+		
+		return panel.getPosition(currentPoint);
 	}
 	
 	public boolean isDragging()

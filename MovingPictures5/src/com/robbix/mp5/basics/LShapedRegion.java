@@ -3,6 +3,8 @@ package com.robbix.mp5.basics;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
+import java.awt.Graphics;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,5 +124,73 @@ public class LShapedRegion implements RIterable<Position>
 		return end1 < end2
 			? val >= end1 && val <= end2
 			: val >= end2 && val <= end1;
+	}
+	
+	public void draw(Graphics g, ColorScheme colors, Point offset, int edgeSize)
+	{
+		begin.draw(g, colors.getFillOnly(), offset, edgeSize);
+		elbow.draw(g, colors.getFillOnly(), offset, edgeSize);
+		end  .draw(g, colors.getFillOnly(), offset, edgeSize);
+		
+		begin.drawEdges(g, colors, offset, edgeSize, Neighbors.allBut(leg1Dir));
+		end.drawEdges(g, colors, offset, edgeSize, Neighbors.allBut(leg2Dir));
+		elbow.drawEdge(g, colors, offset, edgeSize, leg1Dir);
+		elbow.drawEdge(g, colors, offset, edgeSize, leg2Dir);
+		
+		drawLeg(g, colors, offset, edgeSize, begin, elbow);
+		drawLeg(g, colors, offset, edgeSize, end, elbow);
+	}
+	
+	private void drawLeg(Graphics g, ColorScheme colors, Point offset, int edgeSize, Position from, Position to)
+	{
+		g.setColor(colors.fill);
+		
+		int tx0 = to.x * edgeSize + offset.x;
+		int ty0 = to.y * edgeSize + offset.y;
+		int tx1 = tx0 + edgeSize;
+		int ty1 = ty0 + edgeSize;
+		
+		int fx0 = from.x * edgeSize + offset.x;
+		int fy0 = from.y * edgeSize + offset.y;
+		int fx1 = fx0 + edgeSize;
+		int fy1 = fy0 + edgeSize;
+		
+		switch (Direction.getDirection(from, to))
+		{
+		case N:
+			g.fillRect(tx0, ty1, fx1 - fx0, fy0 - ty1);
+			break;
+		case S:
+			g.fillRect(fx0, fy1, fx1 - fx0, ty0 - fy1);
+			break;
+		case E:
+			g.fillRect(fx1, fy0, tx0 - fx1, ty1 - ty0);
+			break;
+		case W:
+			g.fillRect(tx1, ty0, fx0 - tx1, ty1 - ty0);
+			break;
+		}
+		
+		g.setColor(colors.edge);
+		
+		switch (Direction.getDirection(from, to))
+		{
+		case N:
+			g.drawLine(fx0, fy0, tx0, ty1);
+			g.drawLine(fx1, fy0, tx1, ty1);
+			break;
+		case S:
+			g.drawLine(fx0, fy1, tx0, ty0);
+			g.drawLine(fx1, fy1, tx1, ty0);
+			break;
+		case E:
+			g.drawLine(fx1, fy0, tx0, ty0);
+			g.drawLine(fx1, fy1, tx0, ty1);
+			break;
+		case W:
+			g.drawLine(fx0, fy0, tx1, ty0);
+			g.drawLine(fx0, fy1, tx1, ty1);
+			break;
+		}
 	}
 }

@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -52,40 +51,26 @@ public class BuildStructureOverlay extends InputOverlay
 			Position cursorPos = getCursorPosition();
 			Footprint fp = structure.getFootprint();
 			Region innerRegion = fp.getInnerRegion().move(cursorPos);
-			Region outerRegion = innerRegion.stretch(1);
 			LayeredMap map = panel.getMap();
 			
 			if (map.getBounds().contains(innerRegion) && map.canPlaceUnit(cursorPos, fp))
 			{
 				if (!structure.needsConnection() || map.willConnect(cursorPos, fp))
 				{
-					g.setColor(TRANS_GREEN);
-					panel.fill(g, innerRegion);
-					g.setColor(Color.GREEN);
-					panel.draw(g, innerRegion);
+					panel.draw(g, GREEN, innerRegion);
 				}
 				else
 				{
-					g.setColor(TRANS_YELLOW);
-					panel.fill(g, innerRegion);
-					g.setColor(Color.YELLOW);
-					panel.draw(g, innerRegion);
+					panel.draw(g, YELLOW, innerRegion);
 				}
 			}
 			else
 			{
-				g.setColor(TRANS_RED);
-				panel.fill(g, innerRegion);
-				g.setColor(Color.RED);
-				panel.draw(g, innerRegion);
+				panel.draw(g, RED, innerRegion);
 			}
-			
-			g.setColor(Color.WHITE);
-			panel.draw(g, outerRegion);
-			g.setColor(TRANS_WHITE);
-			
+						
 			for (Position tubePos : fp.getTubePositions())
-				panel.fill(g, tubePos.shift(innerRegion.x, innerRegion.y));
+				panel.draw(g, WHITE.getFillOnly(), tubePos.shift(innerRegion.x, innerRegion.y));
 		}
 	}
 	

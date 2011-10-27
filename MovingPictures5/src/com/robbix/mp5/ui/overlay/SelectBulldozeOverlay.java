@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -31,22 +30,8 @@ public class SelectBulldozeOverlay extends InputOverlay
 		{
 			Position pos = getCursorPosition();
 			
-			if (isDragging())
-			{
-				Region dragRegion = getDragRegion();
-				
-				g.setColor(Color.RED);
-				panel.draw(g, dragRegion);
-				g.setColor(TRANS_RED);
-				panel.fill(g, dragRegion);
-			}
-			else
-			{
-				g.setColor(Color.RED);
-				panel.draw(g, pos);
-				g.setColor(TRANS_RED);
-				panel.fill(g, pos);
-			}
+			if (isDragging()) panel.draw(g, RED, getDragRegion());
+			             else panel.draw(g, RED, pos);
 		}
 	}
 	

@@ -1,5 +1,8 @@
 package com.robbix.mp5.basics;
 
+import java.awt.Graphics;
+import java.awt.Point;
+
 /**
  * An immutable rectangular region on a grid.
  * Measured in relative grid co-ordinates.
@@ -399,5 +402,24 @@ public class Region implements RIterable<Position>
 			
 			return new Position(x + xPrime, y + yPrime);
 		}
+	}
+	
+	public void draw(Graphics g, ColorScheme colors, Point offset, int edgeSize)
+	{
+		g.setColor(colors.fill);
+		g.fillRect(
+			x * edgeSize + offset.x,
+			y * edgeSize + offset.y,
+			w * edgeSize,
+			h * edgeSize
+		);
+		
+		g.setColor(colors.edge);
+		g.drawRect(
+			x * edgeSize + offset.x,
+			y * edgeSize + offset.y,
+			w * edgeSize,
+			h * edgeSize
+		);
 	}
 }

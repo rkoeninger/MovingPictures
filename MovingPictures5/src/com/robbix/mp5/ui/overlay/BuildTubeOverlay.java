@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -8,9 +7,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.basics.BorderRegion;
-import com.robbix.mp5.basics.LShapedRegion;
-import com.robbix.mp5.basics.LinearRegion;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.unit.Unit;
@@ -35,40 +31,13 @@ public class BuildTubeOverlay extends InputOverlay
 			
 			if (isDragging())
 			{
-				if (isDragRegionLinear())
-				{
-					LinearRegion dragRegion = getLinearDragRegion();
-					
-					g.setColor(Color.RED);
-					panel.draw(g, dragRegion);
-					g.setColor(TRANS_RED);
-					panel.fill(g, dragRegion);
-				}
-				else if (isControlOptionSet())
-				{
-					BorderRegion dragRegion = getBorderDragRegion();
-					
-					g.setColor(Color.RED);
-					panel.draw(g, dragRegion);
-					g.setColor(TRANS_RED);
-					panel.fill(g, dragRegion);
-				}
-				else
-				{
-					LShapedRegion dragRegion = getLShapedDragRegion();
-					
-					g.setColor(Color.RED);
-					panel.draw(g, dragRegion);
-					g.setColor(TRANS_RED);
-					panel.fill(g, dragRegion);
-				}
+				if      (isDragRegionLinear()) panel.draw(g, RED, getLinearDragRegion());
+				else if (isControlOptionSet()) panel.draw(g, RED, getBorderDragRegion());
+				                          else panel.draw(g, RED, getLShapedDragRegion());
 			}
 			else
 			{
-				g.setColor(Color.RED);
-				panel.draw(g, pos);
-				g.setColor(TRANS_RED);
-				panel.fill(g, pos);
+				panel.draw(g, RED, pos);
 			}
 		}
 	}

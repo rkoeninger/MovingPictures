@@ -2,6 +2,8 @@ package com.robbix.mp5.basics;
 
 import static java.lang.Math.*;
 
+import java.awt.Graphics;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,5 +87,71 @@ public class BorderRegion implements RIterable<Position>
 	public RIterator<Position> iterator()
 	{
 		return RIterator.iterate(elements);
+	}
+	
+	public void draw(Graphics g, ColorScheme colors, int edgeSize)
+	{
+		draw(g, colors, new Point(), edgeSize);
+	}
+	
+	public void draw(Graphics g, ColorScheme colors, Point offset, int edgeSize)
+	{
+		g.setColor(colors.fill);
+		
+		g.fillRect(
+			x * edgeSize + offset.x,
+			y * edgeSize + offset.y,
+			w * edgeSize,
+			edgeSize
+		);
+		
+		if (h > 1)
+		{
+			g.fillRect(
+				x * edgeSize + offset.x,
+				(y + h - 1) * edgeSize + offset.y,
+				w * edgeSize,
+				edgeSize
+			);
+		}
+		
+		if (h > 2)
+		{
+			g.fillRect(
+				x * edgeSize + offset.x,
+				(y + 1) * edgeSize + offset.y,
+				edgeSize,
+				(h - 2) * edgeSize
+			);
+			
+			if (w > 1)
+			{
+				g.fillRect(
+					(x + w - 1) * edgeSize + offset.x,
+					(y + 1) * edgeSize + offset.y,
+					edgeSize,
+					(h - 2) * edgeSize
+				);
+			}
+		}
+		
+		g.setColor(colors.edge);
+		
+		g.drawRect(
+			x * edgeSize + offset.x,
+			y * edgeSize + offset.y,
+			w * edgeSize,
+			h * edgeSize
+		);
+		
+		if (w > 2 && h > 2)
+		{
+			g.drawRect(
+				(x + 1) * edgeSize + offset.x,
+				(y + 1) * edgeSize + offset.y,
+				(w - 2) * edgeSize,
+				(h - 2) * edgeSize
+			);
+		}
 	}
 }

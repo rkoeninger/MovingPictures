@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -14,10 +13,7 @@ public class PlaceBulldozeOverlay extends InputOverlay
 		
 		if (isCursorOnGrid())
 		{
-			g.setColor(Color.RED);
-			panel.draw(g, getCursorPosition());
-			g.setColor(TRANS_RED);
-			panel.fill(g, getCursorPosition());
+			panel.draw(g, RED, getCursorPosition());
 		}
 	}
 	

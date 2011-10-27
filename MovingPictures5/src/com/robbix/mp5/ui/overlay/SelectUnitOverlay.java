@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.HashMap;
@@ -30,10 +29,7 @@ public class SelectUnitOverlay extends InputOverlay
 		
 		if (isDragging())
 		{
-			g.setColor(Color.RED);
-			panel.draw(g, getDragRegion());
-			g.setColor(TRANS_RED);
-			panel.fill(g, getDragRegion());
+			panel.draw(g, RED, getDragRegion());
 		}
 	}
 	

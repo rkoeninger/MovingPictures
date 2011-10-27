@@ -1,5 +1,12 @@
 package com.robbix.mp5.basics;
 
+import static com.robbix.mp5.basics.Direction.E;
+import static com.robbix.mp5.basics.Direction.N;
+import static com.robbix.mp5.basics.Direction.S;
+import static com.robbix.mp5.basics.Direction.W;
+
+import java.awt.Graphics;
+import java.awt.Point;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -133,5 +140,50 @@ public class Position
 	public String toString()
 	{
 		return String.format("(%1$d, %2$d)", x, y);
+	}
+	
+	public void draw(Graphics g, ColorScheme colors, Point offset, int edgeSize)
+	{
+		g.setColor(colors.fill);
+		g.fillRect(
+			x * edgeSize + offset.x,
+			y * edgeSize + offset.y,
+			edgeSize,
+			edgeSize
+		);
+		
+		g.setColor(colors.edge);
+		g.drawRect(
+			x * edgeSize + offset.x,
+			y * edgeSize + offset.y,
+			edgeSize,
+			edgeSize
+		);
+	}
+	
+	public void drawEdge(Graphics g, ColorScheme colors, Point offset, int edgeSize, Direction dir)
+	{
+		g.setColor(colors.edge);
+		int x0 = x * edgeSize + offset.x;
+		int y0 = y * edgeSize + offset.y;
+		int x1 = (x + 1) * edgeSize + offset.x;
+		int y1 = (y + 1) * edgeSize + offset.y;
+		
+		switch (dir)
+		{
+		case N: g.drawLine(x0, y0, x1, y0); break;
+		case S: g.drawLine(x0, y1, x1, y1); break;
+		case E: g.drawLine(x1, y0, x1, y1); break;
+		case W: g.drawLine(x0, y0, x0, y1); break;
+		}
+	}
+	
+	public void drawEdges(Graphics g, ColorScheme colors, Point offset, int edgeSize, Neighbors neighbors)
+	{
+		g.setColor(colors.edge);
+		if (neighbors.has(N)) drawEdge(g, colors, offset, edgeSize, N);
+		if (neighbors.has(S)) drawEdge(g, colors, offset, edgeSize, S);
+		if (neighbors.has(E)) drawEdge(g, colors, offset, edgeSize, E);
+		if (neighbors.has(W)) drawEdge(g, colors, offset, edgeSize, W);
 	}
 }
