@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.robbix.mp5.Mediator;
 import com.robbix.mp5.XNode;
 import com.robbix.mp5.ai.task.SelfDestructAttackTask;
 import com.robbix.mp5.ai.task.Task;
@@ -176,6 +177,11 @@ public class UnitFactory
 			throw new IllegalArgumentException(type + "ty does not exist");
 		
 		return newUnit(uType, owner);
+	}
+	
+	public Unit newUnit(String type, int playerID)
+	{
+		return newUnit(type, Mediator.game.getPlayer(playerID));
 	}
 	
 	public Unit newUnit(String type)

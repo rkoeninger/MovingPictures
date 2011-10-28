@@ -1,11 +1,9 @@
 package com.robbix.mp5.map;
 
-import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -659,97 +657,18 @@ public class LayeredMap
 		return grid.get(pos).occupant;
 	}
 	
-	public Unit getUnitAbsolute(int x, int y)
+	public Set<Unit> getUnits(Region region)
 	{
-		int tileSize = getSpotSize();
+		if (! getBounds().contains(region))
+			throw new IndexOutOfBoundsException();
 		
-		boolean quadrantUpper = y % tileSize < 0.5;
-		boolean quadrantLeft  = x % tileSize < 0.5;
+		Set<Unit> occupants = new HashSet<Unit>();
 		
-		int gridX = (int)x / tileSize;
-		int gridY = (int)y / tileSize;
+		for (Spot spot : grid.iterator(region))	
+			if (spot.occupant != null)
+				occupants.add(spot.occupant);
 		
-		ArrayList<Position> toCheck = new ArrayList<Position>(4);
-		toCheck.add(new Position(gridX, gridY));
-		
-		if (quadrantUpper && quadrantLeft)
-		{
-			toCheck.add(new Position(gridX - 1, gridY));
-			toCheck.add(new Position(gridX,     gridY - 1));
-			toCheck.add(new Position(gridX - 1, gridY - 1));
-		}
-		else if (!quadrantUpper && quadrantLeft)
-		{
-			toCheck.add(new Position(gridX - 1, gridY));
-			toCheck.add(new Position(gridX,     gridY + 1));
-			toCheck.add(new Position(gridX - 1, gridY + 1));
-		}
-		else if (quadrantUpper && !quadrantLeft)
-		{
-			toCheck.add(new Position(gridX + 1, gridY));
-			toCheck.add(new Position(gridX,     gridY - 1));
-			toCheck.add(new Position(gridX + 1, gridY - 1));
-		}
-		else
-		{
-			toCheck.add(new Position(gridX + 1, gridY));
-			toCheck.add(new Position(gridX,     gridY + 1));
-			toCheck.add(new Position(gridX + 1, gridY + 1));
-		}
-		
-		for (Position pos : toCheck)
-		{
-			if (! getBounds().contains(pos))
-				continue;
-			
-			Unit unit = grid.get(pos).occupant;
-			
-			if (unit != null)
-			{
-				int absX = pos.x * tileSize + unit.getXOffset();
-				int absY = pos.y * tileSize + unit.getYOffset();
-				
-				if (x >= absX && x < absX + tileSize
-				&&  y >= absY && y < absY + tileSize)
-					return unit;
-			}
-		}
-		
-		return null;
-	}
-	
-	public Set<Unit> getAllAbsolute(int x, int y, int w, int h)
-	{
-		Set<Unit> selected = new HashSet<Unit>();
-		int tileSize = getSpotSize();
-		
-		Rectangle selectedArea = new Rectangle(x, y, w, h);
-		
-		for (int gridX = x / tileSize; gridX < (x + w) / tileSize; ++gridX)
-		for (int gridY = y / tileSize; gridY < (y + h) / tileSize; ++gridY)
-		{
-			Position pos = new Position(gridX, gridY);
-			
-			if (! getBounds().contains(pos))
-				continue;
-			
-			Unit unit = grid.get(pos).occupant;
-
-			if (unit != null)
-			{
-				Rectangle unitBounds = new Rectangle(
-					unit.getAbsX(),
-					unit.getAbsY(),
-					unit.getWidth()  * tileSize,
-					unit.getHeight() * tileSize
-				);
-				
-				if (selectedArea.intersects(unitBounds))
-					selected.add(unit);
-			}
-		}
-		
-		return selected;
+		return occupants;
 	}
 	
 	public void remove(Unit unit)

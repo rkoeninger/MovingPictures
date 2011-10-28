@@ -73,10 +73,9 @@ import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 
 /**
- * Test code for MovingPictures 5.
+ * Sandbox test suite, main window.
  * 
  * @author bort
- *
  */
 public class Sandbox
 {
@@ -99,6 +98,12 @@ public class Sandbox
 	private static JMenu playerMenu;
 	private static ButtonGroup playerSelectButtonGroup;
 	private static boolean showFrameRate = false;
+	
+	// Action command prefixes
+	private static final String ACP_SELECT_PLAYER  = "selectPlayer-";
+	private static final String ACP_ADD_UNIT       = "addUnit-";
+	private static final String ACP_DISPLAY_OPTION = "displayOption-";
+	private static final String ACP_COMMAND_BUTTON = "commandButton-";
 	
 	private static ActionListener miListener = new MenuItemListener();
 	
@@ -262,47 +267,6 @@ public class Sandbox
 		};
 		
 		/*-------------------------------------------------------------------*
-		 * Load command button icons
-		 */
-		commandBar = new JToolBar();
-		commandBar.setOrientation(SwingConstants.HORIZONTAL);
-		commandBar.setFloatable(false);
-		commandBar.setRollover(true);
-		
-		for (File iconDir : new File(RES_DIR, "art/commandButtons").listFiles())
-		{
-			if (!iconDir.isDirectory())
-				continue;
-			
-			ArrayList<ImageIcon> icons = new ArrayList<ImageIcon>();
-			
-			for (File iconFile : iconDir.listFiles(Utils.BMP))
-			{
-				icons.add(new ImageIcon(Utils.shrink(ImageIO.read(iconFile))));
-			}
-			
-			if (icons.isEmpty())
-				continue;
-			
-			CommandButton button = new CommandButton(iconDir.getName(), icons);
-			button.setActionCommand("commandButton-" + iconDir.getName());
-			button.addActionListener(miListener);
-			button.setFocusable(false);
-			commandBar.add(button);
-		}
-		
-		String[] extraCommands = {"kill", "idle", "build", "dock", "mine"};
-		
-		for (String commandName : extraCommands)
-		{
-			CommandButton button = new CommandButton(commandName);
-			button.setActionCommand("commandButton-" + commandName);
-			button.addActionListener(miListener);
-			button.setFocusable(false);
-			commandBar.add(button);
-		}
-		
-		/*-------------------------------------------------------------------*
 		 * Build UI
 		 */
 		panel = game.getDisplay();
@@ -376,7 +340,7 @@ public class Sandbox
 				playerSelectMenuItem.setSelected(true);
 			
 			playerSelectMenuItem.setActionCommand(
-				"selectPlayer-" + String.valueOf(player.getID())
+				ACP_SELECT_PLAYER + String.valueOf(player.getID())
 			);
 			playerMenu.add(playerSelectMenuItem);
 			playerSelectMenuItem.addActionListener(miListener);
@@ -411,7 +375,7 @@ public class Sandbox
 		{
 			final JMenuItem addUnitMenuItem = new JMenuItem(names.get(i));
 			addUnitMenu.add(addUnitMenuItem);
-			addUnitMenuItem.setActionCommand("addUnit-" + types.get(i));
+			addUnitMenuItem.setActionCommand(ACP_ADD_UNIT + types.get(i));
 			addUnitMenuItem.addActionListener(miListener);
 		}
 		
@@ -424,7 +388,7 @@ public class Sandbox
 		{
 			final JMenuItem panelOptionMenuItem = new JMenuItem(options.get(i));
 			displayMenu.add(panelOptionMenuItem);
-			panelOptionMenuItem.setActionCommand("displayOption-" + options.get(i));
+			panelOptionMenuItem.setActionCommand(ACP_DISPLAY_OPTION + options.get(i));
 			
 			if (options.get(i).equals("Grid"))
 			{
@@ -515,6 +479,8 @@ public class Sandbox
 		statusesPanel.setLayout(new GridLayout(2, 1));
 		statusesPanel.add(unitStatusLabel);
 		statusesPanel.add(playerStatusLabel);
+		
+		commandBar = loadCommandBar();
 		
 		Rectangle windowBounds = Utils.getWindowBounds();
 		
@@ -857,30 +823,30 @@ public class Sandbox
 				addPlayer(newPlayer.getID());
 				selectPlayer(newPlayer.getID());
 			}
-			else if (e.getActionCommand().startsWith("selectPlayer-"))
+			else if (e.getActionCommand().startsWith(ACP_SELECT_PLAYER))
 			{
-				selectPlayer(Integer.valueOf(e.getActionCommand().substring("selectPlayer-".length())));
+				selectPlayer(Integer.valueOf(e.getActionCommand().substring(ACP_SELECT_PLAYER.length())));
 			}
-			else if (e.getActionCommand().startsWith("addUnit-"))
+			else if (e.getActionCommand().startsWith(ACP_ADD_UNIT))
 			{
 				game.getUnitFactory().setDefaultOwner(currentPlayer);
 				panel.pushOverlay(new PlaceUnitOverlay(
 					game.getUnitFactory(),
-					 e.getActionCommand().substring("addUnit-".length())
+					 e.getActionCommand().substring(ACP_ADD_UNIT.length())
 				));
 			}
-			else if (e.getActionCommand().startsWith("displayOption-"))
+			else if (e.getActionCommand().startsWith(ACP_DISPLAY_OPTION))
 			{
 				panel.setOptionValue(
-					e.getActionCommand().substring("displayOption-".length()),
+					e.getActionCommand().substring(ACP_DISPLAY_OPTION.length()),
 					! panel.getOptionValue(
-						e.getActionCommand().substring("displayOption-".length())
+						e.getActionCommand().substring(ACP_DISPLAY_OPTION.length())
 					)
 				);
 			}
-			else if (e.getActionCommand().startsWith("commandButton-"))
+			else if (e.getActionCommand().startsWith(ACP_COMMAND_BUTTON))
 			{
-				game.getDisplay().fireCommandButton(e.getActionCommand().substring("commandButton-".length()));
+				game.getDisplay().fireCommandButton(e.getActionCommand().substring(ACP_COMMAND_BUTTON.length()));
 			}
 		}
 	}
@@ -964,6 +930,59 @@ public class Sandbox
 		playerSelectMenuItem.addActionListener(miListener);
 		playerSelectMenuItem.setSelected(true);
 		playerMenuItems.put(playerID, playerSelectMenuItem);
+	}
+	
+	private static JToolBar loadCommandBar() throws IOException
+	{
+		JToolBar commandBar = new JToolBar();
+		commandBar.setOrientation(SwingConstants.HORIZONTAL);
+		commandBar.setFloatable(false);
+		commandBar.setRollover(true);
+		
+		File[] iconDirs = new File(RES_DIR, "art/commandButtons").listFiles();
+		Arrays.sort(iconDirs, Utils.FILENAME);
+		
+		Dimension preferredSize = null;
+		
+		for (File iconDir : iconDirs)
+		{
+			if (!iconDir.isDirectory())
+				continue;
+			
+			ArrayList<ImageIcon> icons = new ArrayList<ImageIcon>();
+			
+			File[] iconFiles = iconDir.listFiles(Utils.BMP);
+			Arrays.sort(iconFiles, Utils.FILENAME);
+			
+			for (File iconFile : iconFiles)
+			{
+				icons.add(new ImageIcon(Utils.shrink(ImageIO.read(iconFile))));
+			}
+			
+			if (icons.isEmpty())
+				continue;
+			
+			CommandButton button = new CommandButton(iconDir.getName(), icons);
+			button.setActionCommand(ACP_COMMAND_BUTTON + iconDir.getName());
+			button.addActionListener(miListener);
+			button.setFocusable(false);
+			commandBar.add(button);
+			preferredSize = button.getPreferredSize();
+		}
+		
+		String[] extraCommands = {"kill", "idle", "build", "dock", "mine"};
+		
+		for (String commandName : extraCommands)
+		{
+			CommandButton button = new CommandButton(commandName);
+			button.setActionCommand(ACP_COMMAND_BUTTON + commandName);
+			button.addActionListener(miListener);
+			button.setFocusable(false);
+			button.setPreferredSize(preferredSize);
+			commandBar.add(button);
+		}
+		
+		return commandBar;
 	}
 	
 	public static List<String> getAvailableTileSets()

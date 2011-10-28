@@ -61,6 +61,7 @@ public class DisplayPanel extends JComponent
 	private static Font costMapFont = Font.decode("Arial-9");
 	private static Color TRANS_GRAY = new Color(0, 0, 0, 127);
 	private static Color BACKGROUND_BLUE = new Color(127, 127, 255);
+	private Color letterBoxColor = Color.BLACK;
 	
 	private UnitStatus unitStatus;
 	private PlayerStatus playerStatus;
@@ -133,6 +134,19 @@ public class DisplayPanel extends JComponent
 		addMouseListener(adapter);
 		addMouseMotionListener(adapter);
 		addMouseWheelListener(adapter);
+	}
+	
+	public void setLetterBoxColor(Color color)
+	{
+		if (color == null || color.getAlpha() != 255)
+			throw new IllegalArgumentException();
+		
+		this.letterBoxColor = color;
+	}
+	
+	public Color getLetterBoxColor()
+	{
+		return letterBoxColor;
 	}
 	
 	public List<String> getOptionNames()
@@ -889,7 +903,7 @@ public class DisplayPanel extends JComponent
 		}
 		else
 		{
-			g.setColor(Color.BLACK);
+			g.setColor(getBackground());
 			fill(g, rect);
 		}
 		
@@ -933,15 +947,15 @@ public class DisplayPanel extends JComponent
 	 */
 	private void drawLetterBox(Graphics g)
 	{
-		g.setColor(getBackground());
+		g.setColor(letterBoxColor);
 		int hSpace = getHorizontalLetterBoxSpace();
 		int vSpace = getVerticalLetterBoxSpace();
 		
-		// Left side, including corners
+		// Left side, including top/bottom corners
 		g.fillRect(0, 0, hSpace, getHeight());
 		
-		// Right side, including corners
-		g.fillRect(getWidth() - hSpace, 0, hSpace, getHeight());
+		// Right side, including top/bottom corners
+		g.fillRect(getWidth() - hSpace - 1, 0, hSpace, getHeight());
 		
 		// Top side
 		g.fillRect(hSpace, 0, getWidth() - hSpace * 2, vSpace);

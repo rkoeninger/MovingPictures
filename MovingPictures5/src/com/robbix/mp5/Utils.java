@@ -97,6 +97,15 @@ public class Utils
 		return set;
 	}
 	
+	public static final Comparator<File> FILENAME = 
+	new Comparator<File>()
+	{
+		public int compare(File a, File b)
+		{
+			return a.getName().compareToIgnoreCase(b.getName());
+		}
+	};
+	
 	/**
 	 * Compares two Positions for z-order.
 	 * 

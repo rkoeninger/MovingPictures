@@ -31,6 +31,7 @@ public class CommandButton extends JButton
 	public CommandButton(String name, List<ImageIcon> icons)
 	{
 		super(icons.get(0));
+		setToolTipText(name);
 		
 		this.icons = icons;
 		this.disabled = new ImageIcon(Utils.getGrayscale(icons.get(0)));
@@ -41,6 +42,16 @@ public class CommandButton extends JButton
 		
 		frame = 0;
 		frameCount = icons.size();
+	}
+	
+	public void setDelay(int millis)
+	{
+		timer.setDelay(millis);
+	}
+	
+	public int getDelay()
+	{
+		return timer.getDelay();
 	}
 	
 	public void setEnabled(boolean enabled)

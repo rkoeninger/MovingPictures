@@ -4,7 +4,6 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -69,10 +68,10 @@ public class TileSet
 		File[] wallsR = new File(rootDir, "wall/redhealth").listFiles(Utils.BMP);
 		File[] tubes  = new File(rootDir, "tube").listFiles(Utils.BMP);
 		
-		sortFiles(wallsG);
-		sortFiles(wallsY);
-		sortFiles(wallsR);
-		sortFiles(tubes);
+		Arrays.sort(wallsG, Utils.FILENAME);
+		Arrays.sort(wallsY, Utils.FILENAME);
+		Arrays.sort(wallsR, Utils.FILENAME);
+		Arrays.sort(tubes, Utils.FILENAME);
 		
 		for (int x = 0; x < tileOrder2.length; ++x)
 		{
@@ -93,17 +92,6 @@ public class TileSet
 		}
 		
 		return set;
-	}
-	
-	private static void sortFiles(File[] files)
-	{
-		Arrays.sort(files, new Comparator<File>()
-		{
-			public int compare(File a, File b)
-			{
-				return a.getName().compareToIgnoreCase(b.getName());
-			}
-		});
 	}
 	
 	private Map<String, Tile> tiles;

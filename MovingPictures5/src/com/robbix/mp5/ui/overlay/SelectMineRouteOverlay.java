@@ -41,7 +41,10 @@ public class SelectMineRouteOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Unit selected = panel.getMap().getUnitAbsolute(x, y);
+		if (!isCursorOnGrid())
+			return;
+		
+		Unit selected = panel.getMap().getUnit(getCursorPosition());
 		
 		if (selected != null)
 		{

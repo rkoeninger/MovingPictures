@@ -25,7 +25,10 @@ public class SelectAttackTargetOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Unit target = panel.getMap().getUnitAbsolute(x, y);
+		if (!isCursorOnGrid())
+			return;
+		
+		Unit target = panel.getMap().getUnit(getCursorPosition());
 		
 		if (target != null && !target.isAt(attacker.getPosition()))
 		{
