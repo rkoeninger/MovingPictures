@@ -43,6 +43,7 @@ import javax.swing.UIManager;
 
 import com.robbix.mp5.Engine;
 import com.robbix.mp5.Game;
+import com.robbix.mp5.GameListener;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.MeteorShowerTrigger;
 import com.robbix.mp5.Utils;
@@ -346,6 +347,8 @@ public class Sandbox
 			playerSelectMenuItem.addActionListener(miListener);
 			playerMenuItems.put(player.getID(), playerSelectMenuItem);
 		}
+		
+		game.addGameListener(new SandboxListener());
 		
 		/*-------------------------------------------------------------------*
 		 * Add place unit menu items
@@ -820,7 +823,6 @@ public class Sandbox
 				
 				Player newPlayer = new Player(game.getPlayers().size(), name, colorHue);
 				game.addPlayer(newPlayer);
-				addPlayer(newPlayer.getID());
 				selectPlayer(newPlayer.getID());
 			}
 			else if (e.getActionCommand().startsWith(ACP_SELECT_PLAYER))
@@ -918,18 +920,19 @@ public class Sandbox
 			menuItem.setSelected(true);
 	}
 	
-	// Call after Game.addPlayer() to sync with sandbox UI
-	private static void addPlayer(int playerID)
+	private static class SandboxListener implements GameListener
 	{
-		Player newPlayer = game.getPlayer(playerID);
-		String name = newPlayer.getName();
-		JMenuItem playerSelectMenuItem = new JRadioButtonMenuItem(name);
-		playerSelectButtonGroup.add(playerSelectMenuItem);
-		playerSelectMenuItem.setActionCommand(String.valueOf(playerID));
-		playerMenu.add(playerSelectMenuItem);
-		playerSelectMenuItem.addActionListener(miListener);
-		playerSelectMenuItem.setSelected(true);
-		playerMenuItems.put(playerID, playerSelectMenuItem);
+		public void playerAdded(Player player)
+		{
+			String name = player.getName();
+			JMenuItem playerSelectMenuItem = new JRadioButtonMenuItem(name);
+			playerSelectButtonGroup.add(playerSelectMenuItem);
+			playerSelectMenuItem.setActionCommand(String.valueOf(player.getID()));
+			playerMenu.add(playerSelectMenuItem);
+			playerSelectMenuItem.addActionListener(miListener);
+			playerSelectMenuItem.setSelected(true);
+			playerMenuItems.put(player.getID(), playerSelectMenuItem);
+		}
 	}
 	
 	private static JToolBar loadCommandBar() throws IOException
@@ -941,8 +944,6 @@ public class Sandbox
 		
 		File[] iconDirs = new File(RES_DIR, "art/commandButtons").listFiles();
 		Arrays.sort(iconDirs, Utils.FILENAME);
-		
-		Dimension preferredSize = null;
 		
 		for (File iconDir : iconDirs)
 		{
@@ -967,7 +968,6 @@ public class Sandbox
 			button.addActionListener(miListener);
 			button.setFocusable(false);
 			commandBar.add(button);
-			preferredSize = button.getPreferredSize();
 		}
 		
 		String[] extraCommands = {"kill", "idle", "build", "dock", "mine"};
@@ -978,7 +978,6 @@ public class Sandbox
 			button.setActionCommand(ACP_COMMAND_BUTTON + commandName);
 			button.addActionListener(miListener);
 			button.setFocusable(false);
-			button.setPreferredSize(preferredSize);
 			commandBar.add(button);
 		}
 		
@@ -1089,7 +1088,6 @@ public class Sandbox
 		
 		Player player1 = new Player(1, "Targets", 45);
 		game.addPlayer(player1);
-		addPlayer(1);
 		selectPlayer(1);
 		factory.setDefaultOwner(player1);
 		
@@ -1149,7 +1147,6 @@ public class Sandbox
 		
 		Player player1 = new Player(1, "Factories", 275);
 		game.addPlayer(player1);
-		addPlayer(1);
 		selectPlayer(1);
 		factory.setDefaultOwner(player1);
 		
@@ -1206,7 +1203,6 @@ public class Sandbox
 		
 		Player player1 = new Player(1, "Mining Operation", 200);
 		game.addPlayer(player1);
-		addPlayer(1);
 		selectPlayer(1);
 		
 		List<Unit> mines    = new ArrayList<Unit>();
@@ -1299,11 +1295,6 @@ public class Sandbox
 		game.addPlayer(player3);
 		game.addPlayer(player4);
 		game.addPlayer(player5);
-		addPlayer(1);
-		addPlayer(2);
-		addPlayer(3);
-		addPlayer(4);
-		addPlayer(5);
 		selectPlayer(5);
 		
 		for (int x = 1; x <= 15; ++x)

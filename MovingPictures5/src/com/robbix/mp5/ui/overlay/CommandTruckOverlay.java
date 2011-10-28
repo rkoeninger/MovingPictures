@@ -38,8 +38,6 @@ public class CommandTruckOverlay extends InputOverlay
 	{
 		for (Unit truck : trucks)
 			drawSelectedUnitBox(g, truck);
-		
-		drawInstructions(g, rect, "Move", "Cancel");
 	}
 	
 	public void onCommand(String command)
@@ -146,10 +144,15 @@ public class CommandTruckOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		for (Unit truck : trucks)		
-			Mediator.doMove(truck, panel.getPosition(x, y));
-		
-		Mediator.playSound("beep2");
+		if (isCursorOnGrid())
+		{
+			Position pos = getCursorPosition();
+			
+			for (Unit truck : trucks)		
+				Mediator.doMove(truck, pos);
+			
+			Mediator.playSound("beep2");
+		}
 	}
 	
 	public void onRightClick(int x, int y)

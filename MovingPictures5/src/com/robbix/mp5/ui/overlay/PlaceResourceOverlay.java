@@ -21,8 +21,6 @@ public class PlaceResourceOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		drawInstructions(g, rect, "Place", "Cancel");
-		
 		if (isCursorOnGrid())
 		{
 			if (resSprite == null)
@@ -37,9 +35,9 @@ public class PlaceResourceOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Position pos = panel.getPosition(x, y);
+		Position pos = getCursorPosition();
 		
-		if (panel.getMap().canPlaceResourceDeposit(pos))
+		if (isCursorOnGrid() && panel.getMap().canPlaceResourceDeposit(pos))
 		{
 			panel.getMap().putResourceDeposit(res, pos);
 			res = (ResourceDeposit)res.clone();

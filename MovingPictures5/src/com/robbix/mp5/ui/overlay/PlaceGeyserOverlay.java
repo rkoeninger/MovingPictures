@@ -13,8 +13,6 @@ public class PlaceGeyserOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		drawInstructions(g, rect, "Place", "Cancel");
-
 		if (isCursorOnGrid())
 		{
 			Position pos = getCursorPosition();
@@ -31,9 +29,9 @@ public class PlaceGeyserOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Position pos = panel.getPosition(x, y);
+		Position pos = getCursorPosition();
 		
-		if (panel.getMap().canPlaceFixture(pos))
+		if (isCursorOnGrid() && panel.getMap().canPlaceFixture(pos))
 		{
 			panel.getMap().putGeyser(pos);
 			panel.refresh();

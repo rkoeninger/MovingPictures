@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.ui.Sprite;
@@ -35,8 +36,6 @@ public class PlaceUnitOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		drawInstructions(g, rect, "Place", "Cancel");
-		
 		if (isCursorOnGrid())
 		{
 			if (unitSprite == null)
@@ -54,7 +53,8 @@ public class PlaceUnitOverlay extends InputOverlay
 				turretSprite = Utils.getTranslucency(turretSprite, hue, 0.5f);
 			}
 			
-			Position pos = getCursorPosition();
+			Position center = unit.getFootprint().getCenter();
+			Position pos = getCursorPosition().subtract(center);
 			panel.draw(g, unitSprite, pos);
 			
 			if (turretSprite != null)
@@ -64,22 +64,32 @@ public class PlaceUnitOverlay extends InputOverlay
 		}
 	}
 	
+	public void paintOverTerrain(Graphics g, Rectangle rect)
+	{
+		if (isCursorOnGrid())
+		{
+			Position center = unit.getFootprint().getCenter();
+			drawStructureFootprint(g, unit.getType(), getCursorPosition().subtract(center));
+		}
+	}
+	
 	public void onLeftClick(int x, int y)
 	{
-		Position pos = panel.getPosition(x, y);
+		Position center = unit.getFootprint().getCenter();
+		Position pos = getCursorPosition().subtract(center);
+		LayeredMap map = panel.getMap();
 		
-		if (panel.getMap().canPlaceUnit(pos, unit.getFootprint()))
+		if (isCursorOnGrid() && map.canPlaceUnit(pos, unit.getFootprint()))
 		{
 			if (unit.isMine())
 			{
-				ResourceDeposit res =
-					panel.getMap().getResourceDeposit(pos.shift(1, 0));
+				ResourceDeposit res = map.getResourceDeposit(pos.shift(1, 0));
 				
 				if (res == null || res.getType() != ResourceType.COMMON_ORE)
 					return;
 			}
 			
-			panel.getMap().putUnit(unit, pos);
+			map.putUnit(unit, pos);
 			panel.refresh();
 			
 			if (factory != null)

@@ -5,8 +5,8 @@ import static java.lang.Math.max;
 
 import java.awt.Graphics;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.robbix.mp5.Mediator;
 
 /**
  * Does not extend Region as it is not truly rectangular.
@@ -15,7 +15,6 @@ import java.util.List;
  */
 public class LShapedRegion implements RIterable<Position>
 {
-	private List<Position> elements;
 	private Position begin;
 	private Position elbow;
 	private Position end;
@@ -58,16 +57,6 @@ public class LShapedRegion implements RIterable<Position>
 		leg1Len = max(abs(begin.x - elbow.x), abs(begin.y - elbow.y)) - 1;
 		leg2Len = max(abs(elbow.x - end.x), abs(elbow.y - end.y)) - 1;
 		
-		elements = new ArrayList<Position>();
-		
-		for (Position current = begin; ! current.equals(elbow); current = leg1Dir.apply(current))
-			elements.add(current);
-		
-		for (Position current = elbow; ! current.equals(end); current = leg2Dir.reverse().apply(current))
-			elements.add(current);
-		
-		elements.add(end);
-		
 		this.begin = begin;
 		this.elbow = elbow;
 		this.end = end;
@@ -75,16 +64,17 @@ public class LShapedRegion implements RIterable<Position>
 		length = leg1Len + leg2Len - 1;
 	}
 	
-	public LShapedRegion(Position corner1, Position corner2)
+	public LShapedRegion(Position begin, Position end, boolean verticalFirst)
 	{
-		this(corner1, new Position(corner1.x, corner2.y), corner2);
+		this(
+			begin,
+			verticalFirst ? Mediator.getPosition(begin.x, end.y) : Mediator.getPosition(end.x, begin.y),
+			end
+		);
 	}
 	
 	public boolean contains(Position pos)
 	{
-		if (! pos.isColinear(elbow))
-			return false;
-		
 		if (pos.x == begin.x)
 		{
 			return isBetween(pos.y, elbow.y, begin.y);
@@ -97,26 +87,12 @@ public class LShapedRegion implements RIterable<Position>
 		{
 			return isBetween(pos.y, elbow.y, end.y);
 		}
-		else
+		else if (pos.y == end.y)
 		{
 			return isBetween(pos.x, elbow.x, end.x);
 		}
-	}
-	
-	public boolean contains(Region region)
-	{
-		if (region.a == 0)
-			return true;
 		
-		return elements.contains(region.getUpperLeftCorner())
-			&& elements.contains(region.getUpperRightCorner())
-			&& elements.contains(region.getLowerLeftCorner())
-			&& elements.contains(region.getLowerRightCorner());
-	}
-	
-	public RIterator<Position> iterator()
-	{
-		return RIterator.iterate(elements);
+		return false;
 	}
 	
 	private static boolean isBetween(int val, int end1, int end2)
@@ -124,6 +100,68 @@ public class LShapedRegion implements RIterable<Position>
 		return end1 < end2
 			? val >= end1 && val <= end2
 			: val >= end2 && val <= end1;
+	}
+	
+	public boolean contains(Region region)
+	{
+		if (region.a == 0)
+			return true;
+		
+		return contains(region.getUpperLeftCorner())
+			&& contains(region.getUpperRightCorner())
+			&& contains(region.getLowerLeftCorner())
+			&& contains(region.getLowerRightCorner());
+	}
+	
+	public RIterator<Position> iterator()
+	{
+		return new LShapeIterator();
+	}
+	
+	private class LShapeIterator extends RIterator<Position>
+	{
+		private int leg = 0; // side of L-shape being iterated, 0-1, 2 marks end
+		private Position current = begin;
+		
+		public boolean hasNext()
+		{
+			return leg != 2;
+		}
+		
+		public Position next()
+		{
+			checkHasNext();
+			Position result = current;
+			
+			switch (leg)
+			{
+			case 0:
+				if (current.equals(elbow))
+				{
+					leg = current.equals(end) ? 2 : 1;
+					current = leg2Dir.reverse().apply(current);
+				}
+				else
+				{
+					current = leg1Dir.apply(current);
+				}
+				
+				return result;
+			case 1:
+				if (current.equals(end))
+				{
+					leg = 2;
+				}
+				else
+				{
+					current = leg2Dir.reverse().apply(current);
+				}
+				
+				return result;
+			default:
+				throw new Error();
+			}
+		}
 	}
 	
 	public void draw(Graphics g, ColorScheme colors, Point offset, int edgeSize)

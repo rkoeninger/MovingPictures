@@ -41,7 +41,6 @@ public class CommandUnitOverlay extends InputOverlay
 			return;
 		
 		drawSelectedUnitBox(g, unit);
-		drawInstructions(g, rect, "Move", "Cancel");
 	}
 	
 	public void onCommand(String command)
@@ -209,14 +208,17 @@ public class CommandUnitOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		if (!(unit.isStructure() || unit.getType().isGuardPostType()))
+		if (isCursorOnGrid())
 		{
-			Mediator.doMove(unit, panel.getPosition(x, y));
-			Mediator.playSound("beep2");
-		}
-		else
-		{
-			complete();
+			if (!(unit.isStructure() || unit.getType().isGuardPostType()))
+			{
+				Mediator.doMove(unit, panel.getPosition(x, y));
+				Mediator.playSound("beep2");
+			}
+			else
+			{
+				complete();
+			}
 		}
 	}
 	

@@ -1,11 +1,13 @@
 package com.robbix.mp5.basics;
 
-import static java.lang.Math.*;
-
 import java.awt.Graphics;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.robbix.mp5.Mediator;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class BorderRegion implements RIterable<Position>
 {
@@ -14,8 +16,6 @@ public class BorderRegion implements RIterable<Position>
 	public final int w;
 	public final int h;
 	public final int a;
-	
-	private List<Position> elements;
 	
 	public BorderRegion(int x, int y, int w, int h)
 	{
@@ -36,36 +36,6 @@ public class BorderRegion implements RIterable<Position>
 		this.w = w;
 		this.h = h;
 		this.a = (w * 2) + (max(0, h - 2) * 2);
-		
-		elements = new ArrayList<Position>();
-		
-		if (a == 0)
-			return;
-		
-		// top, left->right, including corners
-		for (int i = x; i <= x + w - 1; ++i)
-			elements.add(new Position(i, y));
-		
-		if (h > 2)
-		{
-			// right, top->bottom, excluding corners
-			for (int i = y + 1; i <= y + h - 2; ++i)
-				elements.add(new Position(x + w - 1, i));
-		}
-		
-		if (h > 1)
-		{
-			// bottom, right->left, including corners
-			for (int i = x + w - 1; i >= x; --i)
-				elements.add(new Position(i, y + h - 1));
-		}
-		
-		if (h > 2 && w > 1)
-		{
-			// left, bottom->top, excluding corners
-			for (int i = y + h - 2; i >= y + 1; --i)
-				elements.add(new Position(x, i));
-		}
 	}
 	
 	public BorderRegion(Position a, Position b)
@@ -81,17 +51,141 @@ public class BorderRegion implements RIterable<Position>
 	
 	public boolean contains(Position pos)
 	{
-		return elements.contains(pos);
+		// Aligned vertically
+		if (pos.x == x || pos.x == x + w - 1)
+		{
+			return isBetween(pos.y, y, y + h);
+		}
+		
+		// Aligned horizontally
+		if (pos.y == y || pos.y == y + h - 1)
+		{
+			return isBetween(pos.x, x, x + w);
+		}
+		
+		return false;
+	}
+	
+	private static boolean isBetween(int val, int end1, int end2)
+	{
+		return end1 < end2
+			? val >= end1 && val <= end2
+			: val >= end2 && val <= end1;
 	}
 	
 	public RIterator<Position> iterator()
 	{
-		return RIterator.iterate(elements);
+		return iterator(true);
 	}
 	
-	public void draw(Graphics g, ColorScheme colors, int edgeSize)
+	public RIterator<Position> iterator(boolean clockwise)
 	{
-		draw(g, colors, new Point(), edgeSize);
+		return new SpiralIterator(clockwise);
+	}
+	
+	/**
+	 * Iterates over elements in this BorderRegion. Always starts at (x, y).
+	 * Goes clockwise or counter-clockwise.
+	 */
+	private class SpiralIterator extends RIterator<Position>
+	{
+		private int leg = 0; // side of border being iterated, 0-3, 4 marks end
+		private int index = 0;
+		
+		/*
+		 * The variables j and k are abstractions of x and y. They are used
+		 * in a generalization of two older algorithms, one for clockwise,
+		 * one for counter-clockwise. Their next() methods were similar enough
+		 * to simplifiy down to this generalization.
+		 */
+		
+		private boolean clockwise;
+		private int j0; // origin of j is dimension 1; x when clockwise, y when ccw
+		private int k0; // origin of k is dimension 2; y when clockwise, x when ccw
+		private int jn; // length in dimension 1; w when clockwise, h when ccw
+		private int kn; // length in dimension 2; h when clockwise, w when ccw
+		
+		public SpiralIterator(boolean clockwise)
+		{
+			this.clockwise = clockwise;
+			j0 = clockwise ? x : y;
+			k0 = clockwise ? y : x;
+			jn = clockwise ? w : h;
+			kn = clockwise ? h : w;
+		}
+		
+		private Position pos(int j, int k)
+		{
+			return clockwise ? Mediator.getPosition(j, k) : Mediator.getPosition(k, j);
+		}
+		
+		public boolean hasNext()
+		{
+			if (a == 0)
+				return false;
+			
+			return leg != 4;
+		}
+		
+		public Position next()
+		{
+			checkHasNext();
+			Position result = null;
+			
+			switch (leg)
+			{
+			case 0:
+				result = pos(j0 + index, k0);
+				index++;
+				
+				if (index >= jn)
+				{
+					leg   = kn > 2 ? 1 : 2;
+					index = kn > 2 ? 1 : 0;
+				}
+				
+				return result;
+				
+			case 1:
+				result = pos(j0 + jn - 1, k0 + index);
+				index++;
+				
+				if (index >= kn - 1)
+				{
+					leg   = 2;
+					index = 0;
+				}
+				
+				return result;
+				
+			case 2:
+				result = pos(j0 + jn - 1 - index, k0 + kn - 1);
+				index++;
+				
+				if (index >= jn)
+				{
+					leg   = kn > 2 ? 3 : 4;
+					index = kn > 2 ? 1 : 0;
+				}
+				
+				return result;
+				
+			case 3:
+				result = pos(j0, k0 + kn - 1 - index);
+				index++;
+				
+				if (index >= kn - 1)
+				{
+					leg   = 4;
+					index = 0;
+				}
+				
+				return result;
+				
+			default:
+				throw new Error();
+			}
+		}
 	}
 	
 	public void draw(Graphics g, ColorScheme colors, Point offset, int edgeSize)

@@ -3,7 +3,6 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.DefaultKeyboardFocusManager;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.KeyEventPostProcessor;
 import java.awt.Point;
@@ -15,7 +14,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.Rectangle2D;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
@@ -25,9 +23,12 @@ import com.robbix.mp5.basics.LShapedRegion;
 import com.robbix.mp5.basics.LinearRegion;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
+import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.DisplayPanel;
+import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.unit.UnitType;
 
 public abstract class InputOverlay
 implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
@@ -102,40 +103,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public void paintOverTerrain(Graphics g, Rectangle rect){}
 	public void paintOverUnits(Graphics g, Rectangle rect){}
 	
-	public void drawInstructions(Graphics g, Rectangle rect, String... lines)
-	{
-		g.translate(rect.x, rect.y);
-		g.setColor(Color.RED);
-		g.setFont(OVERLAY_FONT);
-		int y = 0;
-		int i = 0;
-		FontMetrics metrics = g.getFontMetrics();
-		
-		for (String line : lines)
-		{
-			if (i == 0)
-			{
-				line = "Left Click to " + line;
-			}
-			else if (i == 1 && lines.length == 2 || i == 2)
-			{
-				line = "Right Click to " + line;
-			}
-			else if (i == 1 && lines.length == 3)
-			{
-				line = "Middle Click to " + line;
-			}
-			
-			Rectangle2D bounds = metrics.getStringBounds(line, g);
-			int x = (int) (rect.width / 2 - bounds.getCenterX());
-			y += bounds.getHeight() + 4;
-			g.drawString(line, x, y);
-			i++;
-		}
-		
-		g.translate(-rect.x, -rect.y);
-	}
-	
 	public void drawSelectedUnitBox(Graphics g, Unit unit)
 	{
 		if (unit.isDead() || unit.isFloating() || panel.getScale() < 0) return;
@@ -179,25 +146,18 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		
 		int hpBarLength = absWidth - 14;
 		int hpLength = (int) (hpBarLength * hpFactor);
-		
-		double hpHue = 1.0 - hpFactor;
-		hpHue *= 0.333;
-		hpHue = 0.333 - hpHue;
-		
-		double hpAlpha = 2.0 - hpFactor;
-		hpAlpha *= 127.0;
+		double hpHue = 0.333 - (1.0 - hpFactor) * 0.333;
+		int hpAlpha = (int) ((2.0 - hpFactor) * 127);
 		
 		Color hpColor = Color.getHSBColor((float) hpHue, 1.0f, 1.0f);
-		hpColor = new Color(
-			hpColor.getRed(),
-			hpColor.getGreen(),
-			hpColor.getBlue(),
-			(int) hpAlpha
-		);
+		hpColor = Utils.getTranslucency(hpColor, hpAlpha);
 		
 		g.setColor(Color.BLACK);
 		g.fillRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);
 		
+		/*
+		 * Flash health bar when red 
+		 */
 		if (Utils.getTimeBasedSwitch(300, 2) || !isRed)
 		{
 			g.setColor(hpColor);
@@ -208,6 +168,52 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		g.drawRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);
 		
 		g.translate(-panel.getViewX(), -panel.getViewY());
+	}
+	
+	public void drawStructureFootprint(Graphics g, UnitType type, Position pos)
+	{
+		Footprint fp = type.getFootprint();
+		Region innerRegion = fp.getInnerRegion().move(pos);
+		Region outerRegion = innerRegion.stretch(1);
+		LayeredMap map = panel.getMap();
+		
+		if (type.getName().endsWith("Mine"))
+		{
+			if (map.getBounds().contains(innerRegion)
+			 && map.canPlaceUnit(pos, fp)
+			 && map.canPlaceMine(pos))
+			{
+				panel.draw(g, GREEN, innerRegion);
+			}
+			else
+			{
+				panel.draw(g, RED, innerRegion);
+			}
+		}
+		else
+		{
+			if (map.getBounds().contains(innerRegion) && map.canPlaceUnit(pos, fp))
+			{
+				if (!type.needsConnection() || map.willConnect(pos, fp))
+				{
+					panel.draw(g, GREEN, innerRegion);
+				}
+				else
+				{
+					panel.draw(g, YELLOW, innerRegion);
+				}
+			}
+			else
+			{
+				panel.draw(g, RED, innerRegion);
+			}
+			
+			for (Position tubePos : fp.getTubePositions())
+				panel.draw(g, WHITE.getFillOnly(), tubePos.shift(innerRegion.x, innerRegion.y));
+		}
+		
+		if (type.isStructureType() || type.isGuardPostType())
+			panel.drawOutline(g, WHITE, outerRegion);
 	}
 	
 	public void onLeftClick(int x, int y){}
@@ -300,11 +306,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			? fullRegion.getMaxY() - 1
 			: fullRegion.getY();
 		
-		Position farEnd = Mediator.getPosition(farX, farY);
-		Position elbow = isShiftOptionSet()
-			? Mediator.getPosition(origin.x, farEnd.y)
-			: Mediator.getPosition(farEnd.x, origin.y);
-		return new LShapedRegion(origin, elbow, farEnd);
+		return new LShapedRegion(origin, Mediator.getPosition(farX, farY), isShiftOptionSet());
 	}
 	
 	public BorderRegion getBorderDragRegion()
@@ -335,17 +337,13 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public final void mousePressed(MouseEvent e)
 	{
 		pressedPoint = e.getPoint();
-//		panel.addViewOffset(pressedPoint);
 	}
 	
 	public final void mouseReleased(MouseEvent e)
 	{
-//		Point mousePoint = panel.addViewOffset(e.getPoint());
-		Point mousePoint = e.getPoint();
-		
 		if (pressedPoint != null)
 		{
-			if (pressedPoint.distanceSq(mousePoint) < DRAG_THRESHOLD)
+			if (pressedPoint.distanceSq(e.getPoint()) < DRAG_THRESHOLD)
 			{
 				if      (e.getButton() == LEFT)   onLeftClick  (pressedPoint.x, pressedPoint.y);
 				else if (e.getButton() == MIDDLE) onMiddleClick(pressedPoint.x, pressedPoint.y);
@@ -378,9 +376,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public final void mouseDragged(MouseEvent e)
 	{
-		shiftDown = e.isShiftDown();
-		
-		if (pressedPoint != null)
+		if (isCursorOnGrid() && pressedPoint != null)
 		{
 			prepNormalDragArea(e.getX(), e.getY());
 			onAreaDragging(
@@ -416,7 +412,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	private boolean panelContains(int x, int y) // in terms of relative co-ords
 	{
 		Point p = new Point(x, y);
-//		panel.addViewOffset(p);
 		return panel.getPosition(p) != null;
 	}
 	
@@ -431,7 +426,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			
 			currentPoint.x = x;
 			currentPoint.y = y;
-//			panel.addViewOffset(currentPoint);
 		}
 		else
 		{

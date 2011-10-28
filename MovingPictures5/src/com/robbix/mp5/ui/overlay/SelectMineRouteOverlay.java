@@ -29,14 +29,6 @@ public class SelectMineRouteOverlay extends InputOverlay
 	{
 		for (Unit truck : trucks)
 			drawSelectedUnitBox(g, truck);
-		
-		String leftClick = "Select ";
-		
-		if      (mine == null && smelter == null) leftClick += "Smelter/Mine";
-		else if (mine == null && smelter != null) leftClick += "Smelter";
-		else if (mine != null && smelter == null) leftClick += "Mine";
-		
-		drawInstructions(g, rect, leftClick, "Cancel");
 	}
 	
 	public void onLeftClick(int x, int y)

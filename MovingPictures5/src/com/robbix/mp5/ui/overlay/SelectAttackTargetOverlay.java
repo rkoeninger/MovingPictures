@@ -20,20 +20,19 @@ public class SelectAttackTargetOverlay extends InputOverlay
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		drawSelectedUnitBox(g, attacker.getChassis());
-		drawInstructions(g, rect, "Select Target", "Cancel");
 	}
 	
 	public void onLeftClick(int x, int y)
 	{
-		if (!isCursorOnGrid())
-			return;
-		
-		Unit target = panel.getMap().getUnit(getCursorPosition());
-		
-		if (target != null && !target.isAt(attacker.getPosition()))
+		if (isCursorOnGrid())
 		{
-			Mediator.doAttack(attacker, target);
-			complete();
+			Unit target = panel.getMap().getUnit(getCursorPosition());
+			
+			if (target != null && !target.isAt(attacker.getPosition()))
+			{
+				Mediator.doAttack(attacker, target);
+				complete();
+			}
 		}
 	}
 	

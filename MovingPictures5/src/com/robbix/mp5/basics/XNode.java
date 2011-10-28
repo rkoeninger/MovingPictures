@@ -1,4 +1,4 @@
-package com.robbix.mp5;
+package com.robbix.mp5.basics;
 
 import java.awt.Color;
 import java.io.File;
@@ -17,9 +17,6 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import com.robbix.mp5.basics.Direction;
-import com.robbix.mp5.basics.FileFormatException;
-import com.robbix.mp5.basics.Offset;
 
 /**
  * This class represents a node in an XML document. It can be searched

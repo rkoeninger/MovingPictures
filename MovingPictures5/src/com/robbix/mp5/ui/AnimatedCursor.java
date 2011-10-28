@@ -12,8 +12,8 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.robbix.mp5.XNode;
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.basics.XNode;
 
 public class AnimatedCursor
 {

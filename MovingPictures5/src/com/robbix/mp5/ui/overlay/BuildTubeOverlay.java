@@ -23,7 +23,6 @@ public class BuildTubeOverlay extends InputOverlay
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		drawSelectedUnitBox(g, crane);
-		drawInstructions(g, rect, "Build Tube", "Cancel");
 		
 		if (isCursorOnGrid())
 		{
@@ -44,8 +43,11 @@ public class BuildTubeOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Mediator.doEarthworkerBuild(crane, getCursorPosition(), Fixture.TUBE);
-		complete();
+		if (isCursorOnGrid())
+		{
+			Mediator.doEarthworkerBuild(crane, getCursorPosition(), Fixture.TUBE);
+			complete();
+		}
 	}
 	
 	public void onRightClick(int x, int y)

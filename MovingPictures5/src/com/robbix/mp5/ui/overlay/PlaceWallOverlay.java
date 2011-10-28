@@ -13,8 +13,6 @@ public class PlaceWallOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		drawInstructions(g, rect, "Place Wall", "Cancel");
-		
 		if (isCursorOnGrid())
 		{
 			if (wallSprite == null)
@@ -29,9 +27,9 @@ public class PlaceWallOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Position pos = panel.getPosition(x, y);
+		Position pos = getCursorPosition();
 		
-		if (panel.getMap().canPlaceFixture(pos))
+		if (isCursorOnGrid() && panel.getMap().canPlaceFixture(pos))
 		{
 			panel.getMap().putWall(pos);
 			panel.refresh();

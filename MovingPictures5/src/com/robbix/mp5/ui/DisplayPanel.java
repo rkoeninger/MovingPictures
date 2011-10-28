@@ -113,7 +113,7 @@ public class DisplayPanel extends JComponent
 		this.sprites = sprites;
 		this.tiles = tiles;
 		this.tileSize = tiles.getTileSize();
-		this.maxScale = 0;
+		this.maxScale = 1;
 		this.minScale = -Utils.log2(tileSize);
 		this.cursors = cursors;
 		this.overlays = new LinkedList<InputOverlay>();
@@ -552,12 +552,6 @@ public class DisplayPanel extends JComponent
 		return scroll.y;
 	}
 	
-//	public Point addViewOffset(Point p)
-//	{
-//		p.translate(-scroll.x, -scroll.y);
-//		return p;
-//	}
-	
 	public Point subtractViewOffset(Point p)
 	{
 		p.translate(scroll.x, scroll.y);
@@ -715,13 +709,13 @@ public class DisplayPanel extends JComponent
 	 */
 	public void setScale(int scale)
 	{
+		if (scale < minScale || scale > maxScale)
+			throw new IllegalArgumentException("scale " + scale + " out of range");
+		
 		int normalTileSize = tiles.getTileSize();
 		int newTileSize = scale < 0
 			? normalTileSize >> -scale
 			: normalTileSize << scale;
-		
-		if (newTileSize < 1 || newTileSize > 32)
-			throw new IllegalArgumentException("scale " + scale + " out of range");
 		
 		this.tileSize = newTileSize;
 		this.scale = scale;
@@ -857,8 +851,8 @@ public class DisplayPanel extends JComponent
 	public Rectangle getDisplayRect()
 	{
 		return new Rectangle(
-			scroll.x,
-			scroll.y,
+			max(0, scroll.x),
+			max(0, scroll.y),
 			min(getTotalWidth(),  getWidth()),
 			min(getTotalHeight(), getHeight())
 		);
@@ -870,16 +864,6 @@ public class DisplayPanel extends JComponent
 	public Region getDisplayRegion()
 	{
 		return getRegion(getDisplayRect());
-	}
-	
-	public Region getVisibleRegion()
-	{
-		return getRegion(new Rectangle(
-			max(0, -scroll.x),
-			max(0, -scroll.y),
-			min(getTotalWidth(),  getWidth()),
-			min(getTotalHeight(), getHeight())
-		));
 	}
 	
 	/*------------------------------------------------------------------------------------------[*]
@@ -951,37 +935,23 @@ public class DisplayPanel extends JComponent
 		int hSpace = getHorizontalLetterBoxSpace();
 		int vSpace = getVerticalLetterBoxSpace();
 		
-		// Left side, including top/bottom corners
-		g.fillRect(0, 0, hSpace, getHeight());
+		if (getWidth() > getTotalWidth())
+		{
+			// Left side, including top/bottom corners
+			g.fillRect(0, 0, hSpace, getHeight());
+			
+			// Right side, including top/bottom corners
+			g.fillRect(hSpace + getTotalHeight(), 0, hSpace + 1, getHeight());
+		}
 		
-		// Right side, including top/bottom corners
-		g.fillRect(getWidth() - hSpace - 1, 0, hSpace, getHeight());
-		
-		// Top side
-		g.fillRect(hSpace, 0, getWidth() - hSpace * 2, vSpace);
-		
-		// Bottom side
-		g.fillRect(hSpace, getHeight() - vSpace, getWidth() - hSpace * 2, vSpace);
-	}
-	
-	/**
-	 * Draws grid of size tileSize over Region in Color.BLACK.
-	 */
-	private void drawGrid(Graphics g, Rectangle rect, Region region)
-	{
-		g.setColor(Color.BLACK);
-		int x0 = rect.x;
-		int y0 = rect.y;
-		int w = getTotalWidth();
-		int h = getTotalHeight();
-		
-		// Vertical lines
-		for (int x = max(1, region.x); x < region.getMaxX(); ++x)
-			g.drawLine(x0 + x * tileSize, y0, x0 + x * tileSize, y0 + h - 1);
-		
-		// Horizontal lines
-		for (int y = max(1, region.y); y < region.getMaxY(); ++y)
-			g.drawLine(x0, y0 + y * tileSize, x0 + w - 1, y0 + y * tileSize);
+		if (getHeight() > getTotalHeight())
+		{
+			// Top side
+			g.fillRect(hSpace, 0, getWidth() - hSpace * 2, vSpace);
+			
+			// Bottom side
+			g.fillRect(hSpace, getHeight() - vSpace, getWidth() - hSpace * 2, vSpace);
+		}
 	}
 	
 	/**
@@ -992,11 +962,13 @@ public class DisplayPanel extends JComponent
 	{
 		synchronized (cacheLock)
 		{
-			Region region = getVisibleRegion();
+			Region region = getDisplayRegion();
 			region = map.getBounds().getIntersection(region);
 			
 			if (cachedBackground == null)
 			{
+				System.out.println(rect);
+				
 				cachedBackground = new BufferedImage(
 					rect.width,
 					rect.height,
@@ -1005,12 +977,14 @@ public class DisplayPanel extends JComponent
 			}
 			
 			Graphics cg = cachedBackground.getGraphics();
+			cg.translate(min(0, -scroll.x), min(0, -scroll.y));
 			
 			if (showTerrainCostMap) drawCostMap(cg, region);
 							   else drawSurface(cg, region);
 			
 			cg.dispose();
-			draw(g, cachedBackground, getLetterBoxRect());
+			Rectangle letterBox = getLetterBoxRect();
+			g.drawImage(cachedBackground, letterBox.x, letterBox.y, null);
 		}
 	}
 	
@@ -1065,6 +1039,26 @@ public class DisplayPanel extends JComponent
 				draw(g, sprites.getSprite("aGeyser", "geyser"), pos);
 			}
 		}
+	}
+	
+	/**
+	 * Draws grid of size tileSize over Region in Color.BLACK.
+	 */
+	private void drawGrid(Graphics g, Rectangle rect, Region region)
+	{
+		g.setColor(Color.BLACK);
+		int x0 = rect.x;
+		int y0 = rect.y;
+		int w = getTotalWidth();
+		int h = getTotalHeight();
+		
+		// Vertical lines
+		for (int x = max(1, region.x); x < region.getMaxX(); ++x)
+			g.drawLine(x0 + x * tileSize, y0, x0 + x * tileSize, y0 + h - 1);
+		
+		// Horizontal lines
+		for (int y = max(1, region.y); y < region.getMaxY(); ++y)
+			g.drawLine(x0, y0 + y * tileSize, x0 + w - 1, y0 + y * tileSize);
 	}
 	
 	/**
@@ -1198,6 +1192,11 @@ public class DisplayPanel extends JComponent
 		region.draw(g, colors, getViewPosition(), tileSize);
 	}
 	
+	public void drawOutline(Graphics g, ColorScheme colors, Region region)
+	{
+		region.draw(g, colors.getEdgeOnly(), getViewPosition(), tileSize);
+	}
+	
 	public void draw(Graphics g, ColorScheme colors, LShapedRegion region)
 	{
 		region.draw(g, colors, getViewPosition(), tileSize);
@@ -1222,20 +1221,6 @@ public class DisplayPanel extends JComponent
 		g.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 	
-	/**
-	 * Does not account for scale/scroll,
-	 * draws literally to Graphics.
-	 */
-	public void draw(Graphics g, Image img, Rectangle rect)
-	{
-		g.drawImage(
-			img,
-			rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
-			rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
-			null
-		);
-	}
-	
 	public void draw(Graphics g, Image img, Point point)
 	{
 		g.drawImage(
@@ -1245,10 +1230,9 @@ public class DisplayPanel extends JComponent
 		);
 	}
 	
-	// TODO: scrolling/scaling?
 	public void draw(Graphics g, Image img, Position pos)
 	{
-		g.drawImage(img, pos.x * tileSize, pos.y * tileSize, null);
+		g.drawImage(img, pos.x * tileSize + scroll.x, pos.y * tileSize + scroll.y, null);
 	}
 	
 	public void draw(Graphics g, Sprite sprite, Position pos)

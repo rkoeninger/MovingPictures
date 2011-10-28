@@ -102,12 +102,19 @@ public class Game
 	private CursorSet cursorSet;
 	private Set<Trigger> triggers;
 	
+	private GameListener.Helper listenerHelper = new GameListener.Helper();
+	
 	private Game()
 	{
 		defaultPlayer = new Player(0, "Default", 240);
 		players = new HashMap<Integer, Player>();
 		players.put(0, defaultPlayer);
 		triggers = Collections.synchronizedSet(new HashSet<Trigger>());
+	}
+	
+	public void addGameListener(GameListener listener)
+	{
+		listenerHelper.add(listener);
 	}
 	
 	public Set<Trigger> getTriggers()
@@ -163,6 +170,7 @@ public class Game
 	public void addPlayer(Player player)
 	{
 		players.put(player.getID(), player);
+		listenerHelper.firePlayerAdded(player);
 	}
 	
 	public Collection<Player> getPlayers()

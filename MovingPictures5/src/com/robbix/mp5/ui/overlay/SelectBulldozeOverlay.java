@@ -24,22 +24,22 @@ public class SelectBulldozeOverlay extends InputOverlay
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
 		drawSelectedUnitBox(g, dozer);
-		drawInstructions(g, rect, "Select Bulldoze Area", "Cancel");
 		
 		if (isCursorOnGrid())
 		{
-			Position pos = getCursorPosition();
-			
 			if (isDragging()) panel.draw(g, RED, getDragRegion());
-			             else panel.draw(g, RED, pos);
+			             else panel.draw(g, RED, getCursorPosition());
 		}
 	}
 	
 	public void onLeftClick(int x, int y)
 	{
-		Position pos = panel.getPosition(x, y);
-		dozer.assignNow(new BulldozeRegionTask(Arrays.asList(pos)));
-		complete();
+		if (isCursorOnGrid())
+		{
+			Position pos = getCursorPosition();
+			dozer.assignNow(new BulldozeRegionTask(Arrays.asList(pos)));
+			complete();
+		}
 	}
 	
 	public void onRightClick(int x, int y)

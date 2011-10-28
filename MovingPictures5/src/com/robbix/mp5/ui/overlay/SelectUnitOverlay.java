@@ -25,8 +25,6 @@ public class SelectUnitOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		drawInstructions(g, rect, "Select");
-		
 		if (isDragging())
 		{
 			panel.draw(g, RED, getDragRegion());
@@ -62,14 +60,26 @@ public class SelectUnitOverlay extends InputOverlay
 			if (containsNonStructure(selected))
 			{
 				filterNonStructure(selected);
-				Unit leadUnit = getLeadUnit(selected);
-				Mediator.playSound(leadUnit.getType().getAcknowledgement());
-				push(areAllTrucks(selected)
-					? new CommandTruckOverlay(selected)
-					: new CommandGroupOverlay(selected)
-				);
-				panel.showStatus((Unit)null);
-				panel.showStatus(focusedPlayer);
+				
+				if (selected.size() == 1)
+				{
+					Unit only = selected.iterator().next();
+					Mediator.playSound(only.getType().getAcknowledgement());
+					push(new CommandUnitOverlay(only));
+					panel.showStatus(only);
+					panel.showStatus(only.getOwner());
+				}
+				else
+				{
+					Unit leadUnit = getLeadUnit(selected);
+					Mediator.playSound(leadUnit.getType().getAcknowledgement());
+					push(areAllTrucks(selected)
+						? new CommandTruckOverlay(selected)
+						: new CommandGroupOverlay(selected)
+					);
+					panel.showStatus((Unit)null);
+					panel.showStatus(focusedPlayer);
+				}
 			}
 			else
 			{
@@ -105,12 +115,8 @@ public class SelectUnitOverlay extends InputOverlay
 	private static boolean containsNonStructure(Set<Unit> units)
 	{
 		for (Unit unit : units)
-		{
 			if (!unit.isStructure() && !unit.getType().isGuardPostType())
-			{
 				return true;
-			}
-		}
 		
 		return false;
 	}

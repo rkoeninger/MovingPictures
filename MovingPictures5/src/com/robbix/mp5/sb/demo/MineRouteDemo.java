@@ -24,6 +24,7 @@ public class MineRouteDemo extends Demo
 				"eCargoTruck",
 				"eCommandCenter",
 				"eCommonSmelter",
+				"aCommonMine",
 				"eCommonMine",
 				"aResource",
 				"aStructureStatus"
@@ -34,7 +35,7 @@ public class MineRouteDemo extends Demo
 				"dockOpen"
 			),
 			Utils.asSet(
-				new Player(1, "Mining Operation", 200) // FIXME: need to get to sb menus
+				new Player(1, "Mining Operation", 200) // FIXME: how to set current player?
 			)
 		);
 	}

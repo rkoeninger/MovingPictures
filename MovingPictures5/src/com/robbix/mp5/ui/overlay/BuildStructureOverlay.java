@@ -7,7 +7,6 @@ import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.ConVecConstructTask;
 import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Footprint;
@@ -28,8 +27,6 @@ public class BuildStructureOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		drawInstructions(g, rect, "Build", "Cancel");
-		
 		if (isCursorOnGrid())
 		{
 			if (structSprite == null)
@@ -40,7 +37,8 @@ public class BuildStructureOverlay extends InputOverlay
 				structSprite = Utils.getTranslucency(structSprite, hue, 0.5f);
 			}
 			
-			panel.draw(g, structSprite, getCursorPosition());
+			Position center = structure.getFootprint().getCenter();
+			panel.draw(g, structSprite, getCursorPosition().subtract(center));
 		}
 	}
 	
@@ -48,29 +46,8 @@ public class BuildStructureOverlay extends InputOverlay
 	{
 		if (isCursorOnGrid())
 		{
-			Position cursorPos = getCursorPosition();
-			Footprint fp = structure.getFootprint();
-			Region innerRegion = fp.getInnerRegion().move(cursorPos);
-			LayeredMap map = panel.getMap();
-			
-			if (map.getBounds().contains(innerRegion) && map.canPlaceUnit(cursorPos, fp))
-			{
-				if (!structure.needsConnection() || map.willConnect(cursorPos, fp))
-				{
-					panel.draw(g, GREEN, innerRegion);
-				}
-				else
-				{
-					panel.draw(g, YELLOW, innerRegion);
-				}
-			}
-			else
-			{
-				panel.draw(g, RED, innerRegion);
-			}
-						
-			for (Position tubePos : fp.getTubePositions())
-				panel.draw(g, WHITE.getFillOnly(), tubePos.shift(innerRegion.x, innerRegion.y));
+			Position center = structure.getFootprint().getCenter();
+			drawStructureFootprint(g, structure.getType(), getCursorPosition().subtract(center));
 		}
 	}
 	
@@ -78,7 +55,8 @@ public class BuildStructureOverlay extends InputOverlay
 	{
 		LayeredMap map = panel.getMap();
 		Footprint fp = structure.getFootprint();
-		Position pos = panel.getPosition(x, y);
+		Position center = structure.getFootprint().getCenter();
+		Position pos = getCursorPosition().subtract(center);
 		Position conVecPos = pos.shift(fp.getWidth(), fp.getHeight());
 		
 		if (map.canPlaceUnit(pos, fp) && map.canPlaceUnit(conVecPos))

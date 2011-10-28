@@ -541,11 +541,21 @@ public class LayeredMap
 	
 	public boolean canPlaceUnit(Position pos, Footprint fp)
 	{
+		if (! getBounds().contains(fp.getInnerRegion().move(pos)))
+			return false;
+		
 		for (Position occupied : fp.iterator(pos))
 			if (!canPlaceUnit(occupied))
 				return false;
 		
 		return true;
+	}
+	
+	public boolean canPlaceMine(Position pos)
+	{
+		pos = pos.shift(1, 0);
+		ResourceDeposit deposit = getResourceDeposit(pos);
+		return deposit != null && deposit.isCommon();
 	}
 	
 	public boolean willConnect(Position pos, Footprint fp)

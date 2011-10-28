@@ -13,8 +13,6 @@ public class PlaceTubeOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g, Rectangle rect)
 	{
-		drawInstructions(g, rect, "Place Tube", "Cancel");
-		
 		if (isCursorOnGrid())
 		{
 			if (tubeSprite == null)
@@ -29,9 +27,9 @@ public class PlaceTubeOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Position pos = panel.getPosition(x, y);
+		Position pos = getCursorPosition();
 		
-		if (panel.getMap().canPlaceFixture(pos))
+		if (isCursorOnGrid() && panel.getMap().canPlaceFixture(pos))
 		{
 			panel.getMap().putTube(pos);
 			panel.refresh();

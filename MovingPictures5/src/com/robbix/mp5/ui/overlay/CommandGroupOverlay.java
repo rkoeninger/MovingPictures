@@ -31,8 +31,6 @@ public class CommandGroupOverlay extends InputOverlay
 	{
 		for (Unit unit : units)
 			drawSelectedUnitBox(g, unit);
-		
-		drawInstructions(g, rect, "Move", "Cancel");
 	}
 	
 	public void onCommand(String command)
@@ -81,8 +79,11 @@ public class CommandGroupOverlay extends InputOverlay
 	
 	public void onLeftClick(int x, int y)
 	{
-		Mediator.doGroupMove(units, panel.getPosition(x, y));
-		Mediator.playSound("beep2");
+		if (isCursorOnGrid())
+		{
+			Mediator.doGroupMove(units, getCursorPosition());
+			Mediator.playSound("beep2");
+		}
 	}
 	
 	public void onRightClick(int x, int y)

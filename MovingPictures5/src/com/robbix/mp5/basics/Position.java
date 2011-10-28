@@ -51,6 +51,16 @@ public class Position
 		return new Position(x + dx, y + dy);
 	}
 	
+	public Position add(Position pos)
+	{
+		return new Position(x + pos.x, y + pos.y);
+	}
+	
+	public Position subtract(Position pos)
+	{
+		return new Position(x - pos.x, y - pos.y);
+	}
+	
 	/**
 	 * Returns a set of this position's four neighbors n, s, e, w.
 	 */
