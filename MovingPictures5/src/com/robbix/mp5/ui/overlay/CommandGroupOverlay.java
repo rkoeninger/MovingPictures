@@ -77,16 +77,13 @@ public class CommandGroupOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (isCursorOnGrid())
-		{
-			Mediator.doGroupMove(units, getCursorPosition());
-			Mediator.playSound("beep2");
-		}
+		Mediator.doGroupMove(units, getCursorPosition());
+		Mediator.playSound("beep2");
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

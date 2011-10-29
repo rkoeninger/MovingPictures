@@ -49,11 +49,8 @@ public class BuildMineOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (!isCursorOnGrid())
-			return;
-
 		Position center = mine.getFootprint().getCenter();
 		Position pos = getCursorPosition().subtract(center);
 		Position minerPos = pos.shift(1, 0);
@@ -70,7 +67,7 @@ public class BuildMineOverlay extends InputOverlay
 		}
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

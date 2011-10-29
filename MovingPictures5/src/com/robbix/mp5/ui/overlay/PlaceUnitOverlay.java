@@ -73,13 +73,13 @@ public class PlaceUnitOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
 		Position center = unit.getFootprint().getCenter();
 		Position pos = getCursorPosition().subtract(center);
 		LayeredMap map = panel.getMap();
 		
-		if (isCursorOnGrid() && map.canPlaceUnit(pos, unit.getFootprint()))
+		if (map.canPlaceUnit(pos, unit.getFootprint()))
 		{
 			if (unit.isMine())
 			{
@@ -103,7 +103,7 @@ public class PlaceUnitOverlay extends InputOverlay
 		}
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

@@ -9,15 +9,12 @@ public class SpawnMeteorOverlay extends InputOverlay
 		super("meteor");
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (isCursorOnGrid())
-		{
-			Mediator.doSpawnMeteor(getCursorPosition());
-		}
+		Mediator.doSpawnMeteor(getCursorPosition());
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

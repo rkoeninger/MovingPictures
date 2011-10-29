@@ -31,11 +31,8 @@ public class SelectUnitOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (!isCursorOnGrid())
-			return;
-		
 		Unit selected = panel.getMap().getUnit(getCursorPosition());
 		
 		if (selected != null)
@@ -49,7 +46,7 @@ public class SelectUnitOverlay extends InputOverlay
 		}
 	}
 	
-	public void onAreaDragged(int x, int y, int w, int h)
+	public void onAreaDragged()
 	{
 		Set<Unit> selected = panel.getMap().getUnits(getDragRegion());
 		

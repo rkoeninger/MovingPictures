@@ -206,23 +206,20 @@ public class CommandUnitOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (isCursorOnGrid())
+		if (!(unit.isStructure() || unit.getType().isGuardPostType()))
 		{
-			if (!(unit.isStructure() || unit.getType().isGuardPostType()))
-			{
-				Mediator.doMove(unit, panel.getPosition(x, y));
-				Mediator.playSound("beep2");
-			}
-			else
-			{
-				complete();
-			}
+			Mediator.doMove(unit, getCursorPosition());
+			Mediator.playSound("beep2");
+		}
+		else
+		{
+			complete();
 		}
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

@@ -41,21 +41,18 @@ public class BuildTubeOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (isCursorOnGrid())
-		{
-			Mediator.doEarthworkerBuild(crane, getCursorPosition(), Fixture.TUBE);
-			complete();
-		}
+		Mediator.doEarthworkerBuild(crane, getCursorPosition(), Fixture.TUBE);
+		complete();
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}
 	
-	public void onAreaDragged(int x, int y, int w, int h)
+	public void onAreaDragged()
 	{
 		List<Position> tubeRow = new ArrayList<Position>();
 		

@@ -31,11 +31,8 @@ public class SelectMineRouteOverlay extends InputOverlay
 			drawSelectedUnitBox(g, truck);
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (!isCursorOnGrid())
-			return;
-		
 		Unit selected = panel.getMap().getUnit(getCursorPosition());
 		
 		if (selected != null)
@@ -59,7 +56,7 @@ public class SelectMineRouteOverlay extends InputOverlay
 		}
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

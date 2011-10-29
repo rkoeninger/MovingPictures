@@ -22,21 +22,18 @@ public class SelectAttackTargetOverlay extends InputOverlay
 		drawSelectedUnitBox(g, attacker.getChassis());
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (isCursorOnGrid())
+		Unit target = panel.getMap().getUnit(getCursorPosition());
+		
+		if (target != null && !target.isAt(attacker.getPosition()))
 		{
-			Unit target = panel.getMap().getUnit(getCursorPosition());
-			
-			if (target != null && !target.isAt(attacker.getPosition()))
-			{
-				Mediator.doAttack(attacker, target);
-				complete();
-			}
+			Mediator.doAttack(attacker, target);
+			complete();
 		}
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

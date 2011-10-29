@@ -33,11 +33,11 @@ public class PlaceResourceOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
 		Position pos = getCursorPosition();
 		
-		if (isCursorOnGrid() && panel.getMap().canPlaceResourceDeposit(pos))
+		if (panel.getMap().canPlaceResourceDeposit(pos))
 		{
 			panel.getMap().putResourceDeposit(res, pos);
 			res = (ResourceDeposit)res.clone();
@@ -45,7 +45,7 @@ public class PlaceResourceOverlay extends InputOverlay
 		}
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

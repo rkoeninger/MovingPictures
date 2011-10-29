@@ -13,16 +13,13 @@ public class PlaceBulldozeOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (isCursorOnGrid())
-		{
-			panel.getMap().bulldoze(getCursorPosition());
-			panel.refresh();
-		}
+		panel.getMap().bulldoze(getCursorPosition());
+		panel.refresh();
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

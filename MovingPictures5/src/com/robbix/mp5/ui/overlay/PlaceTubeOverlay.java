@@ -25,18 +25,18 @@ public class PlaceTubeOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
 		Position pos = getCursorPosition();
 		
-		if (isCursorOnGrid() && panel.getMap().canPlaceFixture(pos))
+		if (panel.getMap().canPlaceFixture(pos))
 		{
 			panel.getMap().putTube(pos);
 			panel.refresh();
 		}
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

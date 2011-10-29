@@ -51,7 +51,7 @@ public class BuildStructureOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
 		LayeredMap map = panel.getMap();
 		Footprint fp = structure.getFootprint();
@@ -71,7 +71,7 @@ public class BuildStructureOverlay extends InputOverlay
 		}
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

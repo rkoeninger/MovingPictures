@@ -61,6 +61,9 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	private String animatedCursor = null;
 	
 	protected boolean closesOnEscape = true;
+	protected boolean requiresLeftClickOnGrid = true;
+	protected boolean requiresRightClickOnGrid = false;
+	protected boolean requiresMiddleClickOnGrid = true;
 	
 	protected InputOverlay()
 	{
@@ -105,7 +108,13 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public void drawSelectedUnitBox(Graphics g, Unit unit)
 	{
-		if (unit.isDead() || unit.isFloating() || panel.getScale() < 0) return;
+		if (unit.isDead() || unit.isFloating()) return;
+		
+		if (panel.getScale() < 0)
+		{
+			panel.draw(g, WHITE.getEdgeOnly(), unit.getPosition());
+			return;
+		}
 		
 		g.translate(panel.getViewX(), panel.getViewY());
 		
@@ -176,51 +185,39 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		Region innerRegion = fp.getInnerRegion().move(pos);
 		Region outerRegion = innerRegion.stretch(1);
 		LayeredMap map = panel.getMap();
+		ColorScheme scheme = null;
 		
 		if (type.getName().endsWith("Mine"))
 		{
-			if (map.getBounds().contains(innerRegion)
-			 && map.canPlaceUnit(pos, fp)
-			 && map.canPlaceMine(pos))
-			{
-				panel.draw(g, GREEN, innerRegion);
-			}
-			else
-			{
-				panel.draw(g, RED, innerRegion);
-			}
+			boolean validPosition = map.getBounds().contains(innerRegion)
+			 && map.canPlaceUnit(pos, fp) && map.canPlaceMine(pos);
+			
+			scheme = validPosition ? GREEN : RED;
 		}
 		else
 		{
-			if (map.getBounds().contains(innerRegion) && map.canPlaceUnit(pos, fp))
-			{
-				if (!type.needsConnection() || map.willConnect(pos, fp))
-				{
-					panel.draw(g, GREEN, innerRegion);
-				}
-				else
-				{
-					panel.draw(g, YELLOW, innerRegion);
-				}
-			}
-			else
-			{
-				panel.draw(g, RED, innerRegion);
-			}
+			boolean validPosition = map.getBounds().contains(innerRegion)
+			 && map.canPlaceUnit(pos, fp);
+			boolean connected = validPosition
+			 && (!type.needsConnection() || map.willConnect(pos, fp));
 			
-			for (Position tubePos : fp.getTubePositions())
-				panel.draw(g, WHITE.getFillOnly(), tubePos.shift(innerRegion.x, innerRegion.y));
+			scheme = validPosition ? (connected ? GREEN : YELLOW) : RED;
 		}
+		
+		panel.draw(g, scheme, innerRegion);
+		
+		for (Position tubePos : fp.getTubePositions())
+			panel.draw(g, WHITE.getFillOnly(), tubePos.shift(innerRegion.x, innerRegion.y));
 		
 		if (type.isStructureType() || type.isGuardPostType())
 			panel.drawOutline(g, WHITE, outerRegion);
 	}
 	
-	public void onLeftClick(int x, int y){}
-	public void onRightClick(int x, int y){}
-	public void onMiddleClick(int x, int y){}
-	public void onAreaDragged(int x, int y, int w, int h){}
-	public void onAreaDragging(int x, int y, int w, int h){}
+	public void onLeftClick(){}
+	public void onRightClick(){}
+	public void onMiddleClick(){}
+	public void onAreaDragged(){}
+	public void onAreaDragging(){}
 	public void onAreaDragCancelled(){}
 	public void onCommand(String command){}
 	
@@ -345,9 +342,21 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		{
 			if (pressedPoint.distanceSq(e.getPoint()) < DRAG_THRESHOLD)
 			{
-				if      (e.getButton() == LEFT)   onLeftClick  (pressedPoint.x, pressedPoint.y);
-				else if (e.getButton() == MIDDLE) onMiddleClick(pressedPoint.x, pressedPoint.y);
-				else if (e.getButton() == RIGHT)  onRightClick (pressedPoint.x, pressedPoint.y);
+				if (e.getButton() == LEFT)
+				{
+					if (!requiresLeftClickOnGrid || isCursorOnGrid())
+						onLeftClick();
+				}
+				else if (e.getButton() == MIDDLE)
+				{
+					if (!requiresMiddleClickOnGrid || isCursorOnGrid())
+						onMiddleClick();
+				}
+				else if (e.getButton() == RIGHT)
+				{
+					if (!requiresRightClickOnGrid || isCursorOnGrid())
+						onRightClick();
+				}
 				
 				if (dragArea != null)
 				{
@@ -361,10 +370,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 				if (dragArea != null)
 				{
 					onAreaDragged(
-						dragArea.x,
-						dragArea.y,
-						dragArea.width,
-						dragArea.height
 					);
 				}
 			}
@@ -380,10 +385,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		{
 			prepNormalDragArea(e.getX(), e.getY());
 			onAreaDragging(
-				dragArea.x,
-				dragArea.y,
-				dragArea.width,
-				dragArea.height
 			);
 		}
 	}

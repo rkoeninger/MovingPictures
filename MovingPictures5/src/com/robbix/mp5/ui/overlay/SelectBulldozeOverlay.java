@@ -32,22 +32,19 @@ public class SelectBulldozeOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (isCursorOnGrid())
-		{
-			Position pos = getCursorPosition();
-			dozer.assignNow(new BulldozeRegionTask(Arrays.asList(pos)));
-			complete();
-		}
+		Position pos = getCursorPosition();
+		dozer.assignNow(new BulldozeRegionTask(Arrays.asList(pos)));
+		complete();
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}
 	
-	public void onAreaDragged(int x, int y, int w, int h)
+	public void onAreaDragged()
 	{
 		Region dragRegion = getDragRegion();
 		List<Position> dozeArea = new ArrayList<Position>();

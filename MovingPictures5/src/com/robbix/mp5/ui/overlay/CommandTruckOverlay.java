@@ -142,20 +142,17 @@ public class CommandTruckOverlay extends InputOverlay
 		}
 	}
 	
-	public void onLeftClick(int x, int y)
+	public void onLeftClick()
 	{
-		if (isCursorOnGrid())
-		{
-			Position pos = getCursorPosition();
-			
-			for (Unit truck : trucks)		
-				Mediator.doMove(truck, pos);
-			
-			Mediator.playSound("beep2");
-		}
+		Position pos = getCursorPosition();
+		
+		for (Unit truck : trucks)		
+			Mediator.doMove(truck, pos);
+		
+		Mediator.playSound("beep2");
 	}
 	
-	public void onRightClick(int x, int y)
+	public void onRightClick()
 	{
 		complete();
 	}

@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
@@ -113,7 +114,7 @@ public class DisplayPanel extends JComponent
 		this.sprites = sprites;
 		this.tiles = tiles;
 		this.tileSize = tiles.getTileSize();
-		this.maxScale = 1;
+		this.maxScale = 3;
 		this.minScale = -Utils.log2(tileSize);
 		this.cursors = cursors;
 		this.overlays = new LinkedList<InputOverlay>();
@@ -892,7 +893,10 @@ public class DisplayPanel extends JComponent
 		}
 		
 		if (showGrid && tileSize >= 8)
+		{
+			g.setColor(Color.BLACK);
 			drawGrid(g, rect, region);
+		}
 		
 		if (! overlays.isEmpty())
 			overlays.getFirst().paintOverTerrain(g, overlayRect);
@@ -941,7 +945,7 @@ public class DisplayPanel extends JComponent
 			g.fillRect(0, 0, hSpace, getHeight());
 			
 			// Right side, including top/bottom corners
-			g.fillRect(hSpace + getTotalHeight(), 0, hSpace + 1, getHeight());
+			g.fillRect(getWidth() - hSpace - 1, 0, hSpace + 1, getHeight());
 		}
 		
 		if (getHeight() > getTotalHeight())
@@ -950,7 +954,7 @@ public class DisplayPanel extends JComponent
 			g.fillRect(hSpace, 0, getWidth() - hSpace * 2, vSpace);
 			
 			// Bottom side
-			g.fillRect(hSpace, getHeight() - vSpace, getWidth() - hSpace * 2, vSpace);
+			g.fillRect(hSpace, getHeight() - vSpace - 1, getWidth() - hSpace * 2, vSpace + 1);
 		}
 	}
 	
@@ -967,8 +971,6 @@ public class DisplayPanel extends JComponent
 			
 			if (cachedBackground == null)
 			{
-				System.out.println(rect);
-				
 				cachedBackground = new BufferedImage(
 					rect.width,
 					rect.height,
@@ -1010,13 +1012,7 @@ public class DisplayPanel extends JComponent
 					? terrainCost.getScaleFactor(pos)
 					: terrainCost.get(pos);
 				
-				g.drawString(
-					Double.isInfinite(cost)
-						? "Inf"
-						: String.format("%.2f", cost),
-					pos.x * tileSize + 3,
-					pos.y * tileSize + 11
-				);
+				draw(g, String.format("%.2f", cost), pos);
 			}
 		}
 	}
@@ -1046,19 +1042,13 @@ public class DisplayPanel extends JComponent
 	 */
 	private void drawGrid(Graphics g, Rectangle rect, Region region)
 	{
-		g.setColor(Color.BLACK);
-		int x0 = rect.x;
-		int y0 = rect.y;
-		int w = getTotalWidth();
-		int h = getTotalHeight();
-		
 		// Vertical lines
 		for (int x = max(1, region.x); x < region.getMaxX(); ++x)
-			g.drawLine(x0 + x * tileSize, y0, x0 + x * tileSize, y0 + h - 1);
+			g.drawLine(x * tileSize + scroll.x, 0, x * tileSize + scroll.x, getHeight() - 1);
 		
 		// Horizontal lines
 		for (int y = max(1, region.y); y < region.getMaxY(); ++y)
-			g.drawLine(x0, y0 + y * tileSize, x0 + w - 1, y0 + y * tileSize);
+			g.drawLine(0, y * tileSize + scroll.y, getWidth() - 1, y * tileSize + scroll.y);
 	}
 	
 	/**
@@ -1228,6 +1218,16 @@ public class DisplayPanel extends JComponent
 			point.x, point.y,
 			null
 		);
+	}
+	
+	public void draw(Graphics g, String string, Position pos)
+	{
+		int x = pos.x * tileSize + (tileSize / 2) + scroll.x;
+		int y = pos.y * tileSize + (tileSize / 2) + scroll.y;
+		Rectangle2D bounds = g.getFontMetrics().getStringBounds(string, g);
+		int cx = (int) bounds.getCenterX();
+		int cy = (int) bounds.getCenterY();
+		g.drawString(string, x - cx, y - cy);
 	}
 	
 	public void draw(Graphics g, Image img, Position pos)
