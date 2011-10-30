@@ -24,6 +24,9 @@ import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
 
+/**
+ * Async module loading is not enabled by default.
+ */
 public class SpriteLibrary implements Modular
 {
 	public static SpriteLibrary load(File rootDir, boolean lazy) throws IOException
@@ -67,8 +70,8 @@ public class SpriteLibrary implements Modular
 	private Set<String> loadedModules;
 	private ModuleListener.Helper listenerHelper;
 	
+	private boolean asyncMode = false;
 	private Object asyncLock = new Object();
-	
 	private AsyncLoader loader;
 	
 	public SpriteLibrary()
@@ -79,6 +82,16 @@ public class SpriteLibrary implements Modular
 		ambientSets = new HashMap<String, SpriteSet>(256);
 		listenerHelper = new ModuleListener.Helper();
 		loader = new AsyncLoader();
+	}
+	
+	public void setAsyncModeEnabled(boolean asyncMode)
+	{
+		asyncMode = true;
+	}
+	
+	public boolean isAsyncModeEnabled()
+	{
+		return asyncMode;
 	}
 	
 	public void addModuleListener(ModuleListener listener)
@@ -93,7 +106,7 @@ public class SpriteLibrary implements Modular
 	
 	public void loadModuleSync(String moduleName) throws IOException
 	{
-		loadModule(new File(rootDir, moduleName));
+		loadModuleSync(new File(rootDir, moduleName));
 	}
 	
 	public void loadModuleSync(File xmlFile) throws IOException
@@ -124,7 +137,12 @@ public class SpriteLibrary implements Modular
 		listenerHelper.fireModuleLoaded(new ModuleEvent(this, set.getName()));
 	}
 	
-	public void loadModule(File xmlFile) throws IOException
+	public void loadModuleAsync(String name) throws IOException
+	{
+		loadModuleAsync(new File(rootDir, name));
+	}
+	
+	public void loadModuleAsync(File xmlFile) throws IOException
 	{
 		String moduleName = 
 			xmlFile.isDirectory()
@@ -174,6 +192,18 @@ public class SpriteLibrary implements Modular
 	public void loadModule(String name) throws IOException
 	{
 		loadModule(new File(rootDir, name));
+	}
+	
+	public void loadModule(File xmlFile) throws IOException
+	{
+		if (asyncMode)
+		{
+			loadModuleAsync(xmlFile);
+		}
+		else
+		{
+			loadModuleSync(xmlFile);
+		}
 	}
 	
 	public boolean isLoaded(String module)

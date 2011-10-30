@@ -118,6 +118,14 @@ public class Region implements RIterable<Position>
 		this.a = 1;
 	}
 	
+	public Position getCenter()
+	{
+		return new Position(
+			w % 2 == 0 ? w / 2 - 1 : w / 2,
+			h % 2 == 0 ? h / 2 - 1 : h / 2
+		);
+	}
+	
 	/**
 	 * Gets a position representing the upper- and left-most Position
 	 * contained by this Region.

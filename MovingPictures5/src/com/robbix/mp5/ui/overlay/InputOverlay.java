@@ -41,6 +41,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public static final Color TRANS_WHITE = new Color(255, 255, 255, 127);
 	
 	public static final ColorScheme RED    = ColorScheme.withTranslucentBody(Color.RED);
+	public static final ColorScheme BLUE   = ColorScheme.withTranslucentBody(Color.BLUE);
 	public static final ColorScheme YELLOW = ColorScheme.withTranslucentBody(Color.YELLOW);
 	public static final ColorScheme GREEN  = ColorScheme.withTranslucentBody(Color.GREEN);
 	public static final ColorScheme WHITE  = ColorScheme.withTranslucentBody(Color.WHITE);

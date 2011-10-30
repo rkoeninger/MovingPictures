@@ -3,6 +3,7 @@ package com.robbix.mp5.ui;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AsyncLoader
 {
@@ -24,6 +25,8 @@ public class AsyncLoader
 		}
 	}
 	
+	private static final AtomicInteger nextSerial = new AtomicInteger(); 
+	
 	private Thread thread;
 	private LinkedList<Job> jobs = new LinkedList<Job>();
 	
@@ -32,14 +35,12 @@ public class AsyncLoader
 		synchronized (jobs)
 		{
 			jobs.addLast(new Job(file, callback));
-			System.err.println(file.getPath() + " queued");
 			
 			if (thread == null)
 			{
-				System.err.println("starting thread");
 				thread = new Thread(new DoLoad());
 				thread.setDaemon(true);
-				thread.setName("MP5-AsyncLoader");
+				thread.setName("MP5-AsyncLoader-" + nextSerial.getAndIncrement());
 				thread.start();
 			}
 		}
@@ -75,8 +76,6 @@ public class AsyncLoader
 				{
 					job.callback.loadFailed(job.file, ioe);
 				}
-				
-				System.err.println(job.file.getPath() + " complete");
 			}
 			
 			thread = null;

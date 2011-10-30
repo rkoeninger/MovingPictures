@@ -10,10 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,18 +45,13 @@ import com.robbix.mp5.GameListener;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.MeteorShowerTrigger;
 import com.robbix.mp5.Utils;
-import com.robbix.mp5.ai.task.MineRouteTask;
-import com.robbix.mp5.ai.task.SteerTask;
-import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
-import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
+import com.robbix.mp5.sb.demo.Demo;
 import com.robbix.mp5.ui.CommandButton;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.PlayerStatus;
-import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.TitleBar;
 import com.robbix.mp5.ui.UnitStatus;
 import com.robbix.mp5.ui.overlay.PlaceBulldozeOverlay;
@@ -67,9 +60,7 @@ import com.robbix.mp5.ui.overlay.PlaceResourceOverlay;
 import com.robbix.mp5.ui.overlay.PlaceUnitOverlay;
 import com.robbix.mp5.ui.overlay.SelectUnitOverlay;
 import com.robbix.mp5.ui.overlay.SpawnMeteorOverlay;
-import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.unit.UnitFactory;
 
 /**
  * Sandbox test suite, main window.
@@ -79,7 +70,7 @@ import com.robbix.mp5.unit.UnitFactory;
 public class Sandbox
 {
 	private static final String DEFAULT_TILE_SET = "newTerraDirt";
-	private static final String DEFAULT_MAP = "plain";
+	private static final String DEFAULT_MAP = "16-16-plain";
 	private static final File RES_DIR = new File("./res");
 	
 	private static Player currentPlayer;
@@ -137,18 +128,17 @@ public class Sandbox
 	
 	public static void main(String[] args) throws IOException
 	{
-		Map<String, Method> demos = getDemos();
-		
 		/*-------------------------------------------------------------------*
 		 * Parse command-line arguments
 		 */
-		boolean lazyLoadSprites = true;
-		boolean lazyLoadSounds  = true;
-		boolean soundOn         = false;
-//		boolean musicOn         = false;
-		String demoName         = null;
-		String mapName          = null;
-		String tileSetName      = null;
+		boolean lazyLoadSprites  = true;
+		boolean lazyLoadSounds   = true;
+		boolean asyncLoadSprites = true;
+		boolean soundOn          = false;
+//		boolean musicOn          = false;
+		String demoName          = null;
+		String mapName           = null;
+		String tileSetName       = null;
 		
 		for (int a = 0; a < args.length; ++a)
 		{
@@ -162,6 +152,10 @@ public class Sandbox
 			else if (args[a].equals("-lazyLoadSounds"))
 			{
 				lazyLoadSounds = true;
+			}
+			else if (args[a].equals("-asyncLoadSprites"))
+			{
+				asyncLoadSprites = true;
 			}
 			else if (args[a].equals("-soundOn"))
 			{
@@ -179,7 +173,7 @@ public class Sandbox
 //			{
 //				musicOn = false;
 //			}
-			else if (args[a].startsWith("-demo:") && demos.containsKey(option))
+			else if (args[a].startsWith("-demo:"))
 			{
 				if (demoName != null || mapName != null)
 					throw new IllegalArgumentException("Duplicate map/demos");
@@ -202,6 +196,18 @@ public class Sandbox
 			}
 		}
 		
+		Demo demo = null;
+		
+		if (demoName != null)
+		{
+			Map<String, Demo> demos = Demo.getDemos();
+			
+			if (! demos.containsKey(demoName))
+				throw new IllegalArgumentException("Demo does not exist");
+			
+			demo = demos.get(demoName);
+		}
+		
 		if (tileSetName == null)
 		{
 			tileSetName = DEFAULT_TILE_SET;
@@ -209,17 +215,7 @@ public class Sandbox
 		
 		if (mapName == null)
 		{
-			if (demoName == null)
-			{
-				mapName = DEFAULT_MAP;
-			}
-			else
-			{
-				mapName = getDemoMaps().get(demoName);
-				
-				if (mapName == null)
-					throw new Error("no map defined for " + demoName);
-			}
+			mapName = demo == null ? DEFAULT_MAP : demo.getMapName();
 		}
 		
 		Sandbox.trySystemLookAndFeel();
@@ -237,11 +233,10 @@ public class Sandbox
 			lazyLoadSprites,
 			lazyLoadSounds
 		);
+		game.getSpriteLibrary().setAsyncModeEnabled(asyncLoadSprites);
 		engine = new Engine(game);
 		Mediator.initMediator(game);
-		
-		if (soundOn) Mediator.soundOn(true);
-		
+		Mediator.soundOn(soundOn);
 		currentPlayer = game.getDefaultPlayer();
 		
 		/*-------------------------------------------------------------------*
@@ -524,21 +519,10 @@ public class Sandbox
 		 * Setup demo
 		 * Start mechanics
 		 */
-		if (demoName != null)
+		if (demo != null)
 		{
-			Method setupDemo = demos.get(demoName);
-			
-			if (setupDemo == null)
-				throw new IllegalArgumentException(demoName + " not found");
-			
-			try
-			{
-				setupDemo.invoke(null, game);
-			}
-			catch (Exception exc)
-			{
-				throw new Error("Failed to setup demo", exc);
-			}
+			demo.setup(game);
+			selectPlayer(demo.getStartingPlayerID());
 		}
 		
 		engine.play();
@@ -1012,349 +996,6 @@ public class Sandbox
 		}
 		
 		return maps;
-	}
-	
-	public static Map<String, Method> getDemos()
-	{
-		Map<String, Method> demos = new HashMap<String, Method>();
-		
-		for (Method method : Sandbox.class.getDeclaredMethods())
-		{
-			int paramCount = method.getParameterTypes().length;
-			String methodName = method.getName();
-			
-			if (methodName.startsWith("setup")
-			 && methodName.endsWith("Demo")
-			 && paramCount == 1
-			 && method.getParameterTypes()[0].equals(Game.class))
-			{
-				char firstChar = Character.toLowerCase(methodName.charAt(5));
-				methodName = methodName.substring(6, methodName.length());
-				methodName = firstChar + methodName;
-				
-				demos.put(methodName, method);
-			}
-		}
-		
-		return demos;
-	}
-	
-	public static Map<String, String> getDemoMaps()
-	{
-		Map<String, String> demoMaps = new HashMap<String, String>();
-		
-		for (Method method : Sandbox.class.getDeclaredMethods())
-		{
-			int paramCount = method.getParameterTypes().length;
-			String methodName = method.getName();
-			
-			if (methodName.startsWith("map")
-			 && methodName.endsWith("Demo")
-			 && paramCount == 0)
-			{
-				char firstChar = Character.toLowerCase(methodName.charAt(3));
-				String demoName = methodName.substring(4, methodName.length());
-				demoName = firstChar + demoName;
-				
-				String mapName = null;
-				
-				try
-				{
-					mapName = (String) method.invoke(null, (Object[])null);
-				}
-				catch (Exception exc)
-				{
-					throw new Error("could not get map name for demo");
-				}
-				
-				demoMaps.put(demoName, mapName);
-			}
-		}
-		
-		return demoMaps;
-	}
-	
-	public static String mapMeteorDemo()
-	{
-		return "widePlain";
-	}
-	
-	public static void setupMeteorDemo(Game game)
-	{
-		LayeredMap map = game.getMap();
-		UnitFactory factory = game.getUnitFactory();
-		
-		Player player1 = new Player(1, "Targets", 45);
-		game.addPlayer(player1);
-		selectPlayer(1);
-		factory.setDefaultOwner(player1);
-		
-		for (int x = 0; x < 12; ++x)
-		for (int y = 0; y < 20; ++y)
-		{
-			map.putUnit(factory.newUnit("pScout"), Mediator.getPosition(x, y));
-		}
-		
-		for (int x = 12; x < 30; x += 2)
-		for (int y = 13; y < 19; y += 2)
-		{
-			map.putUnit(factory.newUnit("pResidence"), Mediator.getPosition(x, y));
-		}
-		
-		map.putUnit(factory.newUnit("eVehicleFactory"), Mediator.getPosition(12, 1));
-		map.putUnit(factory.newUnit("eVehicleFactory"), Mediator.getPosition(16, 1));
-		map.putUnit(factory.newUnit("eVehicleFactory"), Mediator.getPosition(20, 1));
-		map.putUnit(factory.newUnit("eVehicleFactory"), Mediator.getPosition(24, 1));
-		map.putUnit(factory.newUnit("eStructureFactory"), Mediator.getPosition(12, 5));
-		map.putUnit(factory.newUnit("eStructureFactory"), Mediator.getPosition(16, 5));
-		map.putUnit(factory.newUnit("eStructureFactory"), Mediator.getPosition(20, 5));
-		map.putUnit(factory.newUnit("eStructureFactory"), Mediator.getPosition(24, 5));
-		map.putUnit(factory.newUnit("eCommonSmelter"), Mediator.getPosition(12, 9));
-		map.putUnit(factory.newUnit("eCommonSmelter"), Mediator.getPosition(16, 9));
-		map.putUnit(factory.newUnit("eCommonSmelter"), Mediator.getPosition(20, 9));
-		map.putUnit(factory.newUnit("eCommonSmelter"), Mediator.getPosition(24, 9));
-		
-		SpriteLibrary lib = game.getSpriteLibrary();
-		
-		try
-		{
-			lib.loadModule("pScout");
-			lib.loadModule("pResidence");
-			lib.loadModule("eVehicleFactory");
-			lib.loadModule("eStructureFactory");
-			lib.loadModule("eCommonSmelter");
-			lib.loadModule("aDeath");
-			lib.loadModule("aMeteor");
-			lib.loadModule("aStructureStatus");
-		}
-		catch (IOException ioe)
-		{
-			ioe.printStackTrace();
-		}
-	}
-	
-	public static String mapFactoryDemo()
-	{
-		return "widePlain";
-	}
-	
-	public static void setupFactoryDemo(Game game)
-	{
-		LayeredMap map = game.getMap();
-		UnitFactory factory = game.getUnitFactory();
-		
-		Player player1 = new Player(1, "Factories", 275);
-		game.addPlayer(player1);
-		selectPlayer(1);
-		factory.setDefaultOwner(player1);
-		
-		player1.addResource(ResourceType.COMMON_ORE, 50000);
-		player1.addResource(ResourceType.RARE_ORE,   50000);
-		player1.addResource(ResourceType.FOOD,       50000);
-		
-		Unit convec1     = factory.newUnit("eConVec");
-		Unit convec2     = factory.newUnit("eConVec");
-		Unit convec3     = factory.newUnit("eConVec");
-		Unit convec4     = factory.newUnit("eConVec");
-		Unit earthworker = factory.newUnit("eEarthworker");
-		Unit dozer       = factory.newUnit("pRoboDozer");
-		
-		convec1.setCargo(Cargo.newConVecCargo("eVehicleFactory"));
-		convec2.setCargo(Cargo.newConVecCargo("eStructureFactory"));
-		convec3.setCargo(Cargo.newConVecCargo("eCommonSmelter"));
-		convec4.setCargo(Cargo.newConVecCargo("eCommandCenter"));
-		
-		map.putUnit(convec1,     Mediator.getPosition(9,  7));
-		map.putUnit(convec2,     Mediator.getPosition(10, 7));
-		map.putUnit(convec3,     Mediator.getPosition(11, 7));
-		map.putUnit(convec4,     Mediator.getPosition(12, 7));
-		map.putUnit(earthworker, Mediator.getPosition(10, 9));
-		map.putUnit(dozer,       Mediator.getPosition(11, 9));
-		
-		SpriteLibrary lib = game.getSpriteLibrary();
-		
-		try
-		{
-			lib.loadModule("eConVec");
-			lib.loadModule("eEarthworker");
-			lib.loadModule("pRoboDozer");
-			lib.loadModule("eVehicleFactory");
-			lib.loadModule("eStructureFactory");
-			lib.loadModule("eCommonSmelter");
-			lib.loadModule("eCommandCenter");
-		}
-		catch (IOException ioe)
-		{
-			ioe.printStackTrace();
-		}
-	}
-	
-	public static String mapMineRouteDemo()
-	{
-		return "bigPlain";
-	}
-	
-	public static void setupMineRouteDemo(Game game)
-	{
-		LayeredMap map = game.getMap();
-		UnitFactory factory = game.getUnitFactory();
-		
-		Player player1 = new Player(1, "Mining Operation", 200);
-		game.addPlayer(player1);
-		selectPlayer(1);
-		
-		List<Unit> mines    = new ArrayList<Unit>();
-		List<Unit> smelters = new ArrayList<Unit>();
-		
-		for (int x = 2; x < 44; x += 6)
-		for (int y = 2; y < 20; y += 6)
-		{
-			Unit smelter = factory.newUnit("eCommonSmelter", player1);
-			map.putUnit(smelter, Mediator.getPosition(x, y));
-			map.putTube(Mediator.getPosition(x + 5, y + 1));
-			map.putTube(Mediator.getPosition(x + 2, y + 4));
-			map.putTube(Mediator.getPosition(x + 2, y + 5));
-			smelters.add(smelter);
-		}
-		
-		map.putUnit(factory.newUnit("eCommandCenter", player1), Mediator.getPosition(44, 2));
-		
-		for (int x = 2;  x < 46; x += 4)
-		for (int y = 38; y < 45; y += 4)
-		{
-			ResourceDeposit res = ResourceDeposit.get2BarCommon();
-			map.putResourceDeposit(res, Mediator.getPosition(x + 1, y));
-			Unit mine = factory.newUnit("eCommonMine", player1);
-			map.putUnit(mine, Mediator.getPosition(x, y));
-			mines.add(mine);
-		}
-		
-		Unit truck;
-		int truckIndex = 0;
-		
-		Collections.shuffle(mines);
-		Collections.shuffle(smelters);
-		
-		for (Unit mine : mines)
-		for (Unit smelter : smelters)
-		{
-			if (Utils.randInt(0, 5) % 6 == 0)
-			{
-				Position pos = Mediator.getPosition(
-					truckIndex % 42 + 2,
-					truckIndex / 42 + 24
-				);
-				
-				truck = factory.newUnit("eCargoTruck", player1);
-				truck.assignNow(new MineRouteTask(mine, smelter));
-				map.putUnit(truck, pos);
-			}
-			
-			truckIndex++;
-		}
-		
-		SpriteLibrary lib = game.getSpriteLibrary();
-		
-		try
-		{
-			lib.loadModule("eCargoTruck");
-			lib.loadModule("eCommandCenter");
-			lib.loadModule("eCommonSmelter");
-			lib.loadModule("eCommonMine");
-			lib.loadModule("aResource");
-			lib.loadModule("aStructureStatus");
-		}
-		catch (IOException ioe)
-		{
-			ioe.printStackTrace();
-		}
-		
-		game.getDisplay().setViewCenterPosition(Mediator.getPosition(24, 26));
-	}
-	
-	public static String mapCombatDemo()
-	{
-		return "bigPlain";
-	}
-	
-	public static void setupCombatDemo(Game game)
-	{
-		LayeredMap map = game.getMap();
-		UnitFactory factory = game.getUnitFactory();
-		Region bounds = map.getBounds();
-		Position center = Mediator.getPosition(bounds.w / 2, bounds.h / 2);
-		Player player1 = new Player(1, "Axen", 320);
-		Player player2 = new Player(2, "Emma", 200);
-		Player player3 = new Player(3, "Nguyen", 40);
-		Player player4 = new Player(4, "Frost", 160);
-		Player player5 = new Player(5, "Brook", 95);
-		game.addPlayer(player1);
-		game.addPlayer(player2);
-		game.addPlayer(player3);
-		game.addPlayer(player4);
-		game.addPlayer(player5);
-		selectPlayer(5);
-		
-		for (int x = 1; x <= 15; ++x)
-		for (int y = 1; y <= 11; ++y)
-		{
-			Unit tank = factory.newUnit("pMicrowaveLynx", player1);
-			map.putUnit(tank, Mediator.getPosition(x, y));
-			tank.assignNow(new SteerTask(center));
-		}
-		
-		for (int x = 36; x <= 46; ++x)
-		for (int y = 1;  y <= 15;  ++y)
-		{
-			Unit tank = factory.newUnit("eLaserLynx", player2);
-			map.putUnit(tank, Mediator.getPosition(x, y));
-			tank.assignNow(new SteerTask(center));
-		}
-
-		for (int x = 1;  x <= 11;  ++x)
-		for (int y = 31; y <= 46; ++y)
-		{
-			Unit tank = factory.newUnit("pRPGLynx", player3);
-			map.putUnit(tank, Mediator.getPosition(x, y));
-			tank.assignNow(new SteerTask(center));
-		}
-
-		for (int x = 31; x <= 46; ++x)
-		for (int y = 36; y <= 46; ++y)
-		{
-			Unit tank = factory.newUnit("eRailGunLynx", player4);
-			map.putUnit(tank, Mediator.getPosition(x, y));
-			tank.assignNow(new SteerTask(center));
-		}
-		
-		for (int x = 20; x <= 29; ++x)
-		for (int y = 20; y <= 29; ++y)
-		{
-			Unit tank = factory.newUnit("eAcidCloudLynx", player5);
-			map.putUnit(tank, Mediator.getPosition(x, y));
-		}
-		
-		SpriteLibrary lib = game.getSpriteLibrary();
-		
-		try
-		{
-			lib.loadModule("eLynxChassis");
-			lib.loadModule("pLynxChassis");
-			lib.loadModule("eLaserSingleTurret");
-			lib.loadModule("eRailGunSingleTurret");
-			lib.loadModule("eAcidCloudSingleTurret");
-			lib.loadModule("pMicrowaveSingleTurret");
-			lib.loadModule("pRPGSingleTurret");
-			lib.loadModule("aDeath");
-			lib.loadModule("aRocket");
-			lib.loadModule("aAcidCloud");
-		}
-		catch (IOException ioe)
-		{
-			ioe.printStackTrace();
-		}
-		
-		game.getDisplay().setViewCenterPosition(center);
 	}
 	
 	/**

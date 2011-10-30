@@ -15,6 +15,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 
+import com.robbix.mp5.sb.demo.Demo;
+
 public class Launcher
 {
 	public static void main(String[] args)
@@ -24,9 +26,11 @@ public class Launcher
 		final JDialog dialog = new JDialog();
 		dialog.setTitle("Sandbox Launcher");
 		final JComboBox mapComboBox = new JComboBox(getMapAndDemoOptions());
-		mapComboBox.setSelectedItem("map:plain");
+		mapComboBox.setSelectedItem("map:plain-16-16");
+		mapComboBox.setMaximumRowCount(16);
 		final JComboBox tileSetBox = new JComboBox(getTileSetOptions());
 		tileSetBox.setSelectedItem("tileSet:newTerraDirt");
+		tileSetBox.setMaximumRowCount(16);
 		final JCheckBox lazySpritesCheckBox = new JCheckBox("Load Sprites on Demand");
 		lazySpritesCheckBox.setSelected(true);
 		final JCheckBox lazySoundsCheckBox = new JCheckBox("Load Sounds on Demand");
@@ -102,7 +106,7 @@ public class Launcher
 	private static String[] getMapAndDemoOptions()
 	{
 		List<String> mapList = Sandbox.getAvailableMaps();
-		Set<String> demoList = Sandbox.getDemos().keySet();
+		Set<String> demoList = Demo.getDemos().keySet();
 		String[] mapsAndDemos = new String[mapList.size() + demoList.size()];
 		
 		int i = 0;

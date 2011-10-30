@@ -96,10 +96,7 @@ public class Footprint implements Iterable<Position>
 	private Footprint(Region inner)
 	{
 		this.inner = inner;
-		this.center = new Position(
-			inner.w % 2 == 0 ? inner.w / 2 - 1 : inner.w / 2,
-			inner.h % 2 == 0 ? inner.h / 2 - 1 : inner.h / 2
-		);
+		this.center = inner.getCenter();
 		this.tubePositions = new HashSet<Position>();
 		this.occupiedSet = new TreeSet<Position>(Utils.Z_ORDER_POS);
 		

@@ -1080,9 +1080,10 @@ public class DisplayPanel extends JComponent
 	 */
 	private void drawUnit(Graphics g, Unit unit)
 	{
+		ColorScheme colors = ColorScheme.withFillOnly(unit.getOwner().getColor());
+		
 		if (!unit.isTurret() && scale < -2)
 		{
-			ColorScheme colors = ColorScheme.withFillOnly(unit.getOwner().getColor());
 			draw(g, colors, unit.getOccupiedBounds());
 			return;
 		}
@@ -1092,18 +1093,21 @@ public class DisplayPanel extends JComponent
 		
 		if (showUnitLayerState && !unit.isTurret())
 		{
-			ColorScheme colors = ColorScheme.withTranslucentBody(Color.RED);
-			
 			for (Position pos : unit.getFootprint().iterator(unit.getPosition()))
-				draw(g, colors, pos);
-
-			colors = ColorScheme.withTranslucentBody(Color.BLUE);
+				draw(g, InputOverlay.RED, pos);
 			
 			for (Position pos : unit.getMap().getReservations(unit))
-				draw(g, colors, pos);
+				draw(g, InputOverlay.BLUE, pos);
 		}
 		
-		draw(g, sprite, unitPoint, unit.getOwner());
+		if (sprite == SpriteSet.BLANK_SPRITE)
+		{
+			draw(g, colors, unit.getOccupiedBounds());
+		}
+		else
+		{
+			draw(g, sprite, unitPoint, unit.getOwner());
+		}
 		
 		if (unit.hasTurret())
 		{

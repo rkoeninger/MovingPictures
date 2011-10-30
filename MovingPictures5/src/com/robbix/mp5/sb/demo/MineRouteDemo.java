@@ -1,9 +1,11 @@
 package com.robbix.mp5.sb.demo;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.robbix.mp5.Game;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.MineRouteTask;
@@ -19,7 +21,7 @@ public class MineRouteDemo extends Demo
 	public MineRouteDemo()
 	{
 		super(
-			"bigPlain",
+			"48-48-plain",
 			Utils.asSet(
 				"eCargoTruck",
 				"eCommandCenter",
@@ -35,9 +37,18 @@ public class MineRouteDemo extends Demo
 				"dockOpen"
 			),
 			Utils.asSet(
-				new Player(1, "Mining Operation", 200) // FIXME: how to set current player?
-			)
+				new Player(1, "Mining Operation", 200)
+			),
+			1
 		);
+	}
+	
+	public void setup(Game game) throws IOException
+	{
+		super.setup(game);
+		
+		Position center = game.getMap().getBounds().getCenter();
+		game.getDisplay().setViewCenterPosition(center);
 	}
 	
 	public void placeUnits(LayeredMap map, UnitFactory factory)
@@ -91,5 +102,8 @@ public class MineRouteDemo extends Demo
 			
 			truckIndex++;
 		}
+		
+		// FIXME: how to set starting view position
+		// should be centered for this demo
 	}
 }
