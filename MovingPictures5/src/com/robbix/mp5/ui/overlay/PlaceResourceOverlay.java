@@ -1,9 +1,9 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.basics.ColorScheme;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.ui.Sprite;
@@ -19,7 +19,7 @@ public class PlaceResourceOverlay extends InputOverlay
 		this.res = res;
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -29,7 +29,11 @@ public class PlaceResourceOverlay extends InputOverlay
 				resSprite = Utils.getTranslucency(resSprite, -1, 0.5f);
 			}
 			
-			panel.draw(g, resSprite, getCursorPosition());
+			Position pos = getCursorPosition();
+			
+			ColorScheme colors = panel.getMap().canPlaceResourceDeposit(pos) ? GREEN : RED;
+			panel.draw(g, colors, pos);
+			panel.draw(g, resSprite, pos);
 		}
 	}
 	
@@ -43,10 +47,5 @@ public class PlaceResourceOverlay extends InputOverlay
 			res = (ResourceDeposit)res.clone();
 			panel.refresh();
 		}
-	}
-	
-	public void onRightClick()
-	{
-		complete();
 	}
 }

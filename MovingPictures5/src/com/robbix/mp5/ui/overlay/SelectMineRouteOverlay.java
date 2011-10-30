@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.util.Set;
 
 import com.robbix.mp5.Utils;
@@ -25,7 +24,7 @@ public class SelectMineRouteOverlay extends InputOverlay
 		this.trucks = trucks;
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		for (Unit truck : trucks)
 			drawSelectedUnitBox(g, truck);
@@ -54,10 +53,5 @@ public class SelectMineRouteOverlay extends InputOverlay
 			
 			complete();
 		}
-	}
-	
-	public void onRightClick()
-	{
-		complete();
 	}
 }

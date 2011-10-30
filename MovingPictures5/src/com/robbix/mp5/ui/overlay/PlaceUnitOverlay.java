@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Position;
@@ -9,6 +8,7 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 
@@ -34,37 +34,44 @@ public class PlaceUnitOverlay extends InputOverlay
 		this.unit = factory.newUnit(type);
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{
 			if (unitSprite == null)
 			{
 				int hue = unit.getOwner().getColorHue();
-				unitSprite = panel.getSpriteLibrary().getSprite(unit);
-				unitSprite = Utils.getTranslucency(unitSprite, hue, 0.5f);
+				unitSprite = panel.getSpriteLibrary().getDefaultSprite(unit);
+				unitSprite = (unitSprite == SpriteSet.BLANK_SPRITE)
+					? null
+					: Utils.getTranslucency(unitSprite, hue, 0.5f);
 			}
 			
 			if (turretSprite == null && unit.hasTurret())
 			{
 				Unit turret = unit.getTurret();
 				int hue = unit.getOwner().getColorHue();
-				turretSprite = panel.getSpriteLibrary().getSprite(turret);
-				turretSprite = Utils.getTranslucency(turretSprite, hue, 0.5f);
+				turretSprite = panel.getSpriteLibrary().getDefaultSprite(turret);
+				turretSprite = (turretSprite == SpriteSet.BLANK_SPRITE)
+					? null
+					: Utils.getTranslucency(turretSprite, hue, 0.5f);
 			}
 			
 			Position center = unit.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
-			panel.draw(g, unitSprite, pos);
 			
-			if (turretSprite != null)
+			if (unitSprite != null)
+				panel.draw(g, unitSprite, pos);
+			
+			if (unit.hasTurret())
 			{
-				panel.draw(g, turretSprite, pos);
+				if (turretSprite != null)
+					panel.draw(g, turretSprite, pos);
 			}
 		}
 	}
 	
-	public void paintOverTerrain(Graphics g, Rectangle rect)
+	public void paintOverTerrain(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -101,10 +108,5 @@ public class PlaceUnitOverlay extends InputOverlay
 				complete();
 			}
 		}
-	}
-	
-	public void onRightClick()
-	{
-		complete();
 	}
 }

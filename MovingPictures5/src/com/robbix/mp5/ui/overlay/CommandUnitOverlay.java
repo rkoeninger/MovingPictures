@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,7 +34,7 @@ public class CommandUnitOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		if (unit.getPosition() == null)
 			return;
@@ -217,11 +216,6 @@ public class CommandUnitOverlay extends InputOverlay
 		{
 			complete();
 		}
-	}
-	
-	public void onRightClick()
-	{
-		complete();
 	}
 	
 	private void convecConstruct()

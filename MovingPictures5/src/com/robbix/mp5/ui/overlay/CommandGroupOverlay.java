@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -27,7 +26,7 @@ public class CommandGroupOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		for (Unit unit : units)
 			drawSelectedUnitBox(g, unit);
@@ -81,10 +80,5 @@ public class CommandGroupOverlay extends InputOverlay
 	{
 		Mediator.doGroupMove(units, getCursorPosition());
 		Mediator.playSound("beep2");
-	}
-	
-	public void onRightClick()
-	{
-		complete();
 	}
 }

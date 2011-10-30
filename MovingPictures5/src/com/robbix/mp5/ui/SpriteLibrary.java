@@ -17,6 +17,7 @@ import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.AutoArrayList;
 import com.robbix.mp5.basics.Direction;
+import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.HealthBracket;
@@ -61,16 +62,23 @@ public class SpriteLibrary implements Modular
 	private HashMap<String, SpriteSet> ambientSets; // indexed by eventName
 	
 	private File rootDir;
-
+	
+	private Set<String> modulesBeingLoaded;
 	private Set<String> loadedModules;
 	private ModuleListener.Helper listenerHelper;
+	
+	private Object asyncLock = new Object();
+	
+	private AsyncLoader loader;
 	
 	public SpriteLibrary()
 	{
 		loadedModules = new HashSet<String>(64);
+		modulesBeingLoaded = new HashSet<String>(64);
 		unitSets = new AutoArrayList<SpriteSet>();
 		ambientSets = new HashMap<String, SpriteSet>(256);
 		listenerHelper = new ModuleListener.Helper();
+		loader = new AsyncLoader();
 	}
 	
 	public void addModuleListener(ModuleListener listener)
@@ -83,14 +91,20 @@ public class SpriteLibrary implements Modular
 		listenerHelper.remove(listener);
 	}
 	
-	public void loadModule(File xmlFile) throws IOException
+	public void loadModuleSync(String moduleName) throws IOException
+	{
+		loadModule(new File(rootDir, moduleName));
+	}
+	
+	public void loadModuleSync(File xmlFile) throws IOException
 	{
 		String moduleName = 
 			xmlFile.isDirectory()
 			? xmlFile.getName()
 			: xmlFile.getParentFile().getName();
 		
-		if (loadedModules.contains(moduleName))
+		if (loadedModules.contains(moduleName)
+		 || modulesBeingLoaded.contains(moduleName))
 			return;
 		
 		SpriteSet set = new SpriteSetXMLLoader(xmlFile).load();
@@ -106,8 +120,55 @@ public class SpriteLibrary implements Modular
 			unitSets.set(type.getSerial(), set);
 		}
 		
-		loadedModules.add(moduleName);
-		listenerHelper.fireModuleLoaded(new ModuleEvent(this, moduleName));
+		loadedModules.add(set.getName());
+		listenerHelper.fireModuleLoaded(new ModuleEvent(this, set.getName()));
+	}
+	
+	public void loadModule(File xmlFile) throws IOException
+	{
+		String moduleName = 
+			xmlFile.isDirectory()
+			? xmlFile.getName()
+			: xmlFile.getParentFile().getName();
+		
+		synchronized (asyncLock)
+		{
+			if (loadedModules.contains(moduleName)
+			 || modulesBeingLoaded.contains(moduleName))
+				return;
+			
+			AsyncLoader.Callback callback = new AsyncLoader.Callback()
+			{
+				public void loadFailed(File file, Exception exc)
+				{
+				}
+				
+				public void loadComplete(SpriteSet set)
+				{
+					synchronized (asyncLock)
+					{
+						Class<?>[] params = set.getParameterList();
+						
+						if (params.length == 1 && params[0].equals(String.class))
+						{
+							ambientSets.put(set.getName(), set);
+						}
+						else
+						{
+							UnitType type = Mediator.factory.getType(set.getName());
+							unitSets.set(type.getSerial(), set);
+						}
+						
+						modulesBeingLoaded.remove(set.getName());
+						loadedModules.add(set.getName());
+						listenerHelper.fireModuleLoaded(new ModuleEvent(this, set.getName()));
+					}
+				}
+			};
+			
+			modulesBeingLoaded.add(moduleName);
+			loader.load(xmlFile, callback);
+		}
 	}
 	
 	public void loadModule(String name) throws IOException
@@ -117,100 +178,144 @@ public class SpriteLibrary implements Modular
 	
 	public boolean isLoaded(String module)
 	{
-		return loadedModules.contains(module);
+		synchronized (asyncLock)
+		{
+			return loadedModules.contains(module);
+		}
+	}
+	
+	public boolean isBeingLoaded(String module)
+	{
+		synchronized (asyncLock)
+		{
+			return modulesBeingLoaded.contains(module);
+		}
 	}
 	
 	public boolean unloadModule(String name)
 	{
-		if (ambientSets.containsKey(name))
+		synchronized (asyncLock)
 		{
-			ambientSets.remove(name);
-			loadedModules.remove(name);
-			listenerHelper.fireModuleUnloaded(new ModuleEvent(this, name));
-			return true;
+			if (ambientSets.containsKey(name))
+			{
+				ambientSets.remove(name);
+				loadedModules.remove(name);
+				listenerHelper.fireModuleUnloaded(new ModuleEvent(this, name));
+				return true;
+			}
+			
+			UnitType type = Mediator.factory.getType(name);
+			
+			if (type != null)
+			{
+				unitSets.set(type.getSerial(), null);
+				loadedModules.remove(name);
+				listenerHelper.fireModuleUnloaded(new ModuleEvent(this, name));
+				return true;
+			}
+			
+			return false;
 		}
-		
-		UnitType type = Mediator.factory.getType(name);
-		
-		if (type != null)
-		{
-			unitSets.set(type.getSerial(), null);
-			loadedModules.remove(name);
-			listenerHelper.fireModuleUnloaded(new ModuleEvent(this, name));
-			return true;
-		}
-		
-		return false;
 	}
 	
 	public Set<String> getLoadedModules()
 	{
-		Set<String> modules = getLoadedUnitModules();
-		modules.addAll(getLoadedAmbientModules());
-		return modules;
+		synchronized (asyncLock)
+		{
+			Set<String> modules = getLoadedUnitModules();
+			modules.addAll(getLoadedAmbientModules());
+			return modules;
+		}
 	}
 	
 	public Set<String> getLoadedUnitModules()
 	{
-		Set<String> moduleNames = new HashSet<String>();
-		
-		for (int i = 0; i < unitSets.size(); ++i)
-			if (unitSets.get(i) != null)
-				moduleNames.add(unitSets.get(i).getName());
-		
-		return moduleNames;
+		synchronized (asyncLock)
+		{
+			Set<String> moduleNames = new HashSet<String>();
+			
+			for (int i = 0; i < unitSets.size(); ++i)
+				if (unitSets.get(i) != null)
+					moduleNames.add(unitSets.get(i).getName());
+			
+			return moduleNames;
+		}
 	}
 	
 	public Set<String> getLoadedAmbientModules()
 	{
-		return ambientSets.keySet();
+		synchronized (asyncLock)
+		{
+			return ambientSets.keySet();
+		}
 	}
 	
 	public SpriteSet getSpriteSet(String name)
 	{
-		if (ambientSets.containsKey(name))
-			return ambientSets.get(name);
-		
-		UnitType type = Mediator.factory.getType(name);
-		
-		if (type == null)
-			return null;
-		
-		return unitSets.get(type.getSerial());
+		synchronized (asyncLock)
+		{
+			if (ambientSets.containsKey(name))
+				return ambientSets.get(name);
+			
+			UnitType type = Mediator.factory.getType(name);
+			
+			if (type == null)
+				return null;
+			
+			return unitSets.get(type.getSerial());
+		}
 	}
 	
 	public SpriteSet getUnitSpriteSet(UnitType type)
 	{
-		if (unitSets.get(type.getSerial()) == null)
+		synchronized (asyncLock)
 		{
-			try
+			if (unitSets.get(type.getSerial()) == null)
 			{
-				loadModule(type.getName());
+				if (isBeingLoaded(type.getName()))
+				{
+					return SpriteSet.BLANK;
+				}
+				
+				try
+				{
+					loadModule(type.getName());
+					return SpriteSet.BLANK;
+				}
+				catch (IOException ioe)
+				{
+					throw new Error(ioe);
+				}
 			}
-			catch (IOException ioe)
-			{
-				throw new Error(ioe);
-			}
+			
+			return unitSets.get(type.getSerial());
 		}
-		
-		return unitSets.get(type.getSerial());
 	}
 	
 	public SpriteSet getAmbientSpriteSet(String eventName)
 	{
-		if (! ambientSets.containsKey(eventName))
+		synchronized (asyncLock)
 		{
-			try
+			if (! ambientSets.containsKey(eventName))
 			{
-				loadModule(eventName);
+				if (isBeingLoaded(eventName))
+				{
+					return SpriteSet.BLANK;
+				}
+				
+				try
+				{
+					loadModule(eventName);
+					return SpriteSet.BLANK;
+				}
+				catch (IOException ioe)
+				{
+					throw new Error(ioe);
+				}
 			}
-			catch (IOException ioe)
-			{
-				throw new Error(ioe);
-			}
+			
+			return ambientSets.get(eventName);
 		}
-		
-		return ambientSets.get(eventName);
 	}
 	
 	public Point getHotspot(Unit turret)
@@ -246,6 +351,19 @@ public class SpriteLibrary implements Modular
 	public SpriteGroup getSpriteGroup(ResourceDeposit res)
 	{
 		return getAmbientSpriteGroup("aResource", res.toString());
+	}
+	
+	public Sprite getSprite(LayeredMap.Fixture fixture)
+	{
+		switch (fixture)
+		{
+		case TUBE:          return getSprite("oTerrainFixture", "tube");
+		case WALL:          return getSprite("oTerrainFixture", "wall");
+		case GEYSER:        return getSprite("aGeyser",         "geyser");
+		case MINE_PLATFORM: return getSprite("aCommonMine",     "platform");
+		}
+		
+		throw new IllegalArgumentException("invalid fixture " + fixture);
 	}
 	
 	public Sprite getSprite(String setName, String eventName)
@@ -302,6 +420,9 @@ public class SpriteLibrary implements Modular
 		return getDefaultSprite(unit.getType());
 	}
 	
+	/**
+	 * Does not recolor for owner.
+	 */
 	public Sprite getSprite(Unit unit)
 	{
 		SpriteSet set = getUnitSpriteSet(unit.getType());
@@ -329,9 +450,9 @@ public class SpriteLibrary implements Modular
 		{
 			return group.getFrame(unit.getAnimationFrame()
 				% group.getFrameCount());
-			//FIXME: temporary, group looping should take care of this
+			//FIXME: temporary, group looping should take care of looping
 			//
-			//         - linear sequences are running one frame over.
+			//         - linear sequences are running one,two frame over.
 		}
 	}
 	

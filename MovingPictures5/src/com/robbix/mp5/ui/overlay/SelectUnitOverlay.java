@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -15,7 +14,8 @@ public class SelectUnitOverlay extends InputOverlay
 {
 	public SelectUnitOverlay()
 	{
-		super.closesOnEscape = false;
+		super.closesOnEscape     = false;
+		super.closesOnRightClick = false;
 	}
 	
 	public void dispose()
@@ -23,11 +23,11 @@ public class SelectUnitOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		if (isDragging())
 		{
-			panel.draw(g, RED, getDragRegion());
+			panel.draw(g, WHITE, getDragRegion());
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package com.robbix.mp5.ui;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,33 @@ import com.robbix.mp5.unit.Cargo;
 
 public abstract class SpriteSet
 {
+	public static final Sprite BLANK_SPRITE = new Sprite(
+		new BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB), 0, 0);
+	
+	public static final SpriteGroup BLANK_GROUP = new SpriteGroup(BLANK_SPRITE, true);
+	
+	public static final SpriteSet BLANK = new SpriteSet("Blank")
+	{
+		public Class<?>[] getParameterList()
+		{
+			return new Class<?>[0];
+		}
+		
+		public Object[] getArgumentList()
+		{
+			return new Object[0];
+		}
+		
+		public void set(SpriteGroup group, Object... args)
+		{
+		}
+		
+		public SpriteGroup get(Object... args)
+		{
+			return BLANK_GROUP;
+		}
+	};
+	
 	private String name;
 	
 	protected SpriteSet(String name)

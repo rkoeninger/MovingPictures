@@ -1,13 +1,13 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.BuildMineTask;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 
 public class BuildMineOverlay extends InputOverlay
@@ -23,7 +23,7 @@ public class BuildMineOverlay extends InputOverlay
 		this.mine = mine;
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -32,15 +32,19 @@ public class BuildMineOverlay extends InputOverlay
 				int hue = mine.getOwner().getColorHue();
 				mineSprite = panel.getSpriteLibrary()
 								  .getDefaultSprite(mine);
-				mineSprite = Utils.getTranslucency(mineSprite, hue, 0.5f);
+				mineSprite = (mineSprite == SpriteSet.BLANK_SPRITE)
+					? null
+					: Utils.getTranslucency(mineSprite, hue, 0.5f);
 			}
 			
 			Position center = mine.getFootprint().getCenter();
-			panel.draw(g, mineSprite, getCursorPosition().subtract(center));
+			
+			if (mineSprite != null)
+				panel.draw(g, mineSprite, getCursorPosition().subtract(center));
 		}
 	}
 	
-	public void paintOverTerrain(Graphics g, Rectangle rect)
+	public void paintOverTerrain(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -65,10 +69,5 @@ public class BuildMineOverlay extends InputOverlay
 		{
 			Mediator.playSound("structureError");
 		}
-	}
-	
-	public void onRightClick()
-	{
-		complete();
 	}
 }

@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.unit.Unit;
@@ -17,7 +16,7 @@ public class SelectAttackTargetOverlay extends InputOverlay
 		this.attacker = unit;
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		drawSelectedUnitBox(g, attacker.getChassis());
 	}
@@ -31,10 +30,5 @@ public class SelectAttackTargetOverlay extends InputOverlay
 			Mediator.doAttack(attacker, target);
 			complete();
 		}
-	}
-	
-	public void onRightClick()
-	{
-		complete();
 	}
 }

@@ -878,7 +878,6 @@ public class DisplayPanel extends JComponent
 	public void paintComponent(Graphics g)
 	{
 		drawLetterBox(g);
-		Rectangle overlayRect = new Rectangle(getSize());
 		Rectangle rect = getDisplayRect();
 		Region region = getRegion(rect);
 		
@@ -899,7 +898,7 @@ public class DisplayPanel extends JComponent
 		}
 		
 		if (! overlays.isEmpty())
-			overlays.getFirst().paintOverTerrain(g, overlayRect);
+			overlays.getFirst().paintOverTerrain(g);
 		
 		if (showTubeConnectivity)
 			drawTubeConnectivity(g, region);
@@ -926,7 +925,7 @@ public class DisplayPanel extends JComponent
 		}
 		
 		if (! overlays.isEmpty())
-			overlays.getFirst().paintOverUnits(g, overlayRect);
+			overlays.getFirst().paintOverUnits(g);
 	}
 	
 	/**

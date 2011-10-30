@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
@@ -9,6 +8,7 @@ import com.robbix.mp5.ai.task.ConVecConstructTask;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.Unit;
 
@@ -25,7 +25,7 @@ public class BuildStructureOverlay extends InputOverlay
 		this.structure = structure;
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -34,15 +34,19 @@ public class BuildStructureOverlay extends InputOverlay
 				int hue = structure.getOwner().getColorHue();
 				structSprite = panel.getSpriteLibrary()
 								  .getDefaultSprite(structure);
-				structSprite = Utils.getTranslucency(structSprite, hue, 0.5f);
+				structSprite = (structSprite == SpriteSet.BLANK_SPRITE)
+					? null
+					: Utils.getTranslucency(structSprite, hue, 0.5f);
 			}
 			
 			Position center = structure.getFootprint().getCenter();
-			panel.draw(g, structSprite, getCursorPosition().subtract(center));
+			
+			if (structSprite != null)
+				panel.draw(g, structSprite, getCursorPosition().subtract(center));
 		}
 	}
 	
-	public void paintOverTerrain(Graphics g, Rectangle rect)
+	public void paintOverTerrain(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -69,10 +73,5 @@ public class BuildStructureOverlay extends InputOverlay
 		{
 			Mediator.playSound("structureError");
 		}
-	}
-	
-	public void onRightClick()
-	{
-		complete();
 	}
 }

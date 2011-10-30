@@ -76,7 +76,14 @@ public class LayeredMap
 	
 	public static enum Fixture
 	{
-		WALL, TUBE, MINE_PLATFORM, GEYSER
+		WALL(false), TUBE(true), MINE_PLATFORM(true), GEYSER(false);
+		
+		private final boolean passable;
+		
+		private Fixture(boolean passable)
+		{
+			this.passable = passable;
+		}
 	}
 	
 	private static final int WALL_MAX_HP = 500;
@@ -162,9 +169,10 @@ public class LayeredMap
 		return grid.get(x, y).tileCode;
 	}
 	
-	public boolean canPlaceFixture(Position pos)
+	public boolean canPlaceFixture(Fixture fixture, Position pos)
 	{
-		return canPlaceUnit(pos) && grid.get(pos).fixture == null;
+		return (canPlaceUnit(pos) || fixture.passable)
+			&& grid.get(pos).fixture == null;
 	}
 	
 	public Set<ResourceDeposit> getResourceDeposits()
@@ -204,6 +212,30 @@ public class LayeredMap
 	public boolean canPlaceResourceDeposit(Position pos)
 	{
 		return grid.get(pos).deposit == null;
+	}
+	
+	public void putFixture(Fixture fixture, Position pos)
+	{
+		switch (fixture)
+		{
+		case TUBE:
+			putTube(pos);
+			return;
+		case WALL:
+			putWall(pos);
+			return;
+		case GEYSER:
+			putGeyser(pos);
+			return;
+		case MINE_PLATFORM:
+			if (!canPlaceFixture(fixture, pos))
+				throw new IllegalStateException();
+			
+			grid.get(pos).fixture = fixture;
+			return;
+		}
+		
+		throw new IllegalArgumentException("invalid fixture " + fixture);
 	}
 	
 	public void putWall(Position pos)

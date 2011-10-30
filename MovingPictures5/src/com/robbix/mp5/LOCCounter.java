@@ -11,19 +11,23 @@ import java.util.Set;
 
 public class LOCCounter
 {
-	private static Set<File> top10 = new HashSet<File>();
+	private static Set<FileInfo> infos = new HashSet<FileInfo>();
 	
 	public static void main(String[] args) throws IOException
 	{
-		getLineCount(new File("./src"), true, true);
+		getLineCount(new File("./src"));
 		System.out.println();
-		System.out.println("Top 10 lines: ");
+		System.out.println("Top 10 line counts: ");
 		
-		for (File file : top10)
-			getLineCount(file, true, false);
+		FileInfo[] infoArray = infos.toArray(new FileInfo[infos.size()]);
+		
+		Arrays.sort(infoArray);
+		
+		for (int i = 0; i < Math.min(infoArray.length, 10); ++i)
+			println(infoArray[i].file, infoArray[i].lineCount);
 	}
 	
-	private static int getLineCount(File file, boolean output, boolean tt) throws IOException
+	private static int getLineCount(File file) throws IOException
 	{
 		if (file.getName().contains("LOCCounter"))
 			return 0;
@@ -36,10 +40,9 @@ public class LOCCounter
 			Arrays.sort(files, Utils.FILENAME);
 			
 			for (File child : files)
-				lines += getLineCount(child, output, tt);
+				lines += getLineCount(child);
 			
-			if (output)
-				System.out.println(file.getPath() + " " + lines);
+			println(file, lines);
 			
 			return lines;
 		}
@@ -52,29 +55,45 @@ public class LOCCounter
 			
 			while (reader.readLine() != null)
 				lines++;
+
+			println(file, lines);
 			
-			if (tt)
-				tryTop10(file);
-			
-			if (output)
-				System.out.println(file.getPath() + " " + lines);
+			infos.add(new FileInfo(file, lines));
 			
 			return lines;
 		}
 	}
 	
-	private static boolean tryTop10(File file) throws IOException
+	private static class FileInfo implements Comparable<FileInfo>
 	{
-		if (top10.size() < 10)
-			return top10.add(file);
+		public final File file;
+		public final int lineCount;
 		
-		for (File ttFile : top10)
-			if (getLineCount(file, false, false) > getLineCount(ttFile, false, false))
-			{
-				top10.remove(ttFile);
-				return top10.add(file);
-			}
+		public FileInfo(File file, int lineCount)
+		{
+			this.file = file;
+			this.lineCount = lineCount;
+		}
 		
-		return false;
+		public int compareTo(FileInfo info)
+		{
+			return info.lineCount - this.lineCount;
+		}
+	}
+	
+	private static void println(File f, int i)
+	{
+		String path = f.getPath();
+		System.out.println(path + nSpaces(63 - path.length()) + i);
+	}
+	
+	private static String nSpaces(int n)
+	{
+		StringBuilder b = new StringBuilder(n);
+		
+		for (int x = 0; x < n; ++x)
+			b.append(' ');
+		
+		return b.toString();
 	}
 }

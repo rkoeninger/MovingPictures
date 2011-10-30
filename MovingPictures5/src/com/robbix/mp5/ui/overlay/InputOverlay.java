@@ -45,7 +45,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public static final ColorScheme GREEN  = ColorScheme.withTranslucentBody(Color.GREEN);
 	public static final ColorScheme WHITE  = ColorScheme.withTranslucentBody(Color.WHITE);
 	
-	private static int DRAG_THRESHOLD = 16;
+	private static int DRAG_THRESHOLD = 8*8;
 	private static final int LEFT   = MouseEvent.BUTTON1;
 	private static final int MIDDLE = MouseEvent.BUTTON2;
 	private static final int RIGHT  = MouseEvent.BUTTON3;
@@ -60,9 +60,10 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	private boolean controlDown;
 	private String animatedCursor = null;
 	
-	protected boolean closesOnEscape = true;
-	protected boolean requiresLeftClickOnGrid = true;
-	protected boolean requiresRightClickOnGrid = false;
+	protected boolean closesOnEscape            = true;
+	protected boolean closesOnRightClick        = true;
+	protected boolean requiresLeftClickOnGrid   = true;
+	protected boolean requiresRightClickOnGrid  = false;
 	protected boolean requiresMiddleClickOnGrid = true;
 	
 	protected InputOverlay()
@@ -103,8 +104,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	{
 	}
 	
-	public void paintOverTerrain(Graphics g, Rectangle rect){}
-	public void paintOverUnits(Graphics g, Rectangle rect){}
+	public void paintOverTerrain(Graphics g){}
+	public void paintOverUnits(Graphics g){}
 	
 	public void drawSelectedUnitBox(Graphics g, Unit unit)
 	{
@@ -218,7 +219,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public void onMiddleClick(){}
 	public void onAreaDragged(){}
 	public void onAreaDragging(){}
-	public void onAreaDragCancelled(){}
 	public void onCommand(String command){}
 	
 	public boolean isCursorOnGrid()
@@ -356,11 +356,9 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 				{
 					if (!requiresRightClickOnGrid || isCursorOnGrid())
 						onRightClick();
-				}
-				
-				if (dragArea != null)
-				{
-					onAreaDragCancelled();
+					
+					if (closesOnRightClick)
+						complete();
 				}
 			}
 			else
@@ -368,10 +366,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 				prepNormalDragArea(e.getX(), e.getY());
 				
 				if (dragArea != null)
-				{
-					onAreaDragged(
-					);
-				}
+					onAreaDragged();
 			}
 			
 			pressedPoint = null;
@@ -381,11 +376,13 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public final void mouseDragged(MouseEvent e)
 	{
+		if (pressedPoint.distanceSq(e.getPoint()) < DRAG_THRESHOLD)
+			return;
+			
 		if (isCursorOnGrid() && pressedPoint != null)
 		{
 			prepNormalDragArea(e.getX(), e.getY());
-			onAreaDragging(
-			);
+			onAreaDragging();
 		}
 	}
 	

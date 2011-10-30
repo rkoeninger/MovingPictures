@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -34,7 +33,7 @@ public class CommandTruckOverlay extends InputOverlay
 		this.trucks = trucks;
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		for (Unit truck : trucks)
 			drawSelectedUnitBox(g, truck);
@@ -150,10 +149,5 @@ public class CommandTruckOverlay extends InputOverlay
 			Mediator.doMove(truck, pos);
 		
 		Mediator.playSound("beep2");
-	}
-	
-	public void onRightClick()
-	{
-		complete();
 	}
 }

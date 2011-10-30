@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +19,7 @@ public class BuildTubeOverlay extends InputOverlay
 		this.crane = earthworker;
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		drawSelectedUnitBox(g, crane);
 		
@@ -44,11 +43,6 @@ public class BuildTubeOverlay extends InputOverlay
 	public void onLeftClick()
 	{
 		Mediator.doEarthworkerBuild(crane, getCursorPosition(), Fixture.TUBE);
-		complete();
-	}
-	
-	public void onRightClick()
-	{
 		complete();
 	}
 	

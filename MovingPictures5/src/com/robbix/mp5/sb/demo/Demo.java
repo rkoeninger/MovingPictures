@@ -68,7 +68,7 @@ public abstract class Demo
 		SoundBank sounds = game.getSoundBank();
 		
 		for (String spriteModule : spriteModules)
-			sprites.loadModule(spriteModule);
+			sprites.loadModuleSync(spriteModule);
 		
 		for (String soundModule : soundModules)
 			sounds.loadModule(soundModule);

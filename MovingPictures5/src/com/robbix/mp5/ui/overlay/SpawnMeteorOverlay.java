@@ -13,9 +13,4 @@ public class SpawnMeteorOverlay extends InputOverlay
 	{
 		Mediator.doSpawnMeteor(getCursorPosition());
 	}
-	
-	public void onRightClick()
-	{
-		complete();
-	}
 }

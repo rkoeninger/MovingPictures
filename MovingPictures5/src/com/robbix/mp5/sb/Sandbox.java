@@ -62,11 +62,9 @@ import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.TitleBar;
 import com.robbix.mp5.ui.UnitStatus;
 import com.robbix.mp5.ui.overlay.PlaceBulldozeOverlay;
-import com.robbix.mp5.ui.overlay.PlaceGeyserOverlay;
+import com.robbix.mp5.ui.overlay.PlaceFixtureOverlay;
 import com.robbix.mp5.ui.overlay.PlaceResourceOverlay;
-import com.robbix.mp5.ui.overlay.PlaceTubeOverlay;
 import com.robbix.mp5.ui.overlay.PlaceUnitOverlay;
-import com.robbix.mp5.ui.overlay.PlaceWallOverlay;
 import com.robbix.mp5.ui.overlay.SelectUnitOverlay;
 import com.robbix.mp5.ui.overlay.SpawnMeteorOverlay;
 import com.robbix.mp5.unit.Cargo;
@@ -737,15 +735,15 @@ public class Sandbox
 			}
 			else if (e.getSource() == placeGeyserMenuItem)
 			{
-				panel.pushOverlay(new PlaceGeyserOverlay());
+				panel.pushOverlay(new PlaceFixtureOverlay(LayeredMap.Fixture.GEYSER));
 			}
 			else if (e.getSource() == placeWallMenuItem)
 			{
-				panel.pushOverlay(new PlaceWallOverlay());
+				panel.pushOverlay(new PlaceFixtureOverlay(LayeredMap.Fixture.WALL));
 			}
 			else if (e.getSource() == placeTubeMenuItem)
 			{
-				panel.pushOverlay(new PlaceTubeOverlay());
+				panel.pushOverlay(new PlaceFixtureOverlay(LayeredMap.Fixture.TUBE));
 			}
 			else if (e.getSource() == pauseMenuItem)
 			{

@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,7 +20,7 @@ public class SelectBulldozeOverlay extends InputOverlay
 		this.dozer = dozer;
 	}
 	
-	public void paintOverUnits(Graphics g, Rectangle rect)
+	public void paintOverUnits(Graphics g)
 	{
 		drawSelectedUnitBox(g, dozer);
 		
@@ -36,11 +35,6 @@ public class SelectBulldozeOverlay extends InputOverlay
 	{
 		Position pos = getCursorPosition();
 		dozer.assignNow(new BulldozeRegionTask(Arrays.asList(pos)));
-		complete();
-	}
-	
-	public void onRightClick()
-	{
 		complete();
 	}
 	
