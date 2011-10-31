@@ -157,6 +157,10 @@ public class Sandbox
 			{
 				asyncLoadSprites = true;
 			}
+			else if (args[a].equals("-syncLoadSprites"))
+			{
+				asyncLoadSprites = false;
+			}
 			else if (args[a].equals("-soundOn"))
 			{
 				soundOn = true;

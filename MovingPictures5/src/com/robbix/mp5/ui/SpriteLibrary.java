@@ -86,7 +86,7 @@ public class SpriteLibrary implements Modular
 	
 	public void setAsyncModeEnabled(boolean asyncMode)
 	{
-		asyncMode = true;
+		this.asyncMode = asyncMode;
 	}
 	
 	public boolean isAsyncModeEnabled()
