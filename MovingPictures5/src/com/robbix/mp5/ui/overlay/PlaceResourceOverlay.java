@@ -1,5 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.robbix.mp5.Utils;
@@ -7,6 +8,7 @@ import com.robbix.mp5.basics.ColorScheme;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteSet;
 
 public class PlaceResourceOverlay extends InputOverlay
 {
@@ -26,18 +28,22 @@ public class PlaceResourceOverlay extends InputOverlay
 			if (resSprite == null)
 			{
 				resSprite = panel.getSpriteLibrary().getDefaultSprite(res);
-				resSprite = Utils.getTranslucency(resSprite, -1, 0.5f);
+				resSprite = resSprite == SpriteSet.BLANK_SPRITE
+					? null
+					: Utils.getTranslucency(resSprite, -1, 0.5f);
 			}
 			
 			Position pos = getCursorPosition();
 			
 			ColorScheme colors = null;
+			String toolTip = null;
 			
 			if (panel.getMap().canPlaceResourceDeposit(pos))
 			{
 				if (hasNeighboringDeposit(pos))
 				{
 					colors = YELLOW;
+					toolTip = "Too close to another deposit";
 				}
 				else
 				{
@@ -47,10 +53,19 @@ public class PlaceResourceOverlay extends InputOverlay
 			else
 			{
 				colors = RED;
+				toolTip = "Position already has deposit";
 			}
 			
 			panel.draw(g, colors, pos);
-			panel.draw(g, resSprite, pos);
+			
+			if (resSprite != null)
+				panel.draw(g, resSprite, pos);
+			
+			if (toolTip != null)
+			{
+				g.setColor(Color.WHITE);
+				panel.draw(g, toolTip, pos);
+			}
 		}
 	}
 	

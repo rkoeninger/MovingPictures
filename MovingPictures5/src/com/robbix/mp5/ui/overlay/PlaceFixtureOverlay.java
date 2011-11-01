@@ -1,5 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.robbix.mp5.Utils;
@@ -30,13 +31,19 @@ public class PlaceFixtureOverlay extends InputOverlay
 					? null
 					: Utils.getTranslucency(fixtureSprite, -1, 0.75f);
 			}
-
+			
 			Position pos = getCursorPosition();
 			ColorScheme colors = panel.getMap().canPlaceFixture(fixture, pos) ? GREEN : RED;
 			panel.draw(g, colors, pos);
 			
 			if (fixtureSprite != null)
 				panel.draw(g, fixtureSprite, pos);
+			
+			if (!panel.getMap().canPlaceFixture(fixture, pos))
+			{
+				g.setColor(Color.WHITE);
+				panel.draw(g, "Nope", pos);
+			}
 		}
 	}
 	
