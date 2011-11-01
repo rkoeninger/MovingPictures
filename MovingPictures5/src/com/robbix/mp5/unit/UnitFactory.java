@@ -27,6 +27,9 @@ public class UnitFactory
 		
 		File[] files = rootDir.listFiles();
 		
+		if (files == null)
+			throw new IOException("No directory listing");
+		
 		factory.types = new HashMap<String, UnitType>(files.length);
 		factory.typeList = new ArrayList<String>(files.length);
 		factory.names = new ArrayList<String>(files.length);

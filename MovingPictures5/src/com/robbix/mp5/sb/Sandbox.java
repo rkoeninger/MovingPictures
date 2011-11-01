@@ -14,6 +14,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import javax.sound.sampled.Line;
 import javax.sound.sampled.SourceDataLine;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JApplet;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -37,6 +40,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.JWindow;
 import javax.swing.KeyStroke;
@@ -72,11 +77,32 @@ import com.robbix.mp5.unit.Unit;
  * 
  * @author bort
  */
-public class Sandbox
+public class Sandbox extends JApplet
 {
-	private static final String DEFAULT_TILE_SET = "newTerraDirt";
-	private static final String DEFAULT_MAP = "16-16-plain";
-	private static final File RES_DIR = new File("./res");
+	private static final long serialVersionUID = 1L;
+	
+	public void init()
+	{
+		try
+		{
+			main(new String[]{"-resDir:./../res"});
+			frame.setVisible(false);
+			this.setLayout(new BorderLayout());
+			this.setJMenuBar(frame.getJMenuBar());
+			this.add(panel, BorderLayout.CENTER);
+			this.add(commandBar, BorderLayout.NORTH);
+		}
+		catch (Exception exc)
+		{
+			StringWriter excString = new StringWriter();
+			exc.printStackTrace(new PrintWriter(excString));
+			add(new JScrollPane(new JTextArea(excString.toString())));
+		}
+	}
+	
+	private static final String defaultTileSet = "newTerraDirt";
+	private static final String defaultMap = "16-16-plain";
+	private static File resDir = new File("./res");
 	
 	private static Player currentPlayer;
 	private static Game game;
@@ -205,6 +231,10 @@ public class Sandbox
 				
 				tileSetName = option;
 			}
+			else if (args[a].startsWith("-resDir:"))
+			{
+				resDir = new File(option);
+			}
 		}
 		
 		Demo demo = null;
@@ -221,12 +251,12 @@ public class Sandbox
 		
 		if (tileSetName == null)
 		{
-			tileSetName = DEFAULT_TILE_SET;
+			tileSetName = defaultTileSet;
 		}
 		
 		if (mapName == null)
 		{
-			mapName = demo == null ? DEFAULT_MAP : demo.getMapName();
+			mapName = demo == null ? defaultMap : demo.getMapName();
 		}
 		
 		Sandbox.trySystemLookAndFeel();
@@ -238,7 +268,7 @@ public class Sandbox
 		 * Init Mediator
 		 */
 		game = Game.load(
-			RES_DIR,
+			resDir,
 			mapName,
 			tileSetName,
 			lazyLoadSprites,
@@ -296,7 +326,7 @@ public class Sandbox
 		frameRateMenuItem = new JMenuItem("Frame Rate");
 		scrollSpeedMenuItem = new JMenuItem("Scroll Speed");
 		addDisplayMenuItem = new JMenuItem("Open Additional View");
-//		fullScreenMenuItem = new JMenuItem("Full Screen");
+		fullScreenMenuItem = new JMenuItem("Full Screen");
 		spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
 		meteorShowerMenuItem = new JMenuItem("Meteor Shower");
 		placeGeyserMenuItem = new JMenuItem("Place Geyser");
@@ -454,7 +484,7 @@ public class Sandbox
 		displayMenu.add(scrollBarsMenuItem);
 		displayMenu.add(frameRateMenuItem);
 		displayMenu.add(scrollSpeedMenuItem);
-		displayMenu.add(fullScreenMenuItem);
+//		displayMenu.add(fullScreenMenuItem);
 		displayMenu.add(addDisplayMenuItem);
 		soundMenu.add(playSoundMenuItem);
 //		soundMenu.add(playMusicMenuItem);
@@ -969,7 +999,7 @@ public class Sandbox
 		commandBar.setFloatable(false);
 		commandBar.setRollover(true);
 		
-		File[] iconDirs = new File(RES_DIR, "art/commandButtons").listFiles();
+		File[] iconDirs = new File(resDir, "art/commandButtons").listFiles();
 		Arrays.sort(iconDirs, Utils.FILENAME);
 		
 		for (File iconDir : iconDirs)
@@ -1064,8 +1094,8 @@ public class Sandbox
 	public static List<Image> getWindowIcons() throws IOException
 	{
 		return Arrays.asList(
-			(Image) ImageIO.read(new File(RES_DIR, "art/smallIcon.png")),
-			(Image) ImageIO.read(new File(RES_DIR, "art/mediumIcon.png"))
+			(Image) ImageIO.read(new File(resDir, "art/smallIcon.png")),
+			(Image) ImageIO.read(new File(resDir, "art/mediumIcon.png"))
 		);
 	}
 }
