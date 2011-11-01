@@ -218,7 +218,8 @@ public class Engine
 					}
 				}
 				
-				panel.repaint();
+				for (DisplayPanel panel : game.getDisplays())
+					panel.repaint();
 				
 				frame++;
 			}

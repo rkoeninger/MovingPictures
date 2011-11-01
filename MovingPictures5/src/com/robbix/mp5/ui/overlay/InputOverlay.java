@@ -181,45 +181,71 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		g.translate(-panel.getViewX(), -panel.getViewY());
 	}
 	
-	public void drawStructureFootprint(Graphics g, UnitType type, Position pos)
+	/**
+	 * Returns tooltip text so it can be drawn on top of unit placement sprite.
+	 */
+	public String drawUnitFootprint(Graphics g, UnitType type, Position pos)
 	{
 		Footprint fp = type.getFootprint();
-		Region innerRegion = fp.getInnerRegion().move(pos);
-		Region outerRegion = innerRegion.stretch(1);
+		Region inner = fp.getInnerRegion().move(pos);
+		Region outer = inner.stretch(1);
 		LayeredMap map = panel.getMap();
 		ColorScheme scheme = null;
+		String toolTip = null;
 		
 		if (type.getName().endsWith("Mine"))
 		{
-			boolean validPosition = map.getBounds().contains(innerRegion)
-			 && map.canPlaceUnit(pos, fp) && map.canPlaceMine(pos);
+			boolean onMap = map.getBounds().contains(inner);
+			boolean available = map.canPlaceUnit(pos, fp);
+			boolean hasDeposit = map.canPlaceMine(pos);
 			
-			scheme = validPosition ? GREEN : RED;
+			scheme = onMap && available && hasDeposit ? GREEN : RED;
+			
+			if      (!onMap)      toolTip = "Out of bounds";
+			else if (!available)  toolTip = "Occupied";
+			else if (!hasDeposit) toolTip = "No resource deposit";
 		}
 		else
 		{
-			boolean validPosition = map.getBounds().contains(innerRegion)
-			 && map.canPlaceUnit(pos, fp);
-			boolean connected = validPosition
-			 && (!type.needsConnection() || map.willConnect(pos, fp));
+			boolean onMap = map.getBounds().contains(inner);
+			boolean available = map.canPlaceUnit(pos, fp);
+			boolean connected = !type.needsConnection() || map.willConnect(pos, fp);
+			boolean noDeposit = !containsDeposit(outer);
 			
-			scheme = validPosition ? (connected ? GREEN : YELLOW) : RED;
+			scheme = onMap && available ? (connected && noDeposit ? GREEN : YELLOW) : RED;
+			
+			if      (!onMap)     toolTip = "Out of bounds";
+			else if (!available) toolTip = "Occupied";
+			else if (!noDeposit) toolTip = "Covers resource deposit";
+			else if (!connected) toolTip = "No tube connection";
 		}
 		
-		panel.draw(g, scheme, innerRegion);
+		panel.draw(g, scheme, inner);
 		
 		for (Position tubePos : fp.getTubePositions())
-			panel.draw(g, WHITE.getFillOnly(), tubePos.shift(innerRegion.x, innerRegion.y));
+			panel.draw(g, WHITE.getFillOnly(), tubePos.shift(inner.x, inner.y));
 		
 		if (type.isStructureType() || type.isGuardPostType())
-			panel.drawOutline(g, WHITE, outerRegion);
+			panel.drawOutline(g, WHITE, outer);
+		
+		return toolTip;
+	}
+	
+	private boolean containsDeposit(Region region)
+	{
+		LayeredMap map = panel.getMap();
+		
+		for (Position pos : region)
+			if (map.getBounds().contains(pos) && map.hasResourceDeposit(pos))
+				return true;
+		
+		return false;
 	}
 	
 	public void onLeftClick(){}
 	public void onRightClick(){}
 	public void onMiddleClick(){}
 	public void onAreaDragged(){}
-	public void onAreaDragging(){}
 	public void onCommand(String command){}
 	
 	public boolean isCursorOnGrid()
@@ -383,7 +409,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		if (isCursorOnGrid() && pressedPoint != null)
 		{
 			prepNormalDragArea(e.getX(), e.getY());
-			onAreaDragging();
 		}
 	}
 	

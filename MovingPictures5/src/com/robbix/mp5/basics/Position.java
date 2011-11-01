@@ -169,6 +169,7 @@ public class Position implements RIterable<Position>
 		public Position next()
 		{
 			checkHasNext();
+			done = true;
 			return Position.this;
 		}
 	}

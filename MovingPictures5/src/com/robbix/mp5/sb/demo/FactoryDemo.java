@@ -49,23 +49,23 @@ public class FactoryDemo extends Demo
 	
 	public void placeUnits(LayeredMap map, UnitFactory factory)
 	{
-		Unit convec1     = factory.newUnit("eConVec", 1);
-		Unit convec2     = factory.newUnit("eConVec", 1);
-		Unit convec3     = factory.newUnit("eConVec", 1);
-		Unit convec4     = factory.newUnit("eConVec", 1);
-		Unit earthworker = factory.newUnit("eEarthworker", 1);
-		Unit dozer       = factory.newUnit("pRoboDozer", 1);
+		Unit convec1 = factory.newUnit("eConVec", 1);
+		Unit convec2 = factory.newUnit("eConVec", 1);
+		Unit convec3 = factory.newUnit("eConVec", 1);
+		Unit convec4 = factory.newUnit("eConVec", 1);
+		Unit crane   = factory.newUnit("eEarthworker", 1);
+		Unit dozer   = factory.newUnit("pRoboDozer", 1);
 		
 		convec1.setCargo(Cargo.newConVecCargo("eVehicleFactory"));
 		convec2.setCargo(Cargo.newConVecCargo("eStructureFactory"));
 		convec3.setCargo(Cargo.newConVecCargo("eCommonSmelter"));
 		convec4.setCargo(Cargo.newConVecCargo("eCommandCenter"));
 		
-		map.putUnit(convec1,     Mediator.getPosition(9,  7));
-		map.putUnit(convec2,     Mediator.getPosition(10, 7));
-		map.putUnit(convec3,     Mediator.getPosition(11, 7));
-		map.putUnit(convec4,     Mediator.getPosition(12, 7));
-		map.putUnit(earthworker, Mediator.getPosition(10, 9));
-		map.putUnit(dozer,       Mediator.getPosition(11, 9));
+		map.putUnit(convec1, Mediator.getPosition(9,  7));
+		map.putUnit(convec2, Mediator.getPosition(10, 7));
+		map.putUnit(convec3, Mediator.getPosition(11, 7));
+		map.putUnit(convec4, Mediator.getPosition(12, 7));
+		map.putUnit(crane,   Mediator.getPosition(10, 9));
+		map.putUnit(dozer,   Mediator.getPosition(11, 9));
 	}
 }

@@ -43,7 +43,7 @@ public class PlaceResourceOverlay extends InputOverlay
 				if (hasNeighboringDeposit(pos))
 				{
 					colors = YELLOW;
-					toolTip = "Too close to another deposit";
+					toolTip = "Too close";
 				}
 				else
 				{
@@ -53,7 +53,7 @@ public class PlaceResourceOverlay extends InputOverlay
 			else
 			{
 				colors = RED;
-				toolTip = "Position already has deposit";
+				toolTip = "Occupied";
 			}
 			
 			panel.draw(g, colors, pos);

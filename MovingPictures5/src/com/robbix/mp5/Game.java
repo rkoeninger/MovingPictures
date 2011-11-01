@@ -2,10 +2,12 @@ package com.robbix.mp5;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +16,6 @@ import com.robbix.mp5.map.TileSet;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.CursorSet;
 import com.robbix.mp5.ui.DisplayPanel;
-import com.robbix.mp5.ui.DisplayPanelView;
 import com.robbix.mp5.ui.SoundBank;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.UnitFactory;
@@ -38,13 +39,12 @@ public class Game
 		game.spriteLib = SpriteLibrary.load(new File(root, "sprites"), lazySprites);
 		game.sounds = SoundBank.load(new File(root, "sounds"), lazySounds);
 		game.cursorSet = CursorSet.load(new File(root, "cursors"));
-		game.panel = new DisplayPanel(
+		game.addDisplay(new DisplayPanel(
 			game.map,
 			game.spriteLib,
 			game.tileSet,
 			game.cursorSet
-		);
-		game.view = new DisplayPanelView(game.panel);
+		));
 		
 		return game;
 	}
@@ -81,8 +81,7 @@ public class Game
 			}
 			else if (thing instanceof DisplayPanel)
 			{
-				game.panel = (DisplayPanel) thing;
-				game.view = new DisplayPanelView(game.panel);
+				game.addDisplay((DisplayPanel) thing);
 			}
 		}
 		
@@ -92,8 +91,7 @@ public class Game
 	private Map<Integer, Player> players;
 	private Player defaultPlayer;
 	
-	private DisplayPanel panel;
-	private DisplayPanelView view;
+	private List<DisplayPanel> displays;
 	private LayeredMap map;
 	private SpriteLibrary spriteLib;
 	private SoundBank sounds;
@@ -106,6 +104,7 @@ public class Game
 	
 	private Game()
 	{
+		displays = Collections.synchronizedList(new ArrayList<DisplayPanel>());
 		defaultPlayer = new Player(0, "Default", 240);
 		players = new HashMap<Integer, Player>();
 		players.put(0, defaultPlayer);
@@ -127,14 +126,29 @@ public class Game
 		return map;
 	}
 	
-	public DisplayPanel getDisplay()
+	public void removeDisplay(DisplayPanel panel)
 	{
-		return panel;
+		displays.remove(panel);
 	}
 	
-	public DisplayPanelView getView()
+	public void addDisplay(DisplayPanel panel)
 	{
-		return view;
+		displays.add(panel);
+	}
+	
+	public List<DisplayPanel> getDisplays()
+	{
+		return new ArrayList<DisplayPanel>(displays);
+	}
+	
+	public DisplayPanel getDisplay(int index)
+	{
+		return displays.get(index);
+	}
+	
+	public DisplayPanel getDisplay()
+	{
+		return getDisplay(0);
 	}
 	
 	public SpriteLibrary getSpriteLibrary()

@@ -4,9 +4,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
@@ -119,20 +122,40 @@ public class LayeredMap
 	private CostMap costMap;
 	private TileSet tileSet;
 	
-	private DisplayPanel panel;
+	private List<DisplayPanel> panels;
 	
 	private LayeredMap()
 	{
+		panels = new LinkedList<DisplayPanel>();
 	}
 	
-	public void setDisplayPanel(DisplayPanel panel)
+	public void addDisplayPanel(DisplayPanel panel)
 	{
-		this.panel = panel;
+		synchronized (panels)
+		{
+			panels.add(panel);
+		}
 	}
 	
 	public DisplayPanel getDisplayPanel()
 	{
-		return panel;
+		return getDisplayPanel(0);
+	}
+	
+	public DisplayPanel getDisplayPanel(int index)
+	{
+		synchronized (panels)
+		{
+			return panels.get(index);
+		}
+	}
+	
+	public List<DisplayPanel> getDisplayPanels()
+	{
+		synchronized (panels)
+		{
+			return new ArrayList<DisplayPanel>(panels);
+		}
 	}
 	
 	public int getWidth()
@@ -916,19 +939,28 @@ public class LayeredMap
 	@SuppressWarnings("unused")
 	private void refreshPanel()
 	{
-		if (panel != null)
-			panel.refresh();
+		synchronized (panels)
+		{
+			for (DisplayPanel panel : panels)
+				panel.refresh();
+		}
 	}
 
 	private void refreshPanel(Position pos)
 	{
-		if (panel != null)
-			panel.refresh(pos);
+		synchronized (panels)
+		{
+			for (DisplayPanel panel : panels)
+				panel.refresh(pos);
+		}
 	}
 
 	private void refreshPanel(Region region)
 	{
-		if (panel != null)
-			panel.refresh(region);
+		synchronized (panels)
+		{
+			for (DisplayPanel panel : panels)
+				panel.refresh(region);
+		}
 	}
 }

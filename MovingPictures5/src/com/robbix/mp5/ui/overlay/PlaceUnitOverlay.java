@@ -1,9 +1,11 @@
 package com.robbix.mp5.ui.overlay;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.map.ResourceType;
@@ -59,6 +61,7 @@ public class PlaceUnitOverlay extends InputOverlay
 			
 			Position center = unit.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
+			String toolTip = drawUnitFootprint(g, unit.getType(), pos);
 			
 			if (unitSprite != null)
 				panel.draw(g, unitSprite, pos);
@@ -68,15 +71,15 @@ public class PlaceUnitOverlay extends InputOverlay
 				if (turretSprite != null)
 					panel.draw(g, turretSprite, pos);
 			}
-		}
-	}
-	
-	public void paintOverTerrain(Graphics g)
-	{
-		if (isCursorOnGrid())
-		{
-			Position center = unit.getFootprint().getCenter();
-			drawStructureFootprint(g, unit.getType(), getCursorPosition().subtract(center));
+			
+			if (toolTip != null)
+			{
+				g.setColor(Color.WHITE);
+				Region inner = unit.getFootprint().getInnerRegion();
+				
+				if (inner.w == 1 && inner.h == 1) panel.draw(g, toolTip, pos);
+				                             else panel.draw(g, toolTip, inner.move(pos));
+			}
 		}
 	}
 	

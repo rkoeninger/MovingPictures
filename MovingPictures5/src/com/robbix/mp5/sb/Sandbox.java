@@ -8,6 +8,8 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -107,7 +109,7 @@ public class Sandbox
 	private static JMenuItem scrollBarsMenuItem;
 	private static JMenuItem frameRateMenuItem;
 	private static JMenuItem scrollSpeedMenuItem;
-	private static JMenuItem commandButtonsMenuItem;
+	private static JMenuItem secondDisplayPanelMenuItem;
 	private static JMenuItem spawnMeteorMenuItem;
 	private static JMenuItem meteorShowerMenuItem;
 	private static JMenuItem placeGeyserMenuItem;
@@ -128,7 +130,7 @@ public class Sandbox
 	
 	public static void main(String[] args) throws IOException
 	{
-		/*-------------------------------------------------------------------*
+		/*-------------------------------------------------------------------------------------[*]
 		 * Parse command-line arguments
 		 */
 		boolean lazyLoadSprites  = true;
@@ -224,7 +226,7 @@ public class Sandbox
 		
 		Sandbox.trySystemLookAndFeel();
 		
-		/*-------------------------------------------------------------------*
+		/*-------------------------------------------------------------------------------------[*]
 		 * Load map, units, sprites, cursors
 		 * Create players
 		 * Create engine
@@ -243,7 +245,7 @@ public class Sandbox
 		Mediator.soundOn(soundOn);
 		currentPlayer = game.getDefaultPlayer();
 		
-		/*-------------------------------------------------------------------*
+		/*-------------------------------------------------------------------------------------[*]
 		 * Prepare live-updating status labels
 		 */
 		UnitStatusLabel unitStatusLabel = new UnitStatusLabel();
@@ -264,17 +266,17 @@ public class Sandbox
 			}
 		};
 		
-		/*-------------------------------------------------------------------*
+		/*-------------------------------------------------------------------------------------[*]
 		 * Build UI
 		 */
 		panel = game.getDisplay();
 		panel.setUnitStatus(unitStatusLabel);
 		panel.setPlayerStatus(playerStatusLabel);
 		panel.setTitleBar(titleBar);
-		panel.setShowGrid(false);
-		panel.setShowUnitLayerState(false);
-		panel.setShowTerrainCostMap(false);
-		panel.setShowTerrainCostValues(true);
+		panel.setOption("Grid", false);
+		panel.setOption("Unit Layer State", false);
+		panel.setOption("Terrain Cost Map", false);
+		panel.setOption("Terrain Cost Values", true);
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
 		
@@ -288,7 +290,7 @@ public class Sandbox
 		scrollBarsMenuItem = new JMenuItem("Scroll Bars");
 		frameRateMenuItem = new JMenuItem("Frame Rate");
 		scrollSpeedMenuItem = new JMenuItem("Scroll Speed");
-		commandButtonsMenuItem = new JMenuItem("Command Buttons");
+		secondDisplayPanelMenuItem = new JMenuItem("Open Additional View");
 		spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
 		meteorShowerMenuItem = new JMenuItem("Meteor Shower");
 		placeGeyserMenuItem = new JMenuItem("Place Geyser");
@@ -323,7 +325,7 @@ public class Sandbox
 		playerMenu.add(addPlayerMenuItem);
 		playerMenu.addSeparator();
 		
-		/*-------------------------------------------------------------------*
+		/*-------------------------------------------------------------------------------------[*]
 		 * Add player select menu items
 		 */
 		playerSelectButtonGroup = new ButtonGroup();
@@ -347,7 +349,7 @@ public class Sandbox
 		
 		game.addGameListener(new SandboxListener());
 		
-		/*-------------------------------------------------------------------*
+		/*-------------------------------------------------------------------------------------[*]
 		 * Add place unit menu items
 		 */
 		final List<String> names = game.getUnitFactory().getUnitNames();
@@ -379,7 +381,7 @@ public class Sandbox
 			addUnitMenuItem.addActionListener(miListener);
 		}
 		
-		/*-------------------------------------------------------------------*
+		/*-------------------------------------------------------------------------------------[*]
 		 * Add display option menu items
 		 */
 		final List<String> options = panel.getOptionNames();
@@ -404,10 +406,10 @@ public class Sandbox
 		spriteLibMenuItem.addActionListener(miListener);
 		unitLibMenuItem.addActionListener(miListener);
 		soundPlayerMenuItem.addActionListener(miListener);
-		commandButtonsMenuItem.addActionListener(miListener);
 		scrollSpeedMenuItem.addActionListener(miListener);
 		scrollBarsMenuItem.addActionListener(miListener);
 		frameRateMenuItem.addActionListener(miListener);
+		secondDisplayPanelMenuItem.addActionListener(miListener);
 		meteorShowerMenuItem.addActionListener(miListener);
 		spawnMeteorMenuItem.addActionListener(miListener);
 		playSoundMenuItem.addActionListener(miListener);
@@ -445,7 +447,7 @@ public class Sandbox
 		displayMenu.add(scrollBarsMenuItem);
 		displayMenu.add(frameRateMenuItem);
 		displayMenu.add(scrollSpeedMenuItem);
-		displayMenu.add(commandButtonsMenuItem);
+		displayMenu.add(secondDisplayPanelMenuItem);
 		soundMenu.add(playSoundMenuItem);
 //		soundMenu.add(playMusicMenuItem);
 		soundMenu.addSeparator();
@@ -488,7 +490,7 @@ public class Sandbox
 		frame.setJMenuBar(menuBar);
 		frame.setLayout(new BorderLayout());
 		frame.add(commandBar, BorderLayout.NORTH);
-		frame.add(game.getView(), BorderLayout.CENTER);
+		frame.add(game.getDisplay().getView(), BorderLayout.CENTER);
 		frame.add(statusesPanel, BorderLayout.SOUTH);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setIconImages(getWindowIcons());
@@ -519,7 +521,7 @@ public class Sandbox
 			);
 		}
 		
-		/*--------------------------------------------------------------------*
+		/*-------------------------------------------------------------------------------------[*]
 		 * Setup demo
 		 * Start mechanics
 		 */
@@ -594,25 +596,11 @@ public class Sandbox
 				
 				sbPlayer.setVisible(true);
 			}
-			else if (e.getSource() == commandButtonsMenuItem)
-			{
-				if (commandBar.getParent() == frame.getRootPane())
-				{
-					frame.remove(commandBar);
-					frame.validate();
-				}
-				else
-				{
-					commandBar.setOrientation(SwingConstants.HORIZONTAL);
-					frame.add(commandBar, BorderLayout.NORTH);
-					frame.validate();
-				}
-			}
 			else if (e.getSource() == scrollSpeedMenuItem)
 			{
 				for (;;)
 				{
-					int scrollSpeed = game.getView().getScrollSpeed();
+					int scrollSpeed = game.getDisplay().getView().getScrollSpeed();
 					
 					String result = JOptionPane.showInputDialog(
 						frame,
@@ -626,7 +614,7 @@ public class Sandbox
 					try
 					{
 						scrollSpeed = Integer.parseInt(result);
-						game.getView().setScrollSpeed(scrollSpeed);
+						game.getDisplay().getView().setScrollSpeed(scrollSpeed);
 						break;
 					}
 					catch (NumberFormatException nfe)
@@ -637,7 +625,8 @@ public class Sandbox
 			}
 			else if (e.getSource() == scrollBarsMenuItem)
 			{
-				game.getView().showScrollBars(! game.getView().areScrollBarsVisible());
+				game.getDisplay().getView().showScrollBars(
+					! game.getDisplay().getView().areScrollBarsVisible());
 				frame.validate();
 			}
 			else if (e.getSource() == frameRateMenuItem)
@@ -648,6 +637,29 @@ public class Sandbox
 				{
 					frame.setTitle("Moving Pictures");
 				}
+			}
+			else if (e.getSource() == secondDisplayPanelMenuItem)
+			{
+				JFrame frame2 = new JFrame("Moving Pictures - Additional View");
+				final DisplayPanel panel2 = new DisplayPanel(
+					game.getMap(),
+					game.getSpriteLibrary(),
+					game.getTileSet(),
+					game.getCursorSet()
+				);
+				game.addDisplay(panel2);
+				panel2.pushOverlay(new SelectUnitOverlay());
+				panel2.showStatus(currentPlayer);
+				frame2.add(panel2.getView());
+				frame2.setSize(500, 500);
+				frame2.setVisible(true);
+				frame2.addWindowListener(new WindowAdapter()
+				{
+					public void windowClosed(WindowEvent e)
+					{
+						game.removeDisplay(panel2);
+					}
+				});
 			}
 			else if (e.getSource() == meteorShowerMenuItem)
 			{
@@ -825,9 +837,9 @@ public class Sandbox
 			}
 			else if (e.getActionCommand().startsWith(ACP_DISPLAY_OPTION))
 			{
-				panel.setOptionValue(
+				panel.setOption(
 					e.getActionCommand().substring(ACP_DISPLAY_OPTION.length()),
-					! panel.getOptionValue(
+					! panel.getOption(
 						e.getActionCommand().substring(ACP_DISPLAY_OPTION.length())
 					)
 				);

@@ -1,5 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,28 +30,40 @@ public class BuildTubeOverlay extends InputOverlay
 		
 		if (isCursorOnGrid())
 		{
+			Position pos = getCursorPosition();
+			boolean available = false;
+			
 			if (isDragging())
 			{
 				if (isDragRegionLinear())
 				{
 					LinearRegion region = getLinearDragRegion();
-					panel.draw(g, canPlaceTube(region) ? GREEN : RED, region);
+					available = canPlaceTube(region);
+					panel.draw(g, available ? GREEN : RED, region);
 				}
 				else if (isControlOptionSet())
 				{
 					BorderRegion region = getBorderDragRegion();
-					panel.draw(g, canPlaceTube(region) ? GREEN : RED, region);
+					available = canPlaceTube(region);
+					panel.draw(g, available ? GREEN : RED, region);
 				}
 				else
 				{
 					LShapedRegion region = getLShapedDragRegion();
-					panel.draw(g, canPlaceTube(region) ? GREEN : RED, region);
+					available = canPlaceTube(region);
+					panel.draw(g, available ? GREEN : RED, region);
 				}
 			}
 			else
 			{
-				Position pos = getCursorPosition();
-				panel.draw(g, canPlaceTube(pos) ? GREEN : RED, pos);
+				available = canPlaceTube(pos);
+				panel.draw(g, available ? GREEN : RED, pos);
+			}
+			
+			if (!available)
+			{
+				g.setColor(Color.WHITE);
+				panel.draw(g, "Occupied", pos);
 			}
 		}
 	}

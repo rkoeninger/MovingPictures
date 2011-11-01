@@ -49,7 +49,7 @@ public class BuildMineOverlay extends InputOverlay
 		if (isCursorOnGrid())
 		{
 			Position center = mine.getFootprint().getCenter();
-			drawStructureFootprint(g, mine.getType(), getCursorPosition().subtract(center));
+			drawUnitFootprint(g, mine.getType(), getCursorPosition().subtract(center));
 		}
 	}
 	

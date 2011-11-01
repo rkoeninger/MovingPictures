@@ -1,11 +1,13 @@
 package com.robbix.mp5.ui.overlay;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.ConVecConstructTask;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
@@ -40,18 +42,20 @@ public class BuildStructureOverlay extends InputOverlay
 			}
 			
 			Position center = structure.getFootprint().getCenter();
+			Position pos = getCursorPosition().subtract(center);
+			String toolTip = drawUnitFootprint(g, structure.getType(), pos);
 			
 			if (structSprite != null)
-				panel.draw(g, structSprite, getCursorPosition().subtract(center));
-		}
-	}
-	
-	public void paintOverTerrain(Graphics g)
-	{
-		if (isCursorOnGrid())
-		{
-			Position center = structure.getFootprint().getCenter();
-			drawStructureFootprint(g, structure.getType(), getCursorPosition().subtract(center));
+				panel.draw(g, structSprite, pos);
+			
+			if (toolTip != null)
+			{
+				g.setColor(Color.WHITE);
+				Region inner = structure.getFootprint().getInnerRegion();
+				
+				if (inner.w == 1 && inner.h == 1) panel.draw(g, toolTip, pos);
+				                             else panel.draw(g, toolTip, inner.move(pos));
+			}
 		}
 	}
 	

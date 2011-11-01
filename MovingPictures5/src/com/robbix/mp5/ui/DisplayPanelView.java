@@ -50,6 +50,11 @@ public class DisplayPanelView extends JComponent
 		hScrollBar.addAdjustmentListener(scrollBarMoved);
 	}
 	
+	public DisplayPanel getDisplayPanel()
+	{
+		return panel;
+	}
+	
 	public void showScrollBars(boolean show)
 	{
 		if (show == scrollBarsVisible)
@@ -137,7 +142,7 @@ public class DisplayPanelView extends JComponent
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			panel.shiftViewPosition(sx, sy);
+			panel.shiftViewPoint(sx, sy);
 			panel.repaint();
 		}
 	}

@@ -54,7 +54,7 @@ public class DisplayPanel extends JComponent
 	private Point scroll = new Point();
 	private int tileSize = 32;
 	private int scale = 0;
-	private final int minScale, maxScale;
+	private int minScale, maxScale, normalScale;
 	
 	private BufferedImage cachedBackground = null;
 	private Region cachedBackgroundRegion = new Region(-1, -1, 0, 0);
@@ -75,6 +75,8 @@ public class DisplayPanel extends JComponent
 	
 	private List<AmbientAnimation> animations =
 		new LinkedList<AmbientAnimation>();
+	
+	private DisplayPanelView view;
 	
 	private List<String> options = Arrays.asList(
 		"Grid",
@@ -106,11 +108,13 @@ public class DisplayPanel extends JComponent
 		if (map == null || sprites == null || tiles == null || cursors == null)
 			throw new IllegalArgumentException();
 		
+		this.view = new DisplayPanelView(this);
 		this.map = map;
-		map.setDisplayPanel(this);
+		map.addDisplayPanel(this);
 		this.sprites = sprites;
 		this.tiles = tiles;
 		this.tileSize = tiles.getTileSize();
+		this.normalScale = 0;
 		this.maxScale = 3;
 		this.minScale = -Utils.log2(tileSize);
 		this.cursors = cursors;
@@ -134,6 +138,11 @@ public class DisplayPanel extends JComponent
 		addMouseWheelListener(adapter);
 	}
 	
+	public DisplayPanelView getView()
+	{
+		return view;
+	}
+	
 	public void setLetterBoxColor(Color color)
 	{
 		if (color == null || color.getAlpha() != 255)
@@ -147,12 +156,61 @@ public class DisplayPanel extends JComponent
 		return letterBoxColor;
 	}
 	
+	public SpriteLibrary getSpriteLibrary()
+	{
+		return sprites;
+	}
+	
+	public TileSet getTileSet()
+	{
+		return tiles;
+	}
+	
+	public LayeredMap getMap()
+	{
+		return map;
+	}
+	
+	public void setAnimatedCursor(String name)
+	{
+		this.cursor = name == null ? null : cursors.getCursor(name);
+		
+		if (cursorTimer != null)
+		{
+			cursorTimer.stop();
+			cursorTimer = null;
+		}
+		
+		if (cursor == null)
+		{
+			setCursor(Cursor.getDefaultCursor());
+			return;
+		}
+		
+		cursorTimer = new Timer(0, new ActionListener()
+		{
+			int cursorIndex = 0;
+			
+			public void actionPerformed(ActionEvent e)
+			{
+				setCursor(cursor.getCursor(cursorIndex));
+				int delayMillis = cursor.getDelay(cursorIndex);
+				cursorTimer.setDelay(delayMillis);
+				cursorIndex++;
+				
+				if (cursorIndex == cursor.getFrameCount())
+					cursorIndex = 0;
+			}
+		});
+		cursorTimer.start();
+	}
+	
 	public List<String> getOptionNames()
 	{
 		return options;
 	}
 	
-	public boolean getOptionValue(String name)
+	public boolean getOption(String name)
 	{
 		if (name.equals("Grid"))
 		{
@@ -186,7 +244,7 @@ public class DisplayPanel extends JComponent
 		throw new IllegalArgumentException("Not an option: " + name);
 	}
 	
-	public void setOptionValue(String name, boolean isSet)
+	public void setOption(String name, boolean isSet)
 	{
 		if (name.equals("Grid"))
 		{
@@ -297,55 +355,6 @@ public class DisplayPanel extends JComponent
 			titleBar.showFrameNumber(frameNumber, frameRate);
 	}
 	
-	public void setAnimatedCursor(String name)
-	{
-		this.cursor = name == null ? null : cursors.getCursor(name);
-		
-		if (cursorTimer != null)
-		{
-			cursorTimer.stop();
-			cursorTimer = null;
-		}
-		
-		if (cursor == null)
-		{
-			setCursor(Cursor.getDefaultCursor());
-			return;
-		}
-		
-		cursorTimer = new Timer(0, new ActionListener()
-		{
-			int cursorIndex = 0;
-			
-			public void actionPerformed(ActionEvent e)
-			{
-				setCursor(cursor.getCursor(cursorIndex));
-				int delayMillis = cursor.getDelay(cursorIndex);
-				cursorTimer.setDelay(delayMillis);
-				cursorIndex++;
-				
-				if (cursorIndex == cursor.getFrameCount())
-					cursorIndex = 0;
-			}
-		});
-		cursorTimer.start();
-	}
-	
-	public SpriteLibrary getSpriteLibrary()
-	{
-		return sprites;
-	}
-	
-	public TileSet getTileSet()
-	{
-		return tiles;
-	}
-	
-	public LayeredMap getMap()
-	{
-		return map;
-	}
-	
 	public void completeOverlays()
 	{
 		overlays.clear();
@@ -388,72 +397,6 @@ public class DisplayPanel extends JComponent
 		overlay.setDisplay(this);
 		overlay.init();
 		adapter.setOverlay(overlay);
-	}
-	
-	public void setShowBackground(boolean showBackground)
-	{
-		this.showBackground = showBackground;
-		repaint();
-	}
-	
-	public boolean getShowBackground()
-	{
-		return showBackground;
-	}
-	
-	public void setShowUnitLayerState(boolean showUnitLayerState)
-	{
-		this.showUnitLayerState = showUnitLayerState;
-		repaint();
-	}
-	
-	public boolean getShowUnitLayerState()
-	{
-		return showUnitLayerState;
-	}
-	
-	public void setShowGrid(boolean showGrid)
-	{
-		this.showGrid = showGrid;
-		repaint();
-	}
-	
-	public boolean getShowGrid()
-	{
-		return showGrid;
-	}
-	
-	public void setShowTerrainCostMap(boolean showTerrainCostMap)
-	{
-		this.showTerrainCostMap = showTerrainCostMap;
-		refresh();
-	}
-	
-	public boolean getShowTerrainCostMap()
-	{
-		return showTerrainCostMap;
-	}
-
-	public void setShowTerrainCostValues(boolean showTerrainCostValues)
-	{
-		this.showTerrainCostValues = showTerrainCostValues;
-		refresh();
-	}
-	
-	public boolean getShowTerrainCostValues()
-	{
-		return showTerrainCostValues;
-	}
-	
-	public void setShowCostValuesAsFactors(boolean showCostValuesAsFactors)
-	{
-		this.showCostValuesAsFactors = showCostValuesAsFactors;
-		refresh();
-	}
-	
-	public boolean getShowCostValuesAsFactors()
-	{
-		return showCostValuesAsFactors;
 	}
 	
 	public void cueAnimation(AmbientAnimation animation)
@@ -523,12 +466,12 @@ public class DisplayPanel extends JComponent
 		return max(0, (getWidth() - getTotalWidth()) / 2);
 	}
 	
-	public Point getViewPosition()
+	public Point getViewPoint()
 	{
 		return new Point(scroll);
 	}
 	
-	public Point getViewCenterPosition()
+	public Point getViewCenterPoint()
 	{
 		return new Point(
 			 (getWidth()  / 2) - scroll.x,
@@ -546,7 +489,7 @@ public class DisplayPanel extends JComponent
 		return scroll.y;
 	}
 	
-	public void setViewPosition(int x, int y)
+	public void setViewPoint(int x, int y)
 	{
 		scroll.x = x;
 		scroll.y = y;
@@ -559,17 +502,17 @@ public class DisplayPanel extends JComponent
 		}
 	}
 	
-	public void shiftViewPosition(int dx, int dy)
+	public void shiftViewPoint(int dx, int dy)
 	{
-		setViewPosition(
+		setViewPoint(
 			scroll.x + dx,
 			scroll.y + dy
 		);
 	}
 	
-	public void setViewCenterPosition(int x, int y)
+	public void setViewCenterPoint(int x, int y)
 	{
-		setViewPosition(
+		setViewPoint(
 			(getWidth()  / 2) - x,
 			(getHeight() / 2) - y
 		);
@@ -577,7 +520,7 @@ public class DisplayPanel extends JComponent
 	
 	public void setViewCenterPosition(Position pos)
 	{
-		setViewPosition(
+		setViewPoint(
 			(getWidth()  / 2) - (pos.x * tileSize + tileSize / 2),
 			(getHeight() / 2) - (pos.y * tileSize + tileSize / 2)
 		);
@@ -599,23 +542,23 @@ public class DisplayPanel extends JComponent
 	
 	public void zoomIn()
 	{
-		zoomIn(getViewCenterPosition());
+		zoomIn(getViewCenterPoint());
 	}
 	
 	public void zoomOut()
 	{
-		zoomOut(getViewCenterPosition());
+		zoomOut(getViewCenterPoint());
 	}
 	
 	public void zoomNormal()
 	{
-		zoomNormal(getViewCenterPosition());
+		zoomNormal(getViewCenterPoint());
 	}
 	
 	public void zoomGlobal()
 	{
 		setScale(minScale);
-		setViewCenterPosition(getWidth() / 2, getHeight() / 2);
+		setViewCenterPoint(getWidth() / 2, getHeight() / 2);
 		refresh();
 	}
 	
@@ -654,9 +597,9 @@ public class DisplayPanel extends JComponent
 	
 	public void zoomNormal(Point center)
 	{
-		if (scale != 0)
+		if (scale != normalScale)
 		{
-			setScaleCentered(0, center);
+			setScaleCentered(normalScale, center);
 			refresh(getDisplayRegion());
 		}
 	}
@@ -676,6 +619,26 @@ public class DisplayPanel extends JComponent
 		{
 			refresh(dRegion);
 		}
+	}
+	
+	public int getMinimumScale()
+	{
+		return minScale;
+	}
+	
+	public int getMaximumScale()
+	{
+		return maxScale;
+	}
+	
+	public int getNormalScale()
+	{
+		return normalScale;
+	}
+	
+	public void setNormalScale(int normalScale)
+	{
+		this.normalScale = normalScale;
 	}
 	
 	/**
@@ -728,7 +691,7 @@ public class DisplayPanel extends JComponent
 		double xFraction = center.x / (double) getTotalWidth();
 		double yFraction = center.y / (double) getTotalHeight();
 		setScale(scale);
-		setViewCenterPosition(
+		setViewCenterPoint(
 			(int) (xFraction * getTotalWidth()),
 			(int) (yFraction * getTotalHeight())
 		);
@@ -904,12 +867,13 @@ public class DisplayPanel extends JComponent
 			if (region.intersects(unit.getOccupiedBounds()))
 				drawUnit(g, unit);
 		
-		synchronized (animations)
-		{
-			for (AmbientAnimation animation : animations)
-				if (rect.intersects(animation.getBounds()))
-					animation.paint(g);
-		}
+		// FIXME: AmbientAnimations have been disabled for now
+//		synchronized (animations)
+//		{
+//			for (AmbientAnimation animation : animations)
+//				if (rect.intersects(animation.getBounds()))
+//					animation.paint(g);
+//		}
 		
 		for (ResourceDeposit res : map.getResourceDeposits())
 			if (region.contains(res.getPosition()))
@@ -1172,33 +1136,45 @@ public class DisplayPanel extends JComponent
 	
 	public void draw(Graphics g, ColorScheme colors, Position pos)
 	{
-		pos.draw(g, colors, getViewPosition(), tileSize);
+		pos.draw(g, colors, getViewPoint(), tileSize);
 	}
 	
 	public void draw(Graphics g, ColorScheme colors, Region region)
 	{
-		region.draw(g, colors, getViewPosition(), tileSize);
+		region.draw(g, colors, getViewPoint(), tileSize);
 	}
 	
 	public void drawOutline(Graphics g, ColorScheme colors, Region region)
 	{
-		region.draw(g, colors.getEdgeOnly(), getViewPosition(), tileSize);
+		region.draw(g, colors.getEdgeOnly(), getViewPoint(), tileSize);
 	}
 	
 	public void draw(Graphics g, ColorScheme colors, LShapedRegion region)
 	{
-		region.draw(g, colors, getViewPosition(), tileSize);
+		region.draw(g, colors, getViewPoint(), tileSize);
 	}
 	
 	public void draw(Graphics g, ColorScheme colors, BorderRegion region)
 	{
-		region.draw(g, colors, getViewPosition(), tileSize);
+		region.draw(g, colors, getViewPoint(), tileSize);
 	}
 	
 	public void draw(Graphics g, String string, Position pos)
 	{
 		int x = pos.x * tileSize + (tileSize / 2) + scroll.x;
 		int y = pos.y * tileSize + (tileSize / 2) + scroll.y;
+		Rectangle2D bounds = g.getFontMetrics().getStringBounds(string, g);
+		int cx = (int) bounds.getCenterX();
+		int cy = (int) bounds.getCenterY();
+		g.drawString(string, x - cx, y - cy);
+	}
+	
+	public void draw(Graphics g, String string, Region region)
+	{
+		int w = region.w / 2 * tileSize + (region.w % 2 == 0 ? 0 : tileSize / 2);
+		int h = region.h / 2 * tileSize + (region.h % 2 == 0 ? 0 : tileSize / 2);
+		int x = region.x * tileSize + w + scroll.x;
+		int y = region.y * tileSize + h + scroll.y;
 		Rectangle2D bounds = g.getFontMetrics().getStringBounds(string, g);
 		int cx = (int) bounds.getCenterX();
 		int cy = (int) bounds.getCenterY();
