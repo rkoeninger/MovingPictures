@@ -2,9 +2,11 @@ package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -36,6 +38,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToolBar;
+import javax.swing.JWindow;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
@@ -79,6 +82,7 @@ public class Sandbox
 	private static Game game;
 	private static Engine engine;
 	private static JFrame frame;
+	private static Window fsWindow;
 	private static DisplayPanel panel;
 	private static JToolBar commandBar;
 	private static Map<Integer, JMenuItem> playerMenuItems =
@@ -109,7 +113,8 @@ public class Sandbox
 	private static JMenuItem scrollBarsMenuItem;
 	private static JMenuItem frameRateMenuItem;
 	private static JMenuItem scrollSpeedMenuItem;
-	private static JMenuItem secondDisplayPanelMenuItem;
+	private static JMenuItem addDisplayMenuItem;
+	private static JMenuItem fullScreenMenuItem;
 	private static JMenuItem spawnMeteorMenuItem;
 	private static JMenuItem meteorShowerMenuItem;
 	private static JMenuItem placeGeyserMenuItem;
@@ -290,7 +295,8 @@ public class Sandbox
 		scrollBarsMenuItem = new JMenuItem("Scroll Bars");
 		frameRateMenuItem = new JMenuItem("Frame Rate");
 		scrollSpeedMenuItem = new JMenuItem("Scroll Speed");
-		secondDisplayPanelMenuItem = new JMenuItem("Open Additional View");
+		addDisplayMenuItem = new JMenuItem("Open Additional View");
+//		fullScreenMenuItem = new JMenuItem("Full Screen");
 		spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
 		meteorShowerMenuItem = new JMenuItem("Meteor Shower");
 		placeGeyserMenuItem = new JMenuItem("Place Geyser");
@@ -409,7 +415,8 @@ public class Sandbox
 		scrollSpeedMenuItem.addActionListener(miListener);
 		scrollBarsMenuItem.addActionListener(miListener);
 		frameRateMenuItem.addActionListener(miListener);
-		secondDisplayPanelMenuItem.addActionListener(miListener);
+		addDisplayMenuItem.addActionListener(miListener);
+		fullScreenMenuItem.addActionListener(miListener);
 		meteorShowerMenuItem.addActionListener(miListener);
 		spawnMeteorMenuItem.addActionListener(miListener);
 		playSoundMenuItem.addActionListener(miListener);
@@ -447,7 +454,8 @@ public class Sandbox
 		displayMenu.add(scrollBarsMenuItem);
 		displayMenu.add(frameRateMenuItem);
 		displayMenu.add(scrollSpeedMenuItem);
-		displayMenu.add(secondDisplayPanelMenuItem);
+		displayMenu.add(fullScreenMenuItem);
+		displayMenu.add(addDisplayMenuItem);
 		soundMenu.add(playSoundMenuItem);
 //		soundMenu.add(playMusicMenuItem);
 		soundMenu.addSeparator();
@@ -638,7 +646,28 @@ public class Sandbox
 					frame.setTitle("Moving Pictures");
 				}
 			}
-			else if (e.getSource() == secondDisplayPanelMenuItem)
+			else if (e.getSource() == fullScreenMenuItem)
+			{
+				GraphicsDevice screen = frame.getGraphicsConfiguration().getDevice();
+				
+				if (screen.getFullScreenWindow() == null)
+				{
+					if (fsWindow == null)
+					{
+						fsWindow = new JWindow();
+						fsWindow.setLayout(new BorderLayout());
+						fsWindow.add(panel.getView(), BorderLayout.CENTER);
+						fsWindow.add(commandBar, BorderLayout.NORTH);
+					}
+					
+					screen.setFullScreenWindow(fsWindow);
+				}
+				else if (screen.getFullScreenWindow() == fsWindow)
+				{
+					screen.setFullScreenWindow(null);
+				}
+			}
+			else if (e.getSource() == addDisplayMenuItem)
 			{
 				JFrame frame2 = new JFrame("Moving Pictures - Additional View");
 				final DisplayPanel panel2 = new DisplayPanel(
