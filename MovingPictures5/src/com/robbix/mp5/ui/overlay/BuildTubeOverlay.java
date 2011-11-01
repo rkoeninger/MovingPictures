@@ -6,7 +6,11 @@ import java.util.Collections;
 import java.util.List;
 
 import com.robbix.mp5.Mediator;
+import com.robbix.mp5.basics.BorderRegion;
+import com.robbix.mp5.basics.LShapedRegion;
+import com.robbix.mp5.basics.LinearRegion;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.RIterable;
 import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.unit.Unit;
 
@@ -25,17 +29,28 @@ public class BuildTubeOverlay extends InputOverlay
 		
 		if (isCursorOnGrid())
 		{
-			Position pos = getCursorPosition();
-			
 			if (isDragging())
 			{
-				if      (isDragRegionLinear()) panel.draw(g, RED, getLinearDragRegion());
-				else if (isControlOptionSet()) panel.draw(g, RED, getBorderDragRegion());
-				                          else panel.draw(g, RED, getLShapedDragRegion());
+				if (isDragRegionLinear())
+				{
+					LinearRegion region = getLinearDragRegion();
+					panel.draw(g, canPlaceTube(region) ? GREEN : RED, region);
+				}
+				else if (isControlOptionSet())
+				{
+					BorderRegion region = getBorderDragRegion();
+					panel.draw(g, canPlaceTube(region) ? GREEN : RED, region);
+				}
+				else
+				{
+					LShapedRegion region = getLShapedDragRegion();
+					panel.draw(g, canPlaceTube(region) ? GREEN : RED, region);
+				}
 			}
 			else
 			{
-				panel.draw(g, RED, pos);
+				Position pos = getCursorPosition();
+				panel.draw(g, canPlaceTube(pos) ? GREEN : RED, pos);
 			}
 		}
 	}
@@ -105,5 +120,14 @@ public class BuildTubeOverlay extends InputOverlay
 		}
 		
 		Collections.rotate(tubeLoop, tubeLoop.size() - index);
+	}
+	
+	private boolean canPlaceTube(RIterable<Position> itr)
+	{
+		for (Position pos : itr)
+			if (!panel.getMap().canPlaceFixture(Fixture.TUBE, pos))
+				return false;
+		
+		return true;
 	}
 }

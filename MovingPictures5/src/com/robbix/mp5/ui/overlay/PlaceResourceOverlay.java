@@ -31,7 +31,24 @@ public class PlaceResourceOverlay extends InputOverlay
 			
 			Position pos = getCursorPosition();
 			
-			ColorScheme colors = panel.getMap().canPlaceResourceDeposit(pos) ? GREEN : RED;
+			ColorScheme colors = null;
+			
+			if (panel.getMap().canPlaceResourceDeposit(pos))
+			{
+				if (hasNeighboringDeposit(pos))
+				{
+					colors = YELLOW;
+				}
+				else
+				{
+					colors = GREEN;
+				}
+			}
+			else
+			{
+				colors = RED;
+			}
+			
 			panel.draw(g, colors, pos);
 			panel.draw(g, resSprite, pos);
 		}
@@ -47,5 +64,15 @@ public class PlaceResourceOverlay extends InputOverlay
 			res = (ResourceDeposit)res.clone();
 			panel.refresh();
 		}
+	}
+	
+	private boolean hasNeighboringDeposit(Position pos)
+	{
+		for (Position npos : pos.get8Neighbors())
+			if (panel.getMap().getBounds().contains(npos)
+			 && panel.getMap().hasResourceDeposit(npos))
+				return true;
+		
+		return false;
 	}
 }

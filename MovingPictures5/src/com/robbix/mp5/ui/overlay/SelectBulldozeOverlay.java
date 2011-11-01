@@ -26,8 +26,8 @@ public class SelectBulldozeOverlay extends InputOverlay
 		
 		if (isCursorOnGrid())
 		{
-			if (isDragging()) panel.draw(g, RED, getDragRegion());
-			             else panel.draw(g, RED, getCursorPosition());
+			if (isDragging()) panel.draw(g, GREEN, getDragRegion());
+			             else panel.draw(g, GREEN, getCursorPosition());
 		}
 	}
 	

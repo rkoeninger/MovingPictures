@@ -2,13 +2,16 @@ package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
 
+import com.robbix.mp5.basics.Position;
+
 public class PlaceBulldozeOverlay extends InputOverlay
 {
 	public void paintOverUnits(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{
-			panel.draw(g, RED, getCursorPosition());
+			Position pos = getCursorPosition();
+			panel.draw(g, panel.getMap().isBulldozed(pos) ? YELLOW : GREEN, pos);
 		}
 	}
 	

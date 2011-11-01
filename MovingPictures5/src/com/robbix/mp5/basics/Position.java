@@ -18,7 +18,7 @@ import java.util.Set;
  * 
  * @author bort
  */
-public class Position
+public class Position implements RIterable<Position>
 {
 	/**
 	 * The x-coordinate of this Position.
@@ -150,6 +150,27 @@ public class Position
 	public String toString()
 	{
 		return String.format("(%1$d, %2$d)", x, y);
+	}
+	
+	public RIterator<Position> iterator()
+	{
+		return new MeIterator();
+	}
+	
+	private class MeIterator extends RIterator<Position>
+	{
+		private boolean done = false;
+		
+		public boolean hasNext()
+		{
+			return !done;
+		}
+		
+		public Position next()
+		{
+			checkHasNext();
+			return Position.this;
+		}
 	}
 	
 	public void draw(Graphics g, ColorScheme colors, Point offset, int edgeSize)

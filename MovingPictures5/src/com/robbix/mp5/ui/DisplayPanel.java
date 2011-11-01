@@ -57,10 +57,10 @@ public class DisplayPanel extends JComponent
 	private final int minScale, maxScale;
 	
 	private BufferedImage cachedBackground = null;
+	private Region cachedBackgroundRegion = new Region(-1, -1, 0, 0);
 	private Object cacheLock = new Object();
 	
 	private static Font costMapFont = Font.decode("Arial-9");
-	private static Color TRANS_GRAY = new Color(0, 0, 0, 127);
 	private static Color BACKGROUND_BLUE = new Color(127, 127, 255);
 	private Color letterBoxColor = Color.BLACK;
 	
@@ -83,8 +83,7 @@ public class DisplayPanel extends JComponent
 		"Tube Connectivity",
 		"Terrain Cost Map",
 		"Terrain Cost Values",
-		"Cost Values as Factors",
-		"Night"
+		"Cost Values as Factors"
 	);
 	
 	private boolean showGrid = false;
@@ -94,8 +93,6 @@ public class DisplayPanel extends JComponent
 	private boolean showTerrainCostValues = false;
 	private boolean showCostValuesAsFactors = false;
 	private boolean showBackground = true;
-	
-	private boolean night = false;
 	
 	private AnimatedCursor cursor = null;
 	private Timer cursorTimer = null;
@@ -185,10 +182,6 @@ public class DisplayPanel extends JComponent
 		{
 			return showCostValuesAsFactors;
 		}
-		else if (name.equals("Night"))
-		{
-			return night;
-		}
 		
 		throw new IllegalArgumentException("Not an option: " + name);
 	}
@@ -230,11 +223,6 @@ public class DisplayPanel extends JComponent
 			showCostValuesAsFactors = isSet;
 			refresh();
 		}
-		else if (name.equals("Night"))
-		{
-			night = isSet;
-			repaint();
-		}
 		else
 		{
 			throw new IllegalArgumentException("Not an option: " + name);
@@ -246,6 +234,11 @@ public class DisplayPanel extends JComponent
 		synchronized (cacheLock)
 		{
 			cachedBackground = null;
+			Throwable t = new Throwable();//FIXME: remove
+			StackTraceElement[] ste = t.getStackTrace();
+			System.out.println("=====================================");
+			for (int a = 0; a < min(ste.length, 6); ++a)
+				System.out.println(ste[a]);
 		}
 		
 		repaint();
@@ -553,18 +546,17 @@ public class DisplayPanel extends JComponent
 		return scroll.y;
 	}
 	
-	public Point subtractViewOffset(Point p)
-	{
-		p.translate(scroll.x, scroll.y);
-		return p;
-	}
-	
 	public void setViewPosition(int x, int y)
 	{
 		scroll.x = x;
 		scroll.y = y;
 		centerAsNeeded();
-		refresh(getDisplayRegion());
+		Region dRegion = getDisplayRegion();//FIXME: see reshape()
+		
+		if (!dRegion.equals(cachedBackgroundRegion))
+		{
+			refresh(dRegion);
+		}
 	}
 	
 	public void shiftViewPosition(int dx, int dy)
@@ -603,8 +595,6 @@ public class DisplayPanel extends JComponent
 		scroll.y = (diffHeight > 0)
 			? diffHeight / 2
 			: max(min(scroll.y, 0), diffHeight);
-		
-		refresh(getDisplayRegion());
 	}
 	
 	public void zoomIn()
@@ -679,6 +669,13 @@ public class DisplayPanel extends JComponent
 	{
 		super.reshape(x, y, width, height);
 		centerAsNeeded();
+		Region dRegion = getDisplayRegion();
+		// FIXME: doesn't refresh if we don't cross grid boundry, so
+		// if we only move a few pixels, units move, terrain doesn't.
+		if (!dRegion.equals(cachedBackgroundRegion))
+		{
+			refresh(dRegion);
+		}
 	}
 	
 	/**
@@ -918,12 +915,6 @@ public class DisplayPanel extends JComponent
 			if (region.contains(res.getPosition()))
 				drawResourceDeposit(g, res);
 		
-		if (night)
-		{
-			g.setColor(TRANS_GRAY);
-			fill(g, rect);
-		}
-		
 		if (! overlays.isEmpty())
 			overlays.getFirst().paintOverUnits(g);
 	}
@@ -975,19 +966,23 @@ public class DisplayPanel extends JComponent
 					rect.height,
 					BufferedImage.TYPE_INT_RGB
 				);
+				cachedBackgroundRegion = region;
+				Graphics cg = cachedBackground.getGraphics();
+				cg.translate(min(0, -scroll.x), min(0, -scroll.y));
+				
+				if (showTerrainCostMap) drawCostMap(cg, region);
+								   else drawSurface(cg, region);
+				
+				cg.dispose();
+				System.out.println("drawing background " + dbrep++);//FIXME: remove;
 			}
 			
-			Graphics cg = cachedBackground.getGraphics();
-			cg.translate(min(0, -scroll.x), min(0, -scroll.y));
-			
-			if (showTerrainCostMap) drawCostMap(cg, region);
-							   else drawSurface(cg, region);
-			
-			cg.dispose();
 			Rectangle letterBox = getLetterBoxRect();
 			g.drawImage(cachedBackground, letterBox.x, letterBox.y, null);
 		}
 	}
+	
+	static int dbrep = 0;//FIXME: remove;
 	
 	/**
 	 * Draws the terrain costmap using Graphics g with in given visible Region.
@@ -1005,7 +1000,7 @@ public class DisplayPanel extends JComponent
 			
 			if (showTerrainCostValues)
 			{
-				g.setColor(Utils.getBlackWhiteComplement(g.getColor()));
+				g.setColor(Utils.getBlackWhiteComplement(color));
 				
 				double cost = showCostValuesAsFactors
 					? terrainCost.getScaleFactor(pos)
@@ -1200,29 +1195,6 @@ public class DisplayPanel extends JComponent
 		region.draw(g, colors, getViewPosition(), tileSize);
 	}
 	
-	public void draw(Graphics g, Rectangle rect)
-	{
-		g.drawRect(rect.x, rect.y, rect.width, rect.height);
-	}
-	
-	/**
-	 * Does not account for scale/scroll,
-	 * draws literally to Graphics.
-	 */
-	public void fill(Graphics g, Rectangle rect)
-	{
-		g.fillRect(rect.x, rect.y, rect.width, rect.height);
-	}
-	
-	public void draw(Graphics g, Image img, Point point)
-	{
-		g.drawImage(
-			img,
-			point.x, point.y,
-			null
-		);
-	}
-	
 	public void draw(Graphics g, String string, Position pos)
 	{
 		int x = pos.x * tileSize + (tileSize / 2) + scroll.x;
@@ -1231,6 +1203,15 @@ public class DisplayPanel extends JComponent
 		int cx = (int) bounds.getCenterX();
 		int cy = (int) bounds.getCenterY();
 		g.drawString(string, x - cx, y - cy);
+	}
+	
+	/**
+	 * Does not account for scale/scroll,
+	 * draws literally to Graphics.
+	 */
+	private void fill(Graphics g, Rectangle rect)
+	{
+		g.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 	
 	public void draw(Graphics g, Image img, Position pos)

@@ -175,4 +175,9 @@ public class TileSet
 	{
 		return null;
 	}
+	
+	public boolean isBulldozed(String tileCode)
+	{
+		return tileCode.contains("bulldozed");
+	}
 }

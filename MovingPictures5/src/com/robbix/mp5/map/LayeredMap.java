@@ -363,6 +363,11 @@ public class LayeredMap
 		}
 	}
 	
+	public boolean isBulldozed(Position pos)
+	{
+		return costMap.isFree(pos) && tileSet.isBulldozed(grid.get(pos).tileCode);
+	}
+	
 	public void bulldoze(Position pos)
 	{
 		clearFixture(pos);
