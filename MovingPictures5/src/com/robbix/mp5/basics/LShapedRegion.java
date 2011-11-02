@@ -6,8 +6,6 @@ import static java.lang.Math.max;
 import java.awt.Graphics;
 import java.awt.Point;
 
-import com.robbix.mp5.Mediator;
-
 /**
  * Does not extend Region as it is not truly rectangular.
  * 
@@ -68,7 +66,7 @@ public class LShapedRegion implements RIterable<Position>
 	{
 		this(
 			begin,
-			verticalFirst ? Mediator.getPosition(begin.x, end.y) : Mediator.getPosition(end.x, begin.y),
+			verticalFirst ? new Position(begin.x, end.y) : new Position(end.x, begin.y),
 			end
 		);
 	}

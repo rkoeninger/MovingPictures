@@ -1,5 +1,10 @@
 package com.robbix.mp5.ui;
 
+import static java.lang.Math.ceil;
+import static java.lang.Math.floor;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -10,15 +15,12 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import static java.lang.Math.ceil;
-import static java.lang.Math.floor;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,11 +28,10 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.CostMap;
 import com.robbix.mp5.basics.BorderRegion;
 import com.robbix.mp5.basics.ColorScheme;
+import com.robbix.mp5.basics.CostMap;
 import com.robbix.mp5.basics.LShapedRegion;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.basics.Region;
@@ -57,7 +58,6 @@ public class DisplayPanel extends JComponent
 	private int minScale, maxScale, normalScale;
 	
 	private BufferedImage cachedBackground = null;
-	private Region cachedBackgroundRegion = new Region(-1, -1, 0, 0);
 	private Object cacheLock = new Object();
 	
 	private static Font costMapFont = Font.decode("Arial-9");
@@ -292,11 +292,6 @@ public class DisplayPanel extends JComponent
 		synchronized (cacheLock)
 		{
 			cachedBackground = null;
-			Throwable t = new Throwable();//FIXME: remove
-			StackTraceElement[] ste = t.getStackTrace();
-			System.out.println("=====================================");
-			for (int a = 0; a < min(ste.length, 6); ++a)
-				System.out.println(ste[a]);
 		}
 		
 		repaint();
@@ -401,6 +396,8 @@ public class DisplayPanel extends JComponent
 	
 	public void cueAnimation(AmbientAnimation animation)
 	{
+		animation.setDisplay(this);
+		
 		synchronized (animations)
 		{
 			animations.add(animation);
@@ -491,15 +488,15 @@ public class DisplayPanel extends JComponent
 	
 	public void setViewPoint(int x, int y)
 	{
+		int oldScrollX = scroll.x;
+		int oldScrollY = scroll.y;
+		
 		scroll.x = x;
 		scroll.y = y;
 		centerAsNeeded();
-		Region dRegion = getDisplayRegion();//FIXME: see reshape()
 		
-		if (!dRegion.equals(cachedBackgroundRegion))
-		{
-			refresh(dRegion);
-		}
+		if (scroll.x != oldScrollX || scroll.y != oldScrollY)
+			refresh();
 	}
 	
 	public void shiftViewPoint(int dx, int dy)
@@ -612,13 +609,7 @@ public class DisplayPanel extends JComponent
 	{
 		super.reshape(x, y, width, height);
 		centerAsNeeded();
-		Region dRegion = getDisplayRegion();
-		// FIXME: doesn't refresh if we don't cross grid boundry, so
-		// if we only move a few pixels, units move, terrain doesn't.
-		if (!dRegion.equals(cachedBackgroundRegion))
-		{
-			refresh(dRegion);
-		}
+		refresh();
 	}
 	
 	public int getMinimumScale()
@@ -717,7 +708,7 @@ public class DisplayPanel extends JComponent
 		 || y > min(getHeight(), scroll.y + getTotalHeight()))
 			return null;
 		
-		return Mediator.getPosition(
+		return new Position(
 			(x - scroll.x) / tileSize,
 			(y - scroll.y) / tileSize
 		);
@@ -848,7 +839,7 @@ public class DisplayPanel extends JComponent
 		else
 		{
 			g.setColor(getBackground());
-			fill(g, rect);
+			fill(g);
 		}
 		
 		if (showGrid && tileSize >= 8)
@@ -867,13 +858,12 @@ public class DisplayPanel extends JComponent
 			if (region.intersects(unit.getOccupiedBounds()))
 				drawUnit(g, unit);
 		
-		// FIXME: AmbientAnimations have been disabled for now
-//		synchronized (animations)
-//		{
-//			for (AmbientAnimation animation : animations)
-//				if (rect.intersects(animation.getBounds()))
-//					animation.paint(g);
-//		}
+		synchronized (animations)
+		{
+			for (AmbientAnimation animation : animations)
+//				if (rect.intersects(animation.getBounds())) // FIXME: re-enable bounds checking
+					animation.paint(g);
+		}
 		
 		for (ResourceDeposit res : map.getResourceDeposits())
 			if (region.contains(res.getPosition()))
@@ -930,7 +920,6 @@ public class DisplayPanel extends JComponent
 					rect.height,
 					BufferedImage.TYPE_INT_RGB
 				);
-				cachedBackgroundRegion = region;
 				Graphics cg = cachedBackground.getGraphics();
 				cg.translate(min(0, -scroll.x), min(0, -scroll.y));
 				
@@ -938,15 +927,12 @@ public class DisplayPanel extends JComponent
 								   else drawSurface(cg, region);
 				
 				cg.dispose();
-				System.out.println("drawing background " + dbrep++);//FIXME: remove;
 			}
 			
 			Rectangle letterBox = getLetterBoxRect();
 			g.drawImage(cachedBackground, letterBox.x, letterBox.y, null);
 		}
 	}
-	
-	static int dbrep = 0;//FIXME: remove;
 	
 	/**
 	 * Draws the terrain costmap using Graphics g with in given visible Region.
@@ -1020,7 +1006,7 @@ public class DisplayPanel extends JComponent
 		for (int x = region.x; x < region.getMaxX(); ++x)
 		for (int y = region.y; y < region.getMaxY(); ++y)
 		{
-			Position pos = Mediator.getPosition(x, y);
+			Position pos = new Position(x, y);
 			
 			Unit occupant = map.getUnit(pos);
 			boolean structNeedsConnection = occupant != null && occupant.needsConnection();
@@ -1048,7 +1034,6 @@ public class DisplayPanel extends JComponent
 		}
 		
 		Sprite sprite = sprites.getSprite(unit);
-		Point unitPoint = new Point(unit.getAbsX(), unit.getAbsY());
 		
 		if (showUnitLayerState && !unit.isTurret())
 		{
@@ -1065,7 +1050,7 @@ public class DisplayPanel extends JComponent
 		}
 		else
 		{
-			draw(g, sprite, unitPoint, unit.getOwner());
+			draw(g, sprite, unit.getAbsPoint(), unit.getOwner());
 		}
 		
 		if (unit.hasTurret())
@@ -1181,20 +1166,6 @@ public class DisplayPanel extends JComponent
 		g.drawString(string, x - cx, y - cy);
 	}
 	
-	/**
-	 * Does not account for scale/scroll,
-	 * draws literally to Graphics.
-	 */
-	private void fill(Graphics g, Rectangle rect)
-	{
-		g.fillRect(rect.x, rect.y, rect.width, rect.height);
-	}
-	
-	public void draw(Graphics g, Image img, Position pos)
-	{
-		g.drawImage(img, pos.x * tileSize + scroll.x, pos.y * tileSize + scroll.y, null);
-	}
-	
 	public void draw(Graphics g, Sprite sprite, Position pos)
 	{
 		Image img = sprite.getImage();
@@ -1212,12 +1183,11 @@ public class DisplayPanel extends JComponent
 		);
 	}
 	
-	// TODO: scrolling/scaling?
-	public void draw(Graphics g, Sprite sprite, Point point, Player owner)
+	public void draw(Graphics g, Sprite sprite, Point2D absPoint, Player owner)
 	{
-		Image img = sprite.getImage(owner == null ? -1 : owner.getColorHue());
-		int x = point.x + scroll.x + sprite.getXOffset(scale);
-		int y = point.y + scroll.y + sprite.getYOffset(scale);
+		Image img = owner == null ? sprite.getImage() : sprite.getImage(owner.getColorHue());
+		int x = (int) (absPoint.getX() * tileSize) + scroll.x + sprite.getXOffset(scale);
+		int y = (int) (absPoint.getY() * tileSize) + scroll.y + sprite.getYOffset(scale);
 		int w = img.getWidth(null);
 		int h = img.getHeight(null);
 		int w2 = scale < 0 ? w >> -scale : w << scale;
@@ -1228,5 +1198,25 @@ public class DisplayPanel extends JComponent
 			0, 0, w, h,
 			null
 		);
+	}
+	
+	public void draw(Graphics g, Sprite sprite, Point2D absPoint)
+	{
+		draw(g, sprite, absPoint, null);
+	}
+	
+	public void draw(Graphics g, Point2D a, Point2D b)
+	{
+		g.drawLine((int) a.getX(), (int) a.getY(), (int) b.getX(), (int) b.getY());
+	}
+	
+	private void fill(Graphics g)
+	{
+		g.fillRect(0, 0, getWidth(), getHeight());
+	}
+	
+	private void draw(Graphics g, Image img, Position pos)
+	{
+		g.drawImage(img, pos.x * tileSize + scroll.x, pos.y * tileSize + scroll.y, null);
 	}
 }

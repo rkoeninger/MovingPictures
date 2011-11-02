@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.robbix.mp5.Game;
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.basics.Position;
@@ -60,22 +59,22 @@ public class MineRouteDemo extends Demo
 		for (int y = 2; y < 20; y += 6)
 		{
 			Unit smelter = factory.newUnit("eCommonSmelter", 1);
-			map.putUnit(smelter, Mediator.getPosition(x, y));
-			map.putTube(Mediator.getPosition(x + 5, y + 1));
-			map.putTube(Mediator.getPosition(x + 2, y + 4));
-			map.putTube(Mediator.getPosition(x + 2, y + 5));
+			map.putUnit(smelter, new Position(x, y));
+			map.putTube(new Position(x + 5, y + 1));
+			map.putTube(new Position(x + 2, y + 4));
+			map.putTube(new Position(x + 2, y + 5));
 			smelters.add(smelter);
 		}
 		
-		map.putUnit(factory.newUnit("eCommandCenter", 1), Mediator.getPosition(44, 2));
+		map.putUnit(factory.newUnit("eCommandCenter", 1), new Position(44, 2));
 		
 		for (int x = 2;  x < 46; x += 4)
 		for (int y = 38; y < 45; y += 4)
 		{
 			ResourceDeposit res = ResourceDeposit.get2BarCommon();
-			map.putResourceDeposit(res, Mediator.getPosition(x + 1, y));
+			map.putResourceDeposit(res, new Position(x + 1, y));
 			Unit mine = factory.newUnit("eCommonMine", 1);
-			map.putUnit(mine, Mediator.getPosition(x, y));
+			map.putUnit(mine, new Position(x, y));
 			mines.add(mine);
 		}
 		
@@ -90,7 +89,7 @@ public class MineRouteDemo extends Demo
 		{
 			if (Utils.randInt(0, 5) % 6 == 0)
 			{
-				Position pos = Mediator.getPosition(
+				Position pos = new Position(
 					truckIndex % 42 + 2,
 					truckIndex / 42 + 24
 				);
@@ -102,8 +101,5 @@ public class MineRouteDemo extends Demo
 			
 			truckIndex++;
 		}
-		
-		// FIXME: how to set starting view position
-		// should be centered for this demo
 	}
 }

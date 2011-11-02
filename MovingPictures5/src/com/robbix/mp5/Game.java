@@ -35,7 +35,6 @@ public class Game
 		game.factory = UnitFactory.load(new File(root, "units"));
 		game.tileSet = TileSet.load(new File(root, "tileset"), tileSetName);
 		game.map = LayeredMap.load(new File(root, "terrain"), mapName, game.tileSet);
-		Mediator.initCache(game.map.getWidth(), game.map.getHeight());
 		game.spriteLib = SpriteLibrary.load(new File(root, "sprites"), lazySprites);
 		game.sounds = SoundBank.load(new File(root, "sounds"), lazySounds);
 		game.cursorSet = CursorSet.load(new File(root, "cursors"));

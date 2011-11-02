@@ -15,7 +15,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.BorderRegion;
 import com.robbix.mp5.basics.ColorScheme;
@@ -55,11 +54,11 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	private Point currentPoint = null;
 	private Point pressedPoint = null;
 	private Rectangle dragArea = null;
-	private boolean shiftOption;
-	private boolean controlOption;
+	private int shiftOption;
 	private boolean shiftDown;
-	private boolean controlDown;
 	private String animatedCursor = null;
+	
+	protected int shiftOptionCount = 2;
 	
 	protected boolean closesOnEscape            = true;
 	protected boolean closesOnRightClick        = true;
@@ -315,10 +314,15 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 				: fullRegion.getMaxY() - 1;
 		}
 		
-		return new LinearRegion(origin, Mediator.getPosition(endX, endY));
+		return new LinearRegion(origin, new Position(endX, endY));
 	}
 	
 	public LShapedRegion getLShapedDragRegion()
+	{
+		return getLShapedDragRegion(true);
+	}
+	
+	public LShapedRegion getLShapedDragRegion(boolean verticalFirst)
 	{
 		Position origin = panel.getPosition(pressedPoint);
 		Region fullRegion = panel.getRegion(dragArea);
@@ -330,7 +334,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			? fullRegion.getMaxY() - 1
 			: fullRegion.getY();
 		
-		return new LShapedRegion(origin, Mediator.getPosition(farX, farY), isShiftOptionSet());
+		return new LShapedRegion(origin, new Position(farX, farY), verticalFirst);
 	}
 	
 	public BorderRegion getBorderDragRegion()
@@ -343,19 +347,14 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		return shiftDown;
 	}
 	
-	public boolean isControlDown()
-	{
-		return controlDown;
-	}
-	
 	public boolean isShiftOptionSet()
 	{
-		return shiftOption;
+		return shiftOption % 2 == 0;
 	}
 	
-	public boolean isControlOptionSet()
+	public int getShiftOption()
 	{
-		return controlOption;
+		return shiftOption % shiftOptionCount;
 	}
 	
 	public final void mousePressed(MouseEvent e)
@@ -532,13 +531,9 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 							overlay.complete();
 			
 			if (!overlay.shiftDown && e.isShiftDown())
-				overlay.shiftOption = !overlay.shiftOption;
-			
-			if (!overlay.controlDown && e.isControlDown())
-				overlay.controlOption = !overlay.controlOption;
+				overlay.shiftOption++;
 			
 			overlay.shiftDown = e.isShiftDown();
-			overlay.controlDown = e.isControlDown();
 			return false;
 		}
 		

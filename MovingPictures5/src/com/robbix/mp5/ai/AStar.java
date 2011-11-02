@@ -206,7 +206,7 @@ public class AStar// implements Pathfinder
 						if (oldPair.to.equals(neighbor))
 							nodeIterator.remove();
 					}
-
+					
 					nodes.add(new PosPair(current, neighbor));
 					openSet.put(neighbor, neighborCost);
 				}

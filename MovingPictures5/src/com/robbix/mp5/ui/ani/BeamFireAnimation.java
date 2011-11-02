@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Stroke;
+import java.awt.geom.Point2D;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.Mediator;
@@ -39,12 +40,15 @@ public class BeamFireAnimation extends WeaponFireAnimation
 		((Graphics2D) g).setStroke(stroke);
 		Point attackerCurrent = new Point(getAttacker().getAbsX(), getAttacker().getAbsY());
 		Point targetCurrent = new Point(getTarget().getAbsX(), getTarget().getAbsY());
-		g.drawLine(
+		Point2D pointA = new Point2D.Double(
 			getFireOrigin().x - attackerStart.x + attackerCurrent.x,
-			getFireOrigin().y - attackerStart.y + attackerCurrent.y,
+			getFireOrigin().y - attackerStart.y + attackerCurrent.y
+		);
+		Point2D pointB = new Point2D.Double(
 			getFireImpact().x - targetStart.x + targetCurrent.x,
 			getFireImpact().y - targetStart.y + targetCurrent.y
 		);
+		panel.draw(g, pointA, pointB);
 		((Graphics2D) g).setStroke(oldStroke);
 	}
 	

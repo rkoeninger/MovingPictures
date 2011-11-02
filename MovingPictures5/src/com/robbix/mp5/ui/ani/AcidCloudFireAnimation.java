@@ -3,6 +3,7 @@ package com.robbix.mp5.ui.ani;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -113,7 +114,7 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 			targetPoint.x - firePoint.x
 		);
 		rocketAngle /= (2 * Math.PI);
-		int i = ((((int) Math.round(rocketAngle * 16)) % 16) + 16) % 16 * 2;
+		int i = ((((int) Math.round(rocketAngle * 16)) % 16) + 16) % 16;
 		
 		rocketSprite = lib.getAmbientSpriteGroup("aRocket", "projectile").getSprite(i);
 	}
@@ -212,14 +213,7 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 				continue;
 			}
 			
-			Sprite puffSprite = puffGroup.getSprite(puffFrame);
-			
-			g.drawImage(
-				puffSprite.getImage(),
-				puffSprite.getXOffset() + puff.point.x,
-				puffSprite.getYOffset() + puff.point.y,
-				null
-			);
+			panel.draw(g, puffGroup.getSprite(puffFrame), puff.point);
 		}
 		
 		if (frame < rocketFrameCount)
@@ -232,23 +226,13 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 			x += (int) (distance * Math.cos(angle) * progress);
 			y += (int) (distance * Math.sin(angle) * progress);
 			
-			g.drawImage(
-				rocketSprite.getImage(),
-				rocketSprite.getXOffset() + x,
-				rocketSprite.getYOffset() + y,
-				null
-			);
+			panel.draw(g, rocketSprite, new Point2D.Double(x, y));
 		}
 		else if (frame < totalFrameCount)
 		{
 			Sprite acidSprite = acidCloud.getFrame(frame - rocketFrameCount);
 			
-			g.drawImage(
-				acidSprite.getImage(),
-				acidSprite.getXOffset() + targetPoint.x,
-				acidSprite.getYOffset() + targetPoint.y,
-				null
-			);
+			panel.draw(g, acidSprite, targetPoint);
 		}
 	}
 }

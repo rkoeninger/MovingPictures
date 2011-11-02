@@ -22,6 +22,7 @@ public class BuildTubeOverlay extends InputOverlay
 	public BuildTubeOverlay(Unit earthworker)
 	{
 		this.crane = earthworker;
+		this.shiftOptionCount = 3;
 	}
 	
 	public void paintOverUnits(Graphics g)
@@ -41,7 +42,7 @@ public class BuildTubeOverlay extends InputOverlay
 					available = canPlaceTube(region);
 					panel.draw(g, available ? GREEN : RED, region);
 				}
-				else if (isControlOptionSet())
+				else if (getShiftOption() == 2)
 				{
 					BorderRegion region = getBorderDragRegion();
 					available = canPlaceTube(region);
@@ -49,7 +50,7 @@ public class BuildTubeOverlay extends InputOverlay
 				}
 				else
 				{
-					LShapedRegion region = getLShapedDragRegion();
+					LShapedRegion region = getLShapedDragRegion(getShiftOption() == 0);
 					available = canPlaceTube(region);
 					panel.draw(g, available ? GREEN : RED, region);
 				}
@@ -85,7 +86,7 @@ public class BuildTubeOverlay extends InputOverlay
 			
 			reverseForCloserEnd(tubeRow, crane.getPosition());
 		}
-		else if (isControlOptionSet())
+		else if (getShiftOption() == 2)
 		{
 			for (Position rowPos : getBorderDragRegion())
 				tubeRow.add(rowPos);
@@ -94,7 +95,7 @@ public class BuildTubeOverlay extends InputOverlay
 		}
 		else
 		{
-			for (Position rowPos : getLShapedDragRegion())
+			for (Position rowPos : getLShapedDragRegion(getShiftOption() == 0))
 				tubeRow.add(rowPos);
 			
 			reverseForCloserEnd(tubeRow, crane.getPosition());

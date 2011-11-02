@@ -15,7 +15,6 @@ import com.robbix.mp5.ai.task.RotateTask;
 import com.robbix.mp5.ai.task.SteerTask;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.PositionCache;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.ui.DisplayPanel;
@@ -44,8 +43,6 @@ public class Mediator
 	
 	public static Game game;
 	
-	private static PositionCache cache;
-	
 	private static boolean soundOn = false;
 	
 	public static void initMediator(Game game)
@@ -55,17 +52,6 @@ public class Mediator
 		Mediator.factory = game.getUnitFactory();
 		Mediator.sounds = game.getSoundBank();
 		Mediator.game = game;
-	}
-	
-	public static void initCache(int w, int h)
-	{
-		Mediator.cache = new PositionCache(w, h);
-		Mediator.cache.prepare();
-	}
-	
-	public static Position getPosition(int x, int y)
-	{
-		return cache.get(x, y);
 	}
 	
 	public static void soundOn(boolean soundOn)
@@ -95,7 +81,7 @@ public class Mediator
 	
 	public static void playSound(String name, int x, int y)
 	{
-		playSound(name, getPosition(x, y));
+		playSound(name, new Position(x, y));
 	}
 	
 	public static void doAttack(Unit attacker, Unit target)
@@ -201,7 +187,7 @@ public class Mediator
 		for (int x = xMin; x <= xMax; ++x)
 		for (int y = yMin; y <= yMax; ++y)
 		{
-			Position current = cache.get(x, y);
+			Position current = new Position(x, y);
 			Unit unit = map.getUnit(current);
 			
 			if (unit != null)
@@ -401,7 +387,7 @@ public class Mediator
 			SpriteGroup seq = panel.getSpriteLibrary().getUnitSpriteSet(unit.getType()).get(COLLAPSE);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				seq,
-				unit.getOwner().getColorHue(),
+				unit.getOwner(),
 				point,
 				2
 			));

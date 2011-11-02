@@ -2,6 +2,7 @@ package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -31,6 +32,7 @@ import javax.sound.sampled.SourceDataLine;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -55,6 +57,7 @@ import com.robbix.mp5.GameListener;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.MeteorShowerTrigger;
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.basics.JListDialog;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.player.Player;
@@ -85,7 +88,9 @@ public class Sandbox extends JApplet
 	{
 		try
 		{
-			main(new String[]{"-resDir:./../res"});
+			String resDirPath = getParameter("resDir");
+			if (resDirPath == null) resDirPath = "./../res";
+			main(new String[]{"-resDir:" + resDirPath});
 			frame.setVisible(false);
 			this.setLayout(new BorderLayout());
 			this.setJMenuBar(frame.getJMenuBar());
@@ -154,7 +159,7 @@ public class Sandbox extends JApplet
 	private static JMenuItem placeRare2;
 	private static JMenuItem placeRare3;
 	private static JMenuItem playSoundMenuItem;
-//	private static JMenuItem playMusicMenuItem;
+	private static JMenuItem playMusicMenuItem;
 	private static JMenuItem setAudioFormatMenuItem;
 	private static JMenuItem removeAllUnitsMenuItem;
 	private static JMenuItem addPlayerMenuItem;
@@ -340,7 +345,7 @@ public class Sandbox extends JApplet
 		placeRare2 = new JMenuItem("Rare Med");
 		placeRare3 = new JMenuItem("Rare High");
 		playSoundMenuItem = new JCheckBoxMenuItem("Play Sounds");
-//		playMusicMenuItem = new JCheckBoxMenuItem("Play Music");
+		playMusicMenuItem = new JCheckBoxMenuItem("Play Music");
 		setAudioFormatMenuItem = new JMenuItem("Set Format...");
 		removeAllUnitsMenuItem = new JMenuItem("Remove All");
 		addPlayerMenuItem = new JMenuItem("Add Player...");
@@ -450,7 +455,7 @@ public class Sandbox extends JApplet
 		meteorShowerMenuItem.addActionListener(miListener);
 		spawnMeteorMenuItem.addActionListener(miListener);
 		playSoundMenuItem.addActionListener(miListener);
-//		playMusicMenuItem.addActionListener(miListener);
+		playMusicMenuItem.addActionListener(miListener);
 		setAudioFormatMenuItem.addActionListener(miListener);
 		placeCommon1.addActionListener(miListener);
 		placeCommon2.addActionListener(miListener);
@@ -481,11 +486,11 @@ public class Sandbox extends JApplet
 		engineMenu.add(soundPlayerMenuItem);
 		engineMenu.addSeparator();
 		engineMenu.add(exitMenuItem);
-		displayMenu.add(scrollBarsMenuItem);
+//		displayMenu.add(scrollBarsMenuItem);
 		displayMenu.add(frameRateMenuItem);
-		displayMenu.add(scrollSpeedMenuItem);
+//		displayMenu.add(scrollSpeedMenuItem);
 //		displayMenu.add(fullScreenMenuItem);
-		displayMenu.add(addDisplayMenuItem);
+//		displayMenu.add(addDisplayMenuItem);
 		soundMenu.add(playSoundMenuItem);
 //		soundMenu.add(playMusicMenuItem);
 		soundMenu.addSeparator();
@@ -678,23 +683,58 @@ public class Sandbox extends JApplet
 			}
 			else if (e.getSource() == fullScreenMenuItem)
 			{
-				GraphicsDevice screen = frame.getGraphicsConfiguration().getDevice();
+				final GraphicsDevice screen = frame.getGraphicsConfiguration().getDevice();
 				
 				if (screen.getFullScreenWindow() == null)
 				{
+					final DisplayMode prevMode = screen.getDisplayMode();
+					final DisplayMode mode = screen.isDisplayChangeSupported()
+						? (DisplayMode) JListDialog.showDialog(
+							screen.getDisplayModes(),
+							prevMode
+						)
+						: null;
+					
 					if (fsWindow == null)
 					{
+						final JButton closeButton = new JButton("Exit Fullscreen");
+						closeButton.addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								fsWindow.setVisible(false);
+							}
+						});
+						commandBar.add(closeButton);
+						
 						fsWindow = new JWindow();
 						fsWindow.setLayout(new BorderLayout());
 						fsWindow.add(panel.getView(), BorderLayout.CENTER);
 						fsWindow.add(commandBar, BorderLayout.NORTH);
+						
+						fsWindow.addWindowListener(new WindowAdapter()
+						{
+							public void windowClosed(WindowEvent e)
+							{
+								if (mode != null)
+									screen.setDisplayMode(prevMode);
+								
+								commandBar.remove(closeButton);
+								frame.add(panel, BorderLayout.CENTER);
+								frame.add(commandBar, BorderLayout.NORTH);
+							}
+						});
 					}
+					
+					if (mode != null)
+						screen.setDisplayMode(mode);
 					
 					screen.setFullScreenWindow(fsWindow);
 				}
 				else if (screen.getFullScreenWindow() == fsWindow)
 				{
 					screen.setFullScreenWindow(null);
+					fsWindow = null;
 				}
 			}
 			else if (e.getSource() == addDisplayMenuItem)

@@ -127,8 +127,7 @@ public abstract class Demo
 	protected abstract void placeUnits(LayeredMap map, UnitFactory factory);
 	
 	/**
-	 * Returns all subclasses of the given superclass in it's package using
-	 * the superclass' classloader.
+	 * Returns all subclasses of the given superclass in it's package.
 	 * 
 	 * This method probably has a variety of vulnerabilites as it's limited
 	 * to searching the filesystem for .class files. Reflection of pacakages
@@ -137,7 +136,11 @@ public abstract class Demo
 	private static List<Class<?>> getSubclasses(Class<?> superclass)
 	throws ClassNotFoundException, IOException
 	{
-		ClassLoader classLoader = superclass.getClassLoader();
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		
+		if (classLoader == null)
+			classLoader = superclass.getClassLoader();
+		
 		String packageName = superclass.getPackage().getName();
 		String packagePath = packageName.replace('.', '/');
 		Enumeration<URL> resources = classLoader.getResources(packagePath);

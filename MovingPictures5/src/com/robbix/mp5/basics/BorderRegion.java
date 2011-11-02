@@ -3,8 +3,6 @@ package com.robbix.mp5.basics;
 import java.awt.Graphics;
 import java.awt.Point;
 
-import com.robbix.mp5.Mediator;
-
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -116,7 +114,7 @@ public class BorderRegion implements RIterable<Position>
 		
 		private Position pos(int j, int k)
 		{
-			return clockwise ? Mediator.getPosition(j, k) : Mediator.getPosition(k, j);
+			return clockwise ? new Position(j, k) : new Position(k, j);
 		}
 		
 		public boolean hasNext()

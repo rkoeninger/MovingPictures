@@ -1,5 +1,6 @@
 package com.robbix.mp5.unit;
 
+import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -536,6 +537,15 @@ public class Unit
 		{
 			return getPosition().equals(pos);
 		}
+	}
+	
+	public Point2D getAbsPoint()
+	{
+		int spotSize = getMap().getSpotSize();
+		return new Point2D.Double(
+			getX() + (getXOffset() / (double) spotSize),
+			getY() + (getYOffset() / (double) spotSize)
+		);
 	}
 	
 	/**

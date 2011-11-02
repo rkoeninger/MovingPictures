@@ -1,8 +1,8 @@
 package com.robbix.mp5.ui.ani;
 
 import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.Mediator;
@@ -17,10 +17,10 @@ public class MeteorAnimation extends AmbientAnimation
 	private int frameCount = 80;
 	
 	private Position target;
-	private Point point;
-	private Rectangle bounds;
+	private Point2D point;
+	private Rectangle2D bounds;
 	
-	private double distance = 600;
+	private double distance = 600 / 32;
 	private double angle = 35 * Math.PI / 180; // in rads
 	
 	private boolean impactSoundPlayed = false;
@@ -37,20 +37,20 @@ public class MeteorAnimation extends AmbientAnimation
 		flying  = lib.getAmbientSpriteGroup("aMeteor", "flying");
 		impact  = lib.getAmbientSpriteGroup("aMeteor", "impact");
 		
-		point = new Point(
-			target.x * 32 + 16,
-			target.y * 32 + 16
+		point = new Point2D.Double(
+			target.x + 0.5,
+			target.y + 0.5
 		);
 		
-		bounds = new Rectangle(
-			point.x - 32,
-			point.y + 32,
+		bounds = new Rectangle2D.Double(
+			target.x - 0.5,
+			target.y + 0.5,
 			(int) (distance * Math.cos(angle)),
 			(int) (distance * Math.sin(angle))
 		);
 	}
 	
-	public Rectangle getBounds()
+	public Rectangle2D getBounds()
 	{
 		return bounds;
 	}
@@ -59,53 +59,26 @@ public class MeteorAnimation extends AmbientAnimation
 	{
 		if (frame < 5)
 		{
-			Sprite sprite = forming.getFrame(frame);
-
 			double progress = (frameCount - frame) / (double)(frameCount);
+			double x = point.getX() + distance *  Math.cos(angle) * progress;
+			double y = point.getY() + distance * -Math.sin(angle) * progress;
 			
-			int x = point.x;
-			int y = point.y;
-			
-			x += (int) (distance *  Math.cos(angle) * progress);
-			y += (int) (distance * -Math.sin(angle) * progress);
-			
-			g.drawImage(
-				sprite.getImage(),
-				x + sprite.getXOffset(),
-				y + sprite.getYOffset(),
-				null
-			);
+			panel.draw(g, forming.getFrame(frame), new Point2D.Double(x, y));
 		}
 		else if (frame > frameCount - 9)
 		{
-			Sprite sprite = impact.getFrame(impact.getFrameCount() - (frameCount - frame + 1));
-			
-			int x = point.x;
-			int y = point.y;
-			
-			g.drawImage(
-				sprite.getImage(),
-				x + sprite.getXOffset(),
-				y + sprite.getYOffset(),
-				null
-			);
+			int spriteFrame = impact.getFrameCount() - (frameCount - frame + 1);
+			panel.draw(g, impact.getFrame(spriteFrame), point);
 		}
 		else
 		{
 			Sprite sprite = flying.getFrame(frame % flying.getFrameCount());
 			
-			int x = point.x;
-			int y = point.y;
+			double progress = (frameCount - frame) / (double)(frameCount);
+			double x = point.getX() + distance *  Math.cos(angle) * progress;
+			double y = point.getY() + distance * -Math.sin(angle) * progress;
 			
-			x += (int) (distance *  Math.cos(angle) * (frameCount - frame) / (frameCount));
-			y += (int) (distance * -Math.sin(angle) * (frameCount - frame) / (frameCount));
-			
-			g.drawImage(
-				sprite.getImage(),
-				x + sprite.getXOffset(),
-				y + sprite.getYOffset(),
-				null
-			);
+			panel.draw(g, sprite, new Point2D.Double(x, y));
 		}
 	}
 	

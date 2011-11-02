@@ -3,8 +3,8 @@ package com.robbix.mp5.sb.demo;
 import java.io.IOException;
 
 import com.robbix.mp5.Game;
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
@@ -61,11 +61,11 @@ public class FactoryDemo extends Demo
 		convec3.setCargo(Cargo.newConVecCargo("eCommonSmelter"));
 		convec4.setCargo(Cargo.newConVecCargo("eCommandCenter"));
 		
-		map.putUnit(convec1, Mediator.getPosition(9,  7));
-		map.putUnit(convec2, Mediator.getPosition(10, 7));
-		map.putUnit(convec3, Mediator.getPosition(11, 7));
-		map.putUnit(convec4, Mediator.getPosition(12, 7));
-		map.putUnit(crane,   Mediator.getPosition(10, 9));
-		map.putUnit(dozer,   Mediator.getPosition(11, 9));
+		map.putUnit(convec1, new Position(9,  7));
+		map.putUnit(convec2, new Position(10, 7));
+		map.putUnit(convec3, new Position(11, 7));
+		map.putUnit(convec4, new Position(12, 7));
+		map.putUnit(crane,   new Position(10, 9));
+		map.putUnit(dozer,   new Position(11, 9));
 	}
 }

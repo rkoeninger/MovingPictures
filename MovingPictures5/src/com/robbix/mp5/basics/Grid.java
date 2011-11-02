@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.robbix.mp5.Mediator;
-
 /**
  * A two-dimensional grid containing elements of a generic type. All positions
  * in the grid can be assigned a value of null.
@@ -485,7 +483,7 @@ public class Grid<T> implements RIterable<T>
 						if (distSq < closestDistance)
 						{
 							closestDistance = distSq;
-							closestPos = Mediator.getPosition(x, startY);
+							closestPos = new Position(x, startY);
 						}
 					}
 					
@@ -495,7 +493,7 @@ public class Grid<T> implements RIterable<T>
 						if (distSq < closestDistance)
 						{
 							closestDistance = distSq;
-							closestPos = Mediator.getPosition(x, stopY);
+							closestPos = new Position(x, stopY);
 						}
 					}
 				}
@@ -512,7 +510,7 @@ public class Grid<T> implements RIterable<T>
 						if (distSq < closestDistance)
 						{
 							closestDistance = distSq;
-							closestPos = Mediator.getPosition(startX, y);
+							closestPos = new Position(startX, y);
 						}
 					}
 					
@@ -522,7 +520,7 @@ public class Grid<T> implements RIterable<T>
 						if (distSq < closestDistance)
 						{
 							closestDistance = distSq;
-							closestPos = Mediator.getPosition(stopX, y);
+							closestPos = new Position(stopX, y);
 						}
 					}
 				}

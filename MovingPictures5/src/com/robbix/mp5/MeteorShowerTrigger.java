@@ -33,7 +33,7 @@ public class MeteorShowerTrigger extends Trigger
 		if (time % freq == 0)
 		{
 			Region mapBounds = game.getMap().getBounds();
-			Position pos = Mediator.getPosition(
+			Position pos = new Position(
 				Utils.randInt(0, mapBounds.w - 1),
 				Utils.randInt(0, mapBounds.h - 1)
 			);

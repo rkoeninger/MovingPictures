@@ -3,7 +3,6 @@ package com.robbix.mp5.sb.demo;
 import java.io.IOException;
 
 import com.robbix.mp5.Game;
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.SteerTask;
 import com.robbix.mp5.basics.Position;
@@ -64,7 +63,7 @@ public class CombatDemo extends Demo
 		for (int y = 1; y <= 11; ++y)
 		{
 			Unit tank = factory.newUnit("pMicrowaveLynx", 1);
-			map.putUnit(tank, Mediator.getPosition(x, y));
+			map.putUnit(tank, new Position(x, y));
 			tank.assignNow(new SteerTask(center));
 		}
 		
@@ -72,7 +71,7 @@ public class CombatDemo extends Demo
 		for (int y = 1;  y <= 15;  ++y)
 		{
 			Unit tank = factory.newUnit("eLaserLynx", 2);
-			map.putUnit(tank, Mediator.getPosition(x, y));
+			map.putUnit(tank, new Position(x, y));
 			tank.assignNow(new SteerTask(center));
 		}
 
@@ -80,7 +79,7 @@ public class CombatDemo extends Demo
 		for (int y = 31; y <= 46; ++y)
 		{
 			Unit tank = factory.newUnit("pRPGLynx", 3);
-			map.putUnit(tank, Mediator.getPosition(x, y));
+			map.putUnit(tank, new Position(x, y));
 			tank.assignNow(new SteerTask(center));
 		}
 
@@ -88,7 +87,7 @@ public class CombatDemo extends Demo
 		for (int y = 36; y <= 46; ++y)
 		{
 			Unit tank = factory.newUnit("eRailGunLynx", 4);
-			map.putUnit(tank, Mediator.getPosition(x, y));
+			map.putUnit(tank, new Position(x, y));
 			tank.assignNow(new SteerTask(center));
 		}
 		
@@ -96,7 +95,7 @@ public class CombatDemo extends Demo
 		for (int y = 20; y <= 29; ++y)
 		{
 			Unit tank = factory.newUnit("eAcidCloudLynx", 5);
-			map.putUnit(tank, Mediator.getPosition(x, y));
+			map.putUnit(tank, new Position(x, y));
 		}
 	}
 }
