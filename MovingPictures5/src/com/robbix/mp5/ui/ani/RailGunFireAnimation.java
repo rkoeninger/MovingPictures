@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.ui.Sprite;
@@ -70,13 +69,7 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 	{
 		if (frame == 0)
 		{
-			ref.set(new Runnable()
-			{
-				public void run()
-				{
-					Mediator.playSound("railGunFire", getAttacker().getPosition());
-				}
-			});
+			playSoundLater("railGunFire", getAttacker().getPosition());
 		}
 		
 		if ((frame + 1) % 3 == 0 && !explosionTime)
@@ -91,22 +84,16 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 				getFireImpact().getY() + distance * Math.sin(angle) * progress
 			);
 			
+			System.out.println("smoke ring at " + ring.point);
+			
 			rings.add(ring);
 		}
 		
+		final Position targetPos = getTarget().getPosition();
+		
 		if (atHotPoint())
 		{
-			ref.set(new Runnable()
-			{
-				public void run()
-				{
-					Position pos = getTarget().getPosition();
-					
-					if (pos != null)
-						Mediator.playSound("railGunHit", pos);
-				}
-			});
-			
+			playSoundLater("railGunHit", targetPos);
 			explosionTime = true;
 		}
 		

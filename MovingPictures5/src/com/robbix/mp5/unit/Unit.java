@@ -548,30 +548,13 @@ public class Unit
 		);
 	}
 	
-	/**
-	 * Get absolute pixel position (x) on DisplayPanel.
-	 */
-	public int getAbsX()
+	public Point2D getAbsCenterPoint()
 	{
 		int spotSize = getMap().getSpotSize();
-		int tileSize = getMap().getDisplayPanel().getTileSize();
-		
-		double absX = getX() + getXOffset() / (double) spotSize;
-		
-		return (int) (absX * tileSize);
-	}
-	
-	/**
-	 * Get absolute pixel position (y) on DisplayPanel.
-	 */
-	public int getAbsY()
-	{
-		int spotSize = getMap().getSpotSize();
-		int tileSize = getMap().getDisplayPanel().getTileSize();
-		
-		double absY = getY() + getYOffset() / (double) spotSize;
-		
-		return (int) (absY * tileSize);
+		return new Point2D.Double(
+			getX() + 0.5 + (getXOffset() / (double) spotSize),
+			getY() + 0.5 + (getYOffset() / (double) spotSize)
+		);
 	}
 	
 	/**

@@ -456,7 +456,7 @@ class SpriteSetXMLLoader
 						Offset hotspotOffset = hotspotNode.getOffsetAttributes();
 						hotspot = new Point2D.Double(
 							hotspotOffset.dx / 32.0,
-							hotspotOffset.dy / 23.0
+							hotspotOffset.dy / 32.0
 						);
 					}
 					Image img = loadFrame(activityDir, fileNumber++);

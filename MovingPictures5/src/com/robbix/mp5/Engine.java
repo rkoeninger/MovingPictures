@@ -80,6 +80,11 @@ public class Engine
 		return timer.getDelay();
 	}
 	
+	public void setDelay(int delay)
+	{
+		timer.setDelay(delay);
+	}
+	
 	public boolean isThrottled()
 	{
 		return timer.getDelay() > 0;

@@ -5,7 +5,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
@@ -82,21 +81,11 @@ public class MeteorAnimation extends AmbientAnimation
 	
 	public void step(AtomicReference<Runnable> ref)
 	{
-		if (frame > frameCount - 9)
+		if (frame > frameCount - 9 && !impactSoundPlayed)
 		{
-			if (!impactSoundPlayed)
-			{
-				ref.set(new Runnable()
-				{
-					public void run()
-					{
-						Mediator.doSplashDamage(target, 300, 2);
-						Mediator.playSound("smallExplosion2", target);
-					}
-				});
-				
-				impactSoundPlayed = true;
-			}
+			doSplashDamageLater(target, 300, 2);
+			playSoundLater("smallExplosion2", target);
+			impactSoundPlayed = true;
 		}
 		
 		frame++;

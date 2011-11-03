@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.Point2D;
 
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.BorderRegion;
@@ -126,8 +127,9 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		/*
 		 * Draw borders
 		 */
-		int nwCornerX = unit.getAbsX();
-		int nwCornerY = unit.getAbsY();
+		Point2D absPoint = unit.getAbsPoint();
+		int nwCornerX = (int) (absPoint.getX() * tileSize);
+		int nwCornerY = (int) (absPoint.getY() * tileSize);
 		int neCornerX = nwCornerX + absWidth;
 		int neCornerY = nwCornerY;
 		int swCornerX = nwCornerX;
@@ -204,7 +206,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			else if (!available)  toolTip = "Occupied";
 			else if (!hasDeposit) toolTip = "No resource deposit";
 		}
-		else
+		else if (type.isStructureType() || type.isGuardPostType())
 		{
 			boolean onMap = map.getBounds().contains(inner);
 			boolean available = map.canPlaceUnit(pos, fp);
@@ -217,6 +219,16 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			else if (!available) toolTip = "Occupied";
 			else if (!noDeposit) toolTip = "Covers resource deposit";
 			else if (!connected) toolTip = "No tube connection";
+		}
+		else
+		{
+			boolean onMap = map.getBounds().contains(inner);
+			boolean available = map.canPlaceUnit(pos, fp);
+			
+			scheme = onMap && available ? GREEN : RED;
+			
+			if      (!onMap)     toolTip = "Out of bounds";
+			else if (!available) toolTip = "Occupied";
 		}
 		
 		panel.draw(g, scheme, inner);

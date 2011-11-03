@@ -444,7 +444,7 @@ public class Mediator
 			map.remove(unit);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				panel.getSpriteLibrary().getAmbientSpriteGroup("aDeath", eventName),
-				new Point(unit.getAbsX(), unit.getAbsY()),
+				unit.getAbsPoint(),
 				2
 			));
 			playSound("smallExplosion1");
@@ -499,7 +499,7 @@ public class Mediator
 			map.remove(unit);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				panel.getSpriteLibrary().getAmbientSpriteGroup(setName, eventName),
-				new Point(unit.getAbsX(), unit.getAbsY()),
+				unit.getAbsPoint(),
 				2
 			));
 			doSplashDamage(pos, damage, range);

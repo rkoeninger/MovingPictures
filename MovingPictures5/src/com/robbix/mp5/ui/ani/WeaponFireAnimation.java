@@ -14,8 +14,8 @@ public abstract class WeaponFireAnimation extends AmbientAnimation
 {
 	private Unit attacker;
 	private Unit target;
-	private Point2D start;
-	private Point2D end;
+	private Point2D origin;
+	private Point2D impact;
 	private Rectangle2D bounds;
 	
 	public WeaponFireAnimation(SpriteLibrary lib, Unit attacker, Unit target)
@@ -25,7 +25,7 @@ public abstract class WeaponFireAnimation extends AmbientAnimation
 		this.attacker = attacker;
 		this.target = target;
 		
-		start = add(attacker.getAbsPoint(), lib.getHotspot(attacker));
+		origin = add(attacker.getAbsPoint(), lib.getHotspot(attacker));
 		
 		double w = target.getWidth();
 		double h = target.getHeight();
@@ -33,14 +33,21 @@ public abstract class WeaponFireAnimation extends AmbientAnimation
 			w / 2 + Utils.randFloat(-w / 4, w / 4),
 			h / 2 + Utils.randFloat(-h / 4, h / 4)
 		);
-		end = add(target.getAbsPoint(), impactOffset);
+		impact = add(target.getAbsCenterPoint(), impactOffset);
 		
 		bounds = new Rectangle2D.Double(
-			min(start.getX(), end.getX()),
-			min(start.getY(), end.getY()),
-			abs(start.getX() - end.getX()),
-			abs(start.getY() - end.getY())
+			min(origin.getX(), impact.getX()),
+			min(origin.getY(), impact.getY()),
+			abs(origin.getX() - impact.getX()),
+			abs(origin.getY() - impact.getY())
 		);
+		
+		System.out.println(getClass() + "------------------------------");
+		System.out.println(attacker.getAbsPoint());
+		System.out.println(lib.getHotspot(attacker));
+		System.out.println(target.getAbsPoint());
+		System.out.println(impact);
+		System.out.println(bounds);
 	}
 	
 	public Unit getAttacker()
@@ -55,12 +62,12 @@ public abstract class WeaponFireAnimation extends AmbientAnimation
 	
 	public Point2D getFireOrigin()
 	{
-		return start;
+		return origin;
 	}
 	
 	public Point2D getFireImpact()
 	{
-		return end;
+		return impact;
 	}
 	
 	public Rectangle2D getBounds()

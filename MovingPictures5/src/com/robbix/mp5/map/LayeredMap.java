@@ -613,7 +613,14 @@ public class LayeredMap
 	
 	public boolean canPlaceMine(Position pos)
 	{
+		if (!getBounds().contains(pos))
+			return false;
+		
 		pos = pos.shift(1, 0);
+		
+		if (!getBounds().contains(pos))
+			return false;
+		
 		ResourceDeposit deposit = getResourceDeposit(pos);
 		return deposit != null && deposit.isCommon();
 	}

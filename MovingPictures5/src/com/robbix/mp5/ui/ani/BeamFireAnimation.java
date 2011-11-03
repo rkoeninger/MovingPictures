@@ -7,7 +7,6 @@ import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
@@ -26,8 +25,8 @@ public class BeamFireAnimation extends WeaponFireAnimation
 	public BeamFireAnimation(SpriteLibrary lib, Unit attacker, Unit target, Color color, Stroke stroke, String soundBite)
 	{
 		super(lib, attacker, target);
-		attackerStart = attacker.getAbsPoint();
-		targetStart = target.getAbsPoint();
+		attackerStart = attacker.getAbsCenterPoint();
+		targetStart = target.getAbsCenterPoint();
 		this.color = color;
 		this.stroke = stroke;
 		this.soundBite = soundBite;
@@ -38,8 +37,8 @@ public class BeamFireAnimation extends WeaponFireAnimation
 		g.setColor(color);
 		Stroke oldStroke = ((Graphics2D) g).getStroke();
 		((Graphics2D) g).setStroke(stroke);
-		Point2D attackerCurrent = getAttacker().getAbsPoint();
-		Point2D targetCurrent = getTarget().getAbsPoint();
+		Point2D attackerCurrent = getAttacker().getAbsCenterPoint();
+		Point2D targetCurrent = getTarget().getAbsCenterPoint();
 		Point2D pointA = new Point2D.Double(
 			getFireOrigin().getX() - attackerStart.getX() + attackerCurrent.getX(),
 			getFireOrigin().getY() - attackerStart.getY() + attackerCurrent.getY()
@@ -56,13 +55,7 @@ public class BeamFireAnimation extends WeaponFireAnimation
 	{
 		if (frame == 0)
 		{
-			callback.set(new Runnable()
-			{
-				public void run()
-				{
-					Mediator.playSound(soundBite, getAttacker().getPosition());
-				}
-			});
+			playSoundLater(soundBite, getAttacker().getPosition());
 		}
 		
 		frame++;

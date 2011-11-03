@@ -3,6 +3,7 @@ package com.robbix.mp5.ui.ani;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,7 +14,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
@@ -53,8 +53,6 @@ public class RPGFireAnimation extends WeaponFireAnimation
 	{
 		super(lib, attacker, target);
 		
-		LayeredMap map = attacker.getMap();
-		
 		puffs = new HashSet<SmokePuff>();
 		
 		puffGroups = new ArrayList<SpriteGroup>(3);
@@ -71,19 +69,20 @@ public class RPGFireAnimation extends WeaponFireAnimation
 //		);
 		
 //		Point hotspot = lib.getHotspot(attacker, rocketDir);
-		
-		firePoint = new Point(attacker.getAbsX(), attacker.getAbsY());
+		int tileSize = Mediator.panel.getTileSize();
+		Point2D fireAbs = attacker.getAbsPoint();
+		firePoint = new Point((int) (fireAbs.getX() * tileSize), (int) (fireAbs.getY() * tileSize));
 //		firePoint.translate(hotspot.x, hotspot.y);
 		
-		int tileSize = map.getDisplayPanel().getTileSize();
 		int w = target.getWidth();
 		int h = target.getHeight();
 		int xTargetOffset = (tileSize * w / 2) + Utils.randInt(-5, 5);
 		int yTargetOffset = (tileSize * h / 2) + Utils.randInt(-5, 5);
 		
+		Point2D targetAbs = target.getAbsPoint();
 		targetPoint = new Point(
-			target.getAbsX() + xTargetOffset,
-			target.getAbsY() + yTargetOffset
+			(int) (tileSize * targetAbs.getX()) + xTargetOffset,
+			(int) (tileSize * targetAbs.getY()) + yTargetOffset
 		);
 		
 		bounds = new Rectangle(firePoint);

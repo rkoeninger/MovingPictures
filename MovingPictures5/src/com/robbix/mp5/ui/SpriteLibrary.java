@@ -350,12 +350,12 @@ public class SpriteLibrary implements Modular
 	
 	public Point2D getHotspot(Unit turret)
 	{
-		return getHotspot(turret, turret.getDirection());
+		return getHotspot(turret.getType(), turret.getDirection());
 	}
 	
-	public Point2D getHotspot(Unit turret, Direction dir)
+	public Point2D getHotspot(UnitType turretType, Direction dir)
 	{
-		SpriteSet set = getUnitSpriteSet(turret.getType());
+		SpriteSet set = getUnitSpriteSet(turretType);
 		SpriteGroup group = set.get(TURRET);
 		TurretSprite sprite = (TurretSprite) group.getSprite(dir.ordinal());
 		return sprite.getHotspot();
