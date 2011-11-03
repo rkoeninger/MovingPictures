@@ -3,18 +3,18 @@ package com.robbix.mp5.ui.ani;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.Mediator;
+import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
 public class BeamFireAnimation extends WeaponFireAnimation
 {
-	private Point attackerStart;
-	private Point targetStart;
+	private Point2D attackerStart;
+	private Point2D targetStart;
 	
 	private int frame = 0;
 	private final int frameLength = 20;
@@ -23,11 +23,11 @@ public class BeamFireAnimation extends WeaponFireAnimation
 	private Stroke stroke;
 	private String soundBite;
 	
-	public BeamFireAnimation(Unit attacker, Unit target, Color color, Stroke stroke, String soundBite)
+	public BeamFireAnimation(SpriteLibrary lib, Unit attacker, Unit target, Color color, Stroke stroke, String soundBite)
 	{
-		super(attacker, target);
-		attackerStart = new Point(attacker.getAbsX(), attacker.getAbsY());
-		targetStart = new Point(target.getAbsX(), target.getAbsY());
+		super(lib, attacker, target);
+		attackerStart = attacker.getAbsPoint();
+		targetStart = target.getAbsPoint();
 		this.color = color;
 		this.stroke = stroke;
 		this.soundBite = soundBite;
@@ -38,15 +38,15 @@ public class BeamFireAnimation extends WeaponFireAnimation
 		g.setColor(color);
 		Stroke oldStroke = ((Graphics2D) g).getStroke();
 		((Graphics2D) g).setStroke(stroke);
-		Point attackerCurrent = new Point(getAttacker().getAbsX(), getAttacker().getAbsY());
-		Point targetCurrent = new Point(getTarget().getAbsX(), getTarget().getAbsY());
+		Point2D attackerCurrent = getAttacker().getAbsPoint();
+		Point2D targetCurrent = getTarget().getAbsPoint();
 		Point2D pointA = new Point2D.Double(
-			getFireOrigin().x - attackerStart.x + attackerCurrent.x,
-			getFireOrigin().y - attackerStart.y + attackerCurrent.y
+			getFireOrigin().getX() - attackerStart.getX() + attackerCurrent.getX(),
+			getFireOrigin().getY() - attackerStart.getY() + attackerCurrent.getY()
 		);
 		Point2D pointB = new Point2D.Double(
-			getFireImpact().x - targetStart.x + targetCurrent.x,
-			getFireImpact().y - targetStart.y + targetCurrent.y
+			getFireImpact().getX() - targetStart.getX() + targetCurrent.getX(),
+			getFireImpact().getY() - targetStart.getY() + targetCurrent.getY()
 		);
 		panel.draw(g, pointA, pointB);
 		((Graphics2D) g).setStroke(oldStroke);

@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Stroke;
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
 public class MicrowaveFireAnimation extends BeamFireAnimation
@@ -18,8 +19,8 @@ public class MicrowaveFireAnimation extends BeamFireAnimation
 			0
 		);
 	
-	public MicrowaveFireAnimation(Unit attacker, Unit target)
+	public MicrowaveFireAnimation(SpriteLibrary lib, Unit attacker, Unit target)
 	{
-		super(attacker, target, color, stroke, "microwave");
+		super(lib, attacker, target, color, stroke, "microwave");
 	}
 }

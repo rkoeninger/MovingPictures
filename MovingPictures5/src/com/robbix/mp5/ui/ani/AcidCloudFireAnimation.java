@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
@@ -21,9 +20,10 @@ import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
+// FIXME: needs to be reworked in light of Point2D
 public class AcidCloudFireAnimation extends WeaponFireAnimation
 {
-	private class SmokePuff
+	private static class SmokePuff
 	{
 		public int puffNumber;
 		public Point point;
@@ -53,12 +53,11 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 	
 	private Sprite rocketSprite;
 	
-	public AcidCloudFireAnimation(Unit attacker, Unit target)
+	public AcidCloudFireAnimation(SpriteLibrary lib, Unit attacker, Unit target)
 	{
-		super(attacker, target);
+		super(lib, attacker, target);
 		
 		LayeredMap map = attacker.getMap();
-		SpriteLibrary lib = map.getDisplayPanel().getSpriteLibrary();
 		
 		puffs = new HashSet<SmokePuff>();
 		
@@ -74,18 +73,18 @@ public class AcidCloudFireAnimation extends WeaponFireAnimation
 		acidCouldSprites.addAll(lib.getAmbientSpriteGroup("aAcidCloud", "cloud3").getSprites());
 		acidCloud = new SpriteGroup(acidCouldSprites);
 		
-		Direction rocketDir = Direction.getDirection(
-			attacker.getPosition(),
-			target.getPosition()
-		);
+//		Direction rocketDir = Direction.getDirection(
+//			attacker.getPosition(),
+//			target.getPosition()
+//		);
 		
 		targetPos = target.getPosition();
 		damage = attacker.getType().getDamage();
 		
-		Point hotspot = lib.getHotspot(attacker, rocketDir);
+//		Point2D hotspot = lib.getHotspot(attacker, rocketDir);
 		
 		firePoint = new Point(attacker.getAbsX(), attacker.getAbsY());
-		firePoint.translate(hotspot.x, hotspot.y);
+//		firePoint.translate(hotspot.x, hotspot.y);
 		
 		int tileSize = map.getDisplayPanel().getTileSize();
 		int w = target.getWidth();

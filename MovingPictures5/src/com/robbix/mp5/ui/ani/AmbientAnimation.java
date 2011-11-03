@@ -1,14 +1,22 @@
 package com.robbix.mp5.ui.ani;
 
 import java.awt.Graphics;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.ui.DisplayPanel;
+import com.robbix.mp5.ui.SpriteLibrary;
 
 public abstract class AmbientAnimation
 {
 	protected DisplayPanel panel;
+	protected SpriteLibrary lib;
+	
+	public AmbientAnimation(SpriteLibrary lib)
+	{
+		this.lib = lib;
+	}
 	
 	public void setDisplay(DisplayPanel panel)
 	{
@@ -37,4 +45,9 @@ public abstract class AmbientAnimation
      * rendering anything and no longer will
      */
     public abstract boolean isDone();
+    
+    protected Point2D add(Point2D p1, Point2D p2)
+    {
+    	return new Point2D.Double(p1.getX() + p1.getX(), p1.getY() + p2.getY());
+    }
 }

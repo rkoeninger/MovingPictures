@@ -98,23 +98,23 @@ public class Mediator
 		
 		if (attacker.getType().getName().contains("Laser"))
 		{
-			fireAnimation = new LaserFireAnimation(attacker, target);
+			fireAnimation = new LaserFireAnimation(game.getSpriteLibrary(), attacker, target);
 		}
 		else if (attacker.getType().getName().contains("Microwave"))
 		{
-			fireAnimation = new MicrowaveFireAnimation(attacker, target);
+			fireAnimation = new MicrowaveFireAnimation(game.getSpriteLibrary(), attacker, target);
 		}
 		else if (attacker.getType().getName().contains("RailGun"))
 		{
-			fireAnimation = new RailGunFireAnimation(attacker, target);
+			fireAnimation = new RailGunFireAnimation(game.getSpriteLibrary(), attacker, target);
 		}
 		else if (attacker.getType().getName().contains("RPG"))
 		{
-			fireAnimation = new RPGFireAnimation(attacker, target);
+			fireAnimation = new RPGFireAnimation(game.getSpriteLibrary(), attacker, target);
 		}
 		else if (attacker.getType().getName().contains("AcidCloud"))
 		{
-			fireAnimation = new AcidCloudFireAnimation(attacker, target);
+			fireAnimation = new AcidCloudFireAnimation(game.getSpriteLibrary(), attacker, target);
 		}
 		
 		attacker.assignNow(new AttackTask(target, fireAnimation));
@@ -508,7 +508,7 @@ public class Mediator
 	
 	public static void doSpawnMeteor(Position pos)
 	{
-		panel.cueAnimation(new MeteorAnimation(pos, panel.getSpriteLibrary()));
+		panel.cueAnimation(new MeteorAnimation(game.getSpriteLibrary(), pos));
 		playSound("meteor", pos);
 //		playSound("savant_meteorApproaching");
 	}

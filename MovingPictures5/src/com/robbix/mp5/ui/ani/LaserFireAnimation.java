@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Stroke;
 import com.robbix.mp5.Utils;
+import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
 public class LaserFireAnimation extends BeamFireAnimation
@@ -15,8 +16,8 @@ public class LaserFireAnimation extends BeamFireAnimation
 		BasicStroke.JOIN_ROUND
 	);
 	
-	public LaserFireAnimation(Unit attacker, Unit target)
+	public LaserFireAnimation(SpriteLibrary lib, Unit attacker, Unit target)
 	{
-		super(attacker, target, color, stroke, "laser");
+		super(lib, attacker, target, color, stroke, "laser");
 	}
 }

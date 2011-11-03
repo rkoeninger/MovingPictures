@@ -1207,7 +1207,12 @@ public class DisplayPanel extends JComponent
 	
 	public void draw(Graphics g, Point2D a, Point2D b)
 	{
-		g.drawLine((int) a.getX(), (int) a.getY(), (int) b.getX(), (int) b.getY());
+		g.drawLine(
+			(int) a.getX() * tileSize + scroll.x,
+			(int) a.getY() * tileSize + scroll.y,
+			(int) b.getX() * tileSize + scroll.x,
+			(int) b.getY() * tileSize + scroll.y
+		);
 	}
 	
 	private void fill(Graphics g)

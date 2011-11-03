@@ -1,78 +1,46 @@
 package com.robbix.mp5.ui.ani;
 
-import java.awt.Point;
-import java.awt.Rectangle;
+import static java.lang.Math.abs;
+import static java.lang.Math.min;
+
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import com.robbix.mp5.Utils;
-import com.robbix.mp5.map.LayeredMap;
-import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteLibrary;
-import com.robbix.mp5.ui.TurretSprite;
 import com.robbix.mp5.unit.Unit;
 
 public abstract class WeaponFireAnimation extends AmbientAnimation
 {
 	private Unit attacker;
 	private Unit target;
-	private Point start;
-	private Point end;
-	private Rectangle bounds;
+	private Point2D start;
+	private Point2D end;
+	private Rectangle2D bounds;
 	
-	public WeaponFireAnimation(Unit attacker, Unit target)
+	public WeaponFireAnimation(SpriteLibrary lib, Unit attacker, Unit target)
 	{
+		super(lib);
+		
 		this.attacker = attacker;
 		this.target = target;
 		
-		Unit turret = attacker;
-		Unit chassis = attacker.getChassis();
-		LayeredMap map = chassis.getMap();
+		start = add(attacker.getAbsPoint(), lib.getHotspot(attacker));
 		
-		int tileSize = map.getDisplayPanel().getTileSize();
-		
-		SpriteLibrary lib = map.getDisplayPanel().getSpriteLibrary();
-		
-		Sprite turretSprite = lib.getSprite(turret);
-		Point hotspot = ((TurretSprite) turretSprite).getHotspot();
-		
-		int xSpriteOffset = turretSprite.getXOffset() + hotspot.x;
-		int ySpriteOffset = turretSprite.getYOffset() + hotspot.y;
-		int startX = attacker.getAbsX() + xSpriteOffset;
-		int startY = attacker.getAbsY() + ySpriteOffset;
-		start = new Point(startX, startY);
-		
-		int w = target.getWidth();
-		int h = target.getHeight();
-		int spreadW = tileSize / 2 + tileSize * (w - 1);
-		int spreadH = tileSize / 2 + tileSize * (h - 1);
-		int xTargetOffset = (tileSize * w / 2) + Utils.randInt(-spreadW, spreadH);
-		int yTargetOffset = (tileSize * h / 2) + Utils.randInt(-spreadW, spreadH);
-		int endX = target.getAbsX() + xTargetOffset;
-		int endY = target.getAbsY() + yTargetOffset;
-		end = new Point(endX, endY);
-		
-		bounds = new Rectangle(
-			startX,
-			startY,
-			endX - startX,
-			endY - startY
+		double w = target.getWidth();
+		double h = target.getHeight();
+		Point2D impactOffset = new Point2D.Double(
+			w / 2 + Utils.randFloat(-w / 4, w / 4),
+			h / 2 + Utils.randFloat(-h / 4, h / 4)
 		);
+		end = add(target.getAbsPoint(), impactOffset);
 		
-		if (bounds.width < 0)
-		{
-			bounds.x += bounds.width;
-			bounds.width = -bounds.width;
-		}
-		
-		if (bounds.height < 0)
-		{
-			bounds.y += bounds.height;
-			bounds.height = -bounds.height;
-		}
-		
-		bounds.x -= tileSize;
-		bounds.y -= tileSize;
-		bounds.width  += tileSize * 2;
-		bounds.height += tileSize * 2;
+		bounds = new Rectangle2D.Double(
+			min(start.getX(), end.getX()),
+			min(start.getY(), end.getY()),
+			abs(start.getX() - end.getX()),
+			abs(start.getY() - end.getY())
+		);
 	}
 	
 	public Unit getAttacker()
@@ -85,17 +53,17 @@ public abstract class WeaponFireAnimation extends AmbientAnimation
 		return target;
 	}
 	
-	public Point getFireOrigin()
+	public Point2D getFireOrigin()
 	{
 		return start;
 	}
 	
-	public Point getFireImpact()
+	public Point2D getFireImpact()
 	{
 		return end;
 	}
 	
-	public Rectangle getBounds()
+	public Rectangle2D getBounds()
 	{
 		return bounds;
 	}

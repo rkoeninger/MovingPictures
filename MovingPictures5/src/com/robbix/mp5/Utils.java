@@ -44,6 +44,14 @@ public class Utils
 	{
 		return low + RNG.nextInt(high - low + 1);
 	}
+
+	/**
+	 * Returns a random double between [low, high]
+	 */
+	public static double randFloat(double low, double high)
+	{
+		return low + RNG.nextDouble() * (high - low);
+	}
 	
 	/**
 	 * Regular expression specifying zero or more word characters.

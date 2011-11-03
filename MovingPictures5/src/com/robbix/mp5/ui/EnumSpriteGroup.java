@@ -3,6 +3,7 @@ package com.robbix.mp5.ui;
 import java.util.Collections;
 import java.util.List;
 
+// TODO: factor out this class, move enum indexing to SpriteGroup
 public class EnumSpriteGroup<K extends Enum<K>> extends SpriteGroup
 {
 	private Class<K> enumType;

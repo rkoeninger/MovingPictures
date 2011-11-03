@@ -105,8 +105,6 @@ public class Sandbox extends JApplet
 		}
 	}
 	
-	private static final String defaultTileSet = "newTerraDirt";
-	private static final String defaultMap = "16-16-plain";
 	private static File resDir = new File("./res");
 	
 	private static Player currentPlayer;
@@ -175,71 +173,26 @@ public class Sandbox extends JApplet
 		boolean soundOn          = false;
 //		boolean musicOn          = false;
 		String demoName          = null;
-		String mapName           = null;
-		String tileSetName       = null;
+		String mapName           = "16-16-plain";
+		String tileSetName       = "newTerraDirt";
 		
-		for (int a = 0; a < args.length; ++a)
+		for (String arg : args)
 		{
-			int colonIndex = Math.max(args[a].indexOf(':'), 0);
-			String option = args[a].substring(colonIndex + 1);
+			int colonIndex = Math.max(arg.indexOf(':'), 0);
+			String option = arg.substring(colonIndex + 1);
 			
-			if (args[a].equals("-lazyLoadSprites"))
-			{
-				lazyLoadSprites = true;
-			}
-			else if (args[a].equals("-lazyLoadSounds"))
-			{
-				lazyLoadSounds = true;
-			}
-			else if (args[a].equals("-asyncLoadSprites"))
-			{
-				asyncLoadSprites = true;
-			}
-			else if (args[a].equals("-syncLoadSprites"))
-			{
-				asyncLoadSprites = false;
-			}
-			else if (args[a].equals("-soundOn"))
-			{
-				soundOn = true;
-			}
-			else if (args[a].equals("-soundOff"))
-			{
-				soundOn = false;
-			}
-//			else if (args[a].equals("-musicOn"))
-//			{
-//				musicOn = true;
-//			}
-//			else if (args[a].equals("-musicOff"))
-//			{
-//				musicOn = false;
-//			}
-			else if (args[a].startsWith("-demo:"))
-			{
-				if (demoName != null || mapName != null)
-					throw new IllegalArgumentException("Duplicate map/demos");
-				
-				demoName = option;
-			}
-			else if (args[a].startsWith("-map:"))
-			{
-				if (demoName != null || mapName != null)
-					throw new IllegalArgumentException("Duplicate map/demos");
-				
-				mapName = option;
-			}
-			else if (args[a].startsWith("-tileSet:"))
-			{
-				if (tileSetName != null)
-					throw new IllegalArgumentException("Duplicate tile sets");
-				
-				tileSetName = option;
-			}
-			else if (args[a].startsWith("-resDir:"))
-			{
-				resDir = new File(option);
-			}
+			if      (arg.equals("-lazyLoadSprites"))  lazyLoadSprites = true;
+			else if (arg.equals("-lazyLoadSounds"))   lazyLoadSounds = true;
+			else if (arg.equals("-asyncLoadSprites")) asyncLoadSprites = true;
+			else if (arg.equals("-syncLoadSprites"))  asyncLoadSprites = false;
+			else if (arg.equals("-soundOn"))          soundOn = true;
+			else if (arg.equals("-soundOff"))         soundOn = false;
+//			else if (arg.equals("-musicOn"))          musicOn = true;
+//			else if (arg.equals("-musicOff"))         musicOn = false;
+			else if (arg.startsWith("-demo:"))        demoName = option;
+			else if (arg.startsWith("-map:"))         mapName = option;
+			else if (arg.startsWith("-tileSet:"))     tileSetName = option;
+			else if (arg.startsWith("-resDir:"))      resDir = new File(option);
 		}
 		
 		Demo demo = null;
@@ -252,16 +205,7 @@ public class Sandbox extends JApplet
 				throw new IllegalArgumentException("Demo does not exist");
 			
 			demo = demos.get(demoName);
-		}
-		
-		if (tileSetName == null)
-		{
-			tileSetName = defaultTileSet;
-		}
-		
-		if (mapName == null)
-		{
-			mapName = demo == null ? defaultMap : demo.getMapName();
+			mapName = demo.getMapName();
 		}
 		
 		Sandbox.trySystemLookAndFeel();

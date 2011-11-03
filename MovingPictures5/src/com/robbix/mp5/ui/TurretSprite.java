@@ -1,21 +1,21 @@
 package com.robbix.mp5.ui;
 
 import java.awt.Image;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import com.robbix.mp5.basics.Offset;
 
 public class TurretSprite extends Sprite
 {
-	private Point[] hotspots;
+	private Point2D[] hotspots;
 	
-	public TurretSprite(Image image, int baseHue, Offset offset, Point hotspot)
+	public TurretSprite(Image image, int baseHue, Offset offset, Point2D hotspot)
 	{
 		super(image, baseHue, offset);
-		this.hotspots = new Point[]{hotspot};
+		this.hotspots = new Point2D[]{hotspot};
 	}
 	
-	public TurretSprite(Image image, int baseHue, Offset offset, Point[] hotspots)
+	public TurretSprite(Image image, int baseHue, Offset offset, Point2D[] hotspots)
 	{
 		super(image, baseHue, offset);
 		
@@ -25,7 +25,7 @@ public class TurretSprite extends Sprite
 		this.hotspots = hotspots;
 	}
 	
-	public Point getHotspot()
+	public Point2D getHotspot()
 	{
 		return hotspots[0];
 	}

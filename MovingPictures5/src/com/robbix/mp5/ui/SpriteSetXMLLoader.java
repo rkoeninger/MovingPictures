@@ -2,7 +2,7 @@ package com.robbix.mp5.ui;
 
 import java.awt.Color;
 import java.awt.Image;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -395,14 +395,14 @@ class SpriteSetXMLLoader
 			Offset dirOffset = directionNode.getOffsetAttributes();
 			dirOffset = dirOffset.add(activityOffset);
 			List<XNode> hotspotNodes = directionNode.getNodes("Hotspot");
-			Point hotspot = new Point();
+			Point2D hotspot = new Point2D.Double();
 			if (!hotspotNodes.isEmpty())
 			{
 				XNode hotspotNode = hotspotNodes.get(0);
 				Offset hotspotOffset = hotspotNode.getOffsetAttributes();
-				hotspot = new Point(
-					hotspotOffset.dx,
-					hotspotOffset.dy
+				hotspot = new Point2D.Double(
+					hotspotOffset.dx / 32.0,
+					hotspotOffset.dy / 32.0
 				);
 			}
 			Image img = loadFrame(activityDir, fileNumber++);
@@ -449,14 +449,14 @@ class SpriteSetXMLLoader
 					Offset dirOffset = directionNode.getOffsetAttributes();
 					dirOffset = dirOffset.add(activityOffset);
 					List<XNode> hotspotNodes = directionNode.getNodes("Hotspot");
-					Point hotspot = new Point();
+					Point2D hotspot = new Point2D.Double();
 					if (!hotspotNodes.isEmpty())
 					{
 						XNode hotspotNode = hotspotNodes.get(0);
 						Offset hotspotOffset = hotspotNode.getOffsetAttributes();
-						hotspot = new Point(
-							hotspotOffset.dx,
-							hotspotOffset.dy
+						hotspot = new Point2D.Double(
+							hotspotOffset.dx / 32.0,
+							hotspotOffset.dy / 23.0
 						);
 					}
 					Image img = loadFrame(activityDir, fileNumber++);

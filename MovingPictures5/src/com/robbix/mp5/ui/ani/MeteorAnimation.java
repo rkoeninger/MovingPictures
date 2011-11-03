@@ -25,17 +25,11 @@ public class MeteorAnimation extends AmbientAnimation
 	
 	private boolean impactSoundPlayed = false;
 	
-	private SpriteGroup forming;
-	private SpriteGroup flying;
-	private SpriteGroup impact;
-	
-	public MeteorAnimation(Position target, SpriteLibrary lib)
+	public MeteorAnimation(SpriteLibrary lib, Position target)
 	{
-		this.target = target;
+		super(lib);
 		
-		forming = lib.getAmbientSpriteGroup("aMeteor", "forming");
-		flying  = lib.getAmbientSpriteGroup("aMeteor", "flying");
-		impact  = lib.getAmbientSpriteGroup("aMeteor", "impact");
+		this.target = target;
 		
 		point = new Point2D.Double(
 			target.x + 0.5,
@@ -57,6 +51,10 @@ public class MeteorAnimation extends AmbientAnimation
 	
 	public void paint(Graphics g)
 	{
+		SpriteGroup forming = lib.getAmbientSpriteGroup("aMeteor", "forming");
+		SpriteGroup flying  = lib.getAmbientSpriteGroup("aMeteor", "flying");
+		SpriteGroup impact  = lib.getAmbientSpriteGroup("aMeteor", "impact");
+		
 		if (frame < 5)
 		{
 			double progress = (frameCount - frame) / (double)(frameCount);

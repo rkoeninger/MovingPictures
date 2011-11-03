@@ -2,7 +2,7 @@ package com.robbix.mp5.ui;
 
 import static com.robbix.mp5.unit.Activity.TURRET;
 
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -348,12 +348,12 @@ public class SpriteLibrary implements Modular
 		}
 	}
 	
-	public Point getHotspot(Unit turret)
+	public Point2D getHotspot(Unit turret)
 	{
 		return getHotspot(turret, turret.getDirection());
 	}
 	
-	public Point getHotspot(Unit turret, Direction dir)
+	public Point2D getHotspot(Unit turret, Direction dir)
 	{
 		SpriteSet set = getUnitSpriteSet(turret.getType());
 		SpriteGroup group = set.get(TURRET);
