@@ -38,12 +38,7 @@ public class Game
 		game.spriteLib = SpriteLibrary.load(new File(root, "sprites"), lazySprites);
 		game.sounds = SoundBank.load(new File(root, "sounds"), lazySounds);
 		game.cursorSet = CursorSet.load(new File(root, "cursors"));
-		game.addDisplay(new DisplayPanel(
-			game.map,
-			game.spriteLib,
-			game.tileSet,
-			game.cursorSet
-		));
+		game.addDisplay(new DisplayPanel(game));
 		
 		return game;
 	}

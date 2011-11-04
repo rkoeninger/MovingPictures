@@ -20,6 +20,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.JWindow;
@@ -50,6 +52,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.robbix.mp5.Engine;
 import com.robbix.mp5.Game;
@@ -114,8 +118,7 @@ public class Sandbox extends JApplet
 	private static Window fsWindow;
 	private static DisplayPanel panel;
 	private static JToolBar commandBar;
-	private static Map<Integer, JMenuItem> playerMenuItems =
-		new HashMap<Integer, JMenuItem>();
+	private static Map<Integer, JMenuItem> playerMenuItems = new HashMap<Integer, JMenuItem>();
 	
 	private static JFrame slViewer, utViewer, sbPlayer;
 	
@@ -130,19 +133,20 @@ public class Sandbox extends JApplet
 	private static final String ACP_DISPLAY_OPTION = "displayOption-";
 	private static final String ACP_COMMAND_BUTTON = "commandButton-";
 	
-	private static ActionListener miListener = new MenuItemListener();
-	
+	private static ActionListener listener = new MenuItemListener();
+
+	private static JSliderMenuItem throttleSliderMenuItem;
 	private static JMenuItem pauseMenuItem;
 	private static JMenuItem stepMenuItem;
 	private static JMenuItem spriteLibMenuItem;
 	private static JMenuItem unitLibMenuItem;
 	private static JMenuItem soundPlayerMenuItem;
-	private static JMenuItem throttleMenuItem;
 	private static JMenuItem exitMenuItem;
 	private static JMenuItem scrollBarsMenuItem;
 	private static JMenuItem frameRateMenuItem;
 	private static JMenuItem scrollSpeedMenuItem;
 	private static JMenuItem addDisplayMenuItem;
+	private static JMenuItem splitDisplayMenuItem;
 	private static JMenuItem fullScreenMenuItem;
 	private static JMenuItem spawnMeteorMenuItem;
 	private static JMenuItem meteorShowerMenuItem;
@@ -181,18 +185,18 @@ public class Sandbox extends JApplet
 			int colonIndex = Math.max(arg.indexOf(':'), 0);
 			String option = arg.substring(colonIndex + 1);
 			
-			if      (arg.equals("-lazyLoadSprites"))  lazyLoadSprites = true;
-			else if (arg.equals("-lazyLoadSounds"))   lazyLoadSounds = true;
+			if      (arg.equals("-lazyLoadSprites"))  lazyLoadSprites  = true;
+			else if (arg.equals("-lazyLoadSounds"))   lazyLoadSounds   = true;
 			else if (arg.equals("-asyncLoadSprites")) asyncLoadSprites = true;
 			else if (arg.equals("-syncLoadSprites"))  asyncLoadSprites = false;
-			else if (arg.equals("-soundOn"))          soundOn = true;
-			else if (arg.equals("-soundOff"))         soundOn = false;
-//			else if (arg.equals("-musicOn"))          musicOn = true;
-//			else if (arg.equals("-musicOff"))         musicOn = false;
-			else if (arg.startsWith("-demo:"))        demoName = option;
-			else if (arg.startsWith("-map:"))         mapName = option;
-			else if (arg.startsWith("-tileSet:"))     tileSetName = option;
-			else if (arg.startsWith("-resDir:"))      resDir = new File(option);
+			else if (arg.equals("-soundOn"))          soundOn          = true;
+			else if (arg.equals("-soundOff"))         soundOn          = false;
+//			else if (arg.equals("-musicOn"))          musicOn          = true;
+//			else if (arg.equals("-musicOff"))         musicOn          = false;
+			else if (arg.startsWith("-demo:"))        demoName         = option;
+			else if (arg.startsWith("-map:"))         mapName          = option;
+			else if (arg.startsWith("-tileSet:"))     tileSetName      = option;
+			else if (arg.startsWith("-resDir:"))      resDir           = new File(option);
 		}
 		
 		Demo demo = null;
@@ -201,7 +205,7 @@ public class Sandbox extends JApplet
 		{
 			Map<String, Demo> demos = Demo.getDemos();
 			
-			if (! demos.containsKey(demoName))
+			if (!demos.containsKey(demoName))
 				throw new IllegalArgumentException("Demo does not exist");
 			
 			demo = demos.get(demoName);
@@ -216,13 +220,7 @@ public class Sandbox extends JApplet
 		 * Create engine
 		 * Init Mediator
 		 */
-		game = Game.load(
-			resDir,
-			mapName,
-			tileSetName,
-			lazyLoadSprites,
-			lazyLoadSounds
-		);
+		game = Game.load(resDir, mapName, tileSetName, lazyLoadSprites, lazyLoadSounds);
 		game.getSpriteLibrary().setAsyncModeEnabled(asyncLoadSprites);
 		engine = new Engine(game);
 		Mediator.initMediator(game);
@@ -264,49 +262,56 @@ public class Sandbox extends JApplet
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
 		
-		pauseMenuItem = new JMenuItem("Pause");
-		stepMenuItem = new JMenuItem("Step Once");
-		spriteLibMenuItem = new JMenuItem("Sprite Library");
-		unitLibMenuItem = new JMenuItem("Unit Library");
-		soundPlayerMenuItem = new JMenuItem("Sound Player");
-		throttleMenuItem = new JMenuItem("Unthrottle");
-		exitMenuItem = new JMenuItem("Exit");
-		scrollBarsMenuItem = new JMenuItem("Scroll Bars");
-		frameRateMenuItem = new JMenuItem("Frame Rate");
-		scrollSpeedMenuItem = new JMenuItem("Scroll Speed");
-		addDisplayMenuItem = new JMenuItem("Open Additional View");
-		fullScreenMenuItem = new JMenuItem("Full Screen");
-		spawnMeteorMenuItem = new JMenuItem("Spawn Meteor");
-		meteorShowerMenuItem = new JMenuItem("Meteor Shower");
-		placeGeyserMenuItem = new JMenuItem("Place Geyser");
-		placeWallMenuItem = new JMenuItem("Place Wall");
-		placeTubeMenuItem = new JMenuItem("Place Tube");
-		placeBulldozeMenuItem = new JMenuItem("Bulldoze");
-		placeCommon1 = new JMenuItem("Common Low");
-		placeCommon2 = new JMenuItem("Common Med");
-		placeCommon3 = new JMenuItem("Common High");
-		placeRare1 = new JMenuItem("Rare Low");
-		placeRare2 = new JMenuItem("Rare Med");
-		placeRare3 = new JMenuItem("Rare High");
-		playSoundMenuItem = new JCheckBoxMenuItem("Play Sounds");
-		playMusicMenuItem = new JCheckBoxMenuItem("Play Music");
+		throttleSliderMenuItem = new JSliderMenuItem(0, 200, 10);
+		Hashtable<Integer, JLabel> paintLabels = new Hashtable<Integer, JLabel>();
+		paintLabels.put(0, new JLabel("Unthrottled"));
+		paintLabels.put(throttleSliderMenuItem.getMaximum(), new JLabel("Crawl"));
+		throttleSliderMenuItem.setLabelTable(paintLabels);
+		throttleSliderMenuItem.setPaintLabels(true);
+		pauseMenuItem          = new JMenuItem("Pause");
+		stepMenuItem           = new JMenuItem("Step Once");
+		spriteLibMenuItem      = new JMenuItem("Sprite Library");
+		unitLibMenuItem        = new JMenuItem("Unit Library");
+		soundPlayerMenuItem    = new JMenuItem("Sound Player");
+		exitMenuItem           = new JMenuItem("Exit");
+		scrollBarsMenuItem     = new JMenuItem("Scroll Bars");
+		frameRateMenuItem      = new JMenuItem("Frame Rate");
+		scrollSpeedMenuItem    = new JMenuItem("Scroll Speed");
+		addDisplayMenuItem     = new JMenuItem("Add Display");
+		splitDisplayMenuItem   = new JMenuItem("Split Display");
+		fullScreenMenuItem     = new JMenuItem("Full Screen");
+		spawnMeteorMenuItem    = new JMenuItem("Spawn Meteor");
+		meteorShowerMenuItem   = new JMenuItem("Meteor Shower");
+		placeGeyserMenuItem    = new JMenuItem("Place Geyser");
+		placeWallMenuItem      = new JMenuItem("Place Wall");
+		placeTubeMenuItem      = new JMenuItem("Place Tube");
+		placeBulldozeMenuItem  = new JMenuItem("Bulldoze");
+		placeCommon1           = new JMenuItem("Common Low");
+		placeCommon2           = new JMenuItem("Common Med");
+		placeCommon3           = new JMenuItem("Common High");
+		placeRare1             = new JMenuItem("Rare Low");
+		placeRare2             = new JMenuItem("Rare Med");
+		placeRare3             = new JMenuItem("Rare High");
+		playSoundMenuItem      = new JCheckBoxMenuItem("Play Sounds");
+		playMusicMenuItem      = new JCheckBoxMenuItem("Play Music");
 		setAudioFormatMenuItem = new JMenuItem("Set Format...");
 		removeAllUnitsMenuItem = new JMenuItem("Remove All");
-		addPlayerMenuItem = new JMenuItem("Add Player...");
+		addPlayerMenuItem      = new JMenuItem("Add Player...");
 		
-		final JMenuBar menuBar = new JMenuBar();
-		final JMenu engineMenu = new JMenu("Engine");
-		final JMenu displayMenu = new JMenu("Display");
-		final JMenu terrainMenu = new JMenu("Terrain");
-		final JMenu unitMenu = new JMenu("Units");
-		playerMenu = new JMenu("Players");
-		stepMenuItem.setEnabled(false);
-		throttleMenuItem.setEnabled(engine.isThrottled());
-		final JMenu disastersMenu = new JMenu("Disasters");
+		final JMenuBar menuBar        = new JMenuBar();
+		final JMenu engineMenu        = new JMenu("Engine");
+		final JMenu throttleMenu      = new JMenu("Throttle");
+		final JMenu displayMenu       = new JMenu("Display");
+		final JMenu terrainMenu       = new JMenu("Terrain");
+		final JMenu unitMenu          = new JMenu("Units");
+		final JMenu disastersMenu     = new JMenu("Disasters");
 		final JMenu placeResourceMenu = new JMenu("Add Ore");
-		final JMenu soundMenu = new JMenu("Sound");
+		final JMenu soundMenu         = new JMenu("Sound");
+		final JMenu addUnitMenu       = new JMenu("Add");
+		stepMenuItem.setEnabled(false);
+		throttleSliderMenuItem.setValue(engine.getDelay());
+		playerMenu = new JMenu("Players");
 		playSoundMenuItem.setSelected(game.getSoundBank().isRunning());
-		final JMenu addUnitMenu = new JMenu("Add");
 		playerMenu.add(addPlayerMenuItem);
 		playerMenu.addSeparator();
 		
@@ -328,7 +333,7 @@ public class Sandbox extends JApplet
 				ACP_SELECT_PLAYER + String.valueOf(player.getID())
 			);
 			playerMenu.add(playerSelectMenuItem);
-			playerSelectMenuItem.addActionListener(miListener);
+			playerSelectMenuItem.addActionListener(listener);
 			playerMenuItems.put(player.getID(), playerSelectMenuItem);
 		}
 		
@@ -363,7 +368,7 @@ public class Sandbox extends JApplet
 			final JMenuItem addUnitMenuItem = new JMenuItem(names.get(i));
 			addUnitMenu.add(addUnitMenuItem);
 			addUnitMenuItem.setActionCommand(ACP_ADD_UNIT + types.get(i));
-			addUnitMenuItem.addActionListener(miListener);
+			addUnitMenuItem.addActionListener(listener);
 		}
 		
 		/*-------------------------------------------------------------------------------------[*]
@@ -385,44 +390,46 @@ public class Sandbox extends JApplet
 				));
 			}
 			
-			panelOptionMenuItem.addActionListener(miListener);
+			panelOptionMenuItem.addActionListener(listener);
 		}
 		
-		spriteLibMenuItem.addActionListener(miListener);
-		unitLibMenuItem.addActionListener(miListener);
-		soundPlayerMenuItem.addActionListener(miListener);
-		scrollSpeedMenuItem.addActionListener(miListener);
-		scrollBarsMenuItem.addActionListener(miListener);
-		frameRateMenuItem.addActionListener(miListener);
-		addDisplayMenuItem.addActionListener(miListener);
-		fullScreenMenuItem.addActionListener(miListener);
-		meteorShowerMenuItem.addActionListener(miListener);
-		spawnMeteorMenuItem.addActionListener(miListener);
-		playSoundMenuItem.addActionListener(miListener);
-		playMusicMenuItem.addActionListener(miListener);
-		setAudioFormatMenuItem.addActionListener(miListener);
-		placeCommon1.addActionListener(miListener);
-		placeCommon2.addActionListener(miListener);
-		placeCommon3.addActionListener(miListener);
-		placeRare1.addActionListener(miListener);
-		placeRare2.addActionListener(miListener);
-		placeRare3.addActionListener(miListener);
-		placeBulldozeMenuItem.addActionListener(miListener);
-		placeGeyserMenuItem.addActionListener(miListener);
-		placeWallMenuItem.addActionListener(miListener);
-		placeTubeMenuItem.addActionListener(miListener);
-		removeAllUnitsMenuItem.addActionListener(miListener);
-		pauseMenuItem.addActionListener(miListener);
-		throttleMenuItem.addActionListener(miListener);
-		stepMenuItem.addActionListener(miListener);
-		exitMenuItem.addActionListener(miListener);
-		addPlayerMenuItem.addActionListener(miListener);
+		throttleSliderMenuItem.addChangeListener((ChangeListener) listener);
+		spriteLibMenuItem     .addActionListener(listener);
+		unitLibMenuItem       .addActionListener(listener);
+		soundPlayerMenuItem   .addActionListener(listener);
+		scrollSpeedMenuItem   .addActionListener(listener);
+		scrollBarsMenuItem    .addActionListener(listener);
+		frameRateMenuItem     .addActionListener(listener);
+		addDisplayMenuItem    .addActionListener(listener);
+		splitDisplayMenuItem  .addActionListener(listener);
+		fullScreenMenuItem    .addActionListener(listener);
+		meteorShowerMenuItem  .addActionListener(listener);
+		spawnMeteorMenuItem   .addActionListener(listener);
+		playSoundMenuItem     .addActionListener(listener);
+		playMusicMenuItem     .addActionListener(listener);
+		setAudioFormatMenuItem.addActionListener(listener);
+		placeCommon1          .addActionListener(listener);
+		placeCommon2          .addActionListener(listener);
+		placeCommon3          .addActionListener(listener);
+		placeRare1            .addActionListener(listener);
+		placeRare2            .addActionListener(listener);
+		placeRare3            .addActionListener(listener);
+		placeBulldozeMenuItem .addActionListener(listener);
+		placeGeyserMenuItem   .addActionListener(listener);
+		placeWallMenuItem     .addActionListener(listener);
+		placeTubeMenuItem     .addActionListener(listener);
+		removeAllUnitsMenuItem.addActionListener(listener);
+		pauseMenuItem         .addActionListener(listener);
+		stepMenuItem          .addActionListener(listener);
+		exitMenuItem          .addActionListener(listener);
+		addPlayerMenuItem     .addActionListener(listener);
 		
 		pauseMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PAUSE, 0));
 		stepMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
 		
+		throttleMenu.add(throttleSliderMenuItem);
 		engineMenu.add(pauseMenuItem);
-		engineMenu.add(throttleMenuItem);
+		engineMenu.add(throttleMenu);
 		engineMenu.add(stepMenuItem);
 		engineMenu.addSeparator();
 		engineMenu.add(spriteLibMenuItem);
@@ -435,6 +442,7 @@ public class Sandbox extends JApplet
 //		displayMenu.add(scrollSpeedMenuItem);
 //		displayMenu.add(fullScreenMenuItem);
 //		displayMenu.add(addDisplayMenuItem);
+//		displayMenu.add(splitDisplayMenuItem);
 		soundMenu.add(playSoundMenuItem);
 //		soundMenu.add(playMusicMenuItem);
 		soundMenu.addSeparator();
@@ -483,13 +491,8 @@ public class Sandbox extends JApplet
 		frame.setIconImages(getWindowIcons());
 		frame.pack();
 		
-		boolean maximize = false;
-		
-		if (frame.getWidth()  > windowBounds.width
-		 && frame.getHeight() > windowBounds.height)
-		{
-			maximize = true;
-		}
+		boolean maximize = frame.getWidth()  > windowBounds.width
+						&& frame.getHeight() > windowBounds.height;
 		
 		frame.setSize(
 			Math.min(frame.getWidth(),  windowBounds.width),
@@ -522,8 +525,16 @@ public class Sandbox extends JApplet
 		frame.setVisible(true);
 	}
 	
-	private static class MenuItemListener implements ActionListener
+	private static class MenuItemListener implements ActionListener, ChangeListener
 	{
+		public void stateChanged(ChangeEvent e)
+		{
+			if (e.getSource() == throttleSliderMenuItem)
+			{
+				engine.setDelay(throttleSliderMenuItem.getValue());
+			}
+		}
+		
 		public void actionPerformed(ActionEvent e)
 		{
 			if (e.getSource() == spriteLibMenuItem)
@@ -664,7 +675,7 @@ public class Sandbox extends JApplet
 									screen.setDisplayMode(prevMode);
 								
 								commandBar.remove(closeButton);
-								frame.add(panel, BorderLayout.CENTER);
+								frame.add(panel.getView(), BorderLayout.CENTER);
 								frame.add(commandBar, BorderLayout.NORTH);
 							}
 						});
@@ -704,6 +715,24 @@ public class Sandbox extends JApplet
 					}
 				});
 			}
+			else if (e.getSource() == splitDisplayMenuItem)
+			{
+				engine.pause();
+				final DisplayPanel panel2 = new DisplayPanel(panel);
+				game.addDisplay(panel2);
+				frame.remove(panel.getView());
+				JSplitPane splitPane = new JSplitPane(
+					JSplitPane.HORIZONTAL_SPLIT,
+					false,
+					panel.getView(),
+					panel2.getView()
+				);
+				splitPane.setResizeWeight(0.5);
+				frame.add(splitPane, BorderLayout.CENTER);
+				frame.validate();
+				splitPane.setDividerLocation(splitPane.getWidth() / 2);
+				engine.pause();
+			}
 			else if (e.getSource() == meteorShowerMenuItem)
 			{
 				game.getTriggers().add(new MeteorShowerTrigger(1, 300));
@@ -717,17 +746,17 @@ public class Sandbox extends JApplet
 			{
 				Mediator.soundOn(playSoundMenuItem.isSelected());
 			}
-//			else if (e.getSource() == playMusicMenuItem)
-//			{
-//				if (playMusicMenuItem.isSelected())
-//				{
-//					
-//				}
-//				else
-//				{
-//					
-//				}
-//			}
+			else if (e.getSource() == playMusicMenuItem)
+			{
+				if (playMusicMenuItem.isSelected())
+				{
+					
+				}
+				else
+				{
+					
+				}
+			}
 			else if (e.getSource() == setAudioFormatMenuItem)
 			{
 				AudioFormat format = game.getSoundBank().getFormat();
@@ -796,15 +825,6 @@ public class Sandbox extends JApplet
 					engine.isRunning()
 					? "Pause"
 					: "Resume"
-				);
-			}
-			else if (e.getSource() == throttleMenuItem)
-			{
-				engine.toggleThrottle();
-				throttleMenuItem.setText(
-					engine.isThrottled()
-					? "Unthrottle"
-					: "Throttle"
 				);
 			}
 			else if (e.getSource() == stepMenuItem)
@@ -970,7 +990,7 @@ public class Sandbox extends JApplet
 			playerSelectButtonGroup.add(playerSelectMenuItem);
 			playerSelectMenuItem.setActionCommand(String.valueOf(player.getID()));
 			playerMenu.add(playerSelectMenuItem);
-			playerSelectMenuItem.addActionListener(miListener);
+			playerSelectMenuItem.addActionListener(listener);
 			playerSelectMenuItem.setSelected(true);
 			playerMenuItems.put(player.getID(), playerSelectMenuItem);
 		}
@@ -1006,7 +1026,7 @@ public class Sandbox extends JApplet
 			
 			CommandButton button = new CommandButton(iconDir.getName(), icons);
 			button.setActionCommand(ACP_COMMAND_BUTTON + iconDir.getName());
-			button.addActionListener(miListener);
+			button.addActionListener(listener);
 			button.setFocusable(false);
 			commandBar.add(button);
 		}
@@ -1017,7 +1037,7 @@ public class Sandbox extends JApplet
 		{
 			CommandButton button = new CommandButton(commandName);
 			button.setActionCommand(ACP_COMMAND_BUTTON + commandName);
-			button.addActionListener(miListener);
+			button.addActionListener(listener);
 			button.setFocusable(false);
 			commandBar.add(button);
 		}

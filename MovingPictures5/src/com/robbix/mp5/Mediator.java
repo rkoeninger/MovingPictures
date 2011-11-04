@@ -1,6 +1,5 @@
 package com.robbix.mp5;
 
-import java.awt.Point;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -369,11 +368,10 @@ public class Mediator
 		if (unit.getType().isGuardPostType())
 		{
 			Position pos = unit.getPosition();
-			Point point = panel.getPoint(pos);
 			SpriteGroup seq = panel.getSpriteLibrary().getAmbientSpriteGroup("aDeath", "guardPostKilled");
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				seq,
-				point,
+				unit.getAbsPoint(),
 				2
 			));
 			map.remove(unit);
@@ -383,12 +381,11 @@ public class Mediator
 		else if (unit.isStructure())
 		{
 			Position pos = unit.getPosition();
-			Point point = panel.getPoint(pos);
 			SpriteGroup seq = panel.getSpriteLibrary().getUnitSpriteSet(unit.getType()).get(COLLAPSE);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				seq,
 				unit.getOwner(),
-				point,
+				unit.getAbsPoint(),
 				2
 			));
 			
@@ -432,11 +429,11 @@ public class Mediator
 			seq = panel.getSpriteLibrary().getAmbientSpriteGroup("aDeath", eventName);
 			panel.cueAnimation(new SpriteSequenceAnimation(
 				seq,
-				point,
+				unit.getAbsPoint(),
 				2
 			));
 			map.remove(unit);
-			playSound("structureCollapse3");
+			playSound("structureCollapse3", pos);
 		}
 		else
 		{

@@ -28,6 +28,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
+import com.robbix.mp5.Game;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.basics.BorderRegion;
 import com.robbix.mp5.basics.ColorScheme;
@@ -99,6 +100,12 @@ public class DisplayPanel extends JComponent
 	private AnimatedCursor cursor = null;
 	private Timer cursorTimer = null;
 	
+	public DisplayPanel(Game game)
+	{
+		this(game.getMap(), game.getSpriteLibrary(), game.getTileSet(), game.getCursorSet());
+		currentPlayer = game.getDefaultPlayer();
+	}
+	
 	public DisplayPanel(
 		LayeredMap map,
 		SpriteLibrary sprites,
@@ -138,6 +145,14 @@ public class DisplayPanel extends JComponent
 		addMouseWheelListener(adapter);
 	}
 	
+	public DisplayPanel(DisplayPanel that)
+	{
+		this(that.getMap(), that.getSpriteLibrary(), that.getTileSet(), that.getCursorSet());
+		this.setScale(that.getScale());
+		this.setViewPoint(that.getViewX(), that.getViewY());
+		this.currentPlayer = that.currentPlayer;
+	}
+	
 	public DisplayPanelView getView()
 	{
 		return view;
@@ -169,6 +184,11 @@ public class DisplayPanel extends JComponent
 	public LayeredMap getMap()
 	{
 		return map;
+	}
+	
+	public CursorSet getCursorSet()
+	{
+		return cursors;
 	}
 	
 	public void setAnimatedCursor(String name)

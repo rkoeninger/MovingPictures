@@ -313,17 +313,11 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		
 		if (fullRegion.w > fullRegion.h)
 		{
-			endX = fullRegion.x < origin.x
-					? fullRegion.getX()
-					: fullRegion.getMaxX() - 1;
-			endY = origin.y;
+			endX = fullRegion.x < origin.x ? fullRegion.getX() : fullRegion.getMaxX() - 1;
 		}
 		else
 		{
-			endX = origin.x;
-			endY = fullRegion.y < origin.y
-				? fullRegion.getY()
-				: fullRegion.getMaxY() - 1;
+			endY = fullRegion.y < origin.y ? fullRegion.getY() : fullRegion.getMaxY() - 1;
 		}
 		
 		return new LinearRegion(origin, new Position(endX, endY));
@@ -339,12 +333,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		Position origin = panel.getPosition(pressedPoint);
 		Region fullRegion = panel.getRegion(dragArea);
 		
-		int farX = origin.x == fullRegion.x
-			? fullRegion.getMaxX() - 1
-			: fullRegion.getX();
-		int farY = origin.y == fullRegion.y
-			? fullRegion.getMaxY() - 1
-			: fullRegion.getY();
+		int farX = origin.x == fullRegion.x ? fullRegion.getMaxX() - 1 : fullRegion.getX();
+		int farY = origin.y == fullRegion.y ? fullRegion.getMaxY() - 1 : fullRegion.getY();
 		
 		return new LShapedRegion(origin, new Position(farX, farY), verticalFirst);
 	}
@@ -414,9 +404,12 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public final void mouseDragged(MouseEvent e)
 	{
+		if (pressedPoint == null)
+			mousePressed(e);
+		
 		if (pressedPoint.distanceSq(e.getPoint()) < DRAG_THRESHOLD)
 			return;
-			
+		
 		if (isCursorOnGrid() && pressedPoint != null)
 		{
 			prepNormalDragArea(e.getX(), e.getY());
