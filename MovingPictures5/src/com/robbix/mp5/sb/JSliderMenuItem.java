@@ -10,6 +10,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JSlider;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class JSliderMenuItem extends JFrame
 {
@@ -24,8 +27,10 @@ public class JSliderMenuItem extends JFrame
 	{
 		super("slider menu item");
 		JMenuBar menuBar = new JMenuBar();
-		JMenu menu = new JMenu("unem");
-		menu.add(new SliderMenuItem());
+		JMenu menu = new JMenu("Engine");
+		JMenu throttleMenu = new JMenu("Throttle");
+		menu.add(throttleMenu);
+		throttleMenu.add(new SliderMenuItem());
 		menuBar.add(menu);
 		setJMenuBar(menuBar);
 		setSize(300, 300);
@@ -40,6 +45,14 @@ public class JSliderMenuItem extends JFrame
 		public SliderMenuItem()
 		{
 			super(0, 100, 50);
+			addChangeListener(new ChangeListener()
+			{
+				public void stateChanged(ChangeEvent e)
+				{
+					System.out.println(getValue());
+				}
+			});
+			setOrientation(SwingConstants.VERTICAL);
 		}
 		
 		public void processMouseEvent(MouseEvent e, MenuElement path[],

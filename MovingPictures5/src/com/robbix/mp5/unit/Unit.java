@@ -548,15 +548,6 @@ public class Unit
 		);
 	}
 	
-	public Point2D getAbsCenterPoint()
-	{
-		int spotSize = getMap().getSpotSize();
-		return new Point2D.Double(
-			getX() + 0.5 + (getXOffset() / (double) spotSize),
-			getY() + 0.5 + (getYOffset() / (double) spotSize)
-		);
-	}
-	
 	/**
 	 * Gets the x-coordinate of this Unit's current Position.
 	 * 
@@ -598,7 +589,7 @@ public class Unit
 	 */
 	public int getWidth()
 	{
-		return getType().getFootprint().getInnerRegion().w;
+		return getFootprint().getInnerRegion().w;
 	}
 	
 	/**
@@ -606,12 +597,12 @@ public class Unit
 	 */
 	public int getHeight()
 	{
-		return getType().getFootprint().getInnerRegion().h;
+		return getFootprint().getInnerRegion().h;
 	}
 	
 	public Region getOccupiedBounds()
 	{
-		return type.getFootprint().getInnerRegion().move(pos);
+		return getFootprint().getInnerRegion().move(getPosition());
 	}
 	
 	public boolean isIdle()

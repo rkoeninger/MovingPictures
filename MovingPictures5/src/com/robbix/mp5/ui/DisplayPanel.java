@@ -1046,7 +1046,8 @@ public class DisplayPanel extends JComponent
 		
 		if (sprite == SpriteSet.BLANK_SPRITE)
 		{
-			draw(g, colors, unit.getOccupiedBounds());
+			if (!unit.isTurret())
+				draw(g, colors, unit.getOccupiedBounds());
 		}
 		else
 		{
@@ -1208,10 +1209,10 @@ public class DisplayPanel extends JComponent
 	public void draw(Graphics g, Point2D a, Point2D b)
 	{
 		g.drawLine(
-			(int) a.getX() * tileSize + scroll.x,
-			(int) a.getY() * tileSize + scroll.y,
-			(int) b.getX() * tileSize + scroll.x,
-			(int) b.getY() * tileSize + scroll.y
+			(int) (a.getX() * tileSize + scroll.x),
+			(int) (a.getY() * tileSize + scroll.y),
+			(int) (b.getX() * tileSize + scroll.x),
+			(int) (b.getY() * tileSize + scroll.y)
 		);
 	}
 	
