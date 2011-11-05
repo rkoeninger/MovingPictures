@@ -1,18 +1,17 @@
 package com.robbix.mp5.ai.task;
 
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.basics.Direction;
-import com.robbix.mp5.ui.ani.WeaponFireAnimation;
+import com.robbix.mp5.ui.ani.WeaponAnimation;
 import com.robbix.mp5.unit.Unit;
 
 public class AttackTask extends Task
 {
 	private Unit target;
-	private WeaponFireAnimation animation;
+	private WeaponAnimation animation;
 	
 	private boolean directionSet = false;
 	
-	public AttackTask(Unit target, WeaponFireAnimation animation)
+	public AttackTask(Unit target, WeaponAnimation animation)
 	{
 		super(true, Task.TURRET_ONLY);
 		this.target = target;
@@ -30,7 +29,6 @@ public class AttackTask extends Task
 		
 		if (animation.atHotPoint())
 		{
-			Mediator.doDamage(unit, target, unit.getType().getDamage());
 			unit.completeTask(this);
 		}
 	}

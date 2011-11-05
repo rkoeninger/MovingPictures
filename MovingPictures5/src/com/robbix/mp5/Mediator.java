@@ -19,14 +19,14 @@ import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.SoundBank;
 import com.robbix.mp5.ui.SpriteGroup;
-import com.robbix.mp5.ui.ani.AcidCloudFireAnimation;
-import com.robbix.mp5.ui.ani.LaserFireAnimation;
+import com.robbix.mp5.ui.ani.AcidCloudAnimation;
+import com.robbix.mp5.ui.ani.LaserAnimation;
 import com.robbix.mp5.ui.ani.MeteorAnimation;
-import com.robbix.mp5.ui.ani.MicrowaveFireAnimation;
-import com.robbix.mp5.ui.ani.RPGFireAnimation;
-import com.robbix.mp5.ui.ani.RailGunFireAnimation;
-import com.robbix.mp5.ui.ani.SpriteSequenceAnimation;
-import com.robbix.mp5.ui.ani.WeaponFireAnimation;
+import com.robbix.mp5.ui.ani.MicrowaveAnimation;
+import com.robbix.mp5.ui.ani.RPGAnimation;
+import com.robbix.mp5.ui.ani.RailGunAnimation;
+import com.robbix.mp5.ui.ani.SpriteGroupAnimation;
+import com.robbix.mp5.ui.ani.WeaponAnimation;
 import static com.robbix.mp5.unit.Activity.*;
 
 import com.robbix.mp5.unit.HealthBracket;
@@ -93,27 +93,27 @@ public class Mediator
 		
 		attacker.discharge();
 		
-		WeaponFireAnimation fireAnimation = null;
+		WeaponAnimation fireAnimation = null;
 		
 		if (attacker.getType().getName().contains("Laser"))
 		{
-			fireAnimation = new LaserFireAnimation(game.getSpriteLibrary(), attacker, target);
+			fireAnimation = new LaserAnimation(game.getSpriteLibrary(), attacker, target);
 		}
 		else if (attacker.getType().getName().contains("Microwave"))
 		{
-			fireAnimation = new MicrowaveFireAnimation(game.getSpriteLibrary(), attacker, target);
+			fireAnimation = new MicrowaveAnimation(game.getSpriteLibrary(), attacker, target);
 		}
 		else if (attacker.getType().getName().contains("RailGun"))
 		{
-			fireAnimation = new RailGunFireAnimation(game.getSpriteLibrary(), attacker, target);
+			fireAnimation = new RailGunAnimation(game.getSpriteLibrary(), attacker, target);
 		}
 		else if (attacker.getType().getName().contains("RPG"))
 		{
-			fireAnimation = new RPGFireAnimation(game.getSpriteLibrary(), attacker, target);
+			fireAnimation = new RPGAnimation(game.getSpriteLibrary(), attacker, target);
 		}
 		else if (attacker.getType().getName().contains("AcidCloud"))
 		{
-			fireAnimation = new AcidCloudFireAnimation(game.getSpriteLibrary(), attacker, target);
+			fireAnimation = new AcidCloudAnimation(game.getSpriteLibrary(), attacker, target);
 		}
 		
 		attacker.assignNow(new AttackTask(target, fireAnimation));
@@ -369,7 +369,7 @@ public class Mediator
 		{
 			Position pos = unit.getPosition();
 			SpriteGroup seq = panel.getSpriteLibrary().getAmbientSpriteGroup("aDeath", "guardPostKilled");
-			panel.cueAnimation(new SpriteSequenceAnimation(
+			panel.cueAnimation(new SpriteGroupAnimation(
 				seq,
 				unit.getAbsPoint(),
 				2
@@ -382,7 +382,7 @@ public class Mediator
 		{
 			Position pos = unit.getPosition();
 			SpriteGroup seq = panel.getSpriteLibrary().getUnitSpriteSet(unit.getType()).get(COLLAPSE);
-			panel.cueAnimation(new SpriteSequenceAnimation(
+			panel.cueAnimation(new SpriteGroupAnimation(
 				seq,
 				unit.getOwner(),
 				unit.getAbsPoint(),
@@ -427,7 +427,7 @@ public class Mediator
 			}
 			
 			seq = panel.getSpriteLibrary().getAmbientSpriteGroup("aDeath", eventName);
-			panel.cueAnimation(new SpriteSequenceAnimation(
+			panel.cueAnimation(new SpriteGroupAnimation(
 				seq,
 				unit.getAbsPoint(),
 				2
@@ -439,7 +439,7 @@ public class Mediator
 		{
 			String eventName = unit.isArachnid() ? "arachnidKilled" : "vehicleKilled";
 			map.remove(unit);
-			panel.cueAnimation(new SpriteSequenceAnimation(
+			panel.cueAnimation(new SpriteGroupAnimation(
 				panel.getSpriteLibrary().getAmbientSpriteGroup("aDeath", eventName),
 				unit.getAbsPoint(),
 				2
@@ -494,7 +494,7 @@ public class Mediator
 			}
 			
 			map.remove(unit);
-			panel.cueAnimation(new SpriteSequenceAnimation(
+			panel.cueAnimation(new SpriteGroupAnimation(
 				panel.getSpriteLibrary().getAmbientSpriteGroup(setName, eventName),
 				unit.getAbsPoint(),
 				2

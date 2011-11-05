@@ -43,6 +43,7 @@
 		   path="./smokePuff1"
 		   fileNumber="10526"
 		   frameCount="6"
+		   delay="4"
 		   x="-8"
 		   y="-8">
 		<OffsetFrame x="6" y="7"/>
@@ -56,6 +57,7 @@
 		   path="./smokePuff2"
 		   fileNumber="10532"
 		   frameCount="6"
+		   delay="4"
 		   x="-11"
 		   y="-12">
 		<OffsetFrame x="10" y="11"/>
@@ -69,6 +71,7 @@
 		   path="./smokePuff3"
 		   fileNumber="10538"
 		   frameCount="6"
+		   delay="4"
 		   x="-10"
 		   y="-11">
 		<OffsetFrame x="9" y="11"/>

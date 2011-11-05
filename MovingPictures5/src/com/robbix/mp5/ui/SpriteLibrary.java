@@ -137,12 +137,12 @@ public class SpriteLibrary implements Modular
 		listenerHelper.fireModuleLoaded(new ModuleEvent(this, set.getName()));
 	}
 	
-	public void loadModuleAsync(String name) throws IOException
+	public void loadModuleAsync(String name)
 	{
 		loadModuleAsync(new File(rootDir, name));
 	}
 	
-	public void loadModuleAsync(File xmlFile) throws IOException
+	public void loadModuleAsync(File xmlFile)
 	{
 		String moduleName = 
 			xmlFile.isDirectory()

@@ -7,6 +7,7 @@ import static com.robbix.mp5.basics.Direction.W;
 
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,6 +60,11 @@ public class Position implements RIterable<Position>
 	public Position subtract(Position pos)
 	{
 		return new Position(x - pos.x, y - pos.y);
+	}
+	
+	public Point2D getCenterPoint()
+	{
+		return new Point2D.Double(x + 0.5, y + 0.5);
 	}
 	
 	/**

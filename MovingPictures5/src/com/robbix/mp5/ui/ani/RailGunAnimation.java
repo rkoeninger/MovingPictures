@@ -15,7 +15,7 @@ import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 
-public class RailGunFireAnimation extends WeaponFireAnimation
+public class RailGunAnimation extends WeaponAnimation
 {
 	private static class SmokeRing
 	{
@@ -32,11 +32,11 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 	
 	private double distance;
 	private double angle; // in rads
-	private double speed = 4;
+	private double speed = 4 / 32.0;
 	
 	private boolean explosionTime;
 	
-	public RailGunFireAnimation(SpriteLibrary lib, Unit attacker, Unit target)
+	public RailGunAnimation(SpriteLibrary lib, Unit attacker, Unit target)
 	{
 		super(lib, attacker, target);
 		
@@ -84,8 +84,6 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 				getFireImpact().getY() + distance * Math.sin(angle) * progress
 			);
 			
-			System.out.println("smoke ring at " + ring.point);
-			
 			rings.add(ring);
 		}
 		
@@ -94,6 +92,7 @@ public class RailGunFireAnimation extends WeaponFireAnimation
 		if (atHotPoint())
 		{
 			playSoundLater("railGunHit", targetPos);
+			doDamageLater(getAttacker(), getTarget(), getAttacker().getType().getDamage());
 			explosionTime = true;
 		}
 		

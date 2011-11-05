@@ -11,6 +11,7 @@ import com.robbix.mp5.Mediator;
 import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.SpriteLibrary;
+import com.robbix.mp5.unit.Unit;
 
 public abstract class AmbientAnimation
 {
@@ -73,6 +74,17 @@ public abstract class AmbientAnimation
     		public void run()
     		{
     			Mediator.doSplashDamage(pos, amount, range);
+    		}
+    	});
+    }
+    
+    protected void doDamageLater(final Unit attacker, final Unit target, final double amount)
+    {
+    	SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+    			Mediator.doDamage(attacker, target, amount);
     		}
     	});
     }

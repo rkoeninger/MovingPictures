@@ -9,37 +9,45 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
-public class BeamFireAnimation extends WeaponFireAnimation
+public abstract class BeamAnimation extends WeaponAnimation
 {
 	private int frame = 0;
 	private final int frameLength = 20;
 	
 	private Color color;
-	private Stroke stroke;
 	private String soundBite;
+	private double damage;
 	
-	public BeamFireAnimation(SpriteLibrary lib, Unit attacker, Unit target, Color color, Stroke stroke, String soundBite)
+	public BeamAnimation(SpriteLibrary lib, Unit attacker, Unit target, Color color, String soundBite, double damage)
 	{
 		super(lib, attacker, target);
 		this.color = color;
-		this.stroke = stroke;
 		this.soundBite = soundBite;
+		this.damage = damage;
 	}
 	
 	public void paint(Graphics g)
 	{
+		Graphics2D g2d = (Graphics2D) g;
 		g.setColor(color);
-		Stroke oldStroke = ((Graphics2D) g).getStroke();
-		((Graphics2D) g).setStroke(stroke);
+		Stroke oldStroke = g2d.getStroke();
+		g2d.setStroke(getStroke(panel.getScale()));
 		panel.draw(g, getTrackedFireOrigin(), getTrackedFireImpact());
-		((Graphics2D) g).setStroke(oldStroke);
+		g2d.setStroke(oldStroke);
 	}
+	
+	public abstract Stroke getStroke(int scale);
 	
 	public void step(AtomicReference<Runnable> callback)
 	{
 		if (frame == 0)
 		{
 			playSoundLater(soundBite, getAttacker().getPosition());
+		}
+		
+		if (atHotPoint())
+		{
+			doDamageLater(getAttacker(), getTarget(), damage);
 		}
 		
 		frame++;

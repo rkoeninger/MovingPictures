@@ -2,8 +2,10 @@ package com.robbix.mp5;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -26,6 +28,7 @@ public class Engine
 	private Timer timer;
 	private int previousDelay;
 	private int frame;
+	private List<Runnable> scheduledTasks;
 	
 	public Engine(Game game)
 	{
@@ -37,6 +40,7 @@ public class Engine
 		timer = new Timer(DEFAULT_DELAY, new ThreadCycle());
 		previousDelay = -1;
 		frame = 0;
+		scheduledTasks = new ArrayList<Runnable>();
 	}
 	
 	public synchronized void play()
@@ -125,6 +129,17 @@ public class Engine
 		
 		timer.setDelay(previousDelay);
 		previousDelay = -1;
+	}
+	
+	public void doLater(Runnable doRun)
+	{
+		if (doRun == null)
+			return;
+		
+		synchronized (scheduledTasks)
+		{
+			scheduledTasks.add(doRun);
+		}
 	}
 	
 	private class ThreadCycle implements ActionListener
@@ -220,6 +235,14 @@ public class Engine
 					if (toRun != null)
 					{
 						toRun.run();
+					}
+				}
+				
+				synchronized (scheduledTasks)
+				{
+					for (Runnable doRun : scheduledTasks)
+					{
+						doRun.run();
 					}
 				}
 				

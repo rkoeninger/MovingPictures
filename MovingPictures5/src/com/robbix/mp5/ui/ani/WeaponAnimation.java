@@ -11,7 +11,7 @@ import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
-public abstract class WeaponFireAnimation extends AmbientAnimation
+public abstract class WeaponAnimation extends AmbientAnimation
 {
 	private Unit attacker;
 	private Unit target;
@@ -21,7 +21,7 @@ public abstract class WeaponFireAnimation extends AmbientAnimation
 	private Point2D impact;
 	private Rectangle2D bounds;
 	
-	public WeaponFireAnimation(SpriteLibrary lib, Unit attacker, Unit target)
+	public WeaponAnimation(SpriteLibrary lib, Unit attacker, Unit target)
 	{
 		super(lib);
 		

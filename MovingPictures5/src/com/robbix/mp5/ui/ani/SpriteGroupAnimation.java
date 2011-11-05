@@ -11,29 +11,29 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 
-public class SpriteSequenceAnimation extends AmbientAnimation
+public class SpriteGroupAnimation extends AmbientAnimation
 {
 	private SpriteGroup sprites;
 	private Point2D point;
 	private int frame = 0;
 	private Player player;
 	
-	public SpriteSequenceAnimation(SpriteGroup group, Point2D point)
+	public SpriteGroupAnimation(SpriteGroup group, Point2D point)
 	{
 		this(group, null, point, 1);
 	}
 	
-	public SpriteSequenceAnimation(SpriteGroup group, Point2D point, int delay)
+	public SpriteGroupAnimation(SpriteGroup group, Point2D point, int delay)
 	{
 		this(group, null, point, delay);
 	}
 	
-	public SpriteSequenceAnimation(SpriteGroup group, Player player, Point2D point)
+	public SpriteGroupAnimation(SpriteGroup group, Player player, Point2D point)
 	{
 		this(group, player, point, 1);
 	}
 	
-	public SpriteSequenceAnimation(SpriteGroup group, Player player, Point2D point, int delay)
+	public SpriteGroupAnimation(SpriteGroup group, Player player, Point2D point, int delay)
 	{
 		super(Mediator.game.getSpriteLibrary());
 		this.sprites = group;
