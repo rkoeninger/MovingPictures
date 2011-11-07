@@ -7,13 +7,13 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.robbix.mp5.basics.Direction;
-import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Direction;
+import com.robbix.mp5.utils.Position;
 
 public class RailGunAnimation extends WeaponAnimation
 {

@@ -8,10 +8,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.SwingUtilities;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Position;
 
 public abstract class AmbientAnimation
 {

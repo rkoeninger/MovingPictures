@@ -1,7 +1,7 @@
 package com.robbix.mp5.ai;
 
-import com.robbix.mp5.basics.CostMap;
-import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.utils.CostMap;
+import com.robbix.mp5.utils.Position;
 
 public class Zero
 {

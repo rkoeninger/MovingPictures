@@ -13,11 +13,10 @@ import java.text.DecimalFormat;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.ui.EnumSpriteGroup;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.unit.HealthBracket;
+import com.robbix.mp5.utils.Utils;
 
 public class SpritePanel extends JComponent
 {
@@ -80,15 +79,10 @@ public class SpritePanel extends JComponent
 	
 	public void show(SpriteGroup group, int fpWidth, int fpHeight)
 	{
-		if (group instanceof EnumSpriteGroup)
+		if (group.isEnumGroup() && group.getEnumType().equals(HealthBracket.class))
 		{
-			EnumSpriteGroup<?> enumGroup = (EnumSpriteGroup<?>) group;
-			
-			if (enumGroup.getEnumType().equals(HealthBracket.class))
-			{
-				show(group.getFrame(HealthBracket.GREEN.ordinal()), fpWidth, fpHeight);
-				return;
-			}
+			show(group.getFrame(HealthBracket.getDefault()), fpWidth, fpHeight);
+			return;
 		}
 		
 		this.group = group;

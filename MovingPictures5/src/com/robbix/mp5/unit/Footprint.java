@@ -7,11 +7,11 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.RIterator;
-import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
-import com.robbix.mp5.basics.ShiftingIterator;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.RIterator;
+import com.robbix.mp5.utils.Region;
+import com.robbix.mp5.utils.ShiftingIterator;
+import com.robbix.mp5.utils.Utils;
 
 /**
  * The origin of relative Positions in the Footprint is

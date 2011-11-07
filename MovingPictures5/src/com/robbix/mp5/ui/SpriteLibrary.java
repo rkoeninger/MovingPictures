@@ -11,18 +11,18 @@ import java.util.List;
 import java.util.Set;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.Modular;
-import com.robbix.mp5.ModuleEvent;
-import com.robbix.mp5.ModuleListener;
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.AutoArrayList;
-import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
+import com.robbix.mp5.utils.AutoArrayList;
+import com.robbix.mp5.utils.Direction;
+import com.robbix.mp5.utils.Modular;
+import com.robbix.mp5.utils.ModuleEvent;
+import com.robbix.mp5.utils.ModuleListener;
+import com.robbix.mp5.utils.Utils;
 
 /**
  * Async module loading is not enabled by default.
@@ -458,22 +458,21 @@ public class SpriteLibrary implements Modular
 		SpriteSet set = getUnitSpriteSet(unit.getType());
 		SpriteGroup group = set.get(unit.getSpriteArgs());
 		
-		if (group instanceof EnumSpriteGroup)
+		if (group.isEnumGroup())
 		{
-			EnumSpriteGroup<?> enumGroup = (EnumSpriteGroup<?>) group;
-			Class<?> enumClass = enumGroup.getEnumType();
+			Class<? extends Enum<?>> enumType = group.getEnumType();
 			
-			if (enumClass.equals(Direction.class))
+			if (enumType.equals(Direction.class))
 			{
-				return enumGroup.getFrame(unit.getDirection().ordinal());
+				return group.getFrame(unit.getDirection());
 			}
-			else if (enumClass.equals(HealthBracket.class))
+			else if (enumType.equals(HealthBracket.class))
 			{
-				return enumGroup.getFrame(unit.getHealthBracket().ordinal());
+				return group.getFrame(unit.getHealthBracket());
 			}
 			else
 			{
-				throw new Error("Unsupported enum type" + enumClass);
+				throw new Error("Unsupported enum type " + enumType);
 			}
 		}
 		else

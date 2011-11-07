@@ -16,19 +16,19 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.BorderRegion;
-import com.robbix.mp5.basics.ColorScheme;
-import com.robbix.mp5.basics.LShapedRegion;
-import com.robbix.mp5.basics.LinearRegion;
-import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
+import com.robbix.mp5.utils.BorderRegion;
+import com.robbix.mp5.utils.ColorScheme;
+import com.robbix.mp5.utils.LShapedRegion;
+import com.robbix.mp5.utils.LinearRegion;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.Region;
+import com.robbix.mp5.utils.Utils;
 
 public abstract class InputOverlay
 implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener

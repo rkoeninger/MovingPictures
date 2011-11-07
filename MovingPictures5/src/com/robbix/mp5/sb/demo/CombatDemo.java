@@ -3,13 +3,13 @@ package com.robbix.mp5.sb.demo;
 import java.io.IOException;
 
 import com.robbix.mp5.Game;
-import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.SteerTask;
-import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.Utils;
 
 public class CombatDemo extends Demo
 {

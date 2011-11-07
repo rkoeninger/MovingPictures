@@ -15,11 +15,11 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-import com.robbix.mp5.Modular;
-import com.robbix.mp5.ModuleEvent;
-import com.robbix.mp5.ModuleListener;
-import com.robbix.mp5.basics.SampleBuffer;
-import com.robbix.mp5.basics.SampleStream;
+import com.robbix.mp5.utils.Modular;
+import com.robbix.mp5.utils.ModuleEvent;
+import com.robbix.mp5.utils.ModuleListener;
+import com.robbix.mp5.utils.SampleBuffer;
+import com.robbix.mp5.utils.SampleStream;
 
 public class SoundBank implements Modular
 {

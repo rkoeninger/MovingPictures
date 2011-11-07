@@ -3,9 +3,9 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Graphics;
 import java.util.Set;
 
-import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Utils;
 
 public class SelectMineRouteOverlay extends InputOverlay
 {

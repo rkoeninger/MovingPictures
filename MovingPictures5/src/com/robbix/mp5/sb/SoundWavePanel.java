@@ -8,8 +8,8 @@ import java.text.DecimalFormat;
 
 import javax.swing.JComponent;
 
-import com.robbix.mp5.basics.SampleBuffer;
-import com.robbix.mp5.basics.SampleStream;
+import com.robbix.mp5.utils.SampleBuffer;
+import com.robbix.mp5.utils.SampleStream;
 
 public class SoundWavePanel extends JComponent
 {

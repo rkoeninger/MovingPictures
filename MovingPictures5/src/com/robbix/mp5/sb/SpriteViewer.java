@@ -42,17 +42,16 @@ import javax.swing.tree.TreeSelectionModel;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.ModuleEvent;
-import com.robbix.mp5.ModuleListener;
-import com.robbix.mp5.basics.RTreeNode;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
-import com.robbix.mp5.ui.EnumSpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
+import com.robbix.mp5.utils.ModuleEvent;
+import com.robbix.mp5.utils.ModuleListener;
+import com.robbix.mp5.utils.RTreeNode;
 
 public class SpriteViewer extends JFrame
 {
@@ -452,10 +451,9 @@ public class SpriteViewer extends JFrame
 			groupNode.set(group, fp != null ? fp : Footprint.VEHICLE);
 			append(setNode, groupNode);
 			
-			if (group instanceof EnumSpriteGroup)
+			if (group.isEnumGroup())
 			{
-				EnumSpriteGroup<?> enumGroup = ((EnumSpriteGroup<?>) group);
-				Object[] enumVals = enumGroup.getEnumType().getEnumConstants();
+				Object[] enumVals = group.getEnumType().getEnumConstants();
 				
 				for (int i = 0; i < group.getSpriteCount(); ++i)
 				{

@@ -10,9 +10,9 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.Neighbors;
 import com.robbix.mp5.unit.HealthBracket;
+import com.robbix.mp5.utils.Neighbors;
+import com.robbix.mp5.utils.Utils;
 
 public class TileSet
 {

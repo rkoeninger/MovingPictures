@@ -3,10 +3,10 @@ package com.robbix.mp5.ai.task;
 import java.util.List;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.basics.Filter;
-import com.robbix.mp5.basics.Position;
 import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Filter;
+import com.robbix.mp5.utils.Position;
 
 public class BulldozeRegionTask extends Task
 {

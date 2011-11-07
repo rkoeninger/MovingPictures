@@ -1,9 +1,9 @@
 package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Filter;
+import com.robbix.mp5.utils.Utils;
 
 public class TurretTask extends Task
 {

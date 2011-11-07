@@ -5,10 +5,10 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
+import com.robbix.mp5.utils.Position;
 
 public class MeteorAnimation extends AmbientAnimation
 {

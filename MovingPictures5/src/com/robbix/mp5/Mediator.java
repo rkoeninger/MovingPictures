@@ -12,9 +12,6 @@ import com.robbix.mp5.ai.task.EarthworkerConstructTask;
 import com.robbix.mp5.ai.task.PathTask;
 import com.robbix.mp5.ai.task.RotateTask;
 import com.robbix.mp5.ai.task.SteerTask;
-import com.robbix.mp5.basics.Direction;
-import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.ui.DisplayPanel;
@@ -33,6 +30,10 @@ import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
+import com.robbix.mp5.utils.Direction;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.Region;
+import com.robbix.mp5.utils.Utils;
 
 public class Mediator
 {

@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Cargo;
+import com.robbix.mp5.utils.Direction;
 
 public abstract class SpriteSet
 {

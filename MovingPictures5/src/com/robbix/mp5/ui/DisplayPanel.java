@@ -6,15 +6,12 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -26,16 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JComponent;
-import javax.swing.Timer;
 
 import com.robbix.mp5.Game;
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.BorderRegion;
-import com.robbix.mp5.basics.ColorScheme;
-import com.robbix.mp5.basics.CostMap;
-import com.robbix.mp5.basics.LShapedRegion;
-import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.map.ResourceType;
@@ -44,6 +33,14 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.ani.AmbientAnimation;
 import com.robbix.mp5.ui.overlay.InputOverlay;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.AnimatedCursor;
+import com.robbix.mp5.utils.BorderRegion;
+import com.robbix.mp5.utils.ColorScheme;
+import com.robbix.mp5.utils.CostMap;
+import com.robbix.mp5.utils.LShapedRegion;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.Region;
+import com.robbix.mp5.utils.Utils;
 
 @SuppressWarnings("serial")
 public class DisplayPanel extends JComponent
@@ -72,6 +69,8 @@ public class DisplayPanel extends JComponent
 	
 	private Player currentPlayer;
 	
+	private AnimatedCursor cursor;
+	
 	private LinkedList<InputOverlay> overlays;
 	private InputOverlay.ListenerAdapter adapter;
 	
@@ -98,9 +97,6 @@ public class DisplayPanel extends JComponent
 	private boolean showCostValuesAsFactors = false;
 	private boolean showBackground = true;
 	
-	private AnimatedCursor cursor = null;
-	private Timer cursorTimer = null;
-	
 	public DisplayPanel(Game game)
 	{
 		this(game.getMap(), game.getSpriteLibrary(), game.getTileSet(), game.getCursorSet());
@@ -114,7 +110,7 @@ public class DisplayPanel extends JComponent
 		CursorSet cursors)
 	{
 		if (map == null || sprites == null || tiles == null || cursors == null)
-			throw new IllegalArgumentException();
+			throw new NullPointerException();
 		
 		this.view = new DisplayPanelView(this);
 		this.map = map;
@@ -204,36 +200,18 @@ public class DisplayPanel extends JComponent
 	
 	public void setAnimatedCursor(String name)
 	{
-		this.cursor = name == null ? null : cursors.getCursor(name);
+		if (cursor != null)
+			cursor.hide(this);
 		
-		if (cursorTimer != null)
+		if (name != null)
 		{
-			cursorTimer.stop();
-			cursorTimer = null;
-		}
-		
-		if (cursor == null)
-		{
-			setCursor(Cursor.getDefaultCursor());
-			return;
-		}
-		
-		cursorTimer = new Timer(0, new ActionListener()
-		{
-			int cursorIndex = 0;
+			cursor = cursors.getCursor(name);
 			
-			public void actionPerformed(ActionEvent e)
-			{
-				setCursor(cursor.getCursor(cursorIndex));
-				int delayMillis = cursor.getDelay(cursorIndex);
-				cursorTimer.setDelay(delayMillis);
-				cursorIndex++;
-				
-				if (cursorIndex == cursor.getFrameCount())
-					cursorIndex = 0;
-			}
-		});
-		cursorTimer.start();
+			if (cursor == null)
+				throw new IllegalArgumentException("Cursor " + name + " does not exist");
+			
+			cursor.show(this);
+		}
 	}
 	
 	public List<String> getOptionNames()

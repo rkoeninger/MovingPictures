@@ -3,7 +3,7 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.utils.Position;
 
 public class PlaceBulldozeOverlay extends InputOverlay
 {

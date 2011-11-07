@@ -3,12 +3,12 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.ColorScheme;
-import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
+import com.robbix.mp5.utils.ColorScheme;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.Utils;
 
 public class PlaceFixtureOverlay extends InputOverlay
 {

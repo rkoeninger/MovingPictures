@@ -1,7 +1,7 @@
 package com.robbix.mp5.ai.task;
 
-import com.robbix.mp5.basics.Filter;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Filter;
 
 public abstract class Task
 {

@@ -12,11 +12,11 @@ import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ai.task.SelfDestructAttackTask;
 import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.ai.task.TurretTask;
-import com.robbix.mp5.basics.FileFormatException;
-import com.robbix.mp5.basics.Filter;
-import com.robbix.mp5.basics.XNode;
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
+import com.robbix.mp5.utils.FileFormatException;
+import com.robbix.mp5.utils.Filter;
+import com.robbix.mp5.utils.XNode;
 
 public class UnitFactory
 {
@@ -199,7 +199,7 @@ public class UnitFactory
 	
 	public void loadXml(File xmlFile) throws IOException
 	{
-		XNode rootNode = new XNode(xmlFile, false).getNode("UnitType");
+		XNode rootNode     = XNode.load(xmlFile);
 		String displayName = rootNode.getValue("DisplayName");
 		String civ         = rootNode.getAttribute("civ");
 		String unitType    = rootNode.getAttribute("unitType");

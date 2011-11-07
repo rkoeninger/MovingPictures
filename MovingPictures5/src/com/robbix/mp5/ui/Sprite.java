@@ -5,8 +5,8 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.Offset;
+import com.robbix.mp5.utils.Offset;
+import com.robbix.mp5.utils.Utils;
 
 public class Sprite
 {

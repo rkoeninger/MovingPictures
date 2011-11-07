@@ -1,6 +1,6 @@
 package com.robbix.mp5.unit;
 
-import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Map;
 
 import com.robbix.mp5.map.ResourceType;
@@ -16,12 +16,12 @@ public class Cost
 	 */
 	private Cost()
 	{
-		this.resourceMap = Collections.emptyMap();
+		this.resourceMap = new EnumMap<ResourceType, Integer>(ResourceType.class);
 	}
 	
 	public Cost(Map<ResourceType, Integer> resourceMap)
 	{
-		this.resourceMap = resourceMap;
+		this.resourceMap = new EnumMap<ResourceType, Integer>(resourceMap);
 	}
 	
 	public int getAmount(ResourceType type)

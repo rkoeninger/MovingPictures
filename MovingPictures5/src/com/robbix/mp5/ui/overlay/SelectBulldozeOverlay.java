@@ -7,9 +7,9 @@ import java.util.Collections;
 import java.util.List;
 
 import com.robbix.mp5.ai.task.BulldozeRegionTask;
-import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.Region;
 
 public class SelectBulldozeOverlay extends InputOverlay
 {

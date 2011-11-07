@@ -1,7 +1,8 @@
 package com.robbix.mp5;
 
-import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.Region;
+import com.robbix.mp5.utils.Utils;
 
 public class MeteorShowerTrigger extends Trigger
 {

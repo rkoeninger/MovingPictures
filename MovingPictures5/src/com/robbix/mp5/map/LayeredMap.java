@@ -14,19 +14,19 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.CostMap;
-import com.robbix.mp5.basics.Direction;
-import com.robbix.mp5.basics.Filter;
-import com.robbix.mp5.basics.Grid;
-import com.robbix.mp5.basics.RIterator;
-import com.robbix.mp5.basics.Neighbors;
-import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.CostMap;
+import com.robbix.mp5.utils.Direction;
+import com.robbix.mp5.utils.Filter;
+import com.robbix.mp5.utils.Grid;
+import com.robbix.mp5.utils.Neighbors;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.RIterator;
+import com.robbix.mp5.utils.Region;
+import com.robbix.mp5.utils.Utils;
 
 public class LayeredMap
 {
@@ -530,7 +530,7 @@ public class LayeredMap
 			String[] tileCodeParts = spot.tileCode.split("/");
 			String neihborsString = tileCodeParts[tileCodeParts.length - 1];
 			Neighbors neighbors = Neighbors.valueOf(neihborsString);
-			HealthBracket health = HealthBracket.getDefault(hpFactor);
+			HealthBracket health = HealthBracket.getBracket(hpFactor);
 			spot.tileCode = tileSet.getWallTile(neighbors, health);
 		}
 		

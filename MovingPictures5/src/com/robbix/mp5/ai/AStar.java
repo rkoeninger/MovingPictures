@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.robbix.mp5.basics.CostMap;
-import com.robbix.mp5.basics.Direction;
-import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.utils.CostMap;
+import com.robbix.mp5.utils.Direction;
+import com.robbix.mp5.utils.Position;
 
 public class AStar// implements Pathfinder
 {

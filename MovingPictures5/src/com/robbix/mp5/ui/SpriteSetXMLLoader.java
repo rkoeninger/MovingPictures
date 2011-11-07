@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.AutoArrayList;
-import com.robbix.mp5.basics.Direction;
-import com.robbix.mp5.basics.FileFormatException;
-import com.robbix.mp5.basics.Offset;
-import com.robbix.mp5.basics.XNode;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.HealthBracket;
+import com.robbix.mp5.utils.AutoArrayList;
+import com.robbix.mp5.utils.Direction;
+import com.robbix.mp5.utils.FileFormatException;
+import com.robbix.mp5.utils.Offset;
+import com.robbix.mp5.utils.Utils;
+import com.robbix.mp5.utils.XNode;
 
 import static com.robbix.mp5.unit.Activity.*;
 
@@ -51,7 +51,7 @@ class SpriteSetXMLLoader
 	
 	public SpriteSet load() throws IOException
 	{
-		XNode rootNode = new XNode(xmlFile, false).getNode("SpriteSet");
+		XNode rootNode = XNode.load(xmlFile);
 		
 		offsetFrameMap = getOffsetFrameMap(rootNode);
 		String type = rootNode.getAttribute("type");
@@ -83,8 +83,7 @@ class SpriteSetXMLLoader
 		
 		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
-			String activityName = activityNode.getAttribute("name");
-			Activity activity = getActivity(activityName);
+			Activity activity = activityNode.getEnumAttribute(Activity.class, "name");
 			String path = activityNode.getAttribute("path", ".");
 			
 			File activityDir = new File(dir, path);
@@ -99,7 +98,7 @@ class SpriteSetXMLLoader
 				int majorTurnFrameCount = activityNode.getIntAttribute("majorTurnFrameCount");
 				int minorTurnFrameCount = activityNode.getIntAttribute("minorTurnFrameCount");
 				
-				Cargo.Type cargo = getCargoType(activityNode.getAttribute("cargo", null));
+				Cargo.Type cargo = activityNode.getEnumAttribute(Cargo.Type.class, "cargo", null);
 				
 				if (unitType.contains("Truck") && cargo == null)
 					throw new FileFormatException(xmlFile, "Cargo type not marked for Truck");
@@ -134,7 +133,7 @@ class SpriteSetXMLLoader
 			else if (activity == DUMP)
 			{
 				int perTurnFrameCount = activityNode.getIntAttribute("perTurnFrameCount");
-				Cargo.Type cargo = getCargoType(activityNode.getAttribute("cargo"));
+				Cargo.Type cargo = activityNode.getEnumAttribute(Cargo.Type.class, "cargo");
 
 				if (unitType.contains("Truck") && cargo == null)
 					throw new FileFormatException(xmlFile,
@@ -167,7 +166,7 @@ class SpriteSetXMLLoader
 				
 				try
 				{
-					cargo = getCargoType(activityNode.getAttribute("cargo"));
+					cargo = activityNode.getEnumAttribute(Cargo.Type.class, "cargo");
 				}
 				catch (FileFormatException iae)
 				{
@@ -276,8 +275,7 @@ class SpriteSetXMLLoader
 		
 		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
-			String activityName = activityNode.getAttribute("name");
-			Activity activity = getActivity(activityName);
+			Activity activity = activityNode.getEnumAttribute(Activity.class, "name");
 			String path = activityNode.getAttribute("path", ".");
 			
 			File activityDir = new File(dir, path);
@@ -292,16 +290,16 @@ class SpriteSetXMLLoader
 				
 				for (XNode healthNode : activityNode.getNodes("HealthState"))
 				{
-					String health = healthNode.getAttribute("health");
+					HealthBracket hb = healthNode.getEnumAttribute(HealthBracket.class, "health");
 					int fileNumber = healthNode.getIntAttribute("fileNumber");
 					Offset healthOffset = healthNode.getOffsetAttributes();
 					healthOffset = healthOffset.add(activityOffset);
 					Image img = loadFrame(activityDir, fileNumber);
 					Sprite sprite = new Sprite(img, playerColorHue, healthOffset);
-					tempList.set(getHealth(health).ordinal(), sprite);
+					tempList.set(hb.ordinal(), sprite);
 				}
 				
-				SpriteGroup group = new EnumSpriteGroup<HealthBracket>(HealthBracket.class, tempList);
+				SpriteGroup group = new SpriteGroup(tempList, HealthBracket.class);
 				spriteSet.set(group, activity);
 			}
 			else if (activity == BUILD)
@@ -374,9 +372,8 @@ class SpriteSetXMLLoader
 		
 		if (activityNode == null)
 			throw new FileFormatException(xmlFile, "No activity Node");
-		
-		String activityName = activityNode.getAttribute("name");
-		Activity activity = getActivity(activityName);
+
+		Activity activity = activityNode.getEnumAttribute(Activity.class, "name");
 		
 		if (activity != TURRET)
 			throw new IOException("Only \"turret\" activity valid for turrets");
@@ -410,7 +407,7 @@ class SpriteSetXMLLoader
 			tempList.set(direction.ordinal(), sprite);
 		}
 		
-		SpriteGroup group = new EnumSpriteGroup<Direction>(Direction.class, tempList);
+		SpriteGroup group = new SpriteGroup(tempList, Direction.class);
 		spriteSet.set(group, activity);
 		return spriteSet;
 	}
@@ -428,8 +425,7 @@ class SpriteSetXMLLoader
 		
 		for (XNode activityNode : rootNode.getNodes("Activity"))
 		{
-			String activityName = activityNode.getAttribute("name");
-			Activity activity = getActivity(activityName);
+			Activity activity = activityNode.getEnumAttribute(Activity.class, "name");
 			String path = activityNode.getAttribute("path", ".");
 			File activityDir = new File(dir, path);
 			Offset activityOffset = activityNode.getOffsetAttributes();
@@ -464,7 +460,7 @@ class SpriteSetXMLLoader
 					tempList.set(direction.ordinal(), sprite);
 				}
 				
-				SpriteGroup group = new EnumSpriteGroup<Direction>(Direction.class, tempList);
+				SpriteGroup group = new SpriteGroup(tempList, Direction.class);
 				spriteSet.set(group, activity);
 			}
 			else if (activity == BUILD)
@@ -548,22 +544,18 @@ class SpriteSetXMLLoader
 		Image img = ImageIO.read(new File(dir,
 			"frm-" + (fileNumber++) + ".bmp"
 		));
-		
 		img = Utils.replaceColors(
 			Utils.getAlphaImage((BufferedImage) img),
 			Utils.ORANGE_AND_DARK_ORANGE,
 			Utils.CLEAR
 		);
-		
 		return img;
 	}
 	
 	public static Image loadFrame(File dir, int fileNumber, double trans) throws IOException
 	{
 		BufferedImage img = (BufferedImage)loadFrame(dir, fileNumber);
-		
 		img = Utils.getTranslucency(img, (float)trans);
-		
 		return img;
 	}
 	
@@ -603,10 +595,10 @@ class SpriteSetXMLLoader
 		
 	}
 	
-	private static Map<String, List<XNode>> getOffsetFrameMap(XNode rootNode) throws FileFormatException
+	private static Map<String, List<XNode>> getOffsetFrameMap(XNode rootNode)
+	throws FileFormatException
 	{
-		Map<String, List<XNode>> offsetFrameMap =
-			new HashMap<String, List<XNode>>();
+		Map<String, List<XNode>> offsetFrameMap = new HashMap<String, List<XNode>>();
 		
 		for (XNode offsetFrameGroup : rootNode.getNodes("OffsetFrames"))
 		{
@@ -627,33 +619,10 @@ class SpriteSetXMLLoader
 		return offsetFrameMap;
 	}
 	
-	private static Activity getActivity(String name)
-	{
-		if (name == null) return null;
-		name = name.replace(' ', '_');
-		name = name.toUpperCase();
-		return Activity.valueOf(name);
-	}
-	
-	private static HealthBracket getHealth(String name)
-	{
-		if (name == null) return null;
-		name = name.replace(' ', '_');
-		name = name.toUpperCase();
-		return HealthBracket.valueOf(name);
-	}
-	
-	private static Cargo.Type getCargoType(String name)
-	{
-		if (name == null) return null;
-		name = name.replace(' ', '_');
-		name = name.toUpperCase();
-		return Cargo.Type.valueOf(name);
-	}
-	
 	private static void setListSize(List<?> list, int size)
 	{
 		list.clear();
+		
 		for (int i = 0; i < size; ++i)
 			list.add(null);
 	}

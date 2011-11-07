@@ -34,9 +34,9 @@ import javax.swing.filechooser.FileFilter;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.ModuleEvent;
-import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.ui.SoundBank;
+import com.robbix.mp5.utils.ModuleEvent;
+import com.robbix.mp5.utils.ModuleListener;
 
 public class SoundPlayer extends JFrame
 {

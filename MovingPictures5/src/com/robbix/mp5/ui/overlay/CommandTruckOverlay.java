@@ -6,17 +6,17 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.DockTask;
 import com.robbix.mp5.ai.task.DumpTask;
 import com.robbix.mp5.ai.task.MineTask;
-import com.robbix.mp5.basics.JListDialog;
-import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.JListDialog;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.Utils;
 
 public class CommandTruckOverlay extends InputOverlay
 {

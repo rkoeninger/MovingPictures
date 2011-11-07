@@ -60,13 +60,10 @@ import com.robbix.mp5.Game;
 import com.robbix.mp5.GameListener;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.MeteorShowerTrigger;
-import com.robbix.mp5.Utils;
-import com.robbix.mp5.basics.JListDialog;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.sb.demo.Demo;
-import com.robbix.mp5.ui.CommandButton;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.PlayerStatus;
 import com.robbix.mp5.ui.TitleBar;
@@ -78,6 +75,10 @@ import com.robbix.mp5.ui.overlay.PlaceUnitOverlay;
 import com.robbix.mp5.ui.overlay.SelectUnitOverlay;
 import com.robbix.mp5.ui.overlay.SpawnMeteorOverlay;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.AnimatedButton;
+import com.robbix.mp5.utils.JListDialog;
+import com.robbix.mp5.utils.JSliderMenuItem;
+import com.robbix.mp5.utils.Utils;
 
 /**
  * Sandbox test suite, main window.
@@ -264,13 +265,15 @@ public class Sandbox extends JApplet
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
 		
-		throttleSliderMenuItem = new JSliderMenuItem(0, 200, 10);
+		throttleSliderMenuItem = new JSliderMenuItem(0, 200, 45);
 		Hashtable<Integer, JLabel> paintLabels = new Hashtable<Integer, JLabel>();
 		paintLabels.put(0, new JLabel("Unthrottled"));
 		paintLabels.put(throttleSliderMenuItem.getMaximum(), new JLabel("Crawl"));
 		throttleSliderMenuItem.setLabelTable(paintLabels);
 		throttleSliderMenuItem.setPaintLabels(true);
+		throttleSliderMenuItem.setPreferredSize(new Dimension(10, 100));
 		volumeSliderMenuItem = new JSliderMenuItem(0, 100, 50);
+		volumeSliderMenuItem.setPreferredSize(new Dimension(10, 100));
 		pauseMenuItem          = new JMenuItem("Pause");
 		stepMenuItem           = new JMenuItem("Step Once");
 		spriteLibMenuItem      = new JMenuItem("Sprite Library");
@@ -303,7 +306,6 @@ public class Sandbox extends JApplet
 		
 		final JMenuBar menuBar        = new JMenuBar();
 		final JMenu engineMenu        = new JMenu("Engine");
-		final JMenu throttleMenu      = new JMenu("Throttle");
 		final JMenu displayMenu       = new JMenu("Display");
 		final JMenu terrainMenu       = new JMenu("Terrain");
 		final JMenu unitMenu          = new JMenu("Units");
@@ -431,9 +433,8 @@ public class Sandbox extends JApplet
 		pauseMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PAUSE, 0));
 		stepMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
 		
-		throttleMenu.add(throttleSliderMenuItem);
 		engineMenu.add(pauseMenuItem);
-		engineMenu.add(throttleMenu);
+		engineMenu.add(throttleSliderMenuItem);
 		engineMenu.add(stepMenuItem);
 		engineMenu.addSeparator();
 		engineMenu.add(spriteLibMenuItem);
@@ -537,7 +538,12 @@ public class Sandbox extends JApplet
 		{
 			if (e.getSource() == throttleSliderMenuItem)
 			{
-				engine.setDelay(throttleSliderMenuItem.getValue());
+				float val = throttleSliderMenuItem.getValue();
+				float max = throttleSliderMenuItem.getMaximum();
+				val /= max;
+				val *= val;
+				val *= max;
+				engine.setDelay((int) val);
 			}
 			else if (e.getSource() == volumeSliderMenuItem)
 			{
@@ -1036,7 +1042,7 @@ public class Sandbox extends JApplet
 			if (icons.isEmpty())
 				continue;
 			
-			CommandButton button = new CommandButton(iconDir.getName(), icons);
+			AnimatedButton button = new AnimatedButton(iconDir.getName(), icons);
 			button.setActionCommand(ACP_COMMAND_BUTTON + iconDir.getName());
 			button.addActionListener(listener);
 			button.setFocusable(false);
@@ -1047,7 +1053,7 @@ public class Sandbox extends JApplet
 		
 		for (String commandName : extraCommands)
 		{
-			CommandButton button = new CommandButton(commandName);
+			AnimatedButton button = new AnimatedButton(commandName);
 			button.setActionCommand(ACP_COMMAND_BUTTON + commandName);
 			button.addActionListener(listener);
 			button.setFocusable(false);

@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.basics.JListDialog;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.JListDialog;
 
 public class CommandGroupOverlay extends InputOverlay
 {

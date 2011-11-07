@@ -4,7 +4,7 @@ import java.awt.Image;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.robbix.mp5.Utils;
+import com.robbix.mp5.utils.Utils;
 
 public class Tile
 {

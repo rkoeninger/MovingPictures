@@ -1,11 +1,11 @@
 package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Position;
 
 public class MineRouteTask extends Task
 {

@@ -1,8 +1,8 @@
 package com.robbix.mp5.ai.task;
 
-import com.robbix.mp5.basics.Filter;
 import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Filter;
 
 public class BulldozeTask extends Task
 {

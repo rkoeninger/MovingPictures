@@ -7,13 +7,13 @@ import java.util.Collections;
 import java.util.List;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.basics.BorderRegion;
-import com.robbix.mp5.basics.LShapedRegion;
-import com.robbix.mp5.basics.LinearRegion;
-import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.RIterable;
 import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.BorderRegion;
+import com.robbix.mp5.utils.LShapedRegion;
+import com.robbix.mp5.utils.LinearRegion;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.RIterable;
 
 public class BuildTubeOverlay extends InputOverlay
 {

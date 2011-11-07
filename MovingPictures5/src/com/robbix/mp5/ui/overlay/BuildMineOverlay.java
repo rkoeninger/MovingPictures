@@ -4,13 +4,13 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.BuildMineTask;
-import com.robbix.mp5.basics.Position;
-import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.Region;
+import com.robbix.mp5.utils.Utils;
 
 public class BuildMineOverlay extends InputOverlay
 {

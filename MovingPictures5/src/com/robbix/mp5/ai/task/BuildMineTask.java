@@ -1,12 +1,12 @@
 package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.Mediator;
-import com.robbix.mp5.basics.Filter;
-import com.robbix.mp5.basics.Position;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Filter;
+import com.robbix.mp5.utils.Position;
 
 public class BuildMineTask extends Task
 {
