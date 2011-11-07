@@ -6,16 +6,12 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Stroke;
 
-import com.robbix.mp5.Utils;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 
 public class MicrowaveAnimation extends BeamAnimation
 {
-	private static Color color = Utils.getTranslucency(Color.WHITE, 193);
-	private int phase;
-	
-	public Stroke getStroke(int scale)
+	public Stroke getStroke(int frame, int scale)
 	{
 		return new BasicStroke(
 			scale > 0 ? 2 << scale : 2 >> -scale,
@@ -23,12 +19,17 @@ public class MicrowaveAnimation extends BeamAnimation
 			BasicStroke.JOIN_ROUND,
 			max(1.0f, scale > 0 ? 10 << scale : 10 >> -scale),
 			new float[]{max(1, scale > 0 ? 4 << scale : 4 >> -scale)},
-			phase += 4
+			frame / 4
 		);
+	}
+	
+	public Color getColor(int frame)
+	{
+		return new Color(224, 224, 224);
 	}
 	
 	public MicrowaveAnimation(SpriteLibrary lib, Unit attacker, Unit target)
 	{
-		super(lib, attacker, target, color, "microwave", attacker.getType().getDamage());
+		super(lib, attacker, target, "microwave", attacker.getType().getDamage());
 	}
 }

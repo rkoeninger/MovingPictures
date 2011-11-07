@@ -80,7 +80,7 @@ public class AcidCloudAnimation extends WeaponAnimation
 			playSoundLater("rocketLaunch", getAttacker().getPosition());
 		}
 		
-		if ((frame + 1) % 2 == 0 && frame < rocketFrameCount)
+		if ((frame + 1) % 2 == 0 && frame > 4 && frame < rocketFrameCount)
 		{
 			SmokePuff puff = new SmokePuff();
 			puff.startingFrame = frame;

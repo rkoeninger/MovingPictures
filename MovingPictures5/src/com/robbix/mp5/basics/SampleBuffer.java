@@ -294,6 +294,23 @@ public class SampleBuffer implements Cloneable
 		Arrays.fill(channelList.get(channel), 0.0f);
 	}
 	
+	public void scale(float factor)
+	{
+		for (int ch = 0; ch < channelList.size(); ch++)
+			scale(factor, ch);
+	}
+	
+	public void scale(float factor, int channel)
+	{
+		if (factor == 1.0)
+			return;
+		
+		float[] samples = channelList.get(channel);
+		
+		for (int i = 0; i < sampleCount; i++)
+			samples[i] *= factor;
+	}
+	
 	/**
 	 * Returns the index of the new channel.
 	 */

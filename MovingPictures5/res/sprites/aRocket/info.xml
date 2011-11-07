@@ -85,8 +85,8 @@
 		   path="./explosion"
 		   fileNumber="2329"
 		   frameCount="12"
-		   x="-32"
-		   y="-32">
+		   x="-22"
+		   y="-22">
 		<OffsetFrame x="14" y="15"/>
 		<OffsetFrame x="11" y="10"/>
 		<OffsetFrame x="9"  y="9"/>

@@ -42,7 +42,7 @@ public class PlaceFixtureOverlay extends InputOverlay
 			if (!panel.getMap().canPlaceFixture(fixture, pos))
 			{
 				g.setColor(Color.WHITE);
-				panel.draw(g, "Nope", pos);
+				panel.draw(g, "Obstructed", pos);
 			}
 		}
 	}

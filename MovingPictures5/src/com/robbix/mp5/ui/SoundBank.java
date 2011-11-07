@@ -97,6 +97,8 @@ public class SoundBank implements Modular
 	private File rootDir;
 	private ModuleListener.Helper listenerHelper;
 	private DoPlay doPlay;
+	private int maxStreamCount = 10;
+	private float volume = 1.0f;
 	
 	private SoundBank()
 	{
@@ -185,12 +187,30 @@ public class SoundBank implements Modular
 		return buffer.copy();
 	}
 	
+	public void setVolume(float volume)
+	{
+		if (volume < 0)
+			throw new IllegalArgumentException("Illegal volume: " + volume);
+		
+		this.volume = volume;
+	}
+	
+	public float getVolume()
+	{
+		return volume;
+	}
+	
 	public void play(String name)
 	{
 		play(name, null);
 	}
-	
+
 	public void play(String name, SampleStream.Callback callback)
+	{
+		play(name, 1, 0, callback);
+	}
+	
+	public void play(String name, float volume, float spread, SampleStream.Callback callback)
 	{
 		if (name == null)
 			return;
@@ -213,7 +233,8 @@ public class SoundBank implements Modular
 		
 		synchronized (playList)
 		{
-			playList.add(new SampleStream(buffer, callback));
+			if (playList.size() < maxStreamCount)
+				playList.add(new SampleStream(buffer, volume, spread, callback));
 		}
 	}
 	
@@ -362,6 +383,11 @@ public class SoundBank implements Modular
 				
 				if (numSamples == 0)
 					continue;
+				
+				if (volume == 0)
+					continue;
+				
+				buffer.scale(volume);
 				
 				synchronized (lineLock)
 				{

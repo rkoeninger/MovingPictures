@@ -15,7 +15,13 @@ public abstract class SpriteSet
 	public static final Sprite BLANK_SPRITE = new Sprite(
 		new BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB), 0, 0);
 	
-	public static final SpriteGroup BLANK_GROUP = new SpriteGroup(BLANK_SPRITE, true);
+	public static final SpriteGroup BLANK_GROUP = new SpriteGroup(BLANK_SPRITE, true)
+	{
+		public Sprite getSprite(int index)
+		{
+			return getSprite(0);
+		}
+	};
 	
 	public static final SpriteSet BLANK = new SpriteSet("Blank")
 	{

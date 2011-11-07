@@ -1,11 +1,13 @@
 package com.robbix.mp5.ui.overlay;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.Utils;
 import com.robbix.mp5.ai.task.BuildMineTask;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
@@ -38,18 +40,20 @@ public class BuildMineOverlay extends InputOverlay
 			}
 			
 			Position center = mine.getFootprint().getCenter();
+			Position pos = getCursorPosition().subtract(center);
+			String toolTip = drawUnitFootprint(g, mine.getType(), pos);
 			
 			if (mineSprite != null)
-				panel.draw(g, mineSprite, getCursorPosition().subtract(center));
-		}
-	}
-	
-	public void paintOverTerrain(Graphics g)
-	{
-		if (isCursorOnGrid())
-		{
-			Position center = mine.getFootprint().getCenter();
-			drawUnitFootprint(g, mine.getType(), getCursorPosition().subtract(center));
+				panel.draw(g, mineSprite, pos);
+			
+			if (toolTip != null)
+			{
+				g.setColor(Color.WHITE);
+				Region inner = mine.getFootprint().getInnerRegion();
+				
+				if (inner.w == 1 && inner.h == 1) panel.draw(g, toolTip, pos);
+				                             else panel.draw(g, toolTip, inner.move(pos));
+			}
 		}
 	}
 	

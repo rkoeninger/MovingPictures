@@ -57,6 +57,7 @@ public class DisplayPanel extends JComponent
 	private int tileSize = 32;
 	private int scale = 0;
 	private int minScale, maxScale, normalScale;
+	private int minShowUnitScale = -2;
 	
 	private BufferedImage cachedBackground = null;
 	private Object cacheLock = new Object();
@@ -156,6 +157,16 @@ public class DisplayPanel extends JComponent
 	public DisplayPanelView getView()
 	{
 		return view;
+	}
+	
+	public void setMinimumShowUnitScale(int minShowUnitScale)
+	{
+		this.minShowUnitScale = minShowUnitScale;
+	}
+	
+	public int getMinimumShowUnitScale()
+	{
+		return minShowUnitScale;
 	}
 	
 	public void setLetterBoxColor(Color color)
@@ -851,6 +862,7 @@ public class DisplayPanel extends JComponent
 		drawLetterBox(g);
 		Rectangle rect = getDisplayRect();
 		Region region = getRegion(rect);
+		Rectangle2D absRect = region.getAbsRect();
 		
 		if (showBackground)
 		{
@@ -859,7 +871,7 @@ public class DisplayPanel extends JComponent
 		else
 		{
 			g.setColor(getBackground());
-			fill(g);
+			fill(g, rect);
 		}
 		
 		if (showGrid && tileSize >= 8)
@@ -867,9 +879,6 @@ public class DisplayPanel extends JComponent
 			g.setColor(Color.BLACK);
 			drawGrid(g, rect, region);
 		}
-		
-		if (! overlays.isEmpty())
-			overlays.getFirst().paintOverTerrain(g);
 		
 		if (showTubeConnectivity)
 			drawTubeConnectivity(g, region);
@@ -881,7 +890,7 @@ public class DisplayPanel extends JComponent
 		synchronized (animations)
 		{
 			for (AmbientAnimation animation : animations)
-//				if (rect.intersects(animation.getBounds())) // FIXME: re-enable bounds checking
+				if (absRect.intersects(animation.getBounds()) && scale >= minShowUnitScale)
 					animation.paint(g);
 		}
 		
@@ -1047,7 +1056,7 @@ public class DisplayPanel extends JComponent
 	{
 		ColorScheme colors = ColorScheme.withFillOnly(unit.getOwner().getColor());
 		
-		if (!unit.isTurret() && scale < -2)
+		if (!unit.isTurret() && scale < minShowUnitScale)
 		{
 			draw(g, colors, unit.getOccupiedBounds());
 			return;
@@ -1236,9 +1245,9 @@ public class DisplayPanel extends JComponent
 		);
 	}
 	
-	private void fill(Graphics g)
+	private void fill(Graphics g, Rectangle rect)
 	{
-		g.fillRect(0, 0, getWidth(), getHeight());
+		g.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 	
 	private void draw(Graphics g, Image img, Position pos)

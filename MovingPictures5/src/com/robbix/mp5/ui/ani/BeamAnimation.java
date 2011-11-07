@@ -14,14 +14,12 @@ public abstract class BeamAnimation extends WeaponAnimation
 	private int frame = 0;
 	private final int frameLength = 20;
 	
-	private Color color;
 	private String soundBite;
 	private double damage;
 	
-	public BeamAnimation(SpriteLibrary lib, Unit attacker, Unit target, Color color, String soundBite, double damage)
+	public BeamAnimation(SpriteLibrary lib, Unit attacker, Unit target, String soundBite, double damage)
 	{
 		super(lib, attacker, target);
-		this.color = color;
 		this.soundBite = soundBite;
 		this.damage = damage;
 	}
@@ -29,14 +27,16 @@ public abstract class BeamAnimation extends WeaponAnimation
 	public void paint(Graphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
-		g.setColor(color);
+		g.setColor(getColor(frame));
 		Stroke oldStroke = g2d.getStroke();
-		g2d.setStroke(getStroke(panel.getScale()));
+		g2d.setStroke(getStroke(frame, panel.getScale()));
 		panel.draw(g, getTrackedFireOrigin(), getTrackedFireImpact());
 		g2d.setStroke(oldStroke);
 	}
 	
-	public abstract Stroke getStroke(int scale);
+	public abstract Stroke getStroke(int frame, int scale);
+	
+	public abstract Color getColor(int frame);
 	
 	public void step(AtomicReference<Runnable> callback)
 	{

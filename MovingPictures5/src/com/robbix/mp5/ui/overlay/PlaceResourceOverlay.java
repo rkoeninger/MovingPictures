@@ -23,49 +23,41 @@ public class PlaceResourceOverlay extends InputOverlay
 	
 	public void paintOverUnits(Graphics g)
 	{
-		if (isCursorOnGrid())
+		if (resSprite == null)
 		{
-			if (resSprite == null)
-			{
-				resSprite = panel.getSpriteLibrary().getDefaultSprite(res);
-				resSprite = resSprite == SpriteSet.BLANK_SPRITE
-					? null
-					: Utils.getTranslucency(resSprite, -1, 0.5f);
-			}
+			resSprite = panel.getSpriteLibrary().getDefaultSprite(res);
+			resSprite = resSprite == SpriteSet.BLANK_SPRITE
+				? null
+				: Utils.getTranslucency(resSprite, -1, 0.5f);
+		}
+		
+		Position pos = getCursorPosition();
+		
+		ColorScheme colors = null;
+		String toolTip = null;
+		
+		if (panel.getMap().canPlaceResourceDeposit(pos))
+		{
+			colors = hasNeighboringDeposit(pos) || panel.getMap().isOccupied(pos) ? YELLOW : GREEN;
 			
-			Position pos = getCursorPosition();
-			
-			ColorScheme colors = null;
-			String toolTip = null;
-			
-			if (panel.getMap().canPlaceResourceDeposit(pos))
-			{
-				if (hasNeighboringDeposit(pos))
-				{
-					colors = YELLOW;
-					toolTip = "Too close";
-				}
-				else
-				{
-					colors = GREEN;
-				}
-			}
-			else
-			{
-				colors = RED;
-				toolTip = "Occupied";
-			}
-			
-			panel.draw(g, colors, pos);
-			
-			if (resSprite != null)
-				panel.draw(g, resSprite, pos);
-			
-			if (toolTip != null)
-			{
-				g.setColor(Color.WHITE);
-				panel.draw(g, toolTip, pos);
-			}
+			if      (hasNeighboringDeposit(pos))     toolTip = "Too close";
+			else if (panel.getMap().isOccupied(pos)) toolTip = "Occupied";
+		}
+		else
+		{
+			colors = RED;
+			toolTip = "Occupied";
+		}
+		
+		panel.draw(g, colors, pos);
+		
+		if (resSprite != null)
+			panel.draw(g, resSprite, pos);
+		
+		if (toolTip != null)
+		{
+			g.setColor(Color.WHITE);
+			panel.draw(g, toolTip, pos);
 		}
 	}
 	
@@ -83,10 +75,11 @@ public class PlaceResourceOverlay extends InputOverlay
 	
 	private boolean hasNeighboringDeposit(Position pos)
 	{
-		for (Position npos : pos.get8Neighbors())
-			if (panel.getMap().getBounds().contains(npos)
-			 && panel.getMap().hasResourceDeposit(npos))
-				return true;
+		Position npos = pos.shift(-1, 0);
+		
+		if (panel.getMap().getBounds().contains(npos)
+		 && panel.getMap().hasResourceDeposit(npos))
+			return true;
 		
 		return false;
 	}

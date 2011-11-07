@@ -105,7 +105,6 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	{
 	}
 	
-	public void paintOverTerrain(Graphics g){}
 	public void paintOverUnits(Graphics g){}
 	
 	public void drawSelectedUnitBox(Graphics g, Unit unit)

@@ -14,6 +14,7 @@ import com.robbix.mp5.ai.task.RotateTask;
 import com.robbix.mp5.ai.task.SteerTask;
 import com.robbix.mp5.basics.Direction;
 import com.robbix.mp5.basics.Position;
+import com.robbix.mp5.basics.Region;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.ui.DisplayPanel;
@@ -74,8 +75,19 @@ public class Mediator
 	
 	public static void playSound(String name, Position pos)
 	{
-		if (game.getDisplay().getDisplayRegion().contains(pos))
-			playSound(name);
+		if (!soundOn)
+			return;
+		
+		Region displayRegion = game.getDisplay().getDisplayRegion();
+		
+		if (displayRegion.contains(pos))
+		{
+			Position center = displayRegion.getCenter();
+			float spread = (pos.x - center.x) / (float) displayRegion.w;
+			spread = Math.min(1.0f, Math.max(-1.0f, spread * 2.0f));
+			float volume = 0.5f + Math.abs(spread) * 0.5f;
+			sounds.play(name, volume, spread, null);
+		}
 	}
 	
 	public static void playSound(String name, int x, int y)

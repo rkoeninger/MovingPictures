@@ -2,6 +2,8 @@ package com.robbix.mp5.basics;
 
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * An immutable rectangular region on a grid.
@@ -116,6 +118,16 @@ public class Region implements RIterable<Position>
 		this.w = 1;
 		this.h = 1;
 		this.a = 1;
+	}
+	
+	public Point2D getCenterPoint()
+	{
+		return new Point2D.Double(x + (w / 2.0), y + (h / 2.0));
+	}
+	
+	public Rectangle2D getAbsRect()
+	{
+		return new Rectangle2D.Double(x, y, w, h);
 	}
 	
 	public Position getCenter()

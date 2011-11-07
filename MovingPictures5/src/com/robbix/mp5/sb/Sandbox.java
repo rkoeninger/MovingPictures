@@ -134,7 +134,8 @@ public class Sandbox extends JApplet
 	private static final String ACP_COMMAND_BUTTON = "commandButton-";
 	
 	private static ActionListener listener = new MenuItemListener();
-
+	
+	private static JSliderMenuItem volumeSliderMenuItem;
 	private static JSliderMenuItem throttleSliderMenuItem;
 	private static JMenuItem pauseMenuItem;
 	private static JMenuItem stepMenuItem;
@@ -226,6 +227,7 @@ public class Sandbox extends JApplet
 		Mediator.initMediator(game);
 		Mediator.soundOn(soundOn);
 		currentPlayer = game.getDefaultPlayer();
+		game.getSoundBank().setVolume(0.5f);
 		
 		/*-------------------------------------------------------------------------------------[*]
 		 * Prepare live-updating status labels
@@ -268,6 +270,7 @@ public class Sandbox extends JApplet
 		paintLabels.put(throttleSliderMenuItem.getMaximum(), new JLabel("Crawl"));
 		throttleSliderMenuItem.setLabelTable(paintLabels);
 		throttleSliderMenuItem.setPaintLabels(true);
+		volumeSliderMenuItem = new JSliderMenuItem(0, 100, 50);
 		pauseMenuItem          = new JMenuItem("Pause");
 		stepMenuItem           = new JMenuItem("Step Once");
 		spriteLibMenuItem      = new JMenuItem("Sprite Library");
@@ -394,6 +397,7 @@ public class Sandbox extends JApplet
 		}
 		
 		throttleSliderMenuItem.addChangeListener((ChangeListener) listener);
+		volumeSliderMenuItem  .addChangeListener((ChangeListener) listener);
 		spriteLibMenuItem     .addActionListener(listener);
 		unitLibMenuItem       .addActionListener(listener);
 		soundPlayerMenuItem   .addActionListener(listener);
@@ -445,6 +449,8 @@ public class Sandbox extends JApplet
 //		displayMenu.add(splitDisplayMenuItem);
 		soundMenu.add(playSoundMenuItem);
 //		soundMenu.add(playMusicMenuItem);
+		soundMenu.addSeparator();
+		soundMenu.add(volumeSliderMenuItem);
 		soundMenu.addSeparator();
 		soundMenu.add(setAudioFormatMenuItem);
 		terrainMenu.add(placeWallMenuItem);
@@ -532,6 +538,12 @@ public class Sandbox extends JApplet
 			if (e.getSource() == throttleSliderMenuItem)
 			{
 				engine.setDelay(throttleSliderMenuItem.getValue());
+			}
+			else if (e.getSource() == volumeSliderMenuItem)
+			{
+				int current = volumeSliderMenuItem.getValue();
+				int max = volumeSliderMenuItem.getMaximum();
+				game.getSoundBank().setVolume(current / (float) max);
 			}
 		}
 		

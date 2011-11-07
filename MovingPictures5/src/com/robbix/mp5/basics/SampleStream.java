@@ -12,19 +12,51 @@ public class SampleStream
 	private SampleBuffer buffer;
 	private int pos;
 	private Callback callback;
+	private float volume;
+	private float spread; // -1.0 = L, 1.0 = R
 	
 	public SampleStream(SampleBuffer buffer)
 	{
-		this.buffer = buffer;
-		this.pos = 0;
+		this(buffer, 1, 0, null);
 	}
 	
 	public SampleStream(SampleBuffer buffer, Callback callback)
 	{
-		this(buffer);
+		this(buffer, 1, 0, callback);
+	}
+	
+	public SampleStream(SampleBuffer buffer, float volume, float spread)
+	{
+		this(buffer, volume, spread, null);
+	}
+	
+	public SampleStream(SampleBuffer buffer, float volume, float spread, Callback callback)
+	{
+		if (buffer == null)
+			throw new NullPointerException("buffer");
+		
+		if (volume <= 0)
+			throw new IllegalArgumentException("Invalid volume: " + volume);
+		
+		if (spread < -1.0 || spread > 1.0)
+			throw new IllegalArgumentException("Invalid spread: " + spread);
+		
+		this.buffer = buffer;
+		this.volume = volume;
+		this.spread = spread;
 		this.callback = callback;
 	}
-		
+	
+	public float getVolume()
+	{
+		return volume;
+	}
+	
+	public float getSpread()
+	{
+		return spread;
+	}
+	
 	public int available()
 	{
 		return buffer.length() - pos;
@@ -70,10 +102,14 @@ public class SampleStream
 			float[] bufferChannel = buffer.getChannel(c);
 			float[] outChannel = out.getChannel(c);
 			
+			float spreadFactor = (buffer.getChannelCount() == 2)
+				? getSpreadFactor(spread, c == 0)
+				: 1.0f;
+			
 			for (int i = off; i < off + len; ++i, ++pos)
 			{
 				float sample = outChannel[i];
-				sample += bufferChannel[pos];
+				sample += bufferChannel[pos] * volume * spreadFactor;
 				outChannel[i] = Math.max(-1, Math.min(1, sample));
 			}
 		}
@@ -91,5 +127,31 @@ public class SampleStream
 		}
 		
 		return len;
+	}
+	
+	private float getSpreadFactor(float spread, boolean left)
+	{
+		if (left)
+		{
+			if (spread > 0) // Panned right and this is left channel
+			{
+				return 1 - spread;
+			}
+			else
+			{
+				return 1;
+			}
+		}
+		else
+		{
+			if (spread < 0) // Panned left and this is right channel
+			{
+				return 1 + spread;
+			}
+			else
+			{
+				return 1;
+			}
+		}
 	}
 }

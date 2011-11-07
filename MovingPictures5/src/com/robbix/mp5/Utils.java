@@ -390,9 +390,7 @@ public class Utils
 	 * The returned image is a new image only if the given image does
 	 * not have an alpha channel.
 	 */
-	public static BufferedImage getTranslucency(
-		BufferedImage img,
-		float aFactor)
+	public static BufferedImage getTranslucency(BufferedImage img, float aFactor)
 	{
 		if (aFactor == 1)
 			return img;

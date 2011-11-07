@@ -72,7 +72,7 @@ public class RailGunAnimation extends WeaponAnimation
 			playSoundLater("railGunFire", getAttacker().getPosition());
 		}
 		
-		if ((frame + 1) % 3 == 0 && !explosionTime)
+		if ((frame + 1) % 3 == 0 && frame > 4 && !explosionTime)
 		{
 			SmokeRing ring = new SmokeRing();
 			ring.startingFrame = frame;
