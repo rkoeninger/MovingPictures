@@ -38,13 +38,7 @@ public class SoundBank implements Modular
 			if (! file.getName().endsWith(".wav"))
 				continue;
 			
-			String rawName = file.getName().toLowerCase();
-			int i = rawName.lastIndexOf(".");
-			String name = rawName.substring(0, i);
-			SampleBuffer buffer = SampleBuffer.load(file);
-			buffer.rechannel(DEFAULT_IN_FORMAT.getChannels());
-			buffer.resample(DEFAULT_IN_FORMAT.getSampleRate());
-			sounds.buffers.put(name, buffer);
+			sounds.loadModule(file);
 		}
 		
 		return sounds;
@@ -79,7 +73,7 @@ public class SoundBank implements Modular
 	 * 22.05 kHz, 8-bit, mono, unsigned
 	 */
 	public static final AudioFormat DEFAULT_IN_FORMAT =
-		new AudioFormat(22050.0f, 8, 1, false, false);
+		new AudioFormat(22050.0f, 8, 2, false, false);
 	
 	/**
 	 * Default output format used by SoundBank. Conforms to CD audio standard,

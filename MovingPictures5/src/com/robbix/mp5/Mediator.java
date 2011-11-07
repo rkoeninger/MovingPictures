@@ -84,7 +84,6 @@ public class Mediator
 		{
 			Position center = displayRegion.getCenter();
 			float spread = (pos.x - center.x) / (float) displayRegion.w;
-			spread = Math.min(1.0f, Math.max(-1.0f, spread * 2.0f));
 			float volume = 0.5f + Math.abs(spread) * 0.5f;
 			sounds.play(name, volume, spread, null);
 		}

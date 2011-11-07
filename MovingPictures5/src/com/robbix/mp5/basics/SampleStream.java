@@ -92,6 +92,9 @@ public class SampleStream
 		if (! buffer.formatMatches(out))
 			throw new IllegalArgumentException("Buffer formats do not match");
 		
+		if (off + len > out.length())
+			throw new IndexOutOfBoundsException("out buffer");
+		
 		if (pos == 0 && callback != null)
 			callback.starting();
 		
@@ -106,13 +109,18 @@ public class SampleStream
 				? getSpreadFactor(spread, c == 0)
 				: 1.0f;
 			
-			for (int i = off; i < off + len; ++i, ++pos)
+			System.out.println("Channel: " + (c == 0 ? "L" : "R") + " Spread: " + spreadFactor);
+			
+			for (int i = 0; i < len; ++i)
 			{
-				float sample = outChannel[i];
-				sample += bufferChannel[pos] * volume * spreadFactor;
-				outChannel[i] = Math.max(-1, Math.min(1, sample));
+				float sample = outChannel[off + i];
+				sample += bufferChannel[pos + i] * volume * spreadFactor;
+				sample = Math.max(-1, Math.min(1, sample));
+				outChannel[off + i] = sample;
 			}
 		}
+		
+		pos += len;
 		
 		if (callback != null)
 		{
