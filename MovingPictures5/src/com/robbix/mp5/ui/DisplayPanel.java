@@ -18,7 +18,9 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -401,6 +403,17 @@ public class DisplayPanel extends JComponent
 		overlay.setDisplay(this);
 		overlay.init();
 		adapter.setOverlay(overlay);
+	}
+	
+	/**
+	 * Returns overlays in the order they were added.
+	 * The current overlay will be at the end.
+	 */
+	public List<InputOverlay> getOverlays()
+	{
+		List<InputOverlay> list = new ArrayList<InputOverlay>(overlays);
+		Collections.reverse(list);
+		return list;
 	}
 	
 	public void cueAnimation(AmbientAnimation animation)

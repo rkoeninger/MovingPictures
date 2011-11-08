@@ -224,17 +224,17 @@ public class LayeredMap
 	
 	public ResourceDeposit getResourceDeposit(Position pos)
 	{
-		return grid.get(pos).deposit;
+		return getBounds().contains(pos) ? grid.get(pos).deposit : null;
 	}
 	
 	public boolean hasResourceDeposit(Position pos)
 	{
-		return grid.get(pos).deposit != null;
+		return getBounds().contains(pos) && grid.get(pos).deposit != null;
 	}
 	
 	public boolean canPlaceResourceDeposit(Position pos)
 	{
-		return grid.get(pos).deposit == null;
+		return getBounds().contains(pos) && grid.get(pos).deposit == null;
 	}
 	
 	public void putFixture(Fixture fixture, Position pos)

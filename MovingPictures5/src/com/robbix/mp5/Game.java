@@ -130,6 +130,13 @@ public class Game
 		displays.add(panel);
 	}
 	
+	public DisplayPanel newDisplay()
+	{
+		DisplayPanel panel = new DisplayPanel(this);
+		displays.add(panel);
+		return panel;
+	}
+	
 	public List<DisplayPanel> getDisplays()
 	{
 		return new ArrayList<DisplayPanel>(displays);

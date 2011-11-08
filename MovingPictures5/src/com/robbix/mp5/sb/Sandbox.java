@@ -446,8 +446,8 @@ public class Sandbox extends JApplet
 		displayMenu.add(frameRateMenuItem);
 //		displayMenu.add(scrollSpeedMenuItem);
 //		displayMenu.add(fullScreenMenuItem);
-//		displayMenu.add(addDisplayMenuItem);
-//		displayMenu.add(splitDisplayMenuItem);
+		displayMenu.add(addDisplayMenuItem);
+		displayMenu.add(splitDisplayMenuItem);
 		soundMenu.add(playSoundMenuItem);
 //		soundMenu.add(playMusicMenuItem);
 		soundMenu.addSeparator();
