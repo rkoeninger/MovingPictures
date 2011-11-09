@@ -19,7 +19,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +57,9 @@ public class DisplayPanel extends JComponent
 	private int minScale, maxScale, normalScale;
 	private int minShowUnitScale = -2;
 	
+	private double shadowXOffset = -0.125;
+	private double shadowYOffset = -0.125;
+	
 	private BufferedImage cachedBackground = null;
 	private Object cacheLock = new Object();
 	
@@ -81,16 +83,6 @@ public class DisplayPanel extends JComponent
 	
 	private DisplayPanelView view;
 	
-	private List<String> options = Arrays.asList(
-		"Grid",
-		"Background",
-		"Unit Layer State",
-		"Tube Connectivity",
-		"Terrain Cost Map",
-		"Terrain Cost Values",
-		"Cost Values as Factors"
-	);
-	
 	private boolean showGrid = false;
 	private boolean showUnitLayerState = false;
 	private boolean showTubeConnectivity = false;
@@ -98,6 +90,7 @@ public class DisplayPanel extends JComponent
 	private boolean showTerrainCostValues = false;
 	private boolean showCostValuesAsFactors = false;
 	private boolean showBackground = true;
+	private boolean showShadows = false;
 	
 	public DisplayPanel(Game game)
 	{
@@ -216,86 +209,48 @@ public class DisplayPanel extends JComponent
 		}
 	}
 	
-	public List<String> getOptionNames()
+	public void setShowGrid(boolean showGrid)
 	{
-		return options;
+		this.showGrid = showGrid;
+		repaint();
 	}
 	
-	public boolean getOption(String name)
+	public boolean isShowingGrid()
 	{
-		if (name.equals("Grid"))
-		{
-			return showGrid;
-		}
-		else if (name.equals("Background"))
-		{
-			return showBackground;
-		}
-		else if (name.equals("Tube Connectivity"))
-		{
-			return showTubeConnectivity;
-		}
-		else if (name.equals("Unit Layer State"))
-		{
-			return showUnitLayerState;
-		}
-		else if (name.equals("Terrain Cost Map"))
-		{
-			return showTerrainCostMap;
-		}
-		else if (name.equals("Terrain Cost Values"))
-		{
-			return showTerrainCostValues;
-		}
-		else if (name.equals("Cost Values as Factors"))
-		{
-			return showCostValuesAsFactors;
-		}
-		
-		throw new IllegalArgumentException("Not an option: " + name);
+		return showGrid;
 	}
 	
-	public void setOption(String name, boolean isSet)
+	public void setShowShadows(boolean showShadows)
 	{
-		if (name.equals("Grid"))
-		{
-			showGrid = isSet;
-			repaint();
-		}
-		else if (name.equals("Background"))
-		{
-			showBackground = isSet;
-			refresh();
-		}
-		else if (name.equals("Tube Connectivity"))
-		{
-			showTubeConnectivity = isSet;
-			repaint();
-		}
-		else if (name.equals("Unit Layer State"))
-		{
-			showUnitLayerState = isSet;
-			repaint();
-		}
-		else if (name.equals("Terrain Cost Map"))
-		{
-			showTerrainCostMap = isSet;
-			refresh();
-		}
-		else if (name.equals("Terrain Cost Values"))
-		{
-			showTerrainCostValues = isSet;
-			refresh();
-		}
-		else if (name.equals("Cost Values as Factors"))
-		{
-			showCostValuesAsFactors = isSet;
-			refresh();
-		}
-		else
-		{
-			throw new IllegalArgumentException("Not an option: " + name);
-		}
+		this.showShadows = showShadows;
+		repaint();
+	}
+	
+	public boolean isShowingShadows()
+	{
+		return showShadows;
+	}
+	
+	public void setShowTubeConnectivity(boolean showTubeConnectivity)
+	{
+		this.showTubeConnectivity = showTubeConnectivity;
+		repaint();
+	}
+	
+	public boolean isShowingTubeConnectivity()
+	{
+		return showTubeConnectivity;
+	}
+	
+	public void setShowCostMap(boolean showCostMap)
+	{
+		this.showTerrainCostMap = showCostMap;
+		refresh();
+	}
+	
+	public boolean isShowingCostMap()
+	{
+		return showTerrainCostMap;
 	}
 	
 	public void refresh()
@@ -1020,21 +975,24 @@ public class DisplayPanel extends JComponent
 	 */
 	private void drawTubeConnectivity(Graphics g, Region region)
 	{
-		ColorScheme transGreen = ColorScheme.withFillOnly(new Color(0, 255, 0, 127));
-		ColorScheme transRed   = ColorScheme.withFillOnly(new Color(255, 0, 0, 127));
+		ColorScheme transGreen = InputOverlay.GREEN.getFillOnly();
+		ColorScheme transRed = InputOverlay.RED.getFillOnly();
 		
 		for (int x = region.x; x < region.getMaxX(); ++x)
 		for (int y = region.y; y < region.getMaxY(); ++y)
 		{
 			Position pos = new Position(x, y);
-			
 			Unit occupant = map.getUnit(pos);
-			boolean structNeedsConnection = occupant != null && occupant.needsConnection();
-			boolean structHasConnection = occupant != null && occupant.isConnected();
+			boolean needsConnection = occupant != null && occupant.needsConnection();
+			boolean isSource = occupant != null && occupant.isConnectionSource();
+			boolean hasConnection = occupant != null && occupant.isConnected();
 			
-			if (map.hasTube(pos) || structNeedsConnection)
+			if (map.hasTube(pos) || needsConnection)
 			{
-				draw(g, (map.isAlive(pos) || structHasConnection) ? transGreen : transRed, pos);
+				ColorScheme colors = (map.isAlive(pos) || hasConnection || isSource)
+					? transGreen
+					: transRed;
+				draw(g, colors, pos);
 			}
 		}
 	}
@@ -1053,6 +1011,7 @@ public class DisplayPanel extends JComponent
 			return;
 		}
 		
+		Point2D point = unit.getAbsPoint();
 		Sprite sprite = sprites.getSprite(unit);
 		
 		if (showUnitLayerState && !unit.isTurret())
@@ -1064,6 +1023,15 @@ public class DisplayPanel extends JComponent
 				draw(g, InputOverlay.BLUE, pos);
 		}
 		
+		if (showShadows && !unit.isTurret())
+		{
+			Point2D shadowPoint = new Point2D.Double(
+				point.getX() + shadowXOffset,
+				point.getY() + shadowYOffset
+			);
+			drawShadow(g, sprite, shadowPoint);
+		}
+		
 		if (sprite == SpriteSet.BLANK_SPRITE)
 		{
 			if (!unit.isTurret())
@@ -1071,14 +1039,14 @@ public class DisplayPanel extends JComponent
 		}
 		else
 		{
-			draw(g, sprite, unit.getAbsPoint(), unit.getOwner());
+			draw(g, sprite, point, unit.getOwner());
 		}
 		
 		if (unit.hasTurret())
 		{
 			drawUnit(g, unit.getTurret());
 		}
-		else
+		else if (unit.isGuardPost() || unit.isStructure())
 		{
 			drawStatusLight(g, unit);
 		}
@@ -1094,23 +1062,20 @@ public class DisplayPanel extends JComponent
 		if (!currentPlayer.owns(unit))
 			return;
 		
-		if (unit.isGuardPost() || unit.isStructure())
+		Position pos = unit.getPosition();
+		
+		if (unit.isIdle())
 		{
-			Position pos = unit.getPosition();
-			
-			if (unit.isIdle())
-			{
-				draw(g, sprites.getSprite("aStructureStatus", "idle"), pos);
-			}
-			else if (unit.isDisabled())
-			{
-				SpriteGroup seq = sprites.getAmbientSpriteGroup("aStructureStatus", "disabled");
-				draw(g, seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount())), pos);
-			}
-			else if (unit.isStructure())
-			{
-				draw(g, sprites.getSprite("aStructureStatus", "active"), pos);
-			}
+			draw(g, sprites.getSprite("aStructureStatus", "idle"), pos);
+		}
+		else if (unit.isDisabled())
+		{
+			SpriteGroup seq = sprites.getAmbientSpriteGroup("aStructureStatus", "disabled");
+			draw(g, seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount())), pos);
+		}
+		else if (unit.isStructure())
+		{
+			draw(g, sprites.getSprite("aStructureStatus", "active"), pos);
 		}
 	}
 	
@@ -1207,6 +1172,23 @@ public class DisplayPanel extends JComponent
 	public void draw(Graphics g, Sprite sprite, Point2D absPoint, Player owner)
 	{
 		Image img = owner == null ? sprite.getImage() : sprite.getImage(owner.getColorHue());
+		int x = (int) (absPoint.getX() * tileSize) + scroll.x + sprite.getXOffset(scale);
+		int y = (int) (absPoint.getY() * tileSize) + scroll.y + sprite.getYOffset(scale);
+		int w = img.getWidth(null);
+		int h = img.getHeight(null);
+		int w2 = scale < 0 ? w >> -scale : w << scale;
+		int h2 = scale < 0 ? h >> -scale : h << scale;
+		g.drawImage(
+			img,
+			x, y, x + w2, y + h2,
+			0, 0, w, h,
+			null
+		);
+	}
+	
+	private void drawShadow(Graphics g, Sprite sprite, Point2D absPoint)
+	{
+		Image img = sprite.getShadow();
 		int x = (int) (absPoint.getX() * tileSize) + scroll.x + sprite.getXOffset(scale);
 		int y = (int) (absPoint.getY() * tileSize) + scroll.y + sprite.getYOffset(scale);
 		int w = img.getWidth(null);

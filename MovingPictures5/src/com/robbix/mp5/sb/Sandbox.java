@@ -131,7 +131,6 @@ public class Sandbox extends JApplet
 	// Action command prefixes
 	private static final String ACP_SELECT_PLAYER  = "selectPlayer-";
 	private static final String ACP_ADD_UNIT       = "addUnit-";
-	private static final String ACP_DISPLAY_OPTION = "displayOption-";
 	private static final String ACP_COMMAND_BUTTON = "commandButton-";
 	
 	private static ActionListener listener = new MenuItemListener();
@@ -144,6 +143,9 @@ public class Sandbox extends JApplet
 	private static JMenuItem unitLibMenuItem;
 	private static JMenuItem soundPlayerMenuItem;
 	private static JMenuItem exitMenuItem;
+	private static JMenuItem showGridMenuItem;
+	private static JMenuItem showShadowsMenuItem;
+	private static JMenuItem showCostMapMenuItem;
 	private static JMenuItem scrollBarsMenuItem;
 	private static JMenuItem frameRateMenuItem;
 	private static JMenuItem scrollSpeedMenuItem;
@@ -258,10 +260,6 @@ public class Sandbox extends JApplet
 		panel.setUnitStatus(unitStatusLabel);
 		panel.setPlayerStatus(playerStatusLabel);
 		panel.setTitleBar(titleBar);
-		panel.setOption("Grid", false);
-		panel.setOption("Unit Layer State", false);
-		panel.setOption("Terrain Cost Map", false);
-		panel.setOption("Terrain Cost Values", true);
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
 		
@@ -280,6 +278,9 @@ public class Sandbox extends JApplet
 		unitLibMenuItem        = new JMenuItem("Unit Library");
 		soundPlayerMenuItem    = new JMenuItem("Sound Player");
 		exitMenuItem           = new JMenuItem("Exit");
+		showGridMenuItem       = new JMenuItem(panel.isShowingGrid() ? "Hide Grid" : "Show Grid");
+		showShadowsMenuItem    = new JMenuItem(panel.isShowingShadows() ? "Hide Shadows" : "Show Shadows");
+		showCostMapMenuItem    = new JMenuItem(panel.isShowingCostMap() ? "Show Surface" : "Show Cost Map");
 		scrollBarsMenuItem     = new JMenuItem("Scroll Bars");
 		frameRateMenuItem      = new JMenuItem("Frame Rate");
 		scrollSpeedMenuItem    = new JMenuItem("Scroll Speed");
@@ -376,33 +377,14 @@ public class Sandbox extends JApplet
 			addUnitMenuItem.addActionListener(listener);
 		}
 		
-		/*-------------------------------------------------------------------------------------[*]
-		 * Add display option menu items
-		 */
-		final List<String> options = panel.getOptionNames();
-		
-		for (int i = 0; i < options.size(); ++i)
-		{
-			final JMenuItem panelOptionMenuItem = new JMenuItem(options.get(i));
-			displayMenu.add(panelOptionMenuItem);
-			panelOptionMenuItem.setActionCommand(ACP_DISPLAY_OPTION + options.get(i));
-			
-			if (options.get(i).equals("Grid"))
-			{
-				panelOptionMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-					KeyEvent.VK_G,
-					KeyEvent.ALT_DOWN_MASK
-				));
-			}
-			
-			panelOptionMenuItem.addActionListener(listener);
-		}
-		
 		throttleSliderMenuItem.addChangeListener((ChangeListener) listener);
 		volumeSliderMenuItem  .addChangeListener((ChangeListener) listener);
 		spriteLibMenuItem     .addActionListener(listener);
 		unitLibMenuItem       .addActionListener(listener);
 		soundPlayerMenuItem   .addActionListener(listener);
+		showGridMenuItem      .addActionListener(listener);
+		showShadowsMenuItem   .addActionListener(listener);
+		showCostMapMenuItem   .addActionListener(listener);
 		scrollSpeedMenuItem   .addActionListener(listener);
 		scrollBarsMenuItem    .addActionListener(listener);
 		frameRateMenuItem     .addActionListener(listener);
@@ -442,6 +424,9 @@ public class Sandbox extends JApplet
 		engineMenu.add(soundPlayerMenuItem);
 		engineMenu.addSeparator();
 		engineMenu.add(exitMenuItem);
+		displayMenu.add(showGridMenuItem);
+		displayMenu.add(showShadowsMenuItem);
+		displayMenu.add(showCostMapMenuItem);
 //		displayMenu.add(scrollBarsMenuItem);
 		displayMenu.add(frameRateMenuItem);
 //		displayMenu.add(scrollSpeedMenuItem);
@@ -611,6 +596,30 @@ public class Sandbox extends JApplet
 				}
 				
 				sbPlayer.setVisible(true);
+			}
+			else if (e.getSource() == showGridMenuItem)
+			{
+				panel.setShowGrid(!panel.isShowingGrid());
+				showGridMenuItem.setText(panel.isShowingGrid()
+					? "Hide Grid"
+					: "Show Grid"
+				);
+			}
+			else if (e.getSource() == showShadowsMenuItem)
+			{
+				panel.setShowShadows(!panel.isShowingShadows());
+				showShadowsMenuItem.setText(panel.isShowingShadows()
+					? "Hide Shadows"
+					: "Show Shadows"
+				);
+			}
+			else if (e.getSource() == showCostMapMenuItem)
+			{
+				panel.setShowCostMap(!panel.isShowingCostMap());
+				showCostMapMenuItem.setText(panel.isShowingCostMap()
+					? "Show Surface"
+					: "Show Cost Map"
+				);
 			}
 			else if (e.getSource() == scrollSpeedMenuItem)
 			{
@@ -915,15 +924,6 @@ public class Sandbox extends JApplet
 					game.getUnitFactory(),
 					 e.getActionCommand().substring(ACP_ADD_UNIT.length())
 				));
-			}
-			else if (e.getActionCommand().startsWith(ACP_DISPLAY_OPTION))
-			{
-				panel.setOption(
-					e.getActionCommand().substring(ACP_DISPLAY_OPTION.length()),
-					! panel.getOption(
-						e.getActionCommand().substring(ACP_DISPLAY_OPTION.length())
-					)
-				);
 			}
 			else if (e.getActionCommand().startsWith(ACP_COMMAND_BUTTON))
 			{

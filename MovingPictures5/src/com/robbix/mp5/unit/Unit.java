@@ -335,7 +335,8 @@ public class Unit
 	
 	public boolean isConnected()
 	{
-		return pos == null ? false : !needsConnection() || container.isAlive(pos);
+		return pos == null ? false :
+			isConnectionSource() || !needsConnection() || container.isAlive(pos);
 	}
 	
 	public boolean needsConnection()

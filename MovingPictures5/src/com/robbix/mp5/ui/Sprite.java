@@ -2,6 +2,8 @@ package com.robbix.mp5.ui;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,9 +12,12 @@ import com.robbix.mp5.utils.Utils;
 
 public class Sprite
 {
+	private static final int[] SHADOW_COLOR = {0, 0, 0, 191};
+	private static final int[] CLEAR = {0, 0, 0, 0};
 	private Offset offset;
 	private int baseHue;
 	private Image baseImage;
+	private BufferedImage shadow;
 	private Map<Integer, Image> hueMap;
 	
 	public Sprite(Image image, int xOff, int yOff)
@@ -88,5 +93,30 @@ public class Sprite
 	public int getYOffset(int scale)
 	{
 		return offset.getDY(scale);
+	}
+	
+	public Image getShadow()
+	{
+		if (shadow == null)
+		{
+			shadow = new BufferedImage(
+				baseImage.getWidth(null),
+				baseImage.getHeight(null),
+				BufferedImage.TYPE_INT_ARGB
+			);
+			
+			int[] pixel = new int[4];
+			Raster raster = ((BufferedImage) baseImage).getRaster();
+			WritableRaster out = shadow.getRaster();
+			
+			for (int x = 0; x < shadow.getWidth();  ++x)
+			for (int y = 0; y < shadow.getHeight(); ++y)
+			{
+				raster.getPixel(x, y, pixel);
+				out.setPixel(x, y, (pixel[3] == 0) ? CLEAR : SHADOW_COLOR);
+			}
+		}
+		
+		return shadow;
 	}
 }

@@ -310,12 +310,14 @@ public class LayeredMap
 		
 		for (Position adj : pos.get4Neighbors())
 		{
-			if (grid.getBounds().contains(adj) && hasTube(adj))
+			if (grid.getBounds().contains(adj) && (hasTube(adj) || isOccupied(adj)))
 			{
+				Unit occupant = getUnit(adj);
+				spot.alive |= occupant != null && occupant.isConnected();
 				spot.alive |= grid.get(adj).alive;
 				
-				grid.get(adj).tileCode =
-					tileSet.getTubeTile(getTubeNeighbors(adj));
+				// Refresh tube tile for new neighbor
+				grid.get(adj).tileCode = tileSet.getTubeTile(getTubeNeighbors(adj));
 			}
 		}
 		

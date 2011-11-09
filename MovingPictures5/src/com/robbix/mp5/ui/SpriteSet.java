@@ -19,7 +19,7 @@ public abstract class SpriteSet
 	{
 		public Sprite getSprite(int index)
 		{
-			return getSprite(0);
+			return getFrame(0);
 		}
 	};
 	

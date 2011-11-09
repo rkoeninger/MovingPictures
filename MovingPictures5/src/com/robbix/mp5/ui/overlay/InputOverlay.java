@@ -61,6 +61,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	protected int shiftOptionCount = 2;
 	
+	protected boolean showTubeConnectivity = false;
+	
 	protected boolean closesOnEscape            = true;
 	protected boolean closesOnRightClick        = true;
 	protected boolean requiresLeftClickOnGrid   = true;
@@ -99,10 +101,12 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public void init()
 	{
 		panel.setAnimatedCursor(animatedCursor);
+		panel.setShowTubeConnectivity(showTubeConnectivity);
 	}
 	
 	public void dispose()
 	{
+		panel.setShowTubeConnectivity(false);
 	}
 	
 	public void paintOverUnits(Graphics g){}

@@ -25,6 +25,7 @@ public class BuildStructureOverlay extends InputOverlay
 	{
 		this.conVec = conVec;
 		this.structure = structure;
+		this.showTubeConnectivity = true;
 	}
 	
 	public void paintOverUnits(Graphics g)

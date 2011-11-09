@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-
 public class LOCCounter
 {
 	private static Set<FileInfo> infos = new HashSet<FileInfo>();
@@ -47,7 +46,7 @@ public class LOCCounter
 			
 			return lines;
 		}
-		else
+		else if (file.getName().endsWith(".java"))
 		{
 			BufferedReader reader = new BufferedReader(
 				new InputStreamReader(new FileInputStream(file)));
@@ -62,6 +61,10 @@ public class LOCCounter
 			infos.add(new FileInfo(file, lines));
 			
 			return lines;
+		}
+		else
+		{
+			return 0;
 		}
 	}
 	

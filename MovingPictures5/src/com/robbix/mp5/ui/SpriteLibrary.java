@@ -478,15 +478,11 @@ public class SpriteLibrary implements Modular
 		else
 		{
 			return group.getFrame(unit.getAnimationFrame()
-				% group.getFrameCount());
+				% group.getFrameCount()
+			);
 			//FIXME: temporary, group looping should take care of looping
 			//
 			//         - linear sequences are running one,two frame over.
 		}
-	}
-	
-	public Sprite getShadow(Unit unit)
-	{
-		return null;
 	}
 }

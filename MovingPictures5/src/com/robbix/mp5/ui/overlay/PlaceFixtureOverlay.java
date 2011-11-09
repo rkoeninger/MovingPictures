@@ -18,6 +18,8 @@ public class PlaceFixtureOverlay extends InputOverlay
 	public PlaceFixtureOverlay(LayeredMap.Fixture fixture)
 	{
 		this.fixture = fixture;
+		this.showTubeConnectivity = (fixture == LayeredMap.Fixture.TUBE);
+			
 	}
 	
 	public void paintOverUnits(Graphics g)

@@ -26,7 +26,6 @@ public class Engine
 	private DisplayPanel panel;
 	private Runnable animationCycle;
 	private Timer timer;
-	private int previousDelay;
 	private int frame;
 	private List<Runnable> scheduledTasks;
 	
@@ -38,7 +37,6 @@ public class Engine
 		paused = true;
 		animationCycle = new AnimationCycle();
 		timer = new Timer(DEFAULT_DELAY, new ThreadCycle());
-		previousDelay = -1;
 		frame = 0;
 		scheduledTasks = new ArrayList<Runnable>();
 	}
@@ -94,41 +92,9 @@ public class Engine
 		return timer.getDelay() > 0;
 	}
 	
-	public synchronized void toggleThrottle()
-	{
-		if (timer.getDelay() > 0)
-		{
-			previousDelay = timer.getDelay();
-			timer.setDelay(0);
-		}
-		else
-		{
-			timer.setDelay(previousDelay);
-			previousDelay = -1;
-		}
-	}
-	
 	public int getTime()
 	{
 		return frame;
-	}
-	
-	public synchronized void unthrottle()
-	{
-		if (timer.getDelay() == 0)
-			throw new IllegalStateException("Already unthrottled");
-		
-		previousDelay = timer.getDelay();
-		timer.setDelay(0);
-	}
-	
-	public synchronized void throttle()
-	{
-		if (previousDelay < 0)
-			throw new IllegalStateException("Already throttled");
-		
-		timer.setDelay(previousDelay);
-		previousDelay = -1;
 	}
 	
 	public void doLater(Runnable doRun)

@@ -27,6 +27,7 @@ public class PlaceUnitOverlay extends InputOverlay
 	public PlaceUnitOverlay(Unit unit)
 	{
 		this.unit = unit;
+		this.showTubeConnectivity = unit.needsConnection() || unit.isConnectionSource();
 	}
 	
 	public PlaceUnitOverlay(UnitFactory factory, String type)
@@ -34,6 +35,7 @@ public class PlaceUnitOverlay extends InputOverlay
 		this.factory = factory;
 		this.type = type;
 		this.unit = factory.newUnit(type);
+		this.showTubeConnectivity = unit.needsConnection() || unit.isConnectionSource();
 	}
 	
 	public void paintOverUnits(Graphics g)

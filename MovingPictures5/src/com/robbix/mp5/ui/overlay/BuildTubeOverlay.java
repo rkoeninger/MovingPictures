@@ -23,6 +23,7 @@ public class BuildTubeOverlay extends InputOverlay
 	{
 		this.crane = earthworker;
 		this.shiftOptionCount = 3;
+		this.showTubeConnectivity = true;
 	}
 	
 	public void paintOverUnits(Graphics g)
