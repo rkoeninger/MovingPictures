@@ -24,7 +24,6 @@ public class FocusTest
 	public static void main(String[] args) throws IOException
 	{
 //		final javax.swing.JTextArea area1 = new javax.swing.JTextArea(), area2 = new JTextArea();
-//		final JSplitPane splitPane = new JSplitPane(HORIZONTAL_SPLIT, area1, area2);
 //		final Component left = area1, right = area2;
 		
 		com.robbix.mp5.Game game = com.robbix.mp5.Game.load(new File("./res"), "16-16-plain", "newTerraSand", true, true);
@@ -34,9 +33,9 @@ public class FocusTest
 		game.newDisplay();
 		final com.robbix.mp5.ui.DisplayPanel panel1 = game.getDisplay(0);
 		final com.robbix.mp5.ui.DisplayPanel panel2 = game.getDisplay(1);
-		final JSplitPane splitPane = new JSplitPane(HORIZONTAL_SPLIT, panel1.getView(), panel2.getView());
 		final Component left = panel1.getView(), right = panel2.getView();
 		
+		final JSplitPane splitPane = new JSplitPane(HORIZONTAL_SPLIT, left, right);
 		final JFrame frame = new JFrame();
 		frame.add(splitPane);
 		frame.setSize(512, 512);

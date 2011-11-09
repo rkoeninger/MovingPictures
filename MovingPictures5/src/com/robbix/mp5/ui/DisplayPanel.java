@@ -12,9 +12,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -126,10 +123,6 @@ public class DisplayPanel extends JComponent
 			map.getHeight() * tileSize
 		);
 		setPreferredSize(size);
-		MouseEvents mouseEvents = new MouseEvents();
-		addMouseWheelListener(mouseEvents);
-		addMouseMotionListener(mouseEvents);
-		addMouseListener(mouseEvents);
 		this.adapter = new InputOverlay.ListenerAdapter();
 		addKeyListener(adapter);
 		addMouseListener(adapter);
@@ -384,40 +377,6 @@ public class DisplayPanel extends JComponent
 	public List<AmbientAnimation> getAnimations()
 	{
 		return animations;
-	}
-	
-	private class MouseEvents extends MouseAdapter
-	{
-		public void mouseWheelMoved(MouseWheelEvent e)
-		{
-			if (e.isControlDown())
-			{
-				Point zoomPoint = e.getPoint();
-				zoomPoint.x -= scroll.x;
-				zoomPoint.y -= scroll.y;
-				
-				if (e.getWheelRotation() > 0) zoomIn(zoomPoint);
-				else                          zoomOut(zoomPoint);
-			}
-		}
-		
-		public void mouseClicked(MouseEvent e)
-		{
-			if (e.isControlDown() && e.getButton() == MouseEvent.BUTTON2)
-			{
-				if (tileSize == tiles.getTileSize())
-				{
-					zoomGlobal();
-				}
-				else
-				{
-					Point zoomPoint = e.getPoint();
-					zoomPoint.x -= scroll.x;
-					zoomPoint.y -= scroll.y;
-					zoomNormal(zoomPoint);
-				}
-			}
-		}
 	}
 	
 	public int getTotalWidth()

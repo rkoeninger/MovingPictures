@@ -9,12 +9,16 @@ import static java.awt.event.KeyEvent.VK_RIGHT;
 import static java.awt.event.KeyEvent.VK_UP;
 
 import java.awt.BorderLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollBar;
@@ -42,6 +46,9 @@ public class DisplayPanelView extends JComponent
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
 		addKeyListener(new KeyEvents());
+		panel.addMouseListener(new MouseEvents());
+		panel.addMouseMotionListener(new MouseEvents());
+		panel.addMouseWheelListener(new MouseEvents());
 		scrollTimer = new Timer(20, new DoScroll());
 		vScrollBar = new JScrollBar(SwingConstants.VERTICAL);
 		hScrollBar = new JScrollBar(SwingConstants.HORIZONTAL);
@@ -134,6 +141,45 @@ public class DisplayPanelView extends JComponent
 				
 				if (sx == 0 && sy == 0)
 					scrollTimer.stop();
+			}
+		}
+	}
+	
+	public class MouseEvents extends MouseAdapter
+	{
+		public void mouseWheelMoved(MouseWheelEvent e)
+		{
+			if (e.isControlDown())
+			{
+				Point zoomPoint = e.getPoint();
+				zoomPoint.x -= panel.getViewX();
+				zoomPoint.y -= panel.getViewY();
+				
+				if (e.getWheelRotation() > 0) panel.zoomIn(zoomPoint);
+				else                          panel.zoomOut(zoomPoint);
+			}
+		}
+		
+		public void mousePressed(MouseEvent e)
+		{
+			panel.requestFocus();
+		}
+		
+		public void mouseClicked(MouseEvent e)
+		{
+			if (e.isControlDown() && e.getButton() == MouseEvent.BUTTON2)
+			{
+				if (panel.getScale() == 0)
+				{
+					panel.zoomGlobal();
+				}
+				else
+				{
+					Point zoomPoint = e.getPoint();
+					zoomPoint.x -= panel.getViewX();
+					zoomPoint.y -= panel.getViewY();
+					panel.zoomNormal(zoomPoint);
+				}
 			}
 		}
 	}
