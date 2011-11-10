@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ai.task.SelfDestructAttackTask;
@@ -284,6 +287,7 @@ public class UnitFactory
 			String armorString = statsNode.getAttribute("armor");
 			Armor armor        = getArmor(armorString, xmlFile);
 			Cost cost          = getCost(rootNode.getNode("Cost"), xmlFile);
+			Set<Command> cmds  = getCommands(rootNode.getNode("Commands"), xmlFile);
 			
 			names.add(civ + " " + displayName);
 			typeList.add(unitType);
@@ -298,7 +302,8 @@ public class UnitFactory
 				sightRange,
 				speed,
 				rotationSpeed,
-				rotationDegree
+				rotationDegree,
+				cmds
 			));
 		}
 		else if (type.equals("structure"))
@@ -314,6 +319,7 @@ public class UnitFactory
 			Cost cost               = getCost(rootNode.getNode("Cost"), xmlFile);
 			boolean source          = statsNode.getBooleanAttribute("connectionSource", false);
 			boolean needsConnection = statsNode.getBooleanAttribute("needsConnection", false);
+			Set<Command> cmds       = getCommands(rootNode.getNode("Commands"), xmlFile);
 			
 			names.add(civ + " " + displayName);
 			typeList.add(unitType);
@@ -329,7 +335,8 @@ public class UnitFactory
 				sightRange,
 				footprint,
 				source,
-				needsConnection
+				needsConnection,
+				cmds
 			));
 		}
 		else if (type.equals("guardPost"))
@@ -381,6 +388,13 @@ public class UnitFactory
 		}
 		
 		return new Cost(resourceMap);
+	}
+	
+	private Set<Command> getCommands(XNode commandsNode, File xmlFile)
+	throws FileFormatException
+	{
+		Collection<Command> cmds = commandsNode.getEnumValues(Command.class, "Command");
+		return cmds.isEmpty() ? EnumSet.noneOf(Command.class) : EnumSet.copyOf(cmds);
 	}
 	
 	private static Armor getArmor(String name, File xmlFile)

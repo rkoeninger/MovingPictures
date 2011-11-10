@@ -19,10 +19,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
@@ -74,6 +77,7 @@ import com.robbix.mp5.ui.overlay.PlaceResourceOverlay;
 import com.robbix.mp5.ui.overlay.PlaceUnitOverlay;
 import com.robbix.mp5.ui.overlay.SelectUnitOverlay;
 import com.robbix.mp5.ui.overlay.SpawnMeteorOverlay;
+import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.AnimatedButton;
 import com.robbix.mp5.utils.JListDialog;
@@ -120,6 +124,10 @@ public class Sandbox extends JApplet
 	private static DisplayPanel panel;
 	private static JToolBar commandBar;
 	private static Map<Integer, JMenuItem> playerMenuItems = new HashMap<Integer, JMenuItem>();
+	private static Map<Command, AnimatedButton> commandButtons =
+		new EnumMap<Command, AnimatedButton>(Command.class);
+	
+	private static JButton centerViewButton;
 	
 	private static JFrame slViewer, utViewer, sbPlayer;
 	
@@ -263,6 +271,8 @@ public class Sandbox extends JApplet
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
 		
+		centerViewButton = new JButton("Center View");
+		
 		throttleSliderMenuItem = new JSliderMenuItem(0, 200, 45);
 		Hashtable<Integer, JLabel> paintLabels = new Hashtable<Integer, JLabel>();
 		paintLabels.put(0, new JLabel("Unthrottled"));
@@ -377,6 +387,7 @@ public class Sandbox extends JApplet
 			addUnitMenuItem.addActionListener(listener);
 		}
 		
+		centerViewButton      .addActionListener(listener);
 		throttleSliderMenuItem.addChangeListener((ChangeListener) listener);
 		volumeSliderMenuItem  .addChangeListener((ChangeListener) listener);
 		spriteLibMenuItem     .addActionListener(listener);
@@ -927,7 +938,10 @@ public class Sandbox extends JApplet
 			}
 			else if (e.getActionCommand().startsWith(ACP_COMMAND_BUTTON))
 			{
-				game.getDisplay().fireCommandButton(e.getActionCommand().substring(ACP_COMMAND_BUTTON.length()));
+				String cmd = e.getActionCommand();
+				cmd = cmd.substring(ACP_COMMAND_BUTTON.length());
+				cmd = Utils.allCapsToCamelCase(cmd);
+				game.getDisplay().fireCommandButton(cmd);
 			}
 		}
 	}
@@ -954,6 +968,8 @@ public class Sandbox extends JApplet
 		public synchronized void showStatus(Unit unit)
 		{
 			myUnit = unit;
+			showCommandButtons(unit == null ? null : unit.getType().getCommands());
+			centerViewButton.setEnabled(unit != null);
 		}
 	}
 	
@@ -1042,25 +1058,60 @@ public class Sandbox extends JApplet
 			if (icons.isEmpty())
 				continue;
 			
-			AnimatedButton button = new AnimatedButton(iconDir.getName(), icons);
+			String command = Utils.camelCaseToAllCaps(iconDir.getName());
+			AnimatedButton button = new AnimatedButton(command, icons);
 			button.setActionCommand(ACP_COMMAND_BUTTON + iconDir.getName());
 			button.addActionListener(listener);
 			button.setFocusable(false);
-			commandBar.add(button);
+			commandButtons.put(Command.valueOf(command), button);
 		}
 		
-		String[] extraCommands = {"kill", "idle", "build", "dock", "mine"};
+		String[] extraCommands = {"KILL", "IDLE", "BUILD", "DOCK", "MINE"};
 		
-		for (String commandName : extraCommands)
+		for (String command : extraCommands)
 		{
-			AnimatedButton button = new AnimatedButton(commandName);
-			button.setActionCommand(ACP_COMMAND_BUTTON + commandName);
+			AnimatedButton button = new AnimatedButton(command);
+			button.setActionCommand(ACP_COMMAND_BUTTON + command);
 			button.addActionListener(listener);
 			button.setFocusable(false);
-			commandBar.add(button);
+			commandButtons.put(Command.valueOf(command), button);
 		}
 		
+		commandBar.add(centerViewButton);
 		return commandBar;
+	}
+	
+	private static void showCommandButtons(Set<Command> commands)
+	{
+		commandBar.removeAll();
+		commandBar.add(centerViewButton);
+		
+		if (commands == null || commands.isEmpty())
+			return;
+		
+		ArrayList<AnimatedButton> buttons = new ArrayList<AnimatedButton>(commands.size());
+		
+		for (Command cmd : commands)
+			buttons.add(commandButtons.get(cmd));
+		
+		AnimatedButton[] buttonArray = buttons.toArray(new AnimatedButton[buttons.size()]);
+		Arrays.sort(buttonArray, new AnimatedButtonComparator());
+		
+		for (AnimatedButton button : buttonArray)
+			commandBar.add(button);
+		
+		frame.validate();
+	}
+	
+	private static class AnimatedButtonComparator implements Comparator<AnimatedButton>
+	{
+		public int compare(AnimatedButton a, AnimatedButton b)
+		{
+			if ( a.hasIcons() && !b.hasIcons()) return  1;
+			if (!a.hasIcons() &&  b.hasIcons()) return -1;
+			
+			return a.getActionCommand().compareTo(b.getActionCommand());
+		}
 	}
 	
 	public static List<String> getAvailableTileSets()

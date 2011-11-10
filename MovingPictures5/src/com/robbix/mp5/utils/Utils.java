@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -31,6 +32,65 @@ import com.robbix.mp5.unit.Unit;
  */
 public class Utils
 {
+	/**
+	 * Doesn't like all-upper-case acronyms like "XMLDocument".
+	 */
+	public static String camelCaseToAllCaps(String str)
+	{
+		ArrayList<String> parts = new ArrayList<String>();
+		
+		int i0 = 0;
+		
+		for (int i = 0; i < str.length(); ++i)
+		{
+			if (Character.isUpperCase(str.charAt(i)))
+			{
+				parts.add(str.substring(i0, i));
+				i0 = i;
+			}
+		}
+		
+		if (i0 != str.length() - 1)
+		{
+			parts.add(str.substring(i0, str.length()));
+		}
+		
+		StringBuilder result = new StringBuilder();
+		
+		for (int p = 0; p < parts.size(); ++p)
+		{
+			result.append(parts.get(p).toUpperCase());
+			
+			if (p < parts.size() - 1 && parts.size() > 1)
+				result.append('_');
+		}
+		
+		return result.toString();
+	}
+	
+	public static String allCapsToCamelCase(String str)
+	{
+		StringBuilder result = new StringBuilder();
+		String[] parts = str.split("_");
+		
+		for (int p = 0; p < parts.length; ++p)
+		{
+			if (p == 0)
+			{
+				result.append(parts[p]);
+			}
+			else
+			{
+				result.append(Character.toUpperCase(parts[p].charAt(0)));
+				
+				if (parts[p].length() > 1)
+					result.append(parts[p].substring(1));
+			}
+		}
+		
+		return result.toString();
+	}
+	
 	/**
 	 * Globally accessible random number generator.
 	 */
@@ -629,5 +689,16 @@ public class Utils
 		float[] hsb = new float[4];
 		Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
 		return (int) (hsb[0] * 360);
+	}
+	
+	public static <E extends Enum<E>> Comparator<E> getEnumNameComparator(Class<E> enumType)
+	{
+		return new Comparator<E>()
+		{
+			public int compare(E a, E b)
+			{
+				return a.name().compareTo(b.name());
+			}
+		};
 	}
 }

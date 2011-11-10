@@ -335,6 +335,7 @@ public class UnitTypeViewer extends JFrame
 			appendTableRow("Reload Time", type.getWeaponChargeCost());
 			appendTableRow("Cost", type.getCost());
 			appendTableRow("Ack", type.getAcknowledgement());
+			appendTableRow("Commands", type.getCommands());
 			
 			boolean artLoaded = isArtLoaded(type);
 			

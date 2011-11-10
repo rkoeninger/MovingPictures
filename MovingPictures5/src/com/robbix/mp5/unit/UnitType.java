@@ -1,6 +1,9 @@
 package com.robbix.mp5.unit;
 
+import static com.robbix.mp5.unit.Command.*;
+
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,7 +22,8 @@ public class UnitType
 		double sightRange,
 		double speed,
 		int rotationSpeed,
-		int rotationDegree)
+		int rotationDegree,
+		Set<Command> commands)
 	{
 		UnitType type = new UnitType();
 		
@@ -35,6 +39,8 @@ public class UnitType
 		type.rotationSpeed = rotationSpeed;
 		type.rotationDegree = rotationDegree;
 		type.fp = Footprint.VEHICLE;
+		type.commands = EnumSet.copyOf(VEHICLE_COMMANDS);
+		type.commands.addAll(commands);
 		type.initSpriteArgs();
 		
 		return type;
@@ -52,7 +58,8 @@ public class UnitType
 		double sightRange,
 		Footprint fp,
 		boolean connectionSource,
-		boolean needsConnection)
+		boolean needsConnection,
+		Set<Command> commands)
 	{
 		UnitType type = new UnitType();
 		
@@ -68,6 +75,8 @@ public class UnitType
 		type.buildTime = 150;
 		type.connectionSource = connectionSource;
 		type.needsConnection = needsConnection;
+		type.commands = EnumSet.copyOf(STRUCT_COMMANDS);
+		type.commands.addAll(commands);
 		type.initSpriteArgs();
 		
 		return type;
@@ -102,6 +111,7 @@ public class UnitType
 		type.weaponChargeCost = weaponChargeCost;
 		type.fp = Footprint.STRUCT_1_BY_1;
 		type.buildTime = 50;
+		type.commands = EnumSet.copyOf(GUARD_POST_COMMANDS);
 		type.initSpriteArgs();
 		
 		return type;
@@ -152,6 +162,7 @@ public class UnitType
 		type.rotationSpeed = rotationSpeed;
 		type.rotationDegree = rotationDegree;
 		type.fp = Footprint.VEHICLE;
+		type.commands = EnumSet.copyOf(CHASSIS_COMMANDS);
 		type.initSpriteArgs();
 		
 		return type;
@@ -178,6 +189,35 @@ public class UnitType
 		return type;
 	}
 	
+	private static Set<Command> VEHICLE_COMMANDS = EnumSet.of(
+		MOVE,
+		SELF_DESTRUCT,
+		SCATTER,
+		KILL,
+		STAND_GROUND,
+		TRANSFER,
+		KILL
+	);
+	
+	private static Set<Command> STRUCT_COMMANDS = EnumSet.of(
+		IDLE,
+		KILL
+	);
+	
+	private static Set<Command> GUARD_POST_COMMANDS = EnumSet.of(
+		ATTACK,
+		KILL,
+		IDLE
+	);
+	
+	private static Set<Command> CHASSIS_COMMANDS = EnumSet.of(
+		MOVE,
+		KILL,
+		SELF_DESTRUCT,
+		GUARD,
+		STAND_GROUND
+	);
+	
 	private static AtomicInteger nextSerial = new AtomicInteger();
 	
 	private int serial;
@@ -203,6 +243,7 @@ public class UnitType
 	private boolean connectionSource;
 	private boolean needsConnection;
 	private Object[] spriteArgs;
+	private Set<Command> commands;
 	
 	private UnitType()
 	{
@@ -248,6 +289,11 @@ public class UnitType
 	public int getSerial()
 	{
 		return serial;
+	}
+	
+	public Set<Command> getCommands()
+	{
+		return commands;
 	}
 	
 	public String getAcknowledgement()

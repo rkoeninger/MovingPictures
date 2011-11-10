@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -150,7 +151,8 @@ public class XNode
 			}
 			
 			if (!found)
-				throw new IllegalArgumentException("Node not found " + root.getTextContent());
+				throw new IllegalArgumentException(
+					"Node not found " + Arrays.toString(path) + " on " + root.getNodeName());
 		}
 		
 		return new XNode(currentNode);
@@ -274,6 +276,35 @@ public class XNode
 		}
 		
 		return results;
+	}
+	
+	public String getValue()
+	{
+		return root.getTextContent().trim();
+	}
+	
+	public <E extends Enum<E>> E getEnumValue(Class<E> enumType) throws FileFormatException
+	{
+		String text = getValue();
+		text = text.toUpperCase();
+		text = text.replace(' ', '_');
+		return Enum.valueOf(enumType, text);
+	}
+	
+	public <E extends Enum<E>> List<E> getEnumValues(Class<E> enumType, String... path)
+	throws FileFormatException
+	{
+		List<String> values = getValues(path);
+		List<E> enumValues = new ArrayList<E>(values.size());
+		
+		for (String value : values)
+		{
+			value = value.toUpperCase();
+			value = value.replace(' ', '_');
+			enumValues.add(value == null ? null : Enum.valueOf(enumType, value));
+		}
+		
+		return enumValues;
 	}
 	
 	/**
@@ -461,17 +492,16 @@ public class XNode
 		return dir;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <V extends Enum<V>> V getEnumAttribute(Class<V> enumType, String name)
 	throws FileFormatException
 	{
 		String text = getAttribute(name);
-		text = text.toUpperCase();
-		text = text.replace(' ', '_');
 		
 		try
 		{
-			return (V) enumType.getDeclaredField(text).get(null);
+			text = text.toUpperCase();
+			text = text.replace(' ', '_');
+			return Enum.valueOf(enumType, text);
 		}
 		catch (Exception e)
 		{
@@ -479,7 +509,6 @@ public class XNode
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <V extends Enum<V>> V getEnumAttribute(Class<V> enumType, String name, V defaultValue)
 	{
 		String text = getAttribute(name, null);
@@ -487,12 +516,11 @@ public class XNode
 		if (text == null)
 			return defaultValue;
 		
-		text = text.toUpperCase();
-		text = text.replace(' ', '_');
-		
 		try
 		{
-			return (V) enumType.getDeclaredField(text).get(null);
+			text = text.toUpperCase();
+			text = text.replace(' ', '_');
+			return Enum.valueOf(enumType, text);
 		}
 		catch (Exception e)
 		{

@@ -42,6 +42,11 @@ public class AnimatedButton extends JButton
 		frameCount = icons.size();
 	}
 	
+	public boolean hasIcons()
+	{
+		return icons != null && !icons.isEmpty();
+	}
+	
 	public void setDelay(int millis)
 	{
 		timer.setDelay(millis);
