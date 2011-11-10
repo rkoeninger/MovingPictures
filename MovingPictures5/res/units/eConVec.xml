@@ -2,10 +2,10 @@
 <UnitType type="vehicle" unitType="eConVec" civ="Eden">
 	<DisplayName>ConVec</DisplayName>
 	<Acknowledgement>conVec</Acknowledgement>
-	<Activites>
-		<Activity>move</Activity>
-		<Activity>construct</Activity>
-	</Activites>
+	<Commands>
+		<Command>construct</Command>
+		<Command>demolish</Command>
+	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="250"/>
 	</Cost>

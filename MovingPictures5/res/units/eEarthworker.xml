@@ -2,10 +2,12 @@
 <UnitType type="vehicle" unitType="eEarthworker" civ="Eden">
 	<DisplayName>Earthworker</DisplayName>
 	<Acknowledgement>earthworker</Acknowledgement>
-	<Activites>
-		<Activity>move</Activity>
-		<Activity>construct</Activity>
-	</Activites>
+	<Commands>
+		<Command>build wall</Command>
+		<Command>build wall alt</Command>
+		<Command>build tube</Command>
+		<Command>demolish</Command>
+	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="250"/>
 	</Cost>

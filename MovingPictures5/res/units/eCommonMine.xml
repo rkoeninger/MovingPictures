@@ -2,6 +2,9 @@
 <UnitType type="structure" unitType="eCommonMine" civ="Eden">
 	<DisplayName>Common Ore Mine</DisplayName>
 	<Acknowledgement>commonMine</Acknowledgement>
+	<Commands>
+		<Command>mine</Command>
+	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="400"/>
 	</Cost>

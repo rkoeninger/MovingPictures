@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <UnitType type="tank" unitType="eAcidCloudLynx" civ="Eden">
 	<DisplayName>Acid Cloud Lynx</DisplayName>
+	<Commands/>
 	<Cost>
 		<Resource type="common ore" amount="1000"/>
 		<Resource type="rare ore" amount="250"/>

@@ -2,6 +2,9 @@
 <UnitType type="structure" unitType="eCommonSmelter" civ="Eden">
 	<DisplayName>Common Ore Smelter</DisplayName>
 	<Acknowledgement>commonSmelter</Acknowledgement>
+	<Commands>
+		<Command>dock</Command>
+	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="400"/>
 	</Cost>

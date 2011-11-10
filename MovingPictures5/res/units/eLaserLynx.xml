@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <UnitType type="tank" unitType="eLaserLynx" civ="Eden">
 	<DisplayName>Laser Lynx</DisplayName>
+	<Commands/>
 	<Cost>
 		<Resource type="common ore" amount="250"/>
 	</Cost>

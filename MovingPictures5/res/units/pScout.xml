@@ -2,9 +2,7 @@
 <UnitType type="vehicle" unitType="pScout" civ="Plymouth">
 	<DisplayName>Scout</DisplayName>
 	<Acknowledgement>scout</Acknowledgement>
-	<Activites>
-		<Activity>move</Activity>
-	</Activites>
+	<Commands/>
 	<Cost>
 		<Resource type="common ore" amount="100"/>
 	</Cost>

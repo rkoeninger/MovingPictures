@@ -2,6 +2,7 @@
 <UnitType type="structure" unitType="eCommandCenter" civ="Eden">
 	<DisplayName>Command Center</DisplayName>
 	<Acknowledgement>commandCenter</Acknowledgement>
+	<Commands/>
 	<Cost>
 		<Resource type="common ore" amount="1000"/>
 	</Cost>

@@ -2,9 +2,7 @@
 <UnitType type="vehicle" unitType="pScorpion" civ="Plymouth">
 	<DisplayName>Scorpion</DisplayName>
 	<Acknowledgement>scorpion</Acknowledgement>
-	<Activites>
-		<Activity>move</Activity>
-	</Activites>
+	<Commands/>
 	<Cost>
 		<Resource type="common ore" amount="100"/>
 	</Cost>

@@ -2,9 +2,9 @@
 <UnitType type="vehicle" unitType="eRoboMiner" civ="Eden">
 	<DisplayName>RoboMiner</DisplayName>
 	<Acknowledgement>roboMiner</Acknowledgement>
-	<Activites>
-		<Activity>move</Activity>
-	</Activites>
+	<Commands>
+		<Command>construct</Command>
+	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="250"/>
 	</Cost>

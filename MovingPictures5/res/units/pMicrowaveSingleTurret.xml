@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <UnitType type="turret" unitType="pMicrowaveSingleTurret" civ="Plymouth">
 	<DisplayName>Microwave Single Turret</DisplayName>
+	<Commands/>
 	<Stats damage="40" reloadDelay="80" attackRange="4"/>
 </UnitType>

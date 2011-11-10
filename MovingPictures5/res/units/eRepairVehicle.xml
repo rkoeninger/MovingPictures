@@ -2,10 +2,9 @@
 <UnitType type="vehicle" unitType="eRepairVehicle" civ="Eden">
 	<DisplayName>Repair Vehicle</DisplayName>
 	<Acknowledgement>repairVehicle</Acknowledgement>
-	<Activites>
-		<Activity>move</Activity>
-		<Activity>repair</Activity>
-	</Activites>
+	<Commands>
+		<Command>repair</Command>
+	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="250"/>
 	</Cost>

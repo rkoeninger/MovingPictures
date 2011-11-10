@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <UnitType type="tank" unitType="eRailGunLynx" civ="Eden">
 	<DisplayName>Rail Gun Lynx</DisplayName>
+	<Commands/>
 	<Cost>
 		<Resource type="common ore" amount="500"/>
 	</Cost>

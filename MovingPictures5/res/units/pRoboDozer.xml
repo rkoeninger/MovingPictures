@@ -2,10 +2,9 @@
 <UnitType type="vehicle" unitType="pRoboDozer" civ="Plymouth">
 	<DisplayName>RoboDozer</DisplayName>
 	<Acknowledgement>roboDozer</Acknowledgement>
-	<Activites>
-		<Activity>move</Activity>
-		<Activity>bulldoze</Activity>
-	</Activites>
+	<Commands>
+		<Command>bulldoze</Command>
+	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="250"/>
 	</Cost>

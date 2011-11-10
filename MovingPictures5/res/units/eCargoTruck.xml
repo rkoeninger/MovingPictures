@@ -2,13 +2,12 @@
 <UnitType type="vehicle" unitType="eCargoTruck" civ="Eden">
 	<DisplayName>Cargo Truck</DisplayName>
 	<Acknowledgement>cargoTruck</Acknowledgement>
-	<Activites>
-		<Activity>move</Activity>
-		<Activity>dump</Activity>
-		<Activity>dockUp</Activity>
-		<Activity>dockDown</Activity>
-		<Activity>mineLoad</Activity>
-	</Activites>
+	<Commands>
+		<Command>dump</Command>
+		<Command>salvage</Command>
+		<Command>dock</Command>
+		<Command>mine</Command>
+	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="200"/>
 	</Cost>

@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <UnitType type="turret" unitType="pRPGSingleTurret" civ="Plymouth">
 	<DisplayName>RPG Single Turret</DisplayName>
+	<Commands/>
 	<Stats damage="90" reloadDelay="125" attackRange="5"/>
 </UnitType>

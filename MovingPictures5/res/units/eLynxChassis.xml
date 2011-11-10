@@ -2,9 +2,7 @@
 <UnitType type="chassis" unitType="eLynxChassis" civ="Eden">
 	<DisplayName>Lynx Chassis</DisplayName>
 	<Acknowledgement>lynx</Acknowledgement>
-	<Activites>
-		<Activity>move</Activity>
-	</Activites>
+	<Commands/>
 	<Cost>
 		<Resource type="common ore" amount="100"/>
 	</Cost>

@@ -2,6 +2,9 @@
 <UnitType type="structure" unitType="eVehicleFactory" civ="Eden">
 	<DisplayName>Vehicle Factory</DisplayName>
 	<Acknowledgement>factory</Acknowledgement>
+	<Commands>
+		<Command>build</Command>
+	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="400"/>
 	</Cost>
