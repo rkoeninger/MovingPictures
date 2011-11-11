@@ -12,7 +12,7 @@ import com.robbix.mp5.utils.Utils;
 
 public class Sprite
 {
-	private static final int[] SHADOW_COLOR = {0, 0, 0, 191};
+	private static final int[] SHADOW_COLOR = {0, 0, 0, 127};
 	private static final int[] CLEAR = {0, 0, 0, 0};
 	private Offset offset;
 	private int baseHue;
@@ -73,6 +73,11 @@ public class Sprite
 		}
 		
 		return image;
+	}
+	
+	public Offset getOffset()
+	{
+		return offset;
 	}
 	
 	public int getXOffset()

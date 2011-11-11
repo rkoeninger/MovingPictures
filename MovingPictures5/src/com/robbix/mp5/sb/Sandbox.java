@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
@@ -69,6 +68,7 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.sb.demo.Demo;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.PlayerStatus;
+import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.TitleBar;
 import com.robbix.mp5.ui.UnitStatus;
 import com.robbix.mp5.ui.overlay.PlaceBulldozeOverlay;
@@ -79,6 +79,7 @@ import com.robbix.mp5.ui.overlay.SelectUnitOverlay;
 import com.robbix.mp5.ui.overlay.SpawnMeteorOverlay;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.unit.UnitType;
 import com.robbix.mp5.utils.AnimatedButton;
 import com.robbix.mp5.utils.JListDialog;
 import com.robbix.mp5.utils.JSliderMenuItem;
@@ -127,8 +128,6 @@ public class Sandbox extends JApplet
 	private static Map<Command, AnimatedButton> commandButtons =
 		new EnumMap<Command, AnimatedButton>(Command.class);
 	
-	private static JButton centerViewButton;
-	
 	private static JFrame slViewer, utViewer, sbPlayer;
 	
 	// References moved here so they can be called by addPlayer(int)
@@ -140,6 +139,10 @@ public class Sandbox extends JApplet
 	private static final String ACP_SELECT_PLAYER  = "selectPlayer-";
 	private static final String ACP_ADD_UNIT       = "addUnit-";
 	private static final String ACP_COMMAND_BUTTON = "commandButton-";
+	
+	private static Sprite edenIconSprite;
+	private static Sprite plymouthIconSprite;
+	private static ImageIcon neutralIcon;
 	
 	private static ActionListener listener = new MenuItemListener();
 	
@@ -177,6 +180,7 @@ public class Sandbox extends JApplet
 	private static JMenuItem setAudioFormatMenuItem;
 	private static JMenuItem removeAllUnitsMenuItem;
 	private static JMenuItem addPlayerMenuItem;
+	private static JMenuItem aboutMenuItem;
 	
 	public static void main(String[] args) throws IOException
 	{
@@ -271,8 +275,6 @@ public class Sandbox extends JApplet
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
 		
-		centerViewButton = new JButton("Center View");
-		
 		throttleSliderMenuItem = new JSliderMenuItem(0, 200, 45);
 		Hashtable<Integer, JLabel> paintLabels = new Hashtable<Integer, JLabel>();
 		paintLabels.put(0, new JLabel("Unthrottled"));
@@ -314,6 +316,7 @@ public class Sandbox extends JApplet
 		setAudioFormatMenuItem = new JMenuItem("Set Format...");
 		removeAllUnitsMenuItem = new JMenuItem("Remove All");
 		addPlayerMenuItem      = new JMenuItem("Add Player...");
+		aboutMenuItem          = new JMenuItem("About");
 		
 		final JMenuBar menuBar        = new JMenuBar();
 		final JMenu engineMenu        = new JMenu("Engine");
@@ -324,6 +327,7 @@ public class Sandbox extends JApplet
 		final JMenu placeResourceMenu = new JMenu("Add Ore");
 		final JMenu soundMenu         = new JMenu("Sound");
 		final JMenu addUnitMenu       = new JMenu("Add");
+		final JMenu helpMenu          = new JMenu("Help");
 		stepMenuItem.setEnabled(false);
 		throttleSliderMenuItem.setValue(engine.getDelay());
 		playerMenu = new JMenu("Players");
@@ -387,7 +391,6 @@ public class Sandbox extends JApplet
 			addUnitMenuItem.addActionListener(listener);
 		}
 		
-		centerViewButton      .addActionListener(listener);
 		throttleSliderMenuItem.addChangeListener((ChangeListener) listener);
 		volumeSliderMenuItem  .addChangeListener((ChangeListener) listener);
 		spriteLibMenuItem     .addActionListener(listener);
@@ -422,6 +425,7 @@ public class Sandbox extends JApplet
 		stepMenuItem          .addActionListener(listener);
 		exitMenuItem          .addActionListener(listener);
 		addPlayerMenuItem     .addActionListener(listener);
+		aboutMenuItem         .addActionListener(listener);
 		
 		pauseMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PAUSE, 0));
 		stepMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
@@ -466,6 +470,7 @@ public class Sandbox extends JApplet
 		unitMenu.add(addUnitMenu);
 		unitMenu.addSeparator();
 		unitMenu.add(removeAllUnitsMenuItem);
+		helpMenu.add(aboutMenuItem);
 		
 		menuBar.add(engineMenu);
 		menuBar.add(displayMenu);
@@ -474,11 +479,19 @@ public class Sandbox extends JApplet
 		menuBar.add(disastersMenu);
 		menuBar.add(playerMenu);
 		menuBar.add(unitMenu);
+		menuBar.add(helpMenu);
 		
 		JPanel statusesPanel = new JPanel();
 		statusesPanel.setLayout(new GridLayout(2, 1));
 		statusesPanel.add(unitStatusLabel);
 		statusesPanel.add(playerStatusLabel);
+		
+		Image img = ImageIO.read(new File(resDir, "art/edenIcon.png"));
+		edenIconSprite = new Sprite(img, 240, 0, 0);
+		img = ImageIO.read(new File(resDir, "art/plymouthIcon.png"));
+		plymouthIconSprite = new Sprite(img, 240, 0, 0);
+		img = ImageIO.read(new File(resDir, "art/neutralIcon.png"));
+		neutralIcon = new ImageIcon(img);
 		
 		commandBar = loadCommandBar();
 		
@@ -924,6 +937,10 @@ public class Sandbox extends JApplet
 				game.addPlayer(newPlayer);
 				selectPlayer(newPlayer.getID());
 			}
+			else if (e.getSource() == aboutMenuItem)
+			{
+				AboutDialog.showDialog(frame, true);
+			}
 			else if (e.getActionCommand().startsWith(ACP_SELECT_PLAYER))
 			{
 				selectPlayer(Integer.valueOf(e.getActionCommand().substring(ACP_SELECT_PLAYER.length())));
@@ -940,8 +957,7 @@ public class Sandbox extends JApplet
 			{
 				String cmd = e.getActionCommand();
 				cmd = cmd.substring(ACP_COMMAND_BUTTON.length());
-				cmd = Utils.allCapsToCamelCase(cmd);
-				game.getDisplay().fireCommandButton(cmd);
+				game.getDisplay().fireCommandButton(Command.valueOf(cmd));
 			}
 		}
 	}
@@ -968,8 +984,7 @@ public class Sandbox extends JApplet
 		public synchronized void showStatus(Unit unit)
 		{
 			myUnit = unit;
-			showCommandButtons(unit == null ? null : unit.getType().getCommands());
-			centerViewButton.setEnabled(unit != null);
+			showCommandButtons(unit);
 		}
 	}
 	
@@ -1060,7 +1075,8 @@ public class Sandbox extends JApplet
 			
 			String command = Utils.camelCaseToAllCaps(iconDir.getName());
 			AnimatedButton button = new AnimatedButton(command, icons);
-			button.setActionCommand(ACP_COMMAND_BUTTON + iconDir.getName());
+			button.setToolTipText(iconDir.getName());
+			button.setActionCommand(ACP_COMMAND_BUTTON + command);
 			button.addActionListener(listener);
 			button.setFocusable(false);
 			commandButtons.put(Command.valueOf(command), button);
@@ -1077,29 +1093,37 @@ public class Sandbox extends JApplet
 			commandButtons.put(Command.valueOf(command), button);
 		}
 		
-		commandBar.add(centerViewButton);
+		commandBar.add(new JLabel(neutralIcon));
 		return commandBar;
 	}
 	
-	private static void showCommandButtons(Set<Command> commands)
+	private static void showCommandButtons(Unit unit)
 	{
 		commandBar.removeAll();
-		commandBar.add(centerViewButton);
 		
-		if (commands == null || commands.isEmpty())
+		if (unit == null)
+		{
+			commandBar.add(new JLabel(neutralIcon));
+			commandBar.repaint();
+			frame.validate();
 			return;
+		}
 		
-		ArrayList<AnimatedButton> buttons = new ArrayList<AnimatedButton>(commands.size());
+		UnitType type = unit.getType();
+		Sprite sprite = "Eden".equals(type.getCiv()) ? edenIconSprite : plymouthIconSprite;
+		commandBar.add(new JLabel(new ImageIcon(sprite.getImage(unit.getOwner().getColorHue()))));
+		ArrayList<AnimatedButton> buttons = new ArrayList<AnimatedButton>();
 		
-		for (Command cmd : commands)
+		for (Command cmd : type.getCommands())
 			buttons.add(commandButtons.get(cmd));
 		
-		AnimatedButton[] buttonArray = buttons.toArray(new AnimatedButton[buttons.size()]);
+		AnimatedButton[] buttonArray = buttons.toArray(new AnimatedButton[0]);
 		Arrays.sort(buttonArray, new AnimatedButtonComparator());
 		
 		for (AnimatedButton button : buttonArray)
 			commandBar.add(button);
 		
+		commandBar.repaint();
 		frame.validate();
 	}
 	
@@ -1107,8 +1131,8 @@ public class Sandbox extends JApplet
 	{
 		public int compare(AnimatedButton a, AnimatedButton b)
 		{
-			if ( a.hasIcons() && !b.hasIcons()) return  1;
-			if (!a.hasIcons() &&  b.hasIcons()) return -1;
+			if ( a.hasIcons() && !b.hasIcons()) return -1;
+			if (!a.hasIcons() &&  b.hasIcons()) return  1;
 			
 			return a.getActionCommand().compareTo(b.getActionCommand());
 		}

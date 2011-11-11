@@ -13,6 +13,7 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
+import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.JListDialog;
 import com.robbix.mp5.utils.Position;
@@ -33,29 +34,41 @@ public class CommandTruckOverlay extends InputOverlay
 		this.trucks = trucks;
 	}
 	
+	public void init()
+	{
+		super.init();
+		panel.showStatus(trucks.iterator().next());
+	}
+	
+	public void dispose()
+	{
+		super.dispose();
+		panel.showStatus((Unit)null);
+	}
+	
 	public void paintOverUnits(Graphics g)
 	{
 		for (Unit truck : trucks)
 			drawSelectedUnitBox(g, truck);
 	}
 	
-	public void onCommand(String command)
+	public void onCommand(Command command)
 	{
-		if (command.equals("selfDestruct"))
+		if (command == Command.SELF_DESTRUCT)
 		{
 			for (Unit truck : trucks)
 				Mediator.selfDestruct(truck);
 			
 			complete();
 		}
-		else if (command.equals("kill"))
+		else if (command == Command.KILL)
 		{
 			for (Unit truck : trucks)
 				Mediator.kill(truck);
 			
 			complete();
 		}
-		else if (command.equals("dump"))
+		else if (command == Command.DUMP)
 		{
 			for (Unit truck : trucks)
 				if (!truck.isCargoEmpty())
@@ -64,11 +77,11 @@ public class CommandTruckOverlay extends InputOverlay
 					truck.interrupt(new DumpTask());
 				}
 		}
-		else if (command.equals("patrol"))
+		else if (command == Command.PATROL)
 		{
 			push(new SelectMineRouteOverlay(trucks));
 		}
-		else if (command.equals("transfer"))
+		else if (command == Command.TRANSFER)
 		{
 			Collection<Player> players = Mediator.game.getPlayers();
 			players = new ArrayList<Player>(players);
@@ -89,7 +102,7 @@ public class CommandTruckOverlay extends InputOverlay
 			
 			complete();
 		}
-		else if (command.equals("dock") && trucks.size() == 1)
+		else if (command == Command.DOCK && trucks.size() == 1)
 		{
 			Unit truck = trucks.iterator().next();
 			
@@ -112,7 +125,7 @@ public class CommandTruckOverlay extends InputOverlay
 				}
 			}
 		}
-		else if (command.equals("mine") && trucks.size() == 1)
+		else if (command == Command.MINE && trucks.size() == 1)
 		{
 			Unit truck = trucks.iterator().next();
 			

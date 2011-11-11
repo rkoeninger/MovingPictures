@@ -12,6 +12,7 @@ import com.robbix.mp5.ai.task.DockTask;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
+import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
 import com.robbix.mp5.utils.JListDialog;
@@ -28,6 +29,12 @@ public class CommandUnitOverlay extends InputOverlay
 		this.unit = unit;
 	}
 	
+	public void init()
+	{
+		super.init();
+		panel.showStatus(unit);
+	}
+	
 	public void dispose()
 	{
 		super.dispose();
@@ -42,42 +49,42 @@ public class CommandUnitOverlay extends InputOverlay
 		drawSelectedUnitBox(g, unit);
 	}
 	
-	public void onCommand(String command)
+	public void onCommand(Command command)
 	{
-		if (command.equals("attack"))
+		if (command == Command.ATTACK)
 		{
 			push(new SelectAttackTargetOverlay(unit.getTurret()));
 		}
-		else if (command.equals("stop"))
+		else if (command == Command.STOP)
 		{
 			unit.cancelAssignments();
 		}
-		else if (command.equals("selfDestruct"))
+		else if (command == Command.SELF_DESTRUCT)
 		{
 			Mediator.selfDestruct(unit);
 			complete();
 		}
-		else if (command.equals("bulldoze") && unit.is("Dozer"))
+		else if (command == Command.BULLDOZE && unit.is("Dozer"))
 		{
 			push(new SelectBulldozeOverlay(unit));
 		}
-		else if (command.equals("tube") && unit.is("Earthworker"))
+		else if (command == Command.BUILD_TUBE && unit.is("Earthworker"))
 		{
 			push(new BuildTubeOverlay(unit));
 		}
-		else if (command.equals("construct") && unit.is("ConVec"))
+		else if (command == Command.CONSTRUCT && unit.is("ConVec"))
 		{
 			convecConstruct();
 		}
-		else if (command.equals("construct") && unit.isMiner())
+		else if (command == Command.CONSTRUCT && unit.isMiner())
 		{
 			minerConstruct();
 		}
-		else if (command.equals("bulldoze") && unit.is("Dozer"))
+		else if (command == Command.BULLDOZE && unit.is("Dozer"))
 		{
 			push(new SelectBulldozeOverlay(unit));
 		}
-		else if (command.equals("transfer"))
+		else if (command == Command.TRANSFER)
 		{
 			Collection<Player> players = Mediator.game.getPlayers();
 			players = new ArrayList<Player>(players);
@@ -95,12 +102,12 @@ public class CommandUnitOverlay extends InputOverlay
 			unit.setOwner(player);
 			complete();
 		}
-		else if (command.equals("kill"))
+		else if (command == Command.KILL)
 		{
 			Mediator.kill(unit);
 			complete();
 		}
-		else if (command.equals("build") && unit.is("VehicleFactory"))
+		else if (command == Command.BUILD && unit.is("VehicleFactory"))
 		{
 			List<UnitType> vehicleTypes = Mediator.factory.getVehicleTypes();
 			Object option = JListDialog.showDialog(vehicleTypes.toArray());
@@ -140,7 +147,7 @@ public class CommandUnitOverlay extends InputOverlay
 			
 			JOptionPane.showMessageDialog(panel, "can't exit");
 		}
-		else if (command.equals("build") && unit.is("StructureFactory"))
+		else if (command == Command.BUILD && unit.is("StructureFactory"))
 		{
 			List<UnitType> structTypes = Mediator.factory.getStructureTypes();
 			Object option = JListDialog.showDialog(structTypes.toArray());
@@ -169,7 +176,7 @@ public class CommandUnitOverlay extends InputOverlay
 			owner.spend(type.getCost());
 			unit.setStructureKit(type.getName());
 		}
-		else if (command.equals("dock") && unit.is("ConVec"))
+		else if (command == Command.DOCK && unit.is("ConVec"))
 		{
 			Position adj = unit.getPosition().shift(0, -1);
 			LayeredMap map = panel.getMap();
@@ -192,7 +199,7 @@ public class CommandUnitOverlay extends InputOverlay
 				}
 			}
 		}
-		else if (command.equals("idle") && unit.isStructure())
+		else if (command == Command.IDLE && unit.isStructure())
 		{
 			if (unit.isIdle())
 			{

@@ -18,6 +18,7 @@ import java.awt.geom.Point2D;
 
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.DisplayPanel;
+import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
@@ -260,7 +261,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public void onRightClick(){}
 	public void onMiddleClick(){}
 	public void onAreaDragged(){}
-	public void onCommand(String command){}
+	public void onCommand(Command command){}
 	
 	public boolean isCursorOnGrid()
 	{

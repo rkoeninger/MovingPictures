@@ -19,6 +19,7 @@ public class AnimatedButton extends JButton
 	private Timer timer;
 	private int frame;
 	private int frameCount;
+	private boolean adopted = false;
 	
 	public AnimatedButton(String name)
 	{
@@ -34,12 +35,26 @@ public class AnimatedButton extends JButton
 		this.icons = icons;
 		this.disabled = new ImageIcon(Utils.getGrayscale(icons.get(0)));
 		this.timer = new Timer(60, new RotateIcons());
+		this.timer.setCoalesce(true);
 		
 		setActionCommand(name);
 		addMouseListener(new RolloverListener());
 		
 		frame = 0;
 		frameCount = icons.size();
+	}
+	
+	public void removeNotify()
+	{
+		super.removeNotify();
+		adopted = false;
+		stopTimer();
+	}
+	
+	public void addNotify()
+	{
+		super.addNotify();
+		adopted = true;
 	}
 	
 	public boolean hasIcons()
@@ -49,16 +64,28 @@ public class AnimatedButton extends JButton
 	
 	public void setDelay(int millis)
 	{
-		timer.setDelay(millis);
+		if (timer != null)
+			timer.setDelay(millis);
 	}
 	
 	public int getDelay()
 	{
-		return timer.getDelay();
+		return timer == null ? -1 : timer.getDelay();
+	}
+	
+	public void setVisible(boolean visible)
+	{
+		if (!visible)
+			stopTimer();
+		
+		super.setVisible(visible);
 	}
 	
 	public void setEnabled(boolean enabled)
 	{
+		if (!enabled)
+			stopTimer();
+		
 		if (icons != null)
 			setIcon(enabled ? icons.get(0) : disabled);
 		
@@ -69,8 +96,15 @@ public class AnimatedButton extends JButton
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			frame++;
-			setIcon(icons.get(frame % frameCount));
+			if (isVisible() && isEnabled())
+			{
+				frame++;
+				setIcon(icons.get(frame % frameCount));
+			}
+			else
+			{
+				stopTimer();
+			}
 		}
 	}
 	
@@ -80,7 +114,7 @@ public class AnimatedButton extends JButton
 		{
 			if (isEnabled())
 			{
-				timer.start();
+				startTimer();
 			}
 		}
 		
@@ -88,7 +122,7 @@ public class AnimatedButton extends JButton
 		{
 			if (isEnabled())
 			{
-				timer.stop();
+				stopTimer();
 				frame = 0;
 				setIcon(icons.get(0));
 			}
@@ -98,7 +132,7 @@ public class AnimatedButton extends JButton
 		{
 			if (isEnabled())
 			{
-				timer.stop();
+				stopTimer();
 			}
 		}
 		
@@ -108,8 +142,30 @@ public class AnimatedButton extends JButton
 			{
 				frame = 0;
 				setIcon(icons.get(0));
-				timer.start();
+				startTimer();
 			}
+		}
+	}
+	
+	private void startTimer()
+	{
+		if (timer != null && isVisible() && isEnabled() && adopted)
+		{
+			if (timer.getActionListeners().length == 0)
+				timer.addActionListener(new RotateIcons());
+			
+			timer.start();
+		}
+	}
+	
+	private void stopTimer()
+	{
+		if (timer != null)
+		{
+			timer.stop();
+			
+			for (ActionListener listener : timer.getActionListeners())
+				timer.removeActionListener(listener);
 		}
 	}
 }

@@ -30,6 +30,7 @@ import com.robbix.mp5.map.TileSet;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.ani.AmbientAnimation;
 import com.robbix.mp5.ui.overlay.InputOverlay;
+import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.AnimatedCursor;
 import com.robbix.mp5.utils.BorderRegion;
@@ -266,7 +267,7 @@ public class DisplayPanel extends JComponent
 		refresh();
 	}
 	
-	public void fireCommandButton(String command)
+	public void fireCommandButton(Command command)
 	{
 		if (!overlays.isEmpty()) overlays.get(0).onCommand(command);
 	}
