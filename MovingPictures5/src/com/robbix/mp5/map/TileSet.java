@@ -1,6 +1,5 @@
 package com.robbix.mp5.map;
 
-import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -75,15 +74,10 @@ public class TileSet
 		
 		for (int x = 0; x < tileOrder2.length; ++x)
 		{
-			Image wallGreen  = ImageIO.read(wallsG[x]);
-			Image wallYellow = ImageIO.read(wallsY[x]);
-			Image wallRed    = ImageIO.read(wallsR[x]);
-			Image tube       = ImageIO.read(tubes[x]);
-			
-			Tile wgTile = new Tile(wallGreen);
-			Tile wyTile = new Tile(wallYellow);
-			Tile wrTile = new Tile(wallRed);
-			Tile tuTile = new Tile(tube);
+			Tile wgTile = new Tile(ImageIO.read(wallsG[x]));
+			Tile wyTile = new Tile(ImageIO.read(wallsY[x]));
+			Tile wrTile = new Tile(ImageIO.read(wallsR[x]));
+			Tile tuTile = new Tile(ImageIO.read(tubes[x]));
 			
 			set.tiles.put("wall/green/"  + tileOrder2[x], wgTile);
 			set.tiles.put("wall/yellow/" + tileOrder2[x], wyTile);

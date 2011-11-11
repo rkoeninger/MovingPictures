@@ -28,6 +28,7 @@ import com.robbix.mp5.utils.RIterator;
 import com.robbix.mp5.utils.Region;
 import com.robbix.mp5.utils.Utils;
 
+// TODO: Reassess defensive bounds checking (add checked exception?)
 public class LayeredMap
 {
 	public static LayeredMap load(File rootDir, String mapName, TileSet tileSet) throws IOException
@@ -44,6 +45,7 @@ public class LayeredMap
 		map.sources = new HashSet<Position>();
 		map.units = new HashSet<Unit>();
 		map.deposits = new HashSet<ResourceDeposit>();
+		map.bounds = new Region(0, 0, w, h);
 		
 		for (int x = 0; x < w; ++x)
 		for (int y = 0; y < h; ++y)
@@ -94,13 +96,13 @@ public class LayeredMap
 	
 	private static class Spot
 	{
-		Unit occupant;
-		Unit reservant;
-		Fixture fixture;
-		int fixtureHP;
-		String tileCode;
-		ResourceDeposit deposit;
-		boolean alive;
+		public Unit occupant;
+		public Unit reservant;
+		public Fixture fixture;
+		public int fixtureHP;
+		public String tileCode;
+		public ResourceDeposit deposit;
+		public boolean alive;
 		
 		public boolean isTube()
 		{
@@ -121,6 +123,7 @@ public class LayeredMap
 	private Set<ResourceDeposit> deposits;
 	private CostMap costMap;
 	private TileSet tileSet;
+	private Region bounds;
 	
 	private List<DisplayPanel> panels;
 	
@@ -189,12 +192,16 @@ public class LayeredMap
 	
 	public String getTileCode(int x, int y)
 	{
+		if (!bounds.contains(x, y))
+			return null;
+		
 		return grid.get(x, y).tileCode;
 	}
 	
 	public boolean canPlaceFixture(Fixture fixture, Position pos)
 	{
-		return (canPlaceUnit(pos) || fixture.passable)
+		return bounds.contains(pos)
+			&& (canPlaceUnit(pos) || fixture.passable)
 			&& grid.get(pos).fixture == null;
 	}
 	
@@ -205,6 +212,9 @@ public class LayeredMap
 	
 	public void putResourceDeposit(ResourceDeposit deposit, Position pos)
 	{
+		if (! bounds.contains(pos))
+			return;
+		
 		if (grid.get(pos).deposit != null)
 			throw new IllegalStateException("deposit already set there");
 		
@@ -215,6 +225,9 @@ public class LayeredMap
 	
 	public void removeResourceDeposit(Position pos)
 	{
+		if (! bounds.contains(pos))
+			return;
+		
 		ResourceDeposit deposit = grid.get(pos).deposit;
 		
 		deposits.remove(deposit);
@@ -224,21 +237,24 @@ public class LayeredMap
 	
 	public ResourceDeposit getResourceDeposit(Position pos)
 	{
-		return getBounds().contains(pos) ? grid.get(pos).deposit : null;
+		return bounds.contains(pos) ? grid.get(pos).deposit : null;
 	}
 	
 	public boolean hasResourceDeposit(Position pos)
 	{
-		return getBounds().contains(pos) && grid.get(pos).deposit != null;
+		return bounds.contains(pos) && grid.get(pos).deposit != null;
 	}
 	
 	public boolean canPlaceResourceDeposit(Position pos)
 	{
-		return getBounds().contains(pos) && grid.get(pos).deposit == null;
+		return bounds.contains(pos) && grid.get(pos).deposit == null;
 	}
 	
 	public void putFixture(Fixture fixture, Position pos)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		switch (fixture)
 		{
 		case TUBE:
@@ -263,6 +279,9 @@ public class LayeredMap
 	
 	public void putWall(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		Spot spot = grid.get(pos);
 		
 		if (spot.fixture != null)
@@ -278,16 +297,16 @@ public class LayeredMap
 		Position w = pos.shift(-1, +0);
 		Position e = pos.shift(+1, +0);
 		
-		if (grid.getBounds().contains(n) && hasWall(n))
+		if (bounds.contains(n) && hasWall(n))
 			grid.get(n).tileCode = tileSet.getWallTile(getWallNeighbors(n));
 		
-		if (grid.getBounds().contains(s) && hasWall(s))
+		if (bounds.contains(s) && hasWall(s))
 			grid.get(s).tileCode = tileSet.getWallTile(getWallNeighbors(s));
 		
-		if (grid.getBounds().contains(w) && hasWall(w))
+		if (bounds.contains(w) && hasWall(w))
 			grid.get(w).tileCode = tileSet.getWallTile(getWallNeighbors(w));
 		
-		if (grid.getBounds().contains(e) && hasWall(e))
+		if (bounds.contains(e) && hasWall(e))
 			grid.get(e).tileCode = tileSet.getWallTile(getWallNeighbors(e));
 		
 		refreshPanel(new Region(pos).stretch(1));
@@ -295,6 +314,9 @@ public class LayeredMap
 	
 	public void putTube(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		Spot spot = grid.get(pos);
 		
 		if (spot.fixture != null)
@@ -310,7 +332,7 @@ public class LayeredMap
 		
 		for (Position adj : pos.get4Neighbors())
 		{
-			if (grid.getBounds().contains(adj) && (hasTube(adj) || isOccupied(adj)))
+			if (bounds.contains(adj) && (hasTube(adj) || isOccupied(adj)))
 			{
 				Unit occupant = getUnit(adj);
 				spot.alive |= occupant != null && occupant.isConnected();
@@ -331,6 +353,9 @@ public class LayeredMap
 	
 	public void putGeyser(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		Spot spot = grid.get(pos);
 		
 		if (spot.fixture != null)
@@ -344,6 +369,9 @@ public class LayeredMap
 	
 	public boolean isAlive(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return false;
+		
 		return grid.get(pos).alive;
 	}
 	
@@ -363,6 +391,9 @@ public class LayeredMap
 	
 	private void branchConnections(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		Set<Position> openSet = new HashSet<Position>();
 		openSet.add(pos);
 		
@@ -374,7 +405,7 @@ public class LayeredMap
 			
 			for (Position adj : current.get4Neighbors())
 			{
-				if (!getBounds().contains(adj))
+				if (!bounds.contains(adj))
 					continue;
 				
 				Spot neighborSpot = grid.get(adj);
@@ -390,11 +421,17 @@ public class LayeredMap
 	
 	public boolean isBulldozed(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return false;
+		
 		return costMap.isFree(pos) && tileSet.isBulldozed(grid.get(pos).tileCode);
 	}
 	
 	public void bulldoze(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		clearFixture(pos);
 		costMap.setZero(pos);
 		grid.get(pos).tileCode = tileSet.getBulldozedTile();
@@ -403,6 +440,9 @@ public class LayeredMap
 	
 	public void clearFixture(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		Spot spot = grid.get(pos);
 		spot.fixture = null;
 		spot.fixtureHP = 0;
@@ -410,7 +450,7 @@ public class LayeredMap
 		Position adj;
 		adj = pos.shift(+0, -1);
 		
-		if (grid.getBounds().contains(adj))
+		if (bounds.contains(adj))
 		{
 			spot = grid.get(adj);
 			
@@ -428,7 +468,7 @@ public class LayeredMap
 
 		adj = pos.shift(+0, +1);
 		
-		if (grid.getBounds().contains(adj))
+		if (bounds.contains(adj))
 		{
 			spot = grid.get(adj);
 			
@@ -446,7 +486,7 @@ public class LayeredMap
 
 		adj = pos.shift(+1, +0);
 		
-		if (grid.getBounds().contains(adj))
+		if (bounds.contains(adj))
 		{
 			spot = grid.get(adj);
 			
@@ -464,7 +504,7 @@ public class LayeredMap
 
 		adj = pos.shift(-1, +0);
 		
-		if (grid.getBounds().contains(adj))
+		if (bounds.contains(adj))
 		{
 			spot = grid.get(adj);
 			
@@ -486,31 +526,49 @@ public class LayeredMap
 	
 	public boolean hasFixture(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return false;
+		
 		return grid.get(pos).fixture != null;
 	}
 	
 	public boolean hasWall(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return false;
+		
 		return grid.get(pos).fixture == Fixture.WALL;
 	}
 	
 	public boolean hasTube(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return false;
+		
 		return grid.get(pos).fixture == Fixture.TUBE;
 	}
 	
 	public boolean hasGeyser(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return false;
+		
 		return grid.get(pos).fixture == Fixture.GEYSER;
 	}
 	
 	public boolean hasMinePlatform(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return false;
+		
 		return grid.get(pos).fixture == Fixture.MINE_PLATFORM;
 	}
 	
 	public int getFixtureHP(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return 0;
+		
 		Spot spot = grid.get(pos);
 		
 		if (!(spot.fixture == Fixture.TUBE || spot.fixture == Fixture.WALL))
@@ -521,6 +579,9 @@ public class LayeredMap
 	
 	public void setFixtureHP(Position pos, int hp)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		Spot spot = grid.get(pos);
 		
 		if (!(spot.fixture == Fixture.TUBE || spot.fixture == Fixture.WALL))
@@ -548,16 +609,16 @@ public class LayeredMap
 		Position w = pos.shift(-1, +0);
 		Position e = pos.shift(+1, +0);
 		
-		if (grid.getBounds().contains(n) && hasWall(n))
+		if (bounds.contains(n) && hasWall(n))
 			neighbors = neighbors.add(Neighbors.N);
 		
-		if (grid.getBounds().contains(s) && hasWall(s))
+		if (bounds.contains(s) && hasWall(s))
 			neighbors = neighbors.add(Neighbors.S);
 		
-		if (grid.getBounds().contains(w) && hasWall(w))
+		if (bounds.contains(w) && hasWall(w))
 			neighbors = neighbors.add(Neighbors.W);
 		
-		if (grid.getBounds().contains(e) && hasWall(e))
+		if (bounds.contains(e) && hasWall(e))
 			neighbors = neighbors.add(Neighbors.E);
 		
 		return neighbors;
@@ -572,16 +633,16 @@ public class LayeredMap
 		Position w = pos.shift(-1, +0);
 		Position e = pos.shift(+1, +0);
 		
-		if (grid.getBounds().contains(n) && (hasTube(n) || structureOccupies(n)))
+		if (bounds.contains(n) && (hasTube(n) || structureOccupies(n)))
 			neighbors = neighbors.add(Neighbors.N);
 		
-		if (grid.getBounds().contains(s) && (hasTube(s) || structureOccupies(s)))
+		if (bounds.contains(s) && (hasTube(s) || structureOccupies(s)))
 			neighbors = neighbors.add(Neighbors.S);
 		
-		if (grid.getBounds().contains(w) && (hasTube(w) || structureOccupies(w)))
+		if (bounds.contains(w) && (hasTube(w) || structureOccupies(w)))
 			neighbors = neighbors.add(Neighbors.W);
 		
-		if (grid.getBounds().contains(e) && (hasTube(e) || structureOccupies(e)))
+		if (bounds.contains(e) && (hasTube(e) || structureOccupies(e)))
 			neighbors = neighbors.add(Neighbors.E);
 		
 		return neighbors;
@@ -594,6 +655,9 @@ public class LayeredMap
 	
 	public boolean canPlaceUnit(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return false;
+		
 		Spot spot = grid.get(pos);
 		
 		return !costMap.isInfinite(pos)
@@ -603,7 +667,7 @@ public class LayeredMap
 	
 	public boolean canPlaceUnit(Position pos, Footprint fp)
 	{
-		if (! getBounds().contains(fp.getInnerRegion().move(pos)))
+		if (!bounds.contains(fp.getInnerRegion().move(pos)))
 			return false;
 		
 		for (Position occupied : fp.iterator(pos))
@@ -615,12 +679,12 @@ public class LayeredMap
 	
 	public boolean canPlaceMine(Position pos)
 	{
-		if (!getBounds().contains(pos))
+		if (!bounds.contains(pos))
 			return false;
 		
 		pos = pos.shift(1, 0);
 		
-		if (!getBounds().contains(pos))
+		if (!bounds.contains(pos))
 			return false;
 		
 		ResourceDeposit deposit = getResourceDeposit(pos);
@@ -629,14 +693,17 @@ public class LayeredMap
 	
 	public boolean willConnect(Position pos, Footprint fp)
 	{
+		if (!bounds.contains(fp.getInnerRegion().move(pos)))
+			return false;
+		
 		for (Position occupied : fp.iterator(pos))
 			for (Position neighbor : occupied.get4Neighbors())
-				if (getBounds().contains(neighbor) && isAlive(neighbor))
+				if (bounds.contains(neighbor) && isAlive(neighbor))
 					return true;
 		
 		for (Position relativeTubePos : fp.getTubePositions())
 			for (Position neighbor : relativeTubePos.shift(pos.x, pos.y).get4Neighbors())
-				if (getBounds().contains(neighbor) && isAlive(neighbor))
+				if (bounds.contains(neighbor) && isAlive(neighbor))
 					return true;
 		
 		return false;
@@ -678,7 +745,7 @@ public class LayeredMap
 			
 			for (Position bullPos : outer)
 			{
-				boolean contained = getBounds().contains(bullPos);
+				boolean contained = bounds.contains(bullPos);
 				
 				if (contained && !hasWall(bullPos) && !hasTube(bullPos))
 					bulldoze(bullPos);
@@ -688,7 +755,7 @@ public class LayeredMap
 			{
 				Position tubePos = tubePos0.shift(pos.x, pos.y);
 				
-				if (!getBounds().contains(tubePos))
+				if (!bounds.contains(tubePos))
 					continue;
 				
 				boolean occupied = isOccupied(tubePos)
@@ -733,12 +800,14 @@ public class LayeredMap
 	
 	public Unit getUnit(Position pos)
 	{
+		
+		
 		return grid.get(pos).occupant;
 	}
 	
 	public Set<Unit> getUnits(Region region)
 	{
-		if (! getBounds().contains(region))
+		if (! bounds.contains(region))
 			throw new IndexOutOfBoundsException();
 		
 		Set<Unit> occupants = new HashSet<Unit>();
@@ -812,12 +881,12 @@ public class LayeredMap
 	{
 		Position next = dir.apply(pos);
 		
-		if ((!grid.getBounds().contains(next)) || costMap.isInfinite(next))
+		if ((!bounds.contains(next)) || costMap.isInfinite(next))
 			return false;
 		
 		Position dest = dir.apply(pos);
 		
-		if (!(grid.getBounds().contains(dest)
+		if (!(bounds.contains(dest)
 				&& grid.get(dest).occupant == null
 				&& grid.get(dest).reservant == null))
 			return false;
@@ -844,6 +913,9 @@ public class LayeredMap
 	
 	public void move(Unit unit, Position pos)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		if (grid.get(pos).occupant != null)
 			throw new IllegalStateException(pos + " occupied");
 		
@@ -905,6 +977,9 @@ public class LayeredMap
 	
 	public void reserve(Position pos, Unit unit)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		final Unit holder = grid.get(pos).reservant;
 		
 		if (holder != null && !holder.equals(unit))
@@ -916,6 +991,9 @@ public class LayeredMap
 	
 	public void unreserve(Position pos)
 	{
+		if (!bounds.contains(pos))
+			return;
+		
 		final Unit holder = grid.get(pos).reservant;
 		
 		if (holder == null)

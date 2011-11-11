@@ -26,6 +26,7 @@ import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.map.ResourceType;
+import com.robbix.mp5.map.Tile;
 import com.robbix.mp5.map.TileSet;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.ani.AmbientAnimation;
@@ -903,7 +904,16 @@ public class DisplayPanel extends JComponent
 	{
 		for (Position pos : region)
 		{
-			draw(g, tiles.getTile(map.getTileCode(pos)).getImage(scale), pos);
+			Tile tile = tiles.getTile(map.getTileCode(pos));
+			
+			if (scale >= minShowUnitScale)
+			{
+				draw(g, tile.getImage(), pos);
+			}
+			else
+			{
+				draw(g, ColorScheme.withFillOnly(tile.getAverageColor()), pos);
+			}
 			
 			if (map.hasMinePlatform(pos))
 			{
@@ -1185,6 +1195,17 @@ public class DisplayPanel extends JComponent
 	
 	private void draw(Graphics g, Image img, Position pos)
 	{
-		g.drawImage(img, pos.x * tileSize + scroll.x, pos.y * tileSize + scroll.y, null);
+		int x = pos.x * tileSize + scroll.x;
+		int y = pos.y * tileSize + scroll.y;
+		int w = img.getWidth(null);
+		int h = img.getHeight(null);
+		int w2 = scale < 0 ? w >> -scale : w << scale;
+		int h2 = scale < 0 ? h >> -scale : h << scale;
+		g.drawImage(
+			img,
+			x, y, x + w2, y + h2,
+			0, 0, w, h,
+			null
+		);
 	}
 }

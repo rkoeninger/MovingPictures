@@ -228,7 +228,13 @@ public class Region implements RIterable<Position>
 		return (pos.x >= this.x) && (pos.x < this.x + this.w)
 		    && (pos.y >= this.y) && (pos.y < this.y + this.h);
 	}
-
+	
+	public boolean contains(int x, int y)
+	{
+		return (x >= this.x) && (x < this.x + this.w)
+			&& (y >= this.y) && (y < this.y + this.h);
+	}
+	
 	/**
 	 * Returns true if this Region contains all positions in the given Region.
 	 */
