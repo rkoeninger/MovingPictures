@@ -54,13 +54,11 @@ public class SelectUnitOverlay extends InputOverlay
 		{
 			Player focusedPlayer = getFocusedPlayer(selected);
 			
-			if (containsNonStructure(selected))
+			if (filterNonStructure(selected))
 			{
-				filterNonStructure(selected);
-				
 				if (selected.size() == 1)
 				{
-					Unit only = selected.iterator().next();
+					Unit only = (Unit) selected.toArray()[0];
 					Mediator.playSound(only.getType().getAcknowledgement());
 					push(new CommandUnitOverlay(only));
 					panel.showStatus(only);
@@ -74,7 +72,7 @@ public class SelectUnitOverlay extends InputOverlay
 						? new CommandTruckOverlay(selected)
 						: new CommandGroupOverlay(leadUnit, selected)
 					);
-					panel.showStatus((Unit)null);
+					panel.showStatus(leadUnit);
 					panel.showStatus(focusedPlayer);
 				}
 			}
@@ -94,9 +92,13 @@ public class SelectUnitOverlay extends InputOverlay
 		return units.iterator().next();
 	}
 	
-	private static void filterNonStructure(Set<Unit> units)
+	/**
+	 * Returns true if anything was removed.
+	 */
+	private static boolean filterNonStructure(Set<Unit> units)
 	{
 		Iterator<Unit> unitIterator = units.iterator();
+		boolean anyRemoved = false;
 		
 		while (unitIterator.hasNext())
 		{
@@ -105,17 +107,11 @@ public class SelectUnitOverlay extends InputOverlay
 			if (unit.isStructure() || unit.getType().isGuardPostType())
 			{
 				unitIterator.remove();
+				anyRemoved = true;
 			}
 		}
-	}
-	
-	private static boolean containsNonStructure(Set<Unit> units)
-	{
-		for (Unit unit : units)
-			if (!unit.isStructure() && !unit.getType().isGuardPostType())
-				return true;
 		
-		return false;
+		return anyRemoved;
 	}
 	
 	private static Player getFocusedPlayer(Set<Unit> units)

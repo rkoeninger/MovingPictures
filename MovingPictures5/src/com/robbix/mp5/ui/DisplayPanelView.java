@@ -45,7 +45,7 @@ public class DisplayPanelView extends JComponent
 		add(panel, SwingConstants.CENTER);
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
-		addKeyListener(new KeyEvents());
+		panel.addKeyListener(new KeyEvents());
 		panel.addMouseListener(new MouseEvents());
 		panel.addMouseMotionListener(new MouseEvents());
 		panel.addMouseWheelListener(new MouseEvents());
