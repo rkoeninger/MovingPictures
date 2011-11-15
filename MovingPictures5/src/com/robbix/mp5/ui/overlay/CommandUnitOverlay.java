@@ -41,7 +41,7 @@ public class CommandUnitOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		if (unit.getPosition() == null)
 			return;

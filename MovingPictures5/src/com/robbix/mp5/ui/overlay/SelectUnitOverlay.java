@@ -9,6 +9,7 @@ import java.util.Set;
 import com.robbix.mp5.Mediator;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.RIterator;
 
 public class SelectUnitOverlay extends InputOverlay
 {
@@ -23,7 +24,7 @@ public class SelectUnitOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		if (isDragging())
 		{
@@ -54,8 +55,10 @@ public class SelectUnitOverlay extends InputOverlay
 		{
 			Player focusedPlayer = getFocusedPlayer(selected);
 			
-			if (filterNonStructure(selected))
+			if (containsNonStructure(selected))
 			{
+				filterNonStructure(selected);
+				
 				if (selected.size() == 1)
 				{
 					Unit only = (Unit) selected.toArray()[0];
@@ -92,26 +95,22 @@ public class SelectUnitOverlay extends InputOverlay
 		return units.iterator().next();
 	}
 	
-	/**
-	 * Returns true if anything was removed.
-	 */
-	private static boolean filterNonStructure(Set<Unit> units)
+	private static void filterNonStructure(Set<Unit> units)
 	{
 		Iterator<Unit> unitIterator = units.iterator();
-		boolean anyRemoved = false;
 		
-		while (unitIterator.hasNext())
-		{
-			Unit unit = unitIterator.next();
-			
+		for (Unit unit : RIterator.wrap(unitIterator))
 			if (unit.isStructure() || unit.getType().isGuardPostType())
-			{
 				unitIterator.remove();
-				anyRemoved = true;
-			}
-		}
+	}
+	
+	private static boolean containsNonStructure(Set<Unit> units)
+	{
+		for (Unit unit : units)
+			if (!unit.isStructure() && !unit.getType().isGuardPostType())
+				return true;
 		
-		return anyRemoved;
+		return false;
 	}
 	
 	private static Player getFocusedPlayer(Set<Unit> units)

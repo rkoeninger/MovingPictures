@@ -38,7 +38,7 @@ public class PlaceUnitOverlay extends InputOverlay
 		this.showTubeConnectivity = unit.needsConnection() || unit.isConnectionSource();
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{

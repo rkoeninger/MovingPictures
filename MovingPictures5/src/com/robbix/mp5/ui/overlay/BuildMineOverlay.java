@@ -25,7 +25,7 @@ public class BuildMineOverlay extends InputOverlay
 		this.mine = mine;
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{

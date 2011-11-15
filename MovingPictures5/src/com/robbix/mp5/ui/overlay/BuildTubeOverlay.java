@@ -26,7 +26,7 @@ public class BuildTubeOverlay extends InputOverlay
 		this.showTubeConnectivity = true;
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		drawSelectedUnitBox(g, crane);
 		

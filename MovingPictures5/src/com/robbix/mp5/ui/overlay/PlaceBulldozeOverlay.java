@@ -7,7 +7,7 @@ import com.robbix.mp5.utils.Position;
 
 public class PlaceBulldozeOverlay extends InputOverlay
 {
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{

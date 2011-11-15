@@ -16,7 +16,7 @@ public class SelectAttackTargetOverlay extends InputOverlay
 		this.attacker = unit;
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		drawSelectedUnitBox(g, attacker.getChassis());
 	}

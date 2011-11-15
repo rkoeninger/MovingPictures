@@ -35,7 +35,7 @@ public class CommandGroupOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		for (Unit unit : units)
 			drawSelectedUnitBox(g, unit);

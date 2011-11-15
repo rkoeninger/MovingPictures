@@ -22,7 +22,7 @@ public class PlaceFixtureOverlay extends InputOverlay
 			
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		if (isCursorOnGrid())
 		{

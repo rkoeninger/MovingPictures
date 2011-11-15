@@ -69,6 +69,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	protected boolean requiresLeftClickOnGrid   = true;
 	protected boolean requiresRightClickOnGrid  = false;
 	protected boolean requiresMiddleClickOnGrid = true;
+	protected boolean requiresPaintOnGrid       = true;
 	
 	protected InputOverlay()
 	{
@@ -110,7 +111,13 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		panel.setShowTubeConnectivity(false);
 	}
 	
-	public void paintOverUnits(Graphics g){}
+	public void paint(Graphics g)
+	{
+		if (!requiresPaintOnGrid || isCursorOnGrid())
+			paintImpl(g);
+	}
+	
+	public void paintImpl(Graphics g){}
 	
 	public void drawSelectedUnitBox(Graphics g, Unit unit)
 	{

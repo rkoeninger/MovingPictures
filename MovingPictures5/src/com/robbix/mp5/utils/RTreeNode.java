@@ -1,12 +1,15 @@
 package com.robbix.mp5.utils;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class RTreeNode extends DefaultMutableTreeNode
 {
 	private static final long serialVersionUID = 1L;
 	
-	private Object[] objects;
+	private Collection<Object> objects;
 	
 	public RTreeNode(String name)
 	{
@@ -15,17 +18,29 @@ public class RTreeNode extends DefaultMutableTreeNode
 	
 	public void set(Object... objects)
 	{
-		this.objects = objects;
+		this.objects = Arrays.asList(objects);
+	}
+	
+	public void add(Object... objects)
+	{
+		for (Object object : objects)
+			this.objects.add(object);
+	}
+	
+	public void remove(Object... objects)
+	{
+		for (Object object : objects)
+			this.objects.remove(object);
 	}
 	
 	public boolean has()
 	{
-		return objects != null && objects.length > 0;
+		return objects != null && !objects.isEmpty();
 	}
 	
 	public Object[] get()
 	{
-		return objects;
+		return objects.toArray();
 	}
 	
 	public <T> boolean has(Class<T> clazz)

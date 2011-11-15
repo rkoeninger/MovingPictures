@@ -7,6 +7,7 @@
 		<Command>salvage</Command>
 		<Command>dock</Command>
 		<Command>mine</Command>
+		<Command>patrol</Command>
 	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="200"/>

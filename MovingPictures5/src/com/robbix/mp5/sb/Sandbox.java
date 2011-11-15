@@ -54,6 +54,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -79,7 +80,6 @@ import com.robbix.mp5.ui.overlay.SelectUnitOverlay;
 import com.robbix.mp5.ui.overlay.SpawnMeteorOverlay;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.unit.UnitType;
 import com.robbix.mp5.utils.AnimatedButton;
 import com.robbix.mp5.utils.JListDialog;
 import com.robbix.mp5.utils.JSliderMenuItem;
@@ -275,7 +275,7 @@ public class Sandbox extends JApplet
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
 		
-		throttleSliderMenuItem = new JSliderMenuItem(0, 200, 45);
+		throttleSliderMenuItem = new JSliderMenuItem(0, 100, 45);
 		Hashtable<Integer, JLabel> paintLabels = new Hashtable<Integer, JLabel>();
 		paintLabels.put(0, new JLabel("Unthrottled"));
 		paintLabels.put(throttleSliderMenuItem.getMaximum(), new JLabel("Crawl"));
@@ -329,7 +329,6 @@ public class Sandbox extends JApplet
 		final JMenu addUnitMenu       = new JMenu("Add");
 		final JMenu helpMenu          = new JMenu("Help");
 		stepMenuItem.setEnabled(false);
-		throttleSliderMenuItem.setValue(engine.getDelay());
 		playerMenu = new JMenu("Players");
 		playSoundMenuItem.setSelected(game.getSoundBank().isRunning());
 		playerMenu.add(addPlayerMenuItem);
@@ -1093,7 +1092,7 @@ public class Sandbox extends JApplet
 			commandButtons.put(Command.valueOf(command), button);
 		}
 		
-		commandBar.add(new JLabel(neutralIcon));
+		commandBar.add(getLogoPanel(null));
 		return commandBar;
 	}
 	
@@ -1103,18 +1102,16 @@ public class Sandbox extends JApplet
 		
 		if (unit == null)
 		{
-			commandBar.add(new JLabel(neutralIcon));
+			commandBar.add(getLogoPanel(null));
 			commandBar.repaint();
 			frame.validate();
 			return;
 		}
 		
-		UnitType type = unit.getType();
-		Sprite sprite = "Eden".equals(type.getCiv()) ? edenIconSprite : plymouthIconSprite;
-		commandBar.add(new JLabel(new ImageIcon(sprite.getImage(unit.getOwner().getColorHue()))));
+		commandBar.add(getLogoPanel(unit));
 		ArrayList<AnimatedButton> buttons = new ArrayList<AnimatedButton>();
 		
-		for (Command cmd : type.getCommands())
+		for (Command cmd : unit.getType().getCommands())
 			buttons.add(commandButtons.get(cmd));
 		
 		AnimatedButton[] buttonArray = buttons.toArray(new AnimatedButton[0]);
@@ -1125,6 +1122,25 @@ public class Sandbox extends JApplet
 		
 		commandBar.repaint();
 		frame.validate();
+	}
+	
+	private static JLabel getLogoPanel(Unit unit)
+	{
+		JLabel label = null;
+		
+		if (unit == null)
+		{
+			label = new JLabel(neutralIcon);
+		}
+		else
+		{
+			String civ = unit.getType().getCiv();
+			Sprite sprite = "Eden".equals(civ) ? edenIconSprite : plymouthIconSprite;
+			label = new JLabel(new ImageIcon(sprite.getImage(unit.getOwner().getColorHue())));
+		}
+		
+		label.setBorder(new EmptyBorder(4, 4, 0, 4));
+		return label;
 	}
 	
 	private static class AnimatedButtonComparator implements Comparator<AnimatedButton>

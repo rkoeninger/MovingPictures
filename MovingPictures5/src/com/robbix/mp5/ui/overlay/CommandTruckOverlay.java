@@ -46,7 +46,7 @@ public class CommandTruckOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		for (Unit truck : trucks)
 			drawSelectedUnitBox(g, truck);

@@ -3,6 +3,7 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
@@ -21,7 +22,7 @@ public class PlaceResourceOverlay extends InputOverlay
 		this.res = res;
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		if (resSprite == null)
 		{
@@ -75,12 +76,10 @@ public class PlaceResourceOverlay extends InputOverlay
 	
 	private boolean hasNeighboringDeposit(Position pos)
 	{
-		Position npos = pos.shift(-1, 0);
+		LayeredMap map = panel.getMap();
+		Position wPos = pos.shift(-1, 0);
+		Position ePos = pos.shift(1, 0);
 		
-		if (panel.getMap().getBounds().contains(npos)
-		 && panel.getMap().hasResourceDeposit(npos))
-			return true;
-		
-		return false;
+		return map.hasResourceDeposit(wPos) || map.hasResourceDeposit(ePos);
 	}
 }

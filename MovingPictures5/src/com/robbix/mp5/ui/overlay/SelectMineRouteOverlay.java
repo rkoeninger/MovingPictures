@@ -24,7 +24,7 @@ public class SelectMineRouteOverlay extends InputOverlay
 		this.trucks = trucks;
 	}
 	
-	public void paintOverUnits(Graphics g)
+	public void paintImpl(Graphics g)
 	{
 		for (Unit truck : trucks)
 			drawSelectedUnitBox(g, truck);

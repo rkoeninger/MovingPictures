@@ -806,7 +806,7 @@ public class DisplayPanel extends JComponent
 				drawResourceDeposit(g, res);
 		
 		if (! overlays.isEmpty())
-			overlays.getFirst().paintOverUnits(g);
+			overlays.getFirst().paint(g);
 	}
 	
 	/**
