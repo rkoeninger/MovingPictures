@@ -45,6 +45,9 @@ public class RTreeNode extends DefaultMutableTreeNode
 	
 	public <T> boolean has(Class<T> clazz)
 	{
+		if (objects == null)
+			return false;
+		
 		for (Object object : objects)
 			if (object != null && clazz.isInstance(object))
 				return true;

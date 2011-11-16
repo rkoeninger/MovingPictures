@@ -40,8 +40,10 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import com.robbix.mp5.AsyncModuleListener;
 import com.robbix.mp5.Game;
 import com.robbix.mp5.Mediator;
+import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
@@ -49,8 +51,6 @@ import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
-import com.robbix.mp5.utils.ModuleEvent;
-import com.robbix.mp5.utils.ModuleListener;
 import com.robbix.mp5.utils.RTreeNode;
 
 public class SpriteViewer extends JFrame
@@ -88,7 +88,8 @@ public class SpriteViewer extends JFrame
 		super("Sprite Viewer");
 		this.lib = game.getSpriteLibrary();
 		this.factory = game.getUnitFactory();
-		lib.addModuleListener(new ModuleListener(){
+		lib.addModuleListener(new AsyncModuleListener(){
+			public void moduleLoadStarted(ModuleEvent e) {buildTree();}
 			public void moduleLoaded(ModuleEvent e) {buildTree();}
 			public void moduleUnloaded(ModuleEvent e) {buildTree();}
 		});
@@ -384,14 +385,12 @@ public class SpriteViewer extends JFrame
 		Collections.sort(setNames);
 		
 		for (String name : setNames)
-		{
-			appendSpriteSet(name, false);
-		}
+			appendSpriteSet(name);
 		
 		tree.expandRow(0);
 	}
 	
-	private void appendSpriteSet(String moduleName, boolean scroll)
+	private void appendSpriteSet(String moduleName)
 	{
 		SpriteSet spriteSet = lib.getAmbientSpriteSet(moduleName);
 		
@@ -399,15 +398,33 @@ public class SpriteViewer extends JFrame
 		{
 			UnitType unitType = factory.getType(moduleName);
 			spriteSet = lib.getUnitSpriteSet(unitType);
-			appendUnitSet(spriteSet, unitType, scroll);
+			
+			if (spriteSet == SpriteSet.BLANK)
+			{
+				appendPendingSpriteSet(moduleName);
+			}
+			else
+			{
+				appendUnitSet(spriteSet, unitType);
+			}
+		}
+		else if (spriteSet == SpriteSet.BLANK)
+		{
+			appendPendingSpriteSet(moduleName);
 		}
 		else
 		{
-			appendAmbientSet(spriteSet, scroll);
+			appendAmbientSet(spriteSet);
 		}
 	}
 	
-	private void appendAmbientSet(SpriteSet ambientSet, boolean scroll)
+	private void appendPendingSpriteSet(String name)
+	{
+		RTreeNode pendingNode = new RTreeNode(name + " [Pending...]");
+		append(rootNode, pendingNode);
+	}
+	
+	private void appendAmbientSet(SpriteSet ambientSet)
 	{
 		RTreeNode setNode = new RTreeNode(ambientSet.getName());
 		setNode.set(ambientSet);
@@ -430,12 +447,9 @@ public class SpriteViewer extends JFrame
 				append(groupNode, spriteNode);
 			}
 		}
-		
-		if (scroll)
-			tree.scrollPathToVisible(new TreePath(setNode.getPath()));
 	}
 	
-	private void appendUnitSet(SpriteSet unitSet, UnitType type, boolean scroll)
+	private void appendUnitSet(SpriteSet unitSet, UnitType type)
 	{
 		Footprint fp = type.getFootprint();
 		RTreeNode setNode = new RTreeNode(unitSet.getName());
@@ -474,9 +488,6 @@ public class SpriteViewer extends JFrame
 				}
 			}
 		}
-		
-		if (scroll)
-			tree.scrollPathToVisible(new TreePath(setNode.getPath()));
 	}
 	
 	private void append(MutableTreeNode parent, DefaultMutableTreeNode child)

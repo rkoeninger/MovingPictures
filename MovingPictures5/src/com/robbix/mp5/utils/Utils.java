@@ -2,9 +2,7 @@ package com.robbix.mp5.utils;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
@@ -144,12 +142,6 @@ public class Utils
 		}
 	};
 	
-	public static Rectangle getWindowBounds()
-	{
-		return GraphicsEnvironment.getLocalGraphicsEnvironment()
-								  .getMaximumWindowBounds();
-	}
-	
 	/**
 	 * Returns the provided list of elements as a Set. Duplicate entries in
 	 * the list will be dropped.
@@ -164,8 +156,7 @@ public class Utils
 		return set;
 	}
 	
-	public static final Comparator<File> FILENAME = 
-	new Comparator<File>()
+	public static final Comparator<File> FILENAME = new Comparator<File>()
 	{
 		public int compare(File a, File b)
 		{
@@ -233,59 +224,6 @@ public class Utils
 		}
 	};
 	
-	/**
-	 * Constructs a description path from the given elements.
-	 * 
-	 * Description paths are typically used in hash tables to
-	 * identify sprites, sounds or events based on a set of
-	 * criteria.
-	 * 
-	 * For instance, a sprite description path might look like:
-	 * 
-	 * <pre>
-	 *     getPath(unitType, unitDir, animationFrame) -> "scout/north/3"
-	 * </pre>
-	 * 
-	 * Which represents the sprite for a {@code scout} unit,
-	 * facing {@code north} and on the 4th (index = {@code 3})
-	 * frame of its movement animation.
-	 */
-	public static String getPath(Object... parts)
-	{
-		if (parts == null || parts.length == 0)
-			return "";
-		
-		StringBuilder builder = new StringBuilder();
-		
-		for (int i = 0; i < parts.length - 1; ++i)
-			if (parts[i] != null)
-			{
-				String partString = parts[i].toString();
-				
-				if (partString.matches("\\s"))
-					throw new IllegalArgumentException(
-						"Path can't have whitespace"
-					);
-				
-				builder.append(partString);
-				
-				if (parts[i + 1] != null)
-					builder.append('/');
-			}
-		
-		Object lastPart = parts[parts.length - 1];
-		
-		if (lastPart != null)
-		{
-			if (builder.charAt(builder.length() - 1) != '/')
-				builder.append('/');
-			
-			builder.append(lastPart);
-		}
-		
-		return builder.toString();
-	}
-
 	/**
 	 * Color object representing total transparency.
 	 */

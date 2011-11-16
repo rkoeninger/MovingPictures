@@ -1,6 +1,7 @@
 package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
@@ -47,6 +48,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.JWindow;
@@ -68,6 +70,7 @@ import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.sb.demo.Demo;
 import com.robbix.mp5.ui.DisplayPanel;
+import com.robbix.mp5.ui.DisplayPanelView;
 import com.robbix.mp5.ui.PlayerStatus;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.TitleBar;
@@ -160,7 +163,8 @@ public class Sandbox extends JApplet
 	private static JMenuItem scrollBarsMenuItem;
 	private static JMenuItem frameRateMenuItem;
 	private static JMenuItem scrollSpeedMenuItem;
-	private static JMenuItem addDisplayMenuItem;
+	private static JMenuItem addWindowMenuItem;
+	private static JMenuItem addTabMenuItem;
 	private static JMenuItem splitDisplayMenuItem;
 	private static JMenuItem fullScreenMenuItem;
 	private static JMenuItem spawnMeteorMenuItem;
@@ -296,7 +300,8 @@ public class Sandbox extends JApplet
 		scrollBarsMenuItem     = new JMenuItem("Scroll Bars");
 		frameRateMenuItem      = new JMenuItem("Frame Rate");
 		scrollSpeedMenuItem    = new JMenuItem("Scroll Speed");
-		addDisplayMenuItem     = new JMenuItem("Add Display");
+		addWindowMenuItem      = new JMenuItem("Add Window");
+		addTabMenuItem         = new JMenuItem("Add Tab");
 		splitDisplayMenuItem   = new JMenuItem("Split Display");
 		fullScreenMenuItem     = new JMenuItem("Full Screen");
 		spawnMeteorMenuItem    = new JMenuItem("Spawn Meteor");
@@ -401,7 +406,8 @@ public class Sandbox extends JApplet
 		scrollSpeedMenuItem   .addActionListener(listener);
 		scrollBarsMenuItem    .addActionListener(listener);
 		frameRateMenuItem     .addActionListener(listener);
-		addDisplayMenuItem    .addActionListener(listener);
+		addWindowMenuItem     .addActionListener(listener);
+		addTabMenuItem        .addActionListener(listener);
 		splitDisplayMenuItem  .addActionListener(listener);
 		fullScreenMenuItem    .addActionListener(listener);
 		meteorShowerMenuItem  .addActionListener(listener);
@@ -442,10 +448,11 @@ public class Sandbox extends JApplet
 		displayMenu.add(showShadowsMenuItem);
 		displayMenu.add(showCostMapMenuItem);
 //		displayMenu.add(scrollBarsMenuItem);
-		displayMenu.add(frameRateMenuItem);
+//		displayMenu.add(frameRateMenuItem);
 //		displayMenu.add(scrollSpeedMenuItem);
 //		displayMenu.add(fullScreenMenuItem);
-//		displayMenu.add(addDisplayMenuItem);
+//		displayMenu.add(addWindowMenuItem);
+//		displayMenu.add(addTabMenuItem);
 //		displayMenu.add(splitDisplayMenuItem);
 		soundMenu.add(playSoundMenuItem);
 //		soundMenu.add(playMusicMenuItem);
@@ -485,16 +492,14 @@ public class Sandbox extends JApplet
 		statusesPanel.add(unitStatusLabel);
 		statusesPanel.add(playerStatusLabel);
 		
-		Image img = ImageIO.read(new File(resDir, "art/edenIcon.png"));
+		Image img = ImageIO.read(new File(resDir, "art/edenLogo.png"));
 		edenIconSprite = new Sprite(img, 240, 0, 0);
-		img = ImageIO.read(new File(resDir, "art/plymouthIcon.png"));
+		img = ImageIO.read(new File(resDir, "art/plymouthLogo.png"));
 		plymouthIconSprite = new Sprite(img, 240, 0, 0);
-		img = ImageIO.read(new File(resDir, "art/neutralIcon.png"));
+		img = ImageIO.read(new File(resDir, "art/neutralLogo.png"));
 		neutralIcon = new ImageIcon(img);
 		
 		commandBar = loadCommandBar();
-		
-		Rectangle windowBounds = Utils.getWindowBounds();
 		
 		frame = new JFrame("Moving Pictures");
 		frame.setJMenuBar(menuBar);
@@ -506,24 +511,18 @@ public class Sandbox extends JApplet
 		frame.setIconImages(getWindowIcons());
 		frame.pack();
 		
-		boolean maximize = frame.getWidth()  > windowBounds.width
-						&& frame.getHeight() > windowBounds.height;
+		Rectangle windowBounds = frame.getGraphicsConfiguration().getBounds();
 		
-		frame.setSize(
-			Math.min(frame.getWidth(),  windowBounds.width),
-			Math.min(frame.getHeight(), windowBounds.height)
-		);
+		int w = Math.min(frame.getWidth(), windowBounds.width);
+		int h = Math.min(frame.getHeight(), windowBounds.height);
+		int x = windowBounds.x + (windowBounds.width  - w) / 2;
+		int y = windowBounds.y + (windowBounds.height - h) / 2;
+		frame.setSize(w, h);
+		frame.setLocation(x, y);
 		
-		if (maximize)
+		if (w >= windowBounds.width && h >= windowBounds.height)
 		{
 			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		}
-		else
-		{
-			frame.setLocation(
-				windowBounds.x + (windowBounds.width  - frame.getWidth())  / 2,
-				windowBounds.y + (windowBounds.height - frame.getHeight()) / 2
-			);
 		}
 		
 		/*-------------------------------------------------------------------------------------[*]
@@ -742,7 +741,7 @@ public class Sandbox extends JApplet
 					fsWindow = null;
 				}
 			}
-			else if (e.getSource() == addDisplayMenuItem)
+			else if (e.getSource() == addWindowMenuItem)
 			{
 				JFrame frame2 = new JFrame("Moving Pictures - Additional View");
 				final DisplayPanel panel2 = new DisplayPanel(
@@ -764,6 +763,31 @@ public class Sandbox extends JApplet
 						game.removeDisplay(panel2);
 					}
 				});
+			}
+			else if (e.getSource() == addTabMenuItem)
+			{
+				Component centerComponent = frame.getContentPane().getComponent(1);
+				
+				if (centerComponent instanceof JTabbedPane)
+				{
+					JTabbedPane tabbedPane = (JTabbedPane) centerComponent;
+					String tabTitle = String.valueOf(game.getDisplays().size());
+					tabbedPane.addTab(tabTitle, game.newDisplay().getView());
+					frame.validate();
+				}
+				else if (centerComponent instanceof DisplayPanelView)
+				{
+					JTabbedPane tabbedPane = new JTabbedPane();
+					frame.remove(panel);
+					frame.add(tabbedPane, BorderLayout.CENTER, 1);
+					tabbedPane.addTab("0", game.getDisplay(0).getView());
+					tabbedPane.addTab("1", game.newDisplay().getView());
+					frame.validate();
+				}
+				else
+				{
+					throw new Error("Component is " + centerComponent.getClass());
+				}
 			}
 			else if (e.getSource() == splitDisplayMenuItem)
 			{

@@ -28,14 +28,14 @@ import javax.swing.tree.TreeSelectionModel;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.Mediator;
+import com.robbix.mp5.ModuleEvent;
+import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.ui.SoundBank;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
-import com.robbix.mp5.utils.ModuleEvent;
-import com.robbix.mp5.utils.ModuleListener;
 import com.robbix.mp5.utils.RTreeNode;
 
 public class UnitTypeViewer extends JFrame

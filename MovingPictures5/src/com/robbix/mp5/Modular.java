@@ -1,4 +1,4 @@
-package com.robbix.mp5.utils;
+package com.robbix.mp5;
 
 import java.io.File;
 import java.io.IOException;

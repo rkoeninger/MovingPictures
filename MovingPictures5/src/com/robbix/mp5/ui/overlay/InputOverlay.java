@@ -34,8 +34,7 @@ import com.robbix.mp5.utils.Utils;
 public abstract class InputOverlay
 implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 {
-	public static final Font OVERLAY_FONT = Font.decode("Arial-12");
-	public static final Font COMMAND_FONT = Font.decode("Arial-bold-20");
+	public static final Font OVERLAY_FONT = Font.decode("SansSerif-12");
 	public static final Color TRANS_RED = new Color(255, 0, 0, 127);
 	public static final Color TRANS_YELLOW = new Color(255, 255, 0, 127);
 	public static final Color TRANS_GREEN = new Color(0, 255, 0, 127);

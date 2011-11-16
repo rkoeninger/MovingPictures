@@ -129,20 +129,17 @@ public class TileSet
 			default: throw new IllegalArgumentException("Invalid wall health");
 		}
 		
-		return Utils.getPath("wall", healthCode, neighbors);
+		return "wall/" + healthCode + "/" + neighbors;
 	}
 
 	public String getTubeTile(Neighbors neighbors)
 	{
-		return Utils.getPath("tube", neighbors);
+		return "tube/" + neighbors;
 	}
 
 	public String getBulldozedTile()
 	{
-		return Utils.getPath(
-			"bulldozed",
-			rand.nextInt(bulldozedCount)
-		);
+		return "bulldozed/" + rand.nextInt(bulldozedCount);
 	}
 	
 	/**
@@ -150,7 +147,7 @@ public class TileSet
 	 */
 	public String getPlainTile()
 	{
-		return Utils.getPath("plain", rand.nextInt(plainCount));
+		return "plain/" + rand.nextInt(plainCount);
 	}
 
 	/**
@@ -158,7 +155,7 @@ public class TileSet
 	 */
 	public String getPlainTile(int code)
 	{
-		return Utils.getPath("plain", "grass", code);
+		return "plain/grass/" + code;
 	}
 	
 	/**

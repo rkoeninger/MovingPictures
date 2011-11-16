@@ -10,7 +10,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.robbix.mp5.AsyncModuleListener;
 import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Modular;
+import com.robbix.mp5.ModuleEvent;
+import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.unit.Activity;
@@ -19,9 +23,6 @@ import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
 import com.robbix.mp5.utils.AutoArrayList;
 import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.Modular;
-import com.robbix.mp5.utils.ModuleEvent;
-import com.robbix.mp5.utils.ModuleListener;
 import com.robbix.mp5.utils.Utils;
 
 /**
@@ -68,7 +69,7 @@ public class SpriteLibrary implements Modular
 	
 	private Set<String> modulesBeingLoaded;
 	private Set<String> loadedModules;
-	private ModuleListener.Helper listenerHelper;
+	private AsyncModuleListener.Helper listenerHelper;
 	
 	private boolean asyncMode = false;
 	private Object asyncLock = new Object();
@@ -80,7 +81,7 @@ public class SpriteLibrary implements Modular
 		modulesBeingLoaded = new HashSet<String>(64);
 		unitSets = new AutoArrayList<SpriteSet>();
 		ambientSets = new HashMap<String, SpriteSet>(256);
-		listenerHelper = new ModuleListener.Helper();
+		listenerHelper = new AsyncModuleListener.Helper();
 		loader = new AsyncLoader();
 	}
 	
@@ -151,41 +152,42 @@ public class SpriteLibrary implements Modular
 		
 		synchronized (asyncLock)
 		{
-			if (loadedModules.contains(moduleName)
-			 || modulesBeingLoaded.contains(moduleName))
+			if (loadedModules.contains(moduleName) || modulesBeingLoaded.contains(moduleName))
 				return;
 			
-			AsyncLoader.Callback callback = new AsyncLoader.Callback()
+			String name = xmlFile.getParentFile().getName();
+			modulesBeingLoaded.add(moduleName);
+			listenerHelper.fireModuleLoadStarted(new ModuleEvent(this, name));
+			loader.load(xmlFile, new AsyncCallback());
+		}
+	}
+	
+	private class AsyncCallback implements AsyncLoader.Callback
+	{
+		public void loadFailed(File file, Exception exc)
+		{
+		}
+		
+		public void loadComplete(SpriteSet set)
+		{
+			synchronized (asyncLock)
 			{
-				public void loadFailed(File file, Exception exc)
+				Class<?>[] params = set.getParameterList();
+				
+				if (params.length == 1 && params[0].equals(String.class))
 				{
+					ambientSets.put(set.getName(), set);
+				}
+				else
+				{
+					UnitType type = Mediator.factory.getType(set.getName());
+					unitSets.set(type.getSerial(), set);
 				}
 				
-				public void loadComplete(SpriteSet set)
-				{
-					synchronized (asyncLock)
-					{
-						Class<?>[] params = set.getParameterList();
-						
-						if (params.length == 1 && params[0].equals(String.class))
-						{
-							ambientSets.put(set.getName(), set);
-						}
-						else
-						{
-							UnitType type = Mediator.factory.getType(set.getName());
-							unitSets.set(type.getSerial(), set);
-						}
-						
-						modulesBeingLoaded.remove(set.getName());
-						loadedModules.add(set.getName());
-						listenerHelper.fireModuleLoaded(new ModuleEvent(this, set.getName()));
-					}
-				}
-			};
-			
-			modulesBeingLoaded.add(moduleName);
-			loader.load(xmlFile, callback);
+				modulesBeingLoaded.remove(set.getName());
+				loadedModules.add(set.getName());
+				listenerHelper.fireModuleLoaded(new ModuleEvent(this, set.getName()));
+			}
 		}
 	}
 	

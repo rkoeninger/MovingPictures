@@ -62,7 +62,7 @@ public class DisplayPanel extends JComponent
 	private BufferedImage cachedBackground = null;
 	private Object cacheLock = new Object();
 	
-	private static Font costMapFont = Font.decode("Arial-9");
+	private static Font costMapFont = Font.decode("SansSerif-9");
 	private static Color BACKGROUND_BLUE = new Color(127, 127, 255);
 	private Color letterBoxColor = Color.BLACK;
 	
@@ -86,8 +86,6 @@ public class DisplayPanel extends JComponent
 	private boolean showUnitLayerState = false;
 	private boolean showTubeConnectivity = false;
 	private boolean showTerrainCostMap = false;
-	private boolean showTerrainCostValues = false;
-	private boolean showCostValuesAsFactors = false;
 	private boolean showBackground = true;
 	private boolean showShadows = false;
 	
@@ -875,24 +873,27 @@ public class DisplayPanel extends JComponent
 	 */
 	private void drawCostMap(Graphics g, Region region)
 	{
-		CostMap terrainCost = map.getTerrainCostMap();
+		CostMap costMap = map.getTerrainCostMap();
 		g.setFont(costMapFont);
 		
 		for (Position pos : region)
 		{
-			Color color = Utils.getGrayscale(terrainCost.getScaleFactor(pos));
+			Color color = Utils.getGrayscale(costMap.getScaleFactor(pos));
 			ColorScheme colors = ColorScheme.withFillOnly(color);
 			draw(g, colors, pos);
 			
-			if (showTerrainCostValues)
+			if (scale >= -1)
 			{
 				g.setColor(Utils.getBlackWhiteComplement(color));
+				double cost = costMap.get(pos);
+				String costLabel = null;
 				
-				double cost = showCostValuesAsFactors
-					? terrainCost.getScaleFactor(pos)
-					: terrainCost.get(pos);
+				if (costMap.isInfinite(pos)) costLabel = "Inf";
+				else if (scale >= 0)  costLabel = String.format("%.2f", cost);
+				else if (scale == -1) costLabel = String.valueOf((int) cost);
 				
-				draw(g, String.format("%.2f", cost), pos);
+				if (costLabel != null)
+					draw(g, costLabel, pos);
 			}
 		}
 	}
