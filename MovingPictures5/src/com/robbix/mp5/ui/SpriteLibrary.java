@@ -56,7 +56,7 @@ public class SpriteLibrary implements Modular
 			if (!infoFile.exists())
 				continue;
 			
-			library.loadModule(infoFile);
+			library.loadModuleSync(infoFile);
 		}
 		
 		return library;
