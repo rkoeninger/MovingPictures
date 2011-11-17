@@ -61,6 +61,7 @@ public class DisplayPanel extends JComponent
 	
 	private BufferedImage cachedBackground = null;
 	private Object cacheLock = new Object();
+	private long lastRefreshTime = 0;
 	
 	private static Font costMapFont = Font.decode("SansSerif-9");
 	private static Color BACKGROUND_BLUE = new Color(127, 127, 255);
@@ -846,9 +847,11 @@ public class DisplayPanel extends JComponent
 		{
 			Region region = getDisplayRegion();
 			region = map.getBounds().getIntersection(region);
+			long time = System.currentTimeMillis();
 			
-			if (cachedBackground == null)
+			if ((cachedBackground == null) || (time - lastRefreshTime > 1000))
 			{
+				lastRefreshTime = time;
 				cachedBackground = new BufferedImage(
 					rect.width,
 					rect.height,

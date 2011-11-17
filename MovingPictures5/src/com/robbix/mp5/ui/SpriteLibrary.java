@@ -155,9 +155,8 @@ public class SpriteLibrary implements Modular
 			if (loadedModules.contains(moduleName) || modulesBeingLoaded.contains(moduleName))
 				return;
 			
-			String name = xmlFile.getParentFile().getName();
 			modulesBeingLoaded.add(moduleName);
-			listenerHelper.fireModuleLoadStarted(new ModuleEvent(this, name));
+			listenerHelper.fireModuleLoadStarted(new ModuleEvent(this, moduleName));
 			loader.load(xmlFile, new AsyncCallback());
 		}
 	}
@@ -312,7 +311,8 @@ public class SpriteLibrary implements Modular
 				try
 				{
 					loadModule(type.getName());
-					return SpriteSet.BLANK;
+					
+					return asyncMode ? SpriteSet.BLANK : unitSets.get(type.getSerial());
 				}
 				catch (IOException ioe)
 				{
