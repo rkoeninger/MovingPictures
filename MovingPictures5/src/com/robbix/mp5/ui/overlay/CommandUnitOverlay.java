@@ -25,8 +25,8 @@ public class CommandUnitOverlay extends InputOverlay
 	public CommandUnitOverlay(Unit unit)
 	{
 		super((!unit.isStructure() && !unit.getType().isGuardPostType()) ? "move" : null);
-		
 		this.unit = unit;
+		this.requiresPaintOnGrid = false;
 	}
 	
 	public void init()

@@ -32,6 +32,7 @@ public class CommandTruckOverlay extends InputOverlay
 	{
 		super("move");
 		this.trucks = trucks;
+		this.requiresPaintOnGrid = false;
 	}
 	
 	public void init()

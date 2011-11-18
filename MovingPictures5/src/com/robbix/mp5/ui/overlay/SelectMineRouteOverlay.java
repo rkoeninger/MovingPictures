@@ -3,8 +3,10 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Graphics;
 import java.util.Set;
 
+import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.Position;
 import com.robbix.mp5.utils.Utils;
 
 public class SelectMineRouteOverlay extends InputOverlay
@@ -32,17 +34,19 @@ public class SelectMineRouteOverlay extends InputOverlay
 	
 	public void onLeftClick()
 	{
-		Unit selected = panel.getMap().getUnit(getCursorPosition());
+		Unit selected = getPotentialSelection();
 		
 		if (selected != null)
 		{
 			if (selected.isMine())
 			{
 				mine = selected;
+				Mediator.playSound("beep6");
 			}
-			else if (selected.getType().getName().contains("Smelter"))
+			else if (selected.isSmelter())
 			{
 				smelter = selected;
+				Mediator.playSound("beep6");
 			}
 		}
 		
@@ -53,5 +57,29 @@ public class SelectMineRouteOverlay extends InputOverlay
 			
 			complete();
 		}
+	}
+	
+	private Unit getPotentialSelection()
+	{
+		Position pos = getCursorPosition();
+		Position n = pos.shift(0, -1);
+		Position e = pos.shift(1, 0);
+		
+		Unit occupant = panel.getMap().getUnit(pos);
+		
+		if (occupant != null && (occupant.isMine() || occupant.isSmelter()))
+			return occupant;
+		
+		occupant = panel.getMap().getUnit(n);
+		
+		if (occupant != null && occupant.isSmelter())
+			return occupant;
+		
+		occupant = panel.getMap().getUnit(e);
+		
+		if (occupant != null && occupant.isMine())
+			return occupant;
+		
+		return null;
 	}
 }

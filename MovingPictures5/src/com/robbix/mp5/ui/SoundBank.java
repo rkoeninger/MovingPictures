@@ -209,6 +209,9 @@ public class SoundBank implements Modular
 		if (name == null)
 			return;
 		
+		if (!isRunning())
+			return;
+		
 		SampleBuffer buffer = buffers.get(name);
 		
 		if (buffer == null)

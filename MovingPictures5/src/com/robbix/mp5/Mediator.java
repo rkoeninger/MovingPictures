@@ -76,23 +76,23 @@ public class Mediator
 	
 	public static void playSound(String name, Position pos)
 	{
+		playSound(name, pos.x, pos.y);
+	}
+	
+	public static void playSound(String name, int x, int y)
+	{
 		if (!soundOn)
 			return;
 		
 		Region displayRegion = game.getDisplay().getDisplayRegion();
 		
-		if (displayRegion.contains(pos))
+		if (displayRegion.contains(x, y))
 		{
 			Position center = displayRegion.getCenter();
-			float spread = (pos.x - center.x) / (float) displayRegion.w;
+			float spread = (x - center.x) / (float) displayRegion.w;
 			float volume = 0.5f + Math.abs(spread) * 0.5f;
 			sounds.play(name, volume, spread, null);
 		}
-	}
-	
-	public static void playSound(String name, int x, int y)
-	{
-		playSound(name, new Position(x, y));
 	}
 	
 	public static void doAttack(Unit attacker, Unit target)

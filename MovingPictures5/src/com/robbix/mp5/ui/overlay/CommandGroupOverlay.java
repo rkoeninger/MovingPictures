@@ -21,6 +21,7 @@ public class CommandGroupOverlay extends InputOverlay
 		super("move");
 		this.leadUnit = leadUnit;
 		this.units = units;
+		this.requiresPaintOnGrid = false;
 	}
 	
 	public void init()

@@ -439,6 +439,11 @@ public class Unit
 		return type.getName().endsWith("Mine");
 	}
 	
+	public boolean isSmelter()
+	{
+		return type.getName().endsWith("Smelter");
+	}
+	
 	public boolean isMiner()
 	{
 		return type.getName().contains("Miner");

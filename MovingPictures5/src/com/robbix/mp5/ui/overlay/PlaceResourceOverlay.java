@@ -7,6 +7,7 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
+import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.ColorScheme;
 import com.robbix.mp5.utils.Position;
 import com.robbix.mp5.utils.Utils;
@@ -39,10 +40,11 @@ public class PlaceResourceOverlay extends InputOverlay
 		
 		if (panel.getMap().canPlaceResourceDeposit(pos))
 		{
-			colors = hasNeighboringDeposit(pos) || panel.getMap().isOccupied(pos) ? YELLOW : GREEN;
+			Unit occupant = panel.getMap().getUnit(pos);
+			colors = hasNeighboringDeposit(pos) || isImmobile(occupant) ? YELLOW : GREEN;
 			
-			if      (hasNeighboringDeposit(pos))     toolTip = "Too close";
-			else if (panel.getMap().isOccupied(pos)) toolTip = "Occupied";
+			if      (hasNeighboringDeposit(pos)) toolTip = "Too close";
+			else if (isImmobile(occupant))       toolTip = "Occupied";
 		}
 		else
 		{
@@ -72,6 +74,11 @@ public class PlaceResourceOverlay extends InputOverlay
 			res = (ResourceDeposit)res.clone();
 			panel.refresh();
 		}
+	}
+	
+	private boolean isImmobile(Unit unit)
+	{
+		return unit != null && (unit.isStructure() || unit.isGuardPost());
 	}
 	
 	private boolean hasNeighboringDeposit(Position pos)

@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -86,6 +87,7 @@ public class SpriteViewer extends JFrame
 	private JMenuItem loadByNameMenuItem;
 	private JMenuItem loadFromFileMenuItem;
 	private JMenuItem unloadMenuItem;
+	private JCheckBoxMenuItem asyncModeMenuItem;
 	
 	public SpriteViewer(final Game game)
 	{
@@ -135,13 +137,17 @@ public class SpriteViewer extends JFrame
 		loadByNameMenuItem = new JMenuItem("By Name...");
 		loadFromFileMenuItem = new JMenuItem("From File...");
 		unloadMenuItem = new JMenuItem("Unload...");
+		asyncModeMenuItem = new JCheckBoxMenuItem("Async Loading", lib.isAsyncModeEnabled());
 		loadByNameMenuItem.addActionListener(new MenuListener());
 		loadFromFileMenuItem.addActionListener(new MenuListener());
 		unloadMenuItem.addActionListener(new MenuListener());
+		asyncModeMenuItem.addChangeListener(new MenuListener());
 		moduleMenu.add(loadByNameMenuItem);
 		moduleMenu.add(loadFromFileMenuItem);
 		moduleMenu.addSeparator();
 		moduleMenu.add(unloadMenuItem);
+		moduleMenu.addSeparator();
+		moduleMenu.add(asyncModeMenuItem);
 		menuBar.add(moduleMenu);
 		
 		setJMenuBar(menuBar);
@@ -163,6 +169,7 @@ public class SpriteViewer extends JFrame
 		public void moduleLoaded(ModuleEvent e)
 		{
 			buildTree();
+			preview.showNothing();
 		}
 		
 		public void moduleUnloaded(ModuleEvent e)
@@ -172,8 +179,16 @@ public class SpriteViewer extends JFrame
 		}
 	}
 	
-	private class MenuListener implements ActionListener
+	private class MenuListener implements ActionListener, ChangeListener
 	{
+		public void stateChanged(ChangeEvent e)
+		{
+			if (e.getSource() == asyncModeMenuItem)
+			{
+				lib.setAsyncModeEnabled(asyncModeMenuItem.isSelected());
+			}
+		}
+		
 		public void actionPerformed(ActionEvent e)
 		{
 			if (e.getSource() == loadByNameMenuItem)
@@ -395,29 +410,33 @@ public class SpriteViewer extends JFrame
 	
 	private void appendSpriteSet(String moduleName)
 	{
-		SpriteSet spriteSet = lib.getAmbientSpriteSet(moduleName);
+		UnitType unitType = factory.getType(moduleName);
 		
-		if (spriteSet == null)
+		if (unitType == null)
 		{
-			UnitType unitType = factory.getType(moduleName);
-			spriteSet = lib.getUnitSpriteSet(unitType);
+			SpriteSet ambientSet = lib.getAmbientSpriteSet(moduleName);
 			
-			if (spriteSet == SpriteSet.BLANK)
+			if (ambientSet != SpriteSet.BLANK)
 			{
-				appendPendingSpriteSet(moduleName);
+				appendAmbientSet(ambientSet);
 			}
 			else
 			{
-				appendUnitSet(spriteSet, unitType);
+				appendPendingSpriteSet(moduleName);
 			}
-		}
-		else if (spriteSet == SpriteSet.BLANK)
-		{
-			appendPendingSpriteSet(moduleName);
 		}
 		else
 		{
-			appendAmbientSet(spriteSet);
+			SpriteSet unitSet = lib.getUnitSpriteSet(unitType);
+			
+			if (unitSet != SpriteSet.BLANK)
+			{
+				appendUnitSet(unitSet, unitType);
+			}
+			else
+			{
+				appendPendingSpriteSet(moduleName);
+			}
 		}
 	}
 	
