@@ -45,7 +45,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -63,7 +62,6 @@ import javax.swing.event.ChangeListener;
 import com.robbix.mp5.Engine;
 import com.robbix.mp5.Game;
 import com.robbix.mp5.GameListener;
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.MeteorShowerTrigger;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
@@ -83,9 +81,13 @@ import com.robbix.mp5.ui.overlay.SelectUnitOverlay;
 import com.robbix.mp5.ui.overlay.SpawnMeteorOverlay;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.unit.UnitFactory;
+import com.robbix.mp5.unit.UnitType;
 import com.robbix.mp5.utils.AnimatedButton;
 import com.robbix.mp5.utils.JListDialog;
 import com.robbix.mp5.utils.JSliderMenuItem;
+import com.robbix.mp5.utils.RMenuItem;
+import com.robbix.mp5.utils.RRadioButtonMenuItem;
 import com.robbix.mp5.utils.Utils;
 
 /**
@@ -122,6 +124,7 @@ public class Sandbox extends JApplet
 	
 	private static Player currentPlayer;
 	private static Game game;
+	private static UnitFactory factory;
 	private static Engine engine;
 	private static JFrame frame;
 	private static Window fsWindow;
@@ -137,11 +140,6 @@ public class Sandbox extends JApplet
 	private static JMenu playerMenu;
 	private static ButtonGroup playerSelectButtonGroup;
 	private static boolean showFrameRate = false;
-	
-	// Action command prefixes
-	private static final String ACP_SELECT_PLAYER  = "selectPlayer-";
-	private static final String ACP_ADD_UNIT       = "addUnit-";
-	private static final String ACP_COMMAND_BUTTON = "commandButton-";
 	
 	private static Sprite edenIconSprite;
 	private static Sprite plymouthIconSprite;
@@ -243,8 +241,8 @@ public class Sandbox extends JApplet
 		game = Game.load(resDir, mapName, tileSetName, lazyLoadSprites, lazyLoadSounds);
 		game.getSpriteLibrary().setAsyncModeEnabled(asyncLoadSprites);
 		engine = new Engine(game);
-		Mediator.initMediator(game);
-		Mediator.soundOn(soundOn);
+		factory = game.getUnitFactory();
+		Game.game.setSoundOn(soundOn);
 		currentPlayer = game.getDefaultPlayer();
 		game.getSoundBank().setVolume(0.5f);
 		
@@ -343,22 +341,18 @@ public class Sandbox extends JApplet
 		 * Add player select menu items
 		 */
 		playerSelectButtonGroup = new ButtonGroup();
+		JMenuItem playerSelectMenuItem;
 		
 		for (Player player : game.getPlayers())
 		{
-			final JMenuItem playerSelectMenuItem =
-				new JRadioButtonMenuItem(player.getName());
+			playerSelectMenuItem = new RRadioButtonMenuItem(player.getName(), player);
 			playerSelectButtonGroup.add(playerSelectMenuItem);
-			
-			if (currentPlayer.equals(player))
-				playerSelectMenuItem.setSelected(true);
-			
-			playerSelectMenuItem.setActionCommand(
-				ACP_SELECT_PLAYER + String.valueOf(player.getID())
-			);
 			playerMenu.add(playerSelectMenuItem);
 			playerSelectMenuItem.addActionListener(listener);
 			playerMenuItems.put(player.getID(), playerSelectMenuItem);
+			
+			if (currentPlayer.equals(player))
+				playerSelectMenuItem.setSelected(true);
 		}
 		
 		game.addGameListener(new SandboxListener());
@@ -366,8 +360,8 @@ public class Sandbox extends JApplet
 		/*-------------------------------------------------------------------------------------[*]
 		 * Add place unit menu items
 		 */
-		final List<String> names = game.getUnitFactory().getUnitNames();
-		final List<String> types = game.getUnitFactory().getUnitTypes();
+		List<String> names = factory.getUnitNames();
+		List<String> types = factory.getUnitTypes();
 		
 		// I know it's a bubble sort
 		for (int a = 0; a < names.size(); ++a)
@@ -389,9 +383,8 @@ public class Sandbox extends JApplet
 		
 		for (int i = 0; i < types.size(); ++i)
 		{
-			final JMenuItem addUnitMenuItem = new JMenuItem(names.get(i));
+			JMenuItem addUnitMenuItem = new RMenuItem(names.get(i), factory.getType(types.get(i)));
 			addUnitMenu.add(addUnitMenuItem);
-			addUnitMenuItem.setActionCommand(ACP_ADD_UNIT + types.get(i));
 			addUnitMenuItem.addActionListener(listener);
 		}
 		
@@ -810,7 +803,7 @@ public class Sandbox extends JApplet
 			else if (e.getSource() == meteorShowerMenuItem)
 			{
 				game.getTriggers().add(new MeteorShowerTrigger(1, 300));
-				Mediator.playSound("savant_meteorApproaching");
+				Game.game.playSound("savant_meteorApproaching");
 			}
 			else if (e.getSource() == spawnMeteorMenuItem)
 			{
@@ -818,7 +811,7 @@ public class Sandbox extends JApplet
 			}
 			else if (e.getSource() == playSoundMenuItem)
 			{
-				Mediator.soundOn(playSoundMenuItem.isSelected());
+				Game.game.setSoundOn(playSoundMenuItem.isSelected());
 			}
 			else if (e.getSource() == playMusicMenuItem)
 			{
@@ -964,23 +957,34 @@ public class Sandbox extends JApplet
 			{
 				AboutDialog.showDialog(frame, true);
 			}
-			else if (e.getActionCommand().startsWith(ACP_SELECT_PLAYER))
+			else if (e.getSource() instanceof RRadioButtonMenuItem)
 			{
-				selectPlayer(Integer.valueOf(e.getActionCommand().substring(ACP_SELECT_PLAYER.length())));
+				RRadioButtonMenuItem src = (RRadioButtonMenuItem) e.getSource();
+				
+				if (src.has(Player.class))
+				{
+					selectPlayer(src.get(Player.class).getID());
+				}
 			}
-			else if (e.getActionCommand().startsWith(ACP_ADD_UNIT))
+			else if (e.getSource() instanceof RMenuItem)
 			{
-				game.getUnitFactory().setDefaultOwner(currentPlayer);
-				panel.pushOverlay(new PlaceUnitOverlay(
-					game.getUnitFactory(),
-					 e.getActionCommand().substring(ACP_ADD_UNIT.length())
-				));
+				RMenuItem src = (RMenuItem) e.getSource();
+				
+				if (src.has(UnitType.class))
+				{
+					UnitFactory factory = game.getUnitFactory();
+					factory.setDefaultOwner(currentPlayer);
+					panel.pushOverlay(new PlaceUnitOverlay(factory, src.get(UnitType.class)));
+				}
 			}
-			else if (e.getActionCommand().startsWith(ACP_COMMAND_BUTTON))
+			else if (e.getSource() instanceof AnimatedButton)
 			{
-				String cmd = e.getActionCommand();
-				cmd = cmd.substring(ACP_COMMAND_BUTTON.length());
-				game.getDisplay().fireCommandButton(Command.valueOf(cmd));
+				AnimatedButton src = (AnimatedButton) e.getSource();
+				
+				if (src.has(Command.class))
+				{
+					game.getDisplay().fireCommandButton(src.get(Command.class));
+				}
 			}
 		}
 	}
@@ -1045,7 +1049,7 @@ public class Sandbox extends JApplet
 	{
 		Player player = game.getPlayer(playerID);
 		currentPlayer = player;
-		Mediator.factory.setDefaultOwner(player);
+		factory.setDefaultOwner(player);
 		game.getDisplay().showStatus(currentPlayer);
 		JMenuItem menuItem = playerMenuItems.get(playerID);
 		
@@ -1058,11 +1062,8 @@ public class Sandbox extends JApplet
 		public void playerAdded(Player player)
 		{
 			String name = player.getName();
-			JMenuItem playerSelectMenuItem = new JRadioButtonMenuItem(name);
+			JMenuItem playerSelectMenuItem = new RRadioButtonMenuItem(name, player);
 			playerSelectButtonGroup.add(playerSelectMenuItem);
-			playerSelectMenuItem.setActionCommand(
-				ACP_SELECT_PLAYER + String.valueOf(player.getID())
-			);
 			playerMenu.add(playerSelectMenuItem);
 			playerSelectMenuItem.addActionListener(listener);
 			playerSelectMenuItem.setSelected(true);
@@ -1098,24 +1099,24 @@ public class Sandbox extends JApplet
 			if (icons.isEmpty())
 				continue;
 			
-			String command = Utils.camelCaseToAllCaps(iconDir.getName());
-			AnimatedButton button = new AnimatedButton(command, icons);
+			String commandName = Utils.camelCaseToAllCaps(iconDir.getName());
+			Command command = Command.valueOf(commandName);
+			AnimatedButton button = new AnimatedButton(commandName, icons, command);
 			button.setToolTipText(iconDir.getName());
-			button.setActionCommand(ACP_COMMAND_BUTTON + command);
 			button.addActionListener(listener);
 			button.setFocusable(false);
-			commandButtons.put(Command.valueOf(command), button);
+			commandButtons.put(command, button);
 		}
 		
 		String[] extraCommands = {"KILL", "IDLE", "BUILD", "DOCK", "MINE"};
 		
-		for (String command : extraCommands)
+		for (String commandName : extraCommands)
 		{
-			AnimatedButton button = new AnimatedButton(command);
-			button.setActionCommand(ACP_COMMAND_BUTTON + command);
+			Command command = Command.valueOf(commandName);
+			AnimatedButton button = new AnimatedButton(commandName, command);
 			button.addActionListener(listener);
 			button.setFocusable(false);
-			commandButtons.put(Command.valueOf(command), button);
+			commandButtons.put(command, button);
 		}
 		
 		commandBar.add(getLogoPanel(null));

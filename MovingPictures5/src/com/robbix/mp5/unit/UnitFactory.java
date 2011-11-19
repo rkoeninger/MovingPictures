@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.SelfDestructAttackTask;
 import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.ai.task.TurretTask;
@@ -187,7 +187,7 @@ public class UnitFactory
 	
 	public Unit newUnit(String type, int playerID)
 	{
-		return newUnit(type, Mediator.game.getPlayer(playerID));
+		return newUnit(type, Game.game.getPlayer(playerID));
 	}
 	
 	public Unit newUnit(String type)

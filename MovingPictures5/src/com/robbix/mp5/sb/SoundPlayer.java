@@ -33,7 +33,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 
 import com.robbix.mp5.Game;
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.ui.SoundBank;
@@ -46,7 +45,6 @@ public class SoundPlayer extends JFrame
 		
 		Sandbox.trySystemLookAndFeel();
 		SoundBank sounds = SoundBank.load(new File("./res/sounds"), lazy);
-		Mediator.sounds = sounds;
 		JFrame sPlayer = new SoundPlayer(Game.of(sounds));
 		sPlayer.setIconImages(Sandbox.getWindowIcons());
 		sPlayer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

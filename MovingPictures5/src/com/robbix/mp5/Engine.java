@@ -148,7 +148,7 @@ public class Engine
 				{
 					for (Trigger trigger : game.getTriggers())
 					{
-						trigger.step(Mediator.game, frame);
+						trigger.step(Game.game, frame);
 					}
 				}
 				

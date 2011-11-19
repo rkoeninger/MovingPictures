@@ -1,6 +1,6 @@
 package com.robbix.mp5.ai.task;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.Filter;
 import com.robbix.mp5.utils.Utils;
@@ -21,7 +21,7 @@ public class TurretTask extends Task
 		
 		if (target != null)
 		{
-			Mediator.doAttack(unit, target);
+			Game.game.doAttack(unit, target);
 		}
 		else
 		{

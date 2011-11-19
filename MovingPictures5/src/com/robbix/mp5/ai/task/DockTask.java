@@ -1,6 +1,6 @@
 package com.robbix.mp5.ai.task;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
 import static com.robbix.mp5.unit.Activity.*;
@@ -87,27 +87,27 @@ public class DockTask extends Task
 			{
 				if (state == 1 && unit.getAnimationFrame() == 0)
 				{
-					Mediator.playSound("dockOpen", pos);
+					Game.game.playSound("dockOpen", pos);
 				}
 				else if (state == 1 && unit.getAnimationFrame() == 30)
 				{
-					Mediator.playSound("dockGrab", pos);
+					Game.game.playSound("dockGrab", pos);
 				}
 				else if (state == 1 && unit.getAnimationFrame() == 80)
 				{
-					Mediator.playSound("dockLower", pos);
+					Game.game.playSound("dockLower", pos);
 				}
 				else if (state == 2 && upFrameCount - unit.getAnimationFrame() == 5)
 				{
-					Mediator.playSound("dockOpen", pos);
+					Game.game.playSound("dockOpen", pos);
 				}
 				else if (state == 2 && upFrameCount - unit.getAnimationFrame() == 45)
 				{
-					Mediator.playSound("dockGrab", pos);
+					Game.game.playSound("dockGrab", pos);
 				}
 				else if (state == 2 && upFrameCount - unit.getAnimationFrame() == 125)
 				{
-					Mediator.playSound("dockLower", pos);
+					Game.game.playSound("dockLower", pos);
 				}
 				
 				unit.incrementAnimationFrame();

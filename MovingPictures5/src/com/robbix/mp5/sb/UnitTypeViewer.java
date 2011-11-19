@@ -27,7 +27,6 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.robbix.mp5.Game;
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.ui.SoundBank;
@@ -44,7 +43,6 @@ public class UnitTypeViewer extends JFrame
 	{
 		Sandbox.trySystemLookAndFeel();
 		UnitFactory factory = UnitFactory.load(new File("./res/units"));
-		Mediator.factory = factory;
 		SoundBank sounds = SoundBank.loadLazy(new File("./res/sounds"));
 		SpriteLibrary lib = SpriteLibrary.loadLazy(new File("./res/sprites"));
 		JFrame ufViewer = new UnitTypeViewer(Game.of(lib, factory, sounds));

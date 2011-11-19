@@ -1,9 +1,10 @@
 package com.robbix.mp5.ai.task;
 
+import static com.robbix.mp5.unit.Activity.MOVE;
+
 import java.util.List;
 
-import com.robbix.mp5.Mediator;
-import static com.robbix.mp5.unit.Activity.*;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.Filter;
 import com.robbix.mp5.utils.Position;
@@ -19,7 +20,7 @@ public class BulldozeRegionTask extends Task
 		{
 			public boolean accept(Unit unit)
 			{
-				return unit.getType().getName().contains("Dozer");
+				return unit.is("Dozer");
 			}
 		});
 		
@@ -44,7 +45,7 @@ public class BulldozeRegionTask extends Task
 		}
 		else
 		{
-			Mediator.doMove(unit, toDoze, false);
+			Game.game.doMove(unit, toDoze, false);
 		}
 	}
 }

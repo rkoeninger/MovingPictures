@@ -3,7 +3,7 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Graphics;
 import java.util.Set;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.Position;
@@ -41,12 +41,12 @@ public class SelectMineRouteOverlay extends InputOverlay
 			if (selected.isMine())
 			{
 				mine = selected;
-				Mediator.playSound("beep6");
+				Game.game.playSound("beep6");
 			}
 			else if (selected.isSmelter())
 			{
 				smelter = selected;
-				Mediator.playSound("beep6");
+				Game.game.playSound("beep6");
 			}
 		}
 		

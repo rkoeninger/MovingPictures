@@ -43,7 +43,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import com.robbix.mp5.AsyncModuleListener;
 import com.robbix.mp5.Game;
-import com.robbix.mp5.Mediator;
 import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
@@ -62,7 +61,6 @@ public class SpriteViewer extends JFrame
 		
 		Sandbox.trySystemLookAndFeel();
 		UnitFactory factory = UnitFactory.load(new File("./res/units"));
-		Mediator.factory = factory;
 		SpriteLibrary lib = SpriteLibrary.load(new File("./res/sprites"), lazy);
 		lib.setAsyncModeEnabled(true);
 		JFrame slViewer = new SpriteViewer(Game.of(lib, factory));

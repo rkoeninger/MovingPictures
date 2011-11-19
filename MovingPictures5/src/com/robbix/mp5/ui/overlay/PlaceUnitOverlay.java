@@ -10,6 +10,7 @@ import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
+import com.robbix.mp5.unit.UnitType;
 import com.robbix.mp5.utils.Position;
 import com.robbix.mp5.utils.Region;
 import com.robbix.mp5.utils.Utils;
@@ -35,6 +36,14 @@ public class PlaceUnitOverlay extends InputOverlay
 		this.factory = factory;
 		this.type = type;
 		this.unit = factory.newUnit(type);
+		this.showTubeConnectivity = unit.needsConnection() || unit.isConnectionSource();
+	}
+	
+	public PlaceUnitOverlay(UnitFactory factory, UnitType type)
+	{
+		this.factory = factory;
+		this.type = type.getName();
+		this.unit = factory.newUnit(this.type);
 		this.showTubeConnectivity = unit.needsConnection() || unit.isConnectionSource();
 	}
 	

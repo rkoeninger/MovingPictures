@@ -1,6 +1,6 @@
 package com.robbix.mp5.ai.task;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.unit.Cargo;
@@ -68,7 +68,7 @@ public class MineRouteTask extends Task
 			}
 			else
 			{
-				Mediator.doMove(unit, mineDock, false);
+				Game.game.doMove(unit, mineDock, false);
 			}
 		}
 		else
@@ -88,7 +88,7 @@ public class MineRouteTask extends Task
 			}
 			else
 			{
-				Mediator.doMove(unit, smelterDock, false);
+				Game.game.doMove(unit, smelterDock, false);
 			}
 		}
 	}

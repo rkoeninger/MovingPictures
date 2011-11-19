@@ -6,7 +6,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
@@ -35,7 +35,7 @@ public class SpriteGroupAnimation extends AmbientAnimation
 	
 	public SpriteGroupAnimation(SpriteGroup group, Player player, Point2D point, int delay)
 	{
-		super(Mediator.game.getSpriteLibrary());
+		super(Game.game.getSpriteLibrary());
 		this.sprites = group;
 		this.player = player;
 		this.point = point;

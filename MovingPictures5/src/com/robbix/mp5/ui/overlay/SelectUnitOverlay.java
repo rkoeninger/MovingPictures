@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.RIterator;
@@ -38,7 +38,7 @@ public class SelectUnitOverlay extends InputOverlay
 		
 		if (selected != null)
 		{
-			Mediator.playSound(selected.getType().getAcknowledgement());
+			Game.game.playSound(selected.getType().getAcknowledgement());
 			push(selected.isTruck()
 				? new CommandTruckOverlay(selected)
 				: new CommandUnitOverlay(selected));
@@ -62,7 +62,7 @@ public class SelectUnitOverlay extends InputOverlay
 				if (selected.size() == 1)
 				{
 					Unit only = (Unit) selected.toArray()[0];
-					Mediator.playSound(only.getType().getAcknowledgement());
+					Game.game.playSound(only.getType().getAcknowledgement());
 					push(new CommandUnitOverlay(only));
 					panel.showStatus(only);
 					panel.showStatus(only.getOwner());
@@ -70,7 +70,7 @@ public class SelectUnitOverlay extends InputOverlay
 				else
 				{
 					Unit leadUnit = getLeadUnit(selected);
-					Mediator.playSound(leadUnit.getType().getAcknowledgement());
+					Game.game.playSound(leadUnit.getType().getAcknowledgement());
 					push(areAllTrucks(selected)
 						? new CommandTruckOverlay(selected)
 						: new CommandGroupOverlay(leadUnit, selected)
@@ -82,7 +82,7 @@ public class SelectUnitOverlay extends InputOverlay
 			else
 			{
 				Unit struct = getLeadUnit(selected);
-				Mediator.playSound(struct.getType().getAcknowledgement());
+				Game.game.playSound(struct.getType().getAcknowledgement());
 				push(new CommandUnitOverlay(struct));
 				panel.showStatus(struct);
 				panel.showStatus(struct.getOwner());

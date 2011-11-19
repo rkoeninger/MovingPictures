@@ -1,6 +1,6 @@
 package com.robbix.mp5.ai.task;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 
 import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Cargo;
@@ -58,11 +58,11 @@ public class MineTask extends Task
 				
 				if (unit.getAnimationFrame() == 30)
 				{
-					Mediator.playSound("dockGrab", pos);
+					Game.game.playSound("dockGrab", pos);
 				}
 				else if (unit.getAnimationFrame() == 55)
 				{
-					Mediator.playSound("dockOpen", pos);
+					Game.game.playSound("dockOpen", pos);
 				}
 			}
 			

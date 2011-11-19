@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.DockTask;
 import com.robbix.mp5.ai.task.DumpTask;
 import com.robbix.mp5.ai.task.MineTask;
@@ -58,14 +58,14 @@ public class CommandTruckOverlay extends InputOverlay
 		if (command == Command.SELF_DESTRUCT)
 		{
 			for (Unit truck : trucks)
-				Mediator.selfDestruct(truck);
+				Game.game.selfDestruct(truck);
 			
 			complete();
 		}
 		else if (command == Command.KILL)
 		{
 			for (Unit truck : trucks)
-				Mediator.kill(truck);
+				Game.game.kill(truck);
 			
 			complete();
 		}
@@ -74,7 +74,7 @@ public class CommandTruckOverlay extends InputOverlay
 			for (Unit truck : trucks)
 				if (!truck.isCargoEmpty())
 				{
-					Mediator.playSound("dump", truck.getPosition());
+					Game.game.playSound("dump", truck.getPosition());
 					truck.interrupt(new DumpTask());
 				}
 		}
@@ -84,7 +84,7 @@ public class CommandTruckOverlay extends InputOverlay
 		}
 		else if (command == Command.TRANSFER)
 		{
-			Collection<Player> players = Mediator.game.getPlayers();
+			Collection<Player> players = Game.game.getPlayers();
 			players = new ArrayList<Player>(players);
 			players.remove(trucks.iterator().next().getOwner());
 			
@@ -160,8 +160,8 @@ public class CommandTruckOverlay extends InputOverlay
 		Position pos = getCursorPosition();
 		
 		for (Unit truck : trucks)		
-			Mediator.doMove(truck, pos);
+			Game.game.doMove(truck, pos);
 		
-		Mediator.playSound("beep2");
+		Game.game.playSound("beep2");
 	}
 }

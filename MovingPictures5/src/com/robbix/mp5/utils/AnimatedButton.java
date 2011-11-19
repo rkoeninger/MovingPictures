@@ -4,6 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -20,16 +23,18 @@ public class AnimatedButton extends JButton
 	private int frame;
 	private int frameCount;
 	private boolean adopted = false;
+	private Collection<Object> objects = new ArrayList<Object>();
 	
-	public AnimatedButton(String name)
+	public AnimatedButton(String name, Object... objects)
 	{
 		super(name);
-		setActionCommand(name);
+		add(objects);
 	}
 	
-	public AnimatedButton(String name, List<ImageIcon> icons)
+	public AnimatedButton(String name, List<ImageIcon> icons, Object... objects)
 	{
 		super(icons.get(0));
+		add(objects);
 		setToolTipText(name);
 		
 		this.icons = icons;
@@ -37,7 +42,6 @@ public class AnimatedButton extends JButton
 		this.timer = new Timer(60, new RotateIcons());
 		this.timer.setCoalesce(true);
 		
-		setActionCommand(name);
 		addMouseListener(new RolloverListener());
 		
 		frame = 0;
@@ -167,5 +171,53 @@ public class AnimatedButton extends JButton
 			for (ActionListener listener : timer.getActionListeners())
 				timer.removeActionListener(listener);
 		}
+	}
+	
+	public void set(Object... objects)
+	{
+		this.objects = Arrays.asList(objects);
+	}
+	
+	public void add(Object... objects)
+	{
+		for (Object object : objects)
+			this.objects.add(object);
+	}
+	
+	public void remove(Object... objects)
+	{
+		for (Object object : objects)
+			this.objects.remove(object);
+	}
+	
+	public boolean has()
+	{
+		return !objects.isEmpty();
+	}
+	
+	public Object[] get()
+	{
+		return objects.toArray();
+	}
+	
+	public <T> boolean has(Class<T> clazz)
+	{
+		if (objects == null)
+			return false;
+		
+		for (Object object : objects)
+			if (object != null && clazz.isInstance(object))
+				return true;
+		
+		return false;
+	}
+	
+	public <T> T get(Class<T> clazz)
+	{
+		for (Object object : objects)
+			if (object != null && clazz.isInstance(object))
+				return clazz.cast(object);
+		
+		return null;
 	}
 }

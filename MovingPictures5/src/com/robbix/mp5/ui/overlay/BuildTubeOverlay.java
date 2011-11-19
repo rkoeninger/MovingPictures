@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.BorderRegion;
@@ -72,7 +72,7 @@ public class BuildTubeOverlay extends InputOverlay
 	
 	public void onLeftClick()
 	{
-		Mediator.doEarthworkerBuild(crane, getCursorPosition(), Fixture.TUBE);
+		Game.game.doEarthworkerBuild(crane, getCursorPosition(), Fixture.TUBE);
 		complete();
 	}
 	
@@ -102,7 +102,7 @@ public class BuildTubeOverlay extends InputOverlay
 			reverseForCloserEnd(tubeRow, crane.getPosition());
 		}
 		
-		Mediator.doEarthworkerBuildRow(crane, tubeRow, Fixture.TUBE);
+		Game.game.doEarthworkerBuildRow(crane, tubeRow, Fixture.TUBE);
 		complete();
 	}
 	

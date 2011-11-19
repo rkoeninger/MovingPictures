@@ -1,6 +1,6 @@
 package com.robbix.mp5.ai.task;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Activity;
@@ -30,7 +30,7 @@ public class BuildMineTask extends Task
 		Position pos = unit.getPosition();
 		LayeredMap map = unit.getMap();
 		
-		SpriteLibrary lib = Mediator.game.getSpriteLibrary();
+		SpriteLibrary lib = Game.game.getSpriteLibrary();
 		int buildFrames = lib.getBuildGroupLength(mine.getType());
 		
 		map.remove(unit);

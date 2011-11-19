@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
@@ -47,14 +47,14 @@ public class CommandGroupOverlay extends InputOverlay
 		if (command == Command.SELF_DESTRUCT)
 		{
 			for (Unit unit : units)
-				Mediator.selfDestruct(unit);
+				Game.game.selfDestruct(unit);
 			
 			complete();
 		}
 		else if (command == Command.KILL)
 		{
 			for (Unit unit : units)
-				Mediator.kill(unit);
+				Game.game.kill(unit);
 			
 			complete();
 		}
@@ -65,7 +65,7 @@ public class CommandGroupOverlay extends InputOverlay
 		}
 		else if (command == Command.TRANSFER)
 		{
-			Collection<Player> players = Mediator.game.getPlayers();
+			Collection<Player> players = Game.game.getPlayers();
 			players = new ArrayList<Player>(players);
 			players.remove(units.iterator().next().getOwner());
 			
@@ -88,7 +88,7 @@ public class CommandGroupOverlay extends InputOverlay
 	
 	public void onLeftClick()
 	{
-		Mediator.doGroupMove(units, getCursorPosition());
-		Mediator.playSound("beep2");
+		Game.game.doGroupMove(units, getCursorPosition());
+		Game.game.playSound("beep2");
 	}
 }

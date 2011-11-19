@@ -1,8 +1,9 @@
 package com.robbix.mp5.ai.task;
 
-import static com.robbix.mp5.unit.Activity.*;
+import static com.robbix.mp5.unit.Activity.DUMP;
+import static com.robbix.mp5.unit.Activity.MOVE;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 
@@ -22,7 +23,7 @@ public class DumpTask extends Task
 		{
 			unit.setActivity(DUMP);
 			unit.resetAnimationFrame();
-			frameCount = Mediator.game.getSpriteLibrary().getDumpGroupLength(unit);
+			frameCount = Game.game.getSpriteLibrary().getDumpGroupLength(unit);
 		}
 		else
 		{

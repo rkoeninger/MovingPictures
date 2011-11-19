@@ -1,9 +1,10 @@
 package com.robbix.mp5.ai.task;
 
-import com.robbix.mp5.Mediator;
+import static com.robbix.mp5.unit.Activity.BUILD;
+import static com.robbix.mp5.unit.Activity.CONSTRUCT;
+import static com.robbix.mp5.unit.Activity.MOVE;
 
-import static com.robbix.mp5.unit.Activity.*;
-
+import com.robbix.mp5.Game;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
@@ -43,7 +44,7 @@ public class ConVecConstructTask extends Task
 			unit.setCargo(Cargo.EMPTY);
 			unit.getMap().putUnit(target, targetPos);
 			
-			SpriteLibrary lib = Mediator.game.getSpriteLibrary();
+			SpriteLibrary lib = Game.game.getSpriteLibrary();
 			int buildFrames = lib.getBuildGroupLength(target.getType());
 			
 			target.setActivity(BUILD);

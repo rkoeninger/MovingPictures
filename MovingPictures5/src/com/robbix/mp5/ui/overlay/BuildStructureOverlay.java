@@ -3,7 +3,7 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.ConVecConstructTask;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
@@ -71,12 +71,12 @@ public class BuildStructureOverlay extends InputOverlay
 		if (map.canPlaceUnit(pos, fp) && map.canPlaceUnit(conVecPos))
 		{
 			conVec.assignNow(new ConVecConstructTask(structure, pos));
-			Mediator.doMove(conVec, conVecPos, false);
+			Game.game.doMove(conVec, conVecPos, false);
 			complete();
 		}
 		else
 		{
-			Mediator.playSound("structureError");
+			Game.game.playSound("structureError");
 		}
 	}
 }

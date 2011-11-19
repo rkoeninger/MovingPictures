@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.robbix.mp5.AsyncModuleListener;
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.Modular;
 import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ModuleListener;
@@ -130,7 +130,7 @@ public class SpriteLibrary implements Modular
 		}
 		else
 		{
-			UnitType type = Mediator.factory.getType(set.getName());
+			UnitType type = Game.game.getUnitFactory().getType(set.getName());
 			unitSets.set(type.getSerial(), set);
 		}
 		
@@ -179,7 +179,7 @@ public class SpriteLibrary implements Modular
 				}
 				else
 				{
-					UnitType type = Mediator.factory.getType(set.getName());
+					UnitType type = Game.game.getUnitFactory().getType(set.getName());
 					unitSets.set(type.getSerial(), set);
 				}
 				
@@ -235,7 +235,7 @@ public class SpriteLibrary implements Modular
 				return true;
 			}
 			
-			UnitType type = Mediator.factory.getType(name);
+			UnitType type = Game.game.getUnitFactory().getType(name);
 			
 			if (type != null)
 			{
@@ -288,7 +288,7 @@ public class SpriteLibrary implements Modular
 			if (ambientSets.containsKey(name))
 				return ambientSets.get(name);
 			
-			UnitType type = Mediator.factory.getType(name);
+			UnitType type = Game.game.getUnitFactory().getType(name);
 			
 			if (type == null)
 				return null;

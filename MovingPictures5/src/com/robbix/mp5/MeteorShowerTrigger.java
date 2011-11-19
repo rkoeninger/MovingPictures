@@ -38,7 +38,7 @@ public class MeteorShowerTrigger extends Trigger
 				Utils.randInt(0, mapBounds.w - 1),
 				Utils.randInt(0, mapBounds.h - 1)
 			);
-			Mediator.doSpawnMeteor(pos);
+			Game.game.doSpawnMeteor(pos);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 
 public class SpawnMeteorOverlay extends InputOverlay
 {
@@ -11,6 +11,6 @@ public class SpawnMeteorOverlay extends InputOverlay
 	
 	public void onLeftClick()
 	{
-		Mediator.doSpawnMeteor(getCursorPosition());
+		Game.game.doSpawnMeteor(getCursorPosition());
 	}
 }

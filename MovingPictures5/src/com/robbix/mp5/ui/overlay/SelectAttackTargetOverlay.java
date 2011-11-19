@@ -2,7 +2,7 @@ package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.unit.Unit;
 
 public class SelectAttackTargetOverlay extends InputOverlay
@@ -27,7 +27,7 @@ public class SelectAttackTargetOverlay extends InputOverlay
 		
 		if (target != null && !target.isAt(attacker.getPosition()))
 		{
-			Mediator.doAttack(attacker, target);
+			Game.game.doAttack(attacker, target);
 			complete();
 		}
 	}

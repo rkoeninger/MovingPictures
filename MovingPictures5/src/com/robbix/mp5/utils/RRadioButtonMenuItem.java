@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.JMenuItem;
 
-public class RTreeNode extends DefaultMutableTreeNode
+public class RRadioButtonMenuItem extends JMenuItem
 {
 	private static final long serialVersionUID = 1L;
 	
 	private Collection<Object> objects = new ArrayList<Object>();
 	
-	public RTreeNode(String name, Object... objects)
+	public RRadioButtonMenuItem(String text, Object... objects)
 	{
-		super(name);
+		super(text);
 		add(objects);
 	}
 	

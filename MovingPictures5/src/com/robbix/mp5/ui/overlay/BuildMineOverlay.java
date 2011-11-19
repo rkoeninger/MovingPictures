@@ -3,7 +3,7 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.BuildMineTask;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
@@ -66,12 +66,12 @@ public class BuildMineOverlay extends InputOverlay
 		if (panel.getMap().canPlaceUnit(pos) && panel.getMap().canPlaceMine(pos))
 		{
 			miner.assignNow(new BuildMineTask(mine));
-			Mediator.doMove(miner, minerPos, false);
+			Game.game.doMove(miner, minerPos, false);
 			complete();
 		}
 		else
 		{
-			Mediator.playSound("structureError");
+			Game.game.playSound("structureError");
 		}
 	}
 }

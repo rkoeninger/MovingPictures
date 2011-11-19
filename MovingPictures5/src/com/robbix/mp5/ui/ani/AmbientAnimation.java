@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.SwingUtilities;
 
-import com.robbix.mp5.Mediator;
+import com.robbix.mp5.Game;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
@@ -62,7 +62,7 @@ public abstract class AmbientAnimation
     	{
     		public void run()
     		{
-    			Mediator.playSound(sound, pos);
+    			Game.game.playSound(sound, pos);
     		}
     	});
     }
@@ -73,7 +73,7 @@ public abstract class AmbientAnimation
     	{
     		public void run()
     		{
-    			Mediator.doSplashDamage(pos, amount, range);
+    			Game.game.doSplashDamage(pos, amount, range);
     		}
     	});
     }
@@ -84,7 +84,7 @@ public abstract class AmbientAnimation
     	{
     		public void run()
     		{
-    			Mediator.doDamage(attacker, target, amount);
+    			Game.game.doDamage(attacker, target, amount);
     		}
     	});
     }
