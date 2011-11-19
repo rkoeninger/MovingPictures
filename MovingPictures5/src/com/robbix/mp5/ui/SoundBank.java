@@ -252,9 +252,12 @@ public class SoundBank implements Modular
 	
 	public void setFormat(AudioFormat format)
 	{
+		boolean wasRunning = isRunning();
 		stop();
 		outFormat = format;
-		start();
+		
+		if (wasRunning)
+			start();
 	}
 	
 	public AudioFormat getFormat()
