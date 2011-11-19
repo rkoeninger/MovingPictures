@@ -1060,7 +1060,9 @@ public class Sandbox extends JApplet
 			String name = player.getName();
 			JMenuItem playerSelectMenuItem = new JRadioButtonMenuItem(name);
 			playerSelectButtonGroup.add(playerSelectMenuItem);
-			playerSelectMenuItem.setActionCommand(String.valueOf(player.getID()));
+			playerSelectMenuItem.setActionCommand(
+				ACP_SELECT_PLAYER + String.valueOf(player.getID())
+			);
 			playerMenu.add(playerSelectMenuItem);
 			playerSelectMenuItem.addActionListener(listener);
 			playerSelectMenuItem.setSelected(true);
