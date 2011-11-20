@@ -7,16 +7,15 @@ import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.ConVecConstructTask;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
-import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.Position;
 import com.robbix.mp5.utils.Region;
-import com.robbix.mp5.utils.Utils;
 
 public class BuildStructureOverlay extends InputOverlay
 {
 	private Sprite structSprite;
+	private int hue;
 	
 	private Unit conVec;
 	private Unit structure;
@@ -26,6 +25,7 @@ public class BuildStructureOverlay extends InputOverlay
 		this.conVec = conVec;
 		this.structure = structure;
 		this.showTubeConnectivity = true;
+		this.hue = structure.getOwner().getColorHue();
 	}
 	
 	public void paintImpl(Graphics g)
@@ -33,21 +33,12 @@ public class BuildStructureOverlay extends InputOverlay
 		if (isCursorOnGrid())
 		{
 			if (structSprite == null)
-			{
-				int hue = structure.getOwner().getColorHue();
-				structSprite = panel.getSpriteLibrary()
-								  .getDefaultSprite(structure);
-				structSprite = (structSprite == SpriteSet.BLANK_SPRITE)
-					? null
-					: Utils.getTranslucency(structSprite, hue, 0.5f);
-			}
+				structSprite = panel.getSpriteLibrary().getTranslucentDefault(structure, 0.5f);
 			
 			Position center = structure.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawUnitFootprint(g, structure.getType(), pos);
-			
-			if (structSprite != null)
-				panel.draw(g, structSprite, pos);
+			panel.draw(g, structSprite, hue, pos);
 			
 			if (toolTip != null)
 			{

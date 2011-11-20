@@ -1143,6 +1143,23 @@ public class DisplayPanel extends JComponent
 		);
 	}
 	
+	public void draw(Graphics g, Sprite sprite, int hue, Position pos)
+	{
+		Image img = sprite.getImage(hue);
+		int x = pos.x * tileSize + scroll.x + sprite.getXOffset(scale);
+		int y = pos.y * tileSize + scroll.y + sprite.getYOffset(scale);
+		int w = img.getWidth(null);
+		int h = img.getHeight(null);
+		int w2 = scale < 0 ? w >> -scale : w << scale;
+		int h2 = scale < 0 ? h >> -scale : h << scale;
+		g.drawImage(
+			img,
+			x, y, x + w2, y + h2,
+			0, 0, w, h,
+			null
+		);
+	}
+	
 	public void draw(Graphics g, Sprite sprite, Point2D absPoint, Player owner)
 	{
 		Image img = owner == null ? sprite.getImage() : sprite.getImage(owner.getColorHue());
@@ -1197,7 +1214,7 @@ public class DisplayPanel extends JComponent
 		g.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 	
-	private void draw(Graphics g, Image img, Position pos)
+	public void draw(Graphics g, Image img, Position pos)
 	{
 		int x = pos.x * tileSize + scroll.x;
 		int y = pos.y * tileSize + scroll.y;

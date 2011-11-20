@@ -6,11 +6,9 @@ import java.awt.Graphics;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.ui.Sprite;
-import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.ColorScheme;
 import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.Utils;
 
 public class PlaceResourceOverlay extends InputOverlay
 {
@@ -26,12 +24,7 @@ public class PlaceResourceOverlay extends InputOverlay
 	public void paintImpl(Graphics g)
 	{
 		if (resSprite == null)
-		{
-			resSprite = panel.getSpriteLibrary().getDefaultSprite(res);
-			resSprite = resSprite == SpriteSet.BLANK_SPRITE
-				? null
-				: Utils.getTranslucency(resSprite, -1, 0.5f);
-		}
+			resSprite = panel.getSpriteLibrary().getTranslucentDefault(res, 0.5f);
 		
 		Position pos = getCursorPosition();
 		
@@ -53,9 +46,7 @@ public class PlaceResourceOverlay extends InputOverlay
 		}
 		
 		panel.draw(g, colors, pos);
-		
-		if (resSprite != null)
-			panel.draw(g, resSprite, pos);
+		panel.draw(g, resSprite, pos);
 		
 		if (toolTip != null)
 		{

@@ -4,19 +4,15 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
-
 import com.robbix.mp5.utils.AnimatedCursor;
-import com.robbix.mp5.utils.Utils;
-import com.robbix.mp5.utils.XNode;
+import com.robbix.mp5.utils.RImage;
+import com.robbix.mp5.utils.RNode;
 
 public class CursorSet
 {
@@ -49,7 +45,7 @@ public class CursorSet
 			parent = xmlFile.getParentFile();
 		}
 		
-		XNode rootNode = XNode.load(xmlFile);
+		RNode rootNode = RNode.load(xmlFile);
 		
 		String name = rootNode.getAttribute("name");
 		Color bgColor = Color.decode(rootNode.getAttribute("bgcolor"));
@@ -58,7 +54,7 @@ public class CursorSet
 		int totalHotspotX = rootNode.getIntAttribute("hotspotX", -1);
 		int totalHotspotY = rootNode.getIntAttribute("hotspotY", -1);
 		
-		List<XNode> frameNodes = rootNode.getNodes("Frame");
+		List<RNode> frameNodes = rootNode.getNodes("Frame");
 		int frameCount = frameNodes.size();
 		
 		if (frameNodes.isEmpty())
@@ -70,7 +66,7 @@ public class CursorSet
 		
 		int averageDuration = totalDuration / frameNodes.size();
 		
-		for (XNode frameNode : frameNodes)
+		for (RNode frameNode : frameNodes)
 		{
 			try
 			{
@@ -79,16 +75,11 @@ public class CursorSet
 				int hotspotX = frameNode.getIntAttribute("hotspotX", totalHotspotX);
 				int hotspotY = frameNode.getIntAttribute("hotspotY", totalHotspotY);
 				
-				BufferedImage image = (BufferedImage) ImageIO.read(new File(parent, path));
-				image = Utils.getAlphaImage(image);
-				image = Utils.replaceColors(
-					image,
-					Collections.singleton(bgColor),
-					Utils.CLEAR
-				);
+				RImage img = RImage.readEnsureAlpha(new File(parent, path));
+				img.extract(bgColor);
 				
 				frames[frameIndex] = Toolkit.getDefaultToolkit().createCustomCursor(
-					image,
+					img,
 					new Point(hotspotX, hotspotY),
 					name + frameIndex
 				);

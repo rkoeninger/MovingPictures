@@ -19,7 +19,7 @@ import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.utils.FileFormatException;
 import com.robbix.mp5.utils.Filter;
-import com.robbix.mp5.utils.XNode;
+import com.robbix.mp5.utils.RNode;
 
 public class UnitFactory
 {
@@ -202,7 +202,7 @@ public class UnitFactory
 	
 	public void loadXml(File xmlFile) throws IOException
 	{
-		XNode rootNode     = XNode.load(xmlFile);
+		RNode rootNode     = RNode.load(xmlFile);
 		String displayName = rootNode.getValue("DisplayName");
 		String civ         = rootNode.getAttribute("civ");
 		String unitType    = rootNode.getAttribute("unitType");
@@ -238,7 +238,7 @@ public class UnitFactory
 		}
 		else if (type.equals("turret"))
 		{
-			XNode statsNode    = rootNode.getNode("Stats");
+			RNode statsNode    = rootNode.getNode("Stats");
 			double damage      = statsNode.getFloatAttribute("damage");
 			int reloadDelay    = statsNode.getIntAttribute("reloadDelay");
 			double attackRange = statsNode.getFloatAttribute("attackRange");
@@ -254,7 +254,7 @@ public class UnitFactory
 		}
 		else if (type.equals("chassis"))
 		{
-			XNode statsNode    = rootNode.getNode("Stats");
+			RNode statsNode    = rootNode.getNode("Stats");
 			int maxHP          = statsNode.getIntAttribute("hp");
 			double speed       = statsNode.getFloatAttribute("speed");
 			double sightRange  = statsNode.getFloatAttribute("sightRange");
@@ -278,7 +278,7 @@ public class UnitFactory
 		}
 		else if (type.equals("vehicle"))
 		{
-			XNode statsNode    = rootNode.getNode("Stats");
+			RNode statsNode    = rootNode.getNode("Stats");
 			int maxHP          = statsNode.getIntAttribute("hp");
 			double speed       = statsNode.getFloatAttribute("speed");
 			double sightRange  = statsNode.getFloatAttribute("sightRange");
@@ -308,7 +308,7 @@ public class UnitFactory
 		}
 		else if (type.equals("structure"))
 		{
-			XNode statsNode         = rootNode.getNode("Stats");
+			RNode statsNode         = rootNode.getNode("Stats");
 			int maxHP               = statsNode.getIntAttribute("hp");
 			int buildTime           = statsNode.getIntAttribute("buildTime");
 			double sightRange       = statsNode.getFloatAttribute("sightRange");
@@ -341,7 +341,7 @@ public class UnitFactory
 		}
 		else if (type.equals("guardPost"))
 		{
-			XNode statsNode    = rootNode.getNode("Stats");
+			RNode statsNode    = rootNode.getNode("Stats");
 			int maxHP          = statsNode.getIntAttribute("hp");
 			int buildTime      = statsNode.getIntAttribute("buildTime");
 			double sightRange  = statsNode.getFloatAttribute("sightRange");
@@ -371,17 +371,17 @@ public class UnitFactory
 		}
 	}
 	
-	private static Cost getCost(XNode costNode, File xmlFile)
+	private static Cost getCost(RNode costNode, File xmlFile)
 	throws FileFormatException
 	{
-		List<XNode> costResources = costNode.getNodes("Resource");
+		List<RNode> costResources = costNode.getNodes("Resource");
 		
 		Map<ResourceType, Integer> resourceMap =
 			new HashMap<ResourceType, Integer>();
 		
 		for (int n = 0; n < costResources.size(); ++n)
 		{
-			XNode resNode = costResources.get(n);
+			RNode resNode = costResources.get(n);
 			resourceMap.put(
 				getResourceType(resNode.getAttribute("type"), xmlFile),
 				resNode.getIntAttribute("amount"));
@@ -390,7 +390,7 @@ public class UnitFactory
 		return new Cost(resourceMap);
 	}
 	
-	private Set<Command> getCommands(XNode commandsNode, File xmlFile)
+	private Set<Command> getCommands(RNode commandsNode, File xmlFile)
 	throws FileFormatException
 	{
 		Collection<Command> cmds = commandsNode.getEnumValues(Command.class, "Command");

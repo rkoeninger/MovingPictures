@@ -21,7 +21,7 @@ public class MineRouteDemo extends Demo
 	{
 		super(
 			"48-48-plain",
-			Utils.asSet(
+			new String[]{
 				"eCargoTruck",
 				"eCommandCenter",
 				"eCommonSmelter",
@@ -29,15 +29,15 @@ public class MineRouteDemo extends Demo
 				"eCommonMine",
 				"aResource",
 				"aStructureStatus"
-			),
-			Utils.asSet(
+			},
+			new String[]{
 				"dockGrab",
 				"dockLower",
 				"dockOpen"
-			),
-			Utils.asSet(
+			},
+			new Player[]{
 				new Player(1, "Mining Operation", 200)
-			),
+			},
 			1
 		);
 	}

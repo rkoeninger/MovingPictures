@@ -3,7 +3,6 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.DockTask;
@@ -17,18 +16,19 @@ import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.JListDialog;
 import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.Utils;
 
 public class CommandTruckOverlay extends InputOverlay
 {
-	private Set<Unit> trucks;
+	private Unit[] trucks;
 	
 	public CommandTruckOverlay(Unit truck)
 	{
-		this(Utils.asSet(truck));
+		super("move");
+		this.trucks = new Unit[]{truck};
+		this.requiresPaintOnGrid = false;
 	}
 	
-	public CommandTruckOverlay(Set<Unit> trucks)
+	public CommandTruckOverlay(Unit[] trucks)
 	{
 		super("move");
 		this.trucks = trucks;
@@ -38,7 +38,7 @@ public class CommandTruckOverlay extends InputOverlay
 	public void init()
 	{
 		super.init();
-		panel.showStatus(trucks.iterator().next());
+		panel.showStatus(trucks[0]);
 	}
 	
 	public void dispose()
@@ -86,7 +86,7 @@ public class CommandTruckOverlay extends InputOverlay
 		{
 			Collection<Player> players = Game.game.getPlayers();
 			players = new ArrayList<Player>(players);
-			players.remove(trucks.iterator().next().getOwner());
+			players.remove(trucks[0].getOwner());
 			
 			if (players.isEmpty())
 				return;
@@ -103,9 +103,9 @@ public class CommandTruckOverlay extends InputOverlay
 			
 			complete();
 		}
-		else if (command == Command.DOCK && trucks.size() == 1)
+		else if (command == Command.DOCK && trucks.length == 1)
 		{
-			Unit truck = trucks.iterator().next();
+			Unit truck = trucks[0];
 			
 			if (truck.isCargoEmpty())
 				return;
@@ -126,9 +126,9 @@ public class CommandTruckOverlay extends InputOverlay
 				}
 			}
 		}
-		else if (command == Command.MINE && trucks.size() == 1)
+		else if (command == Command.MINE && trucks.length == 1)
 		{
-			Unit truck = trucks.iterator().next();
+			Unit truck = trucks[0];
 			
 			if (!truck.isCargoEmpty())
 				return;

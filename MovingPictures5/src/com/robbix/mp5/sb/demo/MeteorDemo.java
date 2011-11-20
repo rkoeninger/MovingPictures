@@ -4,7 +4,6 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.Utils;
 
 public class MeteorDemo extends Demo
 {
@@ -12,7 +11,7 @@ public class MeteorDemo extends Demo
 	{
 		super(
 			"30-20-plain",
-			Utils.asSet(
+			new String[]{
 				"pScout",
 				"pResidence",
 				"eVehicleFactory",
@@ -22,13 +21,13 @@ public class MeteorDemo extends Demo
 				"aDeath",
 				"aMeteor",
 				"aStructureStatus"
-			),
-			Utils.asSet(
+			},
+			new String[]{
 				"meteor"
-			),
-			Utils.asSet(
+			},
+			new Player[]{
 				new Player(1, "Targets", 45)
-			),
+			},
 			1
 		);
 	}

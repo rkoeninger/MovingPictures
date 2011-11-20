@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,11 +8,11 @@ import java.util.Map;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.utils.Direction;
+import com.robbix.mp5.utils.RImage;
 
 public abstract class SpriteSet
 {
-	public static final Sprite BLANK_SPRITE = new Sprite(
-		new BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB), 0, 0);
+	public static final Sprite BLANK_SPRITE = new Sprite(new RImage(32, 32, false), 0, 0);
 	
 	public static final SpriteGroup BLANK_GROUP = new SpriteGroup(BLANK_SPRITE, true)
 	{

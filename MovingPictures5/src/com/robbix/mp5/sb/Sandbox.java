@@ -86,6 +86,7 @@ import com.robbix.mp5.unit.UnitType;
 import com.robbix.mp5.utils.AnimatedButton;
 import com.robbix.mp5.utils.JListDialog;
 import com.robbix.mp5.utils.JSliderMenuItem;
+import com.robbix.mp5.utils.RImage;
 import com.robbix.mp5.utils.RMenuItem;
 import com.robbix.mp5.utils.RRadioButtonMenuItem;
 import com.robbix.mp5.utils.Utils;
@@ -485,11 +486,11 @@ public class Sandbox extends JApplet
 		statusesPanel.add(unitStatusLabel);
 		statusesPanel.add(playerStatusLabel);
 		
-		Image img = ImageIO.read(new File(resDir, "art/edenLogo.png"));
+		RImage img = RImage.read(new File(resDir, "art/edenLogo.png"));
 		edenIconSprite = new Sprite(img, 240, 0, 0);
-		img = ImageIO.read(new File(resDir, "art/plymouthLogo.png"));
+		img = RImage.read(new File(resDir, "art/plymouthLogo.png"));
 		plymouthIconSprite = new Sprite(img, 240, 0, 0);
-		img = ImageIO.read(new File(resDir, "art/neutralLogo.png"));
+		img = RImage.read(new File(resDir, "art/neutralLogo.png"));
 		neutralIcon = new ImageIcon(img);
 		
 		commandBar = loadCommandBar();
@@ -974,7 +975,7 @@ public class Sandbox extends JApplet
 				{
 					UnitFactory factory = game.getUnitFactory();
 					factory.setDefaultOwner(currentPlayer);
-					panel.pushOverlay(new PlaceUnitOverlay(factory, src.get(UnitType.class)));
+					panel.pushOverlay(new PlaceUnitOverlay(factory, src.get(UnitType.class), currentPlayer));
 				}
 			}
 			else if (e.getSource() instanceof AnimatedButton)
@@ -1093,7 +1094,7 @@ public class Sandbox extends JApplet
 			
 			for (File iconFile : iconFiles)
 			{
-				icons.add(new ImageIcon(Utils.shrink(ImageIO.read(iconFile))));
+				icons.add(new ImageIcon(RImage.read(iconFile).getResizedCopy(0.5)));
 			}
 			
 			if (icons.isEmpty())

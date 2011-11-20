@@ -1,41 +1,22 @@
 package com.robbix.mp5.ui;
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.robbix.mp5.utils.Offset;
-import com.robbix.mp5.utils.Utils;
+import com.robbix.mp5.utils.RImage;
 
 public class Sprite
 {
-	private static final int[] SHADOW_COLOR = {0, 0, 0, 127};
-	private static final int[] CLEAR = {0, 0, 0, 0};
+	private static final Color SHADOW = new Color(0, 0, 0, 127);
 	private Offset offset;
 	private int baseHue;
-	private Image baseImage;
-	private BufferedImage shadow;
-	private Map<Integer, Image> hueMap;
+	private RImage baseImage;
+	private RImage shadow;
+	private Map<Integer, RImage> hueMap;
 	
-	public Sprite(Image image, int xOff, int yOff)
-	{
-		this(image, -1, new Offset(xOff, yOff));
-	}
-	
-	public Sprite(Image image, int baseHue, int xOff, int yOff)
-	{
-		this(image, baseHue, new Offset(xOff, yOff));
-	}
-	
-	public Sprite(Image image, Offset offset)
-	{
-		this(image, -1, offset);
-	}
-	
-	public Sprite(Image image, int baseHue, Offset offset)
+	public Sprite(RImage image, int baseHue, Offset offset)
 	{
 		this.baseImage = image;
 		this.baseHue = baseHue;
@@ -43,9 +24,29 @@ public class Sprite
 		
 		if (baseHue >= 0 && baseHue < 360)
 		{
-			this.hueMap = new HashMap<Integer, Image>();
+			this.hueMap = new HashMap<Integer, RImage>();
 			hueMap.put(baseHue, image);
 		}
+	}
+	
+	public Sprite(RImage image)
+	{
+		this(image, -1, new Offset());
+	}
+	
+	public Sprite(RImage image, int xOff, int yOff)
+	{
+		this(image, -1, new Offset(xOff, yOff));
+	}
+	
+	public Sprite(RImage image, int baseHue, int xOff, int yOff)
+	{
+		this(image, baseHue, new Offset(xOff, yOff));
+	}
+	
+	public Sprite(RImage image, Offset offset)
+	{
+		this(image, -1, offset);
 	}
 	
 	public int getBaseTeamHue()
@@ -53,26 +54,33 @@ public class Sprite
 		return baseHue;
 	}
 	
-	public Image getImage()
+	public RImage getImage()
 	{
 		return baseImage;
 	}
 	
-	public Image getImage(int hue)
+	public RImage getImage(int hue, boolean cache)
 	{
 		if (baseHue == -1 || hue == baseHue)
 			return baseImage;
 		
-		BufferedImage image = (BufferedImage) hueMap.get(hue);
+		RImage img = hueMap.get(hue);
 		
-		if (image == null)
+		if (img == null)
 		{
-			image = (BufferedImage) baseImage;
-			image = Utils.recolorUnit(image, baseHue, hue);
-			hueMap.put(hue, image);
+			img = baseImage.copy();
+			img.recolor(baseHue, hue);
+			
+			if (cache)
+				hueMap.put(hue, img);
 		}
 		
-		return image;
+		return img;
+	}
+	
+	public RImage getImage(int hue)
+	{
+		return getImage(hue, true);
 	}
 	
 	public Offset getOffset()
@@ -100,28 +108,19 @@ public class Sprite
 		return offset.getDY(scale);
 	}
 	
-	public Image getShadow()
+	public RImage getShadow()
 	{
 		if (shadow == null)
 		{
-			shadow = new BufferedImage(
-				baseImage.getWidth(null),
-				baseImage.getHeight(null),
-				BufferedImage.TYPE_INT_ARGB
-			);
-			
-			int[] pixel = new int[4];
-			Raster raster = ((BufferedImage) baseImage).getRaster();
-			WritableRaster out = shadow.getRaster();
-			
-			for (int x = 0; x < shadow.getWidth();  ++x)
-			for (int y = 0; y < shadow.getHeight(); ++y)
-			{
-				raster.getPixel(x, y, pixel);
-				out.setPixel(x, y, (pixel[3] == 0) ? CLEAR : SHADOW_COLOR);
-			}
+			shadow = baseImage.copy();
+			shadow.mask(SHADOW);
 		}
 		
 		return shadow;
+	}
+	
+	public Sprite getFadedCopy(double alpha)
+	{
+		return new Sprite(baseImage.getFadedCopy(alpha), baseHue, offset);
 	}
 }

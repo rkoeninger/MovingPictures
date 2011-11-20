@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import com.robbix.mp5.utils.Position;
 import com.robbix.mp5.utils.RIterator;
 import com.robbix.mp5.utils.Region;
 import com.robbix.mp5.utils.ShiftingIterator;
-import com.robbix.mp5.utils.Utils;
 
 /**
  * The origin of relative Positions in the Footprint is
@@ -72,7 +69,7 @@ public class Footprint implements Iterable<Position>
 	/**
 	 * The set of Positions this Footprint exclusively occupies.
 	 */
-	private SortedSet<Position> occupiedSet;
+	private Set<Position> occupiedSet;
 	
 	/**
 	 * The set of Positions in this Footprint where tubes are placed.
@@ -98,7 +95,7 @@ public class Footprint implements Iterable<Position>
 		this.inner = inner;
 		this.center = inner.getCenter();
 		this.tubePositions = new HashSet<Position>();
-		this.occupiedSet = new TreeSet<Position>(Utils.Z_ORDER_POS);
+		this.occupiedSet = new HashSet<Position>();
 		
 		for (Position occupied : inner)
 			occupiedSet.add(occupied);

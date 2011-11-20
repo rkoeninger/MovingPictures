@@ -72,7 +72,7 @@ public class SelectUnitOverlay extends InputOverlay
 					Unit leadUnit = getLeadUnit(selected);
 					Game.game.playSound(leadUnit.getType().getAcknowledgement());
 					push(areAllTrucks(selected)
-						? new CommandTruckOverlay(selected)
+						? new CommandTruckOverlay((Unit[]) selected.toArray())
 						: new CommandGroupOverlay(leadUnit, selected)
 					);
 					panel.showStatus(leadUnit);

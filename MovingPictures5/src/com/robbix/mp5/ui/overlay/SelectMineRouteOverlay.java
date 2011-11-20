@@ -1,28 +1,25 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Graphics;
-import java.util.Set;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.Utils;
 
 public class SelectMineRouteOverlay extends InputOverlay
 {
 	private Unit smelter, mine;
-	private Set<Unit> trucks;
+	private Unit[] trucks;
 	
 	public SelectMineRouteOverlay(Unit truck)
 	{
-		this(Utils.asSet(truck));
+		this(new Unit[]{truck});
 	}
 	
-	public SelectMineRouteOverlay(Set<Unit> trucks)
+	public SelectMineRouteOverlay(Unit[] trucks)
 	{
 		super("dock");
-		
 		this.trucks = trucks;
 	}
 	

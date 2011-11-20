@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,7 +27,6 @@ import com.robbix.mp5.utils.Neighbors;
 import com.robbix.mp5.utils.Position;
 import com.robbix.mp5.utils.RIterator;
 import com.robbix.mp5.utils.Region;
-import com.robbix.mp5.utils.Utils;
 
 // TODO: Reassess defensive bounds checking (add checked exception?)
 public class LayeredMap
@@ -1015,7 +1015,7 @@ public class LayeredMap
 	
 	public RIterator<Unit> getUnitIterator(boolean zorder)
 	{
-		Set<Unit> copy = zorder ? new TreeSet<Unit>(Utils.Z_ORDER_UNIT)
+		Set<Unit> copy = zorder ? new TreeSet<Unit>(Z_ORDER_UNIT)
 								: new HashSet<Unit>();
 		
 		copy.addAll(units);
@@ -1050,4 +1050,40 @@ public class LayeredMap
 				panel.refresh(region);
 		}
 	}
+	
+	/**
+	 * Compares two Units for z-order.
+	 * 
+	 * Sorted just like Z_ORDER_POS but all the structures on a row
+	 * come after all the vehicles on the same row.
+	 */
+	private static final Comparator<Unit> Z_ORDER_UNIT =
+	new Comparator<Unit>()
+	{
+		private final int A =  1;
+		private final int B = -1;
+		
+		public int compare(Unit a, Unit b)
+		{
+			final Position posA = a.getPosition();
+			final Position posB = b.getPosition();
+			
+			if (posA.y > posB.y) return A;
+			if (posA.y < posB.y) return B;
+			
+			final boolean structA = a.isStructure() && !a.isMine();
+			final boolean structB = b.isStructure() && !b.isMine();
+			
+			if ( structA && !structB) return A;
+			if (!structA &&  structB) return B;
+			
+			if (posA.x > posB.x) return A;
+			if (posA.x < posB.x) return B;
+			
+			if (b.isMine()) return A;
+			if (a.isMine()) return B;
+			
+			return 0; // Should this be possible?
+		}
+	};
 }

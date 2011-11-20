@@ -37,8 +37,11 @@ public class AnimatedButton extends JButton
 		add(objects);
 		setToolTipText(name);
 		
+		RImage img0 = RImage.copyOf(icons.get(0).getImage());
+		img0.gray();
+		
 		this.icons = icons;
-		this.disabled = new ImageIcon(Utils.getGrayscale(icons.get(0)));
+		this.disabled = new ImageIcon(img0);
 		this.timer = new Timer(60, new RotateIcons());
 		this.timer.setCoalesce(true);
 		

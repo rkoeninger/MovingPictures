@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.map.ResourceType;
+import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
@@ -13,37 +14,26 @@ import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
 import com.robbix.mp5.utils.Position;
 import com.robbix.mp5.utils.Region;
-import com.robbix.mp5.utils.Utils;
 
 public class PlaceUnitOverlay extends InputOverlay
 {
 	private Sprite unitSprite;
 	private Sprite turretSprite;
+	private int hue;
 	
 	private Unit unit;
 	
 	private UnitFactory factory;
 	private String type;
+	private Player player;
 	
-	public PlaceUnitOverlay(Unit unit)
-	{
-		this.unit = unit;
-		this.showTubeConnectivity = unit.needsConnection() || unit.isConnectionSource();
-	}
-	
-	public PlaceUnitOverlay(UnitFactory factory, String type)
-	{
-		this.factory = factory;
-		this.type = type;
-		this.unit = factory.newUnit(type);
-		this.showTubeConnectivity = unit.needsConnection() || unit.isConnectionSource();
-	}
-	
-	public PlaceUnitOverlay(UnitFactory factory, UnitType type)
+	public PlaceUnitOverlay(UnitFactory factory, UnitType type, Player player)
 	{
 		this.factory = factory;
 		this.type = type.getName();
-		this.unit = factory.newUnit(this.type);
+		this.player = player;
+		this.hue = player.getColorHue();
+		this.unit = factory.newUnit(this.type, player);
 		this.showTubeConnectivity = unit.needsConnection() || unit.isConnectionSource();
 	}
 	
@@ -51,37 +41,19 @@ public class PlaceUnitOverlay extends InputOverlay
 	{
 		if (isCursorOnGrid())
 		{
-			if (unitSprite == null)
-			{
-				int hue = unit.getOwner().getColorHue();
-				unitSprite = panel.getSpriteLibrary().getDefaultSprite(unit);
-				unitSprite = (unitSprite == SpriteSet.BLANK_SPRITE)
-					? null
-					: Utils.getTranslucency(unitSprite, hue, 0.5f);
-			}
+			if (unitSprite == null || unitSprite == SpriteSet.BLANK_SPRITE)
+				unitSprite = panel.getSpriteLibrary().getTranslucentDefault(unit, 0.5);
 			
-			if (turretSprite == null && unit.hasTurret())
-			{
-				Unit turret = unit.getTurret();
-				int hue = unit.getOwner().getColorHue();
-				turretSprite = panel.getSpriteLibrary().getDefaultSprite(turret);
-				turretSprite = (turretSprite == SpriteSet.BLANK_SPRITE)
-					? null
-					: Utils.getTranslucency(turretSprite, hue, 0.5f);
-			}
+			if ((turretSprite == null || turretSprite == SpriteSet.BLANK_SPRITE) && unit.hasTurret())
+				unitSprite = panel.getSpriteLibrary().getTranslucentDefault(unit.getTurret(), 0.5);
 			
 			Position center = unit.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawUnitFootprint(g, unit.getType(), pos);
-			
-			if (unitSprite != null)
-				panel.draw(g, unitSprite, pos);
+			panel.draw(g, unitSprite, hue, pos);
 			
 			if (unit.hasTurret())
-			{
-				if (turretSprite != null)
-					panel.draw(g, turretSprite, pos);
-			}
+				panel.draw(g, turretSprite, hue, pos);
 			
 			if (toolTip != null)
 			{
@@ -115,7 +87,7 @@ public class PlaceUnitOverlay extends InputOverlay
 			
 			if (factory != null)
 			{
-				unit = factory.newUnit(type);
+				unit = factory.newUnit(type, player);
 			}
 			else
 			{

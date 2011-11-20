@@ -4,12 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap;
@@ -41,9 +39,9 @@ public abstract class Demo
 	}
 	
 	private String mapName;
-	private Set<String> spriteModules;
-	private Set<String> soundModules;
-	private Set<Player> players;
+	private String[] spriteModules;
+	private String[] soundModules;
+	private Player[] players;
 	private int startingPlayerID;
 	
 	/**
@@ -52,29 +50,16 @@ public abstract class Demo
 	 */
 	public Demo(
 		String mapName,
-		Set<String> spriteModules,
-		Set<String> soundModules,
-		Set<Player> players,
+		String[] spriteModules,
+		String[] soundModules,
+		Player[] players,
 		int startingPlayerID)
 	{
 		this.mapName = mapName;
-		
-		if (spriteModules == null)
-			this.spriteModules = Collections.emptySet();
-		else
-			this.spriteModules = Collections.unmodifiableSet(spriteModules);
-		
-		if (soundModules == null)
-			this.soundModules = Collections.emptySet();
-		else
-			this.soundModules = Collections.unmodifiableSet(soundModules);
-		
-		if (players == null)
-			this.players = Collections.emptySet();
-		else
-			this.players = Collections.unmodifiableSet(players);
-		
 		this.startingPlayerID = startingPlayerID;
+		this.spriteModules = spriteModules == null ? new String[0] : spriteModules;
+		this.soundModules  = soundModules  == null ? new String[0] : soundModules;
+		this.players       = players       == null ? new Player[0] : players;
 	}
 	
 	public String getName()
@@ -87,17 +72,17 @@ public abstract class Demo
 		return mapName;
 	}
 	
-	public Set<String> getRequiredSpriteModuleNames()
+	public String[] getRequiredSpriteModuleNames()
 	{
 		return spriteModules;
 	}
 	
-	public Set<String> getRequiredSoundModulesNames()
+	public String[] getRequiredSoundModulesNames()
 	{
 		return soundModules;
 	}
 	
-	public Set<Player> getPlayers()
+	public Player[] getPlayers()
 	{
 		return players;
 	}

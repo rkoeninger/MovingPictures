@@ -1,22 +1,11 @@
 package com.robbix.mp5.utils;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
-
-import javax.swing.Icon;
-import com.robbix.mp5.ui.Sprite;
-import com.robbix.mp5.unit.Unit;
 
 /**
  * Yes, it's a Utils class. I know.
@@ -142,20 +131,6 @@ public class Utils
 		}
 	};
 	
-	/**
-	 * Returns the provided list of elements as a Set. Duplicate entries in
-	 * the list will be dropped.
-	 */
-	public static <T> Set<T> asSet(T... elements)
-	{
-		Set<T> set = new HashSet<T>(elements.length);
-		
-		for (T element : elements)
-			set.add(element);
-		
-		return set;
-	}
-	
 	public static final Comparator<File> FILENAME = new Comparator<File>()
 	{
 		public int compare(File a, File b)
@@ -165,127 +140,10 @@ public class Utils
 	};
 	
 	/**
-	 * Compares two Positions for z-order.
-	 * 
-	 * Positions are first sorted by y-coordinate, second by x-coordinate,
-	 * top to bottom, left to right.
-	 */
-	public static final Comparator<Position> Z_ORDER_POS =
-	new Comparator<Position>()
-	{
-		private final int A =  1;
-		private final int B = -1;
-		
-		public int compare(Position a, Position b)
-		{
-			if      (a.y > b.y) return A;
-			else if (a.y < b.y) return B;
-			
-			if      (a.x > b.x) return A;
-			else if (a.x < b.x) return B;
-			
-			return 0;
-		}
-	};
-
-	/**
-	 * Compares two Units for z-order.
-	 * 
-	 * Sorted just like Z_ORDER_POS but all the structures on a row
-	 * come after all the vehicles on the same row.
-	 */
-	public static final Comparator<Unit> Z_ORDER_UNIT =
-	new Comparator<Unit>()
-	{
-		private final int A =  1;
-		private final int B = -1;
-		
-		public int compare(Unit a, Unit b)
-		{
-			final Position posA = a.getPosition();
-			final Position posB = b.getPosition();
-			
-			if (posA.y > posB.y) return A;
-			if (posA.y < posB.y) return B;
-			
-			final boolean structA = a.isStructure() && !a.isMine();
-			final boolean structB = b.isStructure() && !b.isMine();
-			
-			if ( structA && !structB) return A;
-			if (!structA &&  structB) return B;
-			
-			if (posA.x > posB.x) return A;
-			if (posA.x < posB.x) return B;
-			
-			if (b.isMine()) return A;
-			if (a.isMine()) return B;
-			
-			return 0; // Should this be possible?
-		}
-	};
-	
-	/**
 	 * Color object representing total transparency.
 	 */
 	public static final Color CLEAR = new Color(0, 0, 0, 0);
-
-	/**
-	 * Color object representing dark orange - #7f3f00.
-	 */
-	public static final Color DARK_ORANGE = new Color(127, 63, 0);
-
-	/**
-	 * Color object representing dark orange - #ff7f00.
-	 */
-	public static final Color ORANGE = new Color(255, 127, 0);
 	
-	/**
-	 * A set containing ORANGE and DARK_ORANGE.
-	 */
-	public static final Set<Color> ORANGE_AND_DARK_ORANGE =
-		Collections.unmodifiableSet(asSet(ORANGE, DARK_ORANGE));
-	
-	/**
-	 * Returns the HTML color code (#000000) for the given Color.
-	 */
-	public static String getColorCode(Color color)
-	{
-		return "#" + Integer.toHexString(color.getRGB()).substring(2);
-	}
-	
-	/**
-	 * Gets a random color - a color whose red, green and blue components
-	 * are random values 0-255.
-	 */
-	public static Color getRandomColor()
-	{
-		return new Color(RNG.nextInt(256), RNG.nextInt(256), RNG.nextInt(256));
-	}
-	
-	/**
-	 * Gets a random primary color - a color whose red, green and blue
-	 * components are each either 0 or 255.
-	 * 
-	 * Could be one of: BLACK, RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, WHITE.
-	 */
-	public static Color getRandomPrimaryColor()
-	{
-		return new Color(RNG.nextBoolean() ? 255 : 0,
-						 RNG.nextBoolean() ? 255 : 0,
-						 RNG.nextBoolean() ? 255 : 0); 
-	}
-	
-	/**
-	 * Gets the RGB-component wise inversion of given Color.
-	 */
-	public static Color invert(Color color)
-	{
-		return new Color(255 - color.getRed(),
-						 255 - color.getGreen(),
-						 255 - color.getBlue(),
-						 color.getAlpha());
-	}
-
 	/**
 	 * Gets which Color is more different than the given Color: Black or White.
 	 */
@@ -318,33 +176,6 @@ public class Utils
 		
 		return new Color(avg, avg, avg);
 	}
-
-	/**
-	 * Gets the gray scale of given Image.
-	 */
-	public static BufferedImage getGrayscale(Icon icon)
-	{
-		BufferedImage copy = new BufferedImage(
-			icon.getIconWidth(),
-			icon.getIconHeight(),
-			BufferedImage.TYPE_INT_RGB
-		);
-		WritableRaster out = copy.getRaster();
-		
-		icon.paintIcon(null, copy.getGraphics(), 0, 0);
-		
-		int[] pixel = new int[4];
-		
-		for (int x = 0; x < out.getWidth();  ++x)
-		for (int y = 0; y < out.getHeight(); ++y)
-		{
-			out.getPixel(x, y, pixel);
-			pixel[0] = pixel[1] = pixel[2] = (pixel[0] + pixel[1] + pixel[2]) / 3;
-			out.setPixel(x, y, pixel);
-		}
-		
-		return copy;
-	}
 	
 	/**
 	 * Gets the complement of the gray scale of given Color.
@@ -364,279 +195,16 @@ public class Utils
 	{		
 		return new Color(base.getRed(), base.getGreen(), base.getBlue(), a);
 	}
-
+	
 	/**
 	 * Gets a Color with the same RGB components as the given Color,
 	 * but with the specified translucentcy value in the range [0.0,1.0].
 	 */
-	public static Color getTranslucency(Color base, float a)
+	public static Color getTranslucency(Color base, double a)
 	{
 		float[] rgb = new float[3];
 		base.getColorComponents(rgb);
 		
-		return new Color(rgb[0], rgb[1], rgb[2], a);
-	}
-	
-	/**
-	 * Returns a BufferedImage with the alpha value of all pixels scaled
-	 * by the specified factor.
-	 * 
-	 * Unlike the other getTranslucency methods, the alpha values are not
-	 * <b>set</b> to the given factor, they are <b>multiplied</b> by it.
-	 * 
-	 * The returned image is a new image only if the given image does
-	 * not have an alpha channel.
-	 */
-	public static BufferedImage getTranslucency(BufferedImage img, float aFactor)
-	{
-		if (aFactor == 1)
-			return img;
-		
-		if (aFactor < 0 || aFactor > 1)
-			throw new IllegalArgumentException();
-		
-		BufferedImage copy = new BufferedImage(
-			img.getWidth(),
-			img.getHeight(),
-			BufferedImage.TYPE_INT_ARGB
-		);
-		
-		if (aFactor == 0)
-			return copy;
-		
-		WritableRaster srcRaster = img.getRaster();
-		WritableRaster outRaster = copy.getRaster();
-		
-		float[] pixel = new float[4];
-		
-		boolean alpha = img.getColorModel().hasAlpha();
-		
-		for (int y = 0; y < copy.getHeight(); ++y)
-		for (int x = 0; x < copy.getWidth();  ++x)
-		{
-			srcRaster.getPixel(x, y, pixel);
-			
-			if (alpha)
-			{
-				pixel[3] *= aFactor;
-			}
-			else
-			{
-				pixel[3] = aFactor * 255;
-			}
-			
-			outRaster.setPixel(x, y, pixel);
-		}
-		
-		return copy;
-	}
-	
-	public static Sprite getTranslucency(Sprite sprite, int hue, float aFactor)
-	{
-		BufferedImage img = (BufferedImage)
-			(hue >= 0 ? sprite.getImage(hue) : sprite.getImage());
-		
-		img = getTranslucency(img, aFactor);
-		
-		return new Sprite(img, hue, sprite.getXOffset(), sprite.getYOffset());
-	}
-	
-	/**
-	 * Gets a new BufferedImage of the specified size with all pixels having
-	 * the given color.
-	 */
-	public static BufferedImage getBlankImage(Color color, int w, int h)
-	{
-		BufferedImage img = new BufferedImage(
-			w,
-			h,
-			BufferedImage.TYPE_INT_ARGB
-		);
-		
-		WritableRaster raster = img.getRaster();
-		
-		int[] pixel = new int[]{
-			color.getRed(),
-			color.getGreen(),
-			color.getBlue(),
-			color.getAlpha()
-		};
-		
-		for (int x = 0; x < w; ++x)
-		for (int y = 0; y < h; ++y)
-			raster.setPixel(x, y, pixel);
-		
-		return img;
-	}
-	
-	/**
-	 * Gets a new BufferedImage with an alpha channel that has the pixel
-	 * data from the given image copied into it.
-	 * 
-	 * If the given BufferedImage already has an alpha channel, it is
-	 * simply returned.
-	 */
-	public static BufferedImage getAlphaImage(BufferedImage img)
-	{
-		if (img.getColorModel().hasAlpha())
-			return img;
-		
-		int w = img.getWidth();
-		int h = img.getHeight();
-		
-		BufferedImage copy = new BufferedImage(
-			w,
-			h,
-			BufferedImage.TYPE_INT_ARGB
-		);
-		
-		for (int y = 0; y < h; ++y)
-		for (int x = 0; x < w; ++x)
-			copy.setRGB(x, y, img.getRGB(x, y));
-		
-		return copy;
-	}
-
-	/**
-	 * Replaces all pixels with Colors in the the Set backgroundColors
-	 * with replacementColor.
-	 * 
-	 * This method is most useful when replacing the background Color
-	 * of a no-alpha sprite with zero-alpha pixels.
-	 * 
-	 * @see Utils.CLEAR
-	 */
-	public static BufferedImage replaceColors(
-		BufferedImage img,
-		Set<Color> backgroundColors,
-		Color replacementColor)
-	{
-		boolean hasAlpha = img.getColorModel().hasAlpha();
-		int replacementCode = replacementColor.getRGB();
-		
-		for (int y = 0; y < img.getHeight(); ++y)
-		for (int x = 0; x < img.getWidth();  ++x)
-		{
-			Color color = new Color(img.getRGB(x, y), hasAlpha);
-			
-			if (backgroundColors.contains(color))
-			{
-				img.setRGB(x, y, replacementCode);
-			}
-		}
-				
-		return img;
-	}
-	
-	public static BufferedImage shrink(Image img)
-	{
-		return shrink(img, true);
-	}
-	
-	public static BufferedImage shrink(Image img, boolean alpha)
-	{
-		int sWidth = img.getWidth(null);
-		int sHeight = img.getHeight(null);
-		int dWidth = sWidth / 2;
-		int dHeight = sHeight / 2;
-		BufferedImage newImg = new BufferedImage(dWidth, dHeight, alpha
-			? BufferedImage.TYPE_INT_ARGB
-			: BufferedImage.TYPE_INT_RGB
-		);
-		Graphics g = newImg.getGraphics();
-		g.drawImage(
-			img,
-			0, 0, dWidth, dHeight,
-			0, 0, sWidth, sHeight,
-			null
-		);
-		g.dispose();
-		return newImg;
-	}
-	
-	public static BufferedImage stretch(Image img)
-	{
-		return stretch(img, true);
-	}
-	
-	public static BufferedImage stretch(Image img, boolean alpha)
-	{
-		int sWidth = img.getWidth(null);
-		int sHeight = img.getHeight(null);
-		int dWidth = sWidth * 2;
-		int dHeight = sHeight * 2;
-		BufferedImage newImg = new BufferedImage(dWidth, dHeight, alpha
-			? BufferedImage.TYPE_INT_ARGB
-			: BufferedImage.TYPE_INT_RGB
-		);
-		Graphics g = newImg.getGraphics();
-		g.drawImage(
-			img,
-			0, 0, dWidth, dHeight,
-			0, 0, sWidth, sHeight,
-			null
-		);
-		g.dispose();
-		return newImg;
-	}
-	
-	public static BufferedImage recolorUnit(
-		BufferedImage baseImage,
-		int baseHue,
-		int hue)
-	{
-		WritableRaster baseRaster = baseImage.getRaster();
-		
-		int w = baseRaster.getWidth();
-		int h = baseRaster.getHeight();
-		
-		BufferedImage newImage = new BufferedImage(w, h, baseImage.getType());
-		WritableRaster newRaster = newImage.getRaster();
-		
-		int[] rgb = new int[]{0, 0, 0, 255};
-		float[] hsb = new float[4];
-		
-		for (int x = 0; x < w; ++x)
-		for (int y = 0; y < h; ++y)
-		{
-			baseRaster.getPixel(x, y, rgb);
-			
-			if (rgb[3] > 0)
-			{
-				Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
-				
-				if (Math.abs((int) (hsb[0] * 360) - baseHue) <= 5)
-				{
-					hsb[0] = hue / 360.0f;
-					int rgbInt = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-					
-					rgb[0] = (rgbInt >> 0x10) & 0xff;
-					rgb[1] = (rgbInt >> 0x08) & 0xff;
-					rgb[2] = (rgbInt >> 0x00) & 0xff;
-				}
-			}
-			
-			newRaster.setPixel(x, y, rgb);
-		}
-		
-		return newImage;
-	}
-	
-	public static int getHueInt(Color color)
-	{
-		float[] hsb = new float[4];
-		Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
-		return (int) (hsb[0] * 360);
-	}
-	
-	public static <E extends Enum<E>> Comparator<E> getEnumNameComparator(Class<E> enumType)
-	{
-		return new Comparator<E>()
-		{
-			public int compare(E a, E b)
-			{
-				return a.name().compareTo(b.name());
-			}
-		};
+		return new Color(rgb[0], rgb[1], rgb[2], (float)a);
 	}
 }

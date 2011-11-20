@@ -27,7 +27,7 @@ import org.xml.sax.SAXParseException;
  * This class is essentially a wrapper for org.w3c.dom.Node, with
  * conveinence methods addded.
  */
-public class XNode
+public class RNode
 {
 	private Node root;
 	
@@ -38,7 +38,7 @@ public class XNode
 	 * The returned XNode represents the root tag/element of the document and
 	 * not the document itself, as in the org.w3c.dom api.
 	 */
-	public static XNode load(File xmlFile, boolean validate) throws IOException
+	public static RNode load(File xmlFile, boolean validate) throws IOException
 	{
 		DocumentBuilderFactory parserFactory = DocumentBuilderFactory.newInstance();
 		parserFactory.setIgnoringComments(true);
@@ -78,7 +78,7 @@ public class XNode
 			if (rootChildren.getLength() > 1)
 				throw new FileFormatException("Multiple root elements in " + xmlFile);
 			
-			return new XNode(rootChildren.item(0));
+			return new RNode(rootChildren.item(0));
 		}
 		catch (ParserConfigurationException e)
 		{
@@ -93,7 +93,7 @@ public class XNode
 	/**
 	 * Does not validate against DTD or Schema by default.
 	 */
-	public static XNode load(File xmlFile) throws IOException
+	public static RNode load(File xmlFile) throws IOException
 	{
 		return load(xmlFile, false);
 	}
@@ -101,7 +101,7 @@ public class XNode
 	/*
 	 * Private constructor to base a XNode on a org.w3c.dom.Node.
 	 */
-	private XNode(Node node)
+	private RNode(Node node)
 	{
 		this.root = node;
 	}
@@ -130,7 +130,7 @@ public class XNode
 	 * Which node that is with respect to the order in the file is not
 	 * guaranteed.
 	 */
-	public XNode getNode(String... path) throws FileFormatException
+	public RNode getNode(String... path) throws FileFormatException
 	{
 		Node currentNode = root;
 		
@@ -155,7 +155,7 @@ public class XNode
 					"Node not found " + Arrays.toString(path) + " on " + root.getNodeName());
 		}
 		
-		return new XNode(currentNode);
+		return new RNode(currentNode);
 	}
 	
 	/**
@@ -168,7 +168,7 @@ public class XNode
 	 */
 	public String getValue(String... path) throws FileFormatException
 	{
-		XNode xnode = getNode(path);
+		RNode xnode = getNode(path);
 		
 		if (xnode == null)
 			return null;
@@ -187,9 +187,9 @@ public class XNode
 	 * path on the second to last branch, so all nodes in the returned list
 	 * will be immediate siblings.
 	 */
-	public List<XNode> getNodes(String... path)
+	public List<RNode> getNodes(String... path)
 	{
-		ArrayList<XNode> results = new ArrayList<XNode>();
+		ArrayList<RNode> results = new ArrayList<RNode>();
 		Node currentNode = root;
 		
 		for (int p = 0; p < path.length - 1; ++p)
@@ -222,7 +222,7 @@ public class XNode
 			
 			if (child.getNodeName().matches(path[path.length - 1]))
 			{
-				results.add(new XNode(child));
+				results.add(new RNode(child));
 			}
 		}
 		

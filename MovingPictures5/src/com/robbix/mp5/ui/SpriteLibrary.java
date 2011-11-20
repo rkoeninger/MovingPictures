@@ -363,15 +363,15 @@ public class SpriteLibrary implements Modular
 		return sprite.getHotspot();
 	}
 	
-	public Sprite getDefaultSprite(ResourceDeposit res)
-	{
-		return getSpriteGroup(res).getFirst();
-	}
-	
 	public Sprite getUnknownDepositSprite()
 	{
 		SpriteGroup seq = getAmbientSpriteGroup("aResource", "unknown");
 		return seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount()));
+	}
+	
+	public SpriteGroup getSpriteGroup(ResourceDeposit res)
+	{
+		return getAmbientSpriteGroup("aResource", res.toString());
 	}
 	
 	public Sprite getSprite(ResourceDeposit res)
@@ -380,9 +380,22 @@ public class SpriteLibrary implements Modular
 		return seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount()));
 	}
 	
-	public SpriteGroup getSpriteGroup(ResourceDeposit res)
+	public Sprite getDefaultSprite(ResourceDeposit res)
 	{
-		return getAmbientSpriteGroup("aResource", res.toString());
+		return getSpriteGroup(res).getFirst();
+	}
+	
+	public Sprite getTranslucentDefault(ResourceDeposit res, double aFactor)
+	{
+		Sprite sprite = getDefaultSprite(res);
+		
+		if (sprite == null)
+			return null;
+		
+		if (sprite == SpriteSet.BLANK_SPRITE)
+			return sprite;
+		
+		return sprite.getFadedCopy(aFactor);
 	}
 	
 	public Sprite getSprite(LayeredMap.Fixture fixture)
@@ -396,6 +409,19 @@ public class SpriteLibrary implements Modular
 		}
 		
 		throw new IllegalArgumentException("invalid fixture " + fixture);
+	}
+	
+	public Sprite getTranslucentSprite(LayeredMap.Fixture fixture, double aFactor)
+	{
+		Sprite sprite = getSprite(fixture);
+		
+		if (sprite == null)
+			return null;
+		
+		if (sprite == SpriteSet.BLANK_SPRITE)
+			return sprite;
+		
+		return sprite.getFadedCopy(aFactor);
 	}
 	
 	public Sprite getSprite(String setName, String eventName)
@@ -450,6 +476,24 @@ public class SpriteLibrary implements Modular
 	public Sprite getDefaultSprite(Unit unit)
 	{
 		return getDefaultSprite(unit.getType());
+	}
+	
+	public Sprite getTranslucentDefault(UnitType unitType, double aFactor)
+	{
+		Sprite sprite = getDefaultSprite(unitType);
+		
+		if (sprite == null)
+			return null;
+		
+		if (sprite == SpriteSet.BLANK_SPRITE)
+			return sprite;
+		
+		return sprite.getFadedCopy(aFactor);
+	}
+	
+	public Sprite getTranslucentDefault(Unit unit, double aFactor)
+	{
+		return getTranslucentDefault(unit.getType(), aFactor);
 	}
 	
 	/**

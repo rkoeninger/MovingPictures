@@ -11,7 +11,6 @@ import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.Utils;
 
 public class FactoryDemo extends Demo
 {
@@ -19,7 +18,7 @@ public class FactoryDemo extends Demo
 	{
 		super(
 			"30-20-plain",
-			Utils.asSet(
+			new String[]{
 				"eConVec",
 				"eCommandCenter",
 				"eCommonSmelter",
@@ -27,13 +26,13 @@ public class FactoryDemo extends Demo
 				"eVehicleFactory",
 				"eEarthworker",
 				"pRoboDozer"
-			),
-			Utils.asSet(
+			},
+			new String[]{
 				"structureBuild"
-			),
-			Utils.asSet(
+			},
+			new Player[]{
 				new Player(1, "Factories", 275)
-			),
+			},
 			1
 		);
 	}

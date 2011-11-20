@@ -7,7 +7,6 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 
 import javax.swing.JComponent;
@@ -16,7 +15,6 @@ import javax.swing.Timer;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.unit.HealthBracket;
-import com.robbix.mp5.utils.Utils;
 
 public class SpritePanel extends JComponent
 {
@@ -188,10 +186,7 @@ public class SpritePanel extends JComponent
 		boolean centered = fpw == 0 && fph == 0;
 		int w = centered ? 0 : fpw * tileSize;
 		int h = centered ? 0 : fph * tileSize;
-		Image img = sprite.getImage();
-		int baseHue = sprite.getBaseTeamHue();
-		if (baseHue != hue && baseHue >= 0 && baseHue < 360)
-			img = Utils.recolorUnit((BufferedImage) img, baseHue, hue);
+		Image img = sprite.getImage(hue, false);
 		int x = (getWidth()  - w) / 2 + sprite.getXOffset();
 		int y = (getHeight() - h) / 2 + sprite.getYOffset();
 		g.drawImage(img, x, y, null);

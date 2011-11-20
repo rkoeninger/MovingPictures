@@ -9,7 +9,6 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.Utils;
 
 public class CombatDemo extends Demo
 {
@@ -17,7 +16,7 @@ public class CombatDemo extends Demo
 	{
 		super(
 			"48-48-plain",
-			Utils.asSet(
+			new String[]{
 				"eLynxChassis",
 				"pLynxChassis",
 				"eLaserSingleTurret",
@@ -28,21 +27,21 @@ public class CombatDemo extends Demo
 				"aAcidCloud",
 				"eAcidCloudSingleTurret",
 				"aDeath"
-			),
-			Utils.asSet(
+			},
+			new String[]{
 				"laser",
 				"microwave",
 				"railGunFire",
 				"railGunHit",
 				"rocketLaunch"
-			),
-			Utils.asSet(
+			},
+			new Player[]{
 				new Player(1, "Axen", 320),
 				new Player(2, "Emma", 200),
 				new Player(3, "Nguyen", 40),
 				new Player(4, "Frost", 160),
 				new Player(5, "Brook", 95)
-			),
+			},
 			5
 		);
 	}

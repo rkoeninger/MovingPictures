@@ -605,12 +605,22 @@ public class Game
 			map.remove(unit);
 			Game.game.playSound("structureCollapse3", pos);
 		}
-		else
+		else if (unit.isArachnid())
 		{
-			String eventName = unit.isArachnid() ? "arachnidKilled" : "vehicleKilled";
 			map.remove(unit);
 			getDisplay().cueAnimation(new SpriteGroupAnimation(
-				spriteLib.getAmbientSpriteGroup("aDeath", eventName),
+				spriteLib.getAmbientSpriteGroup("aDeath", "arachnidKilled"),
+				unit.getOwner(),
+				unit.getAbsPoint(),
+				2
+			));
+			Game.game.playSound("smallExplosion1");
+		}
+		else
+		{
+			map.remove(unit);
+			getDisplay().cueAnimation(new SpriteGroupAnimation(
+				spriteLib.getAmbientSpriteGroup("aDeath", "vehicleKilled"),
 				unit.getAbsPoint(),
 				2
 			));
