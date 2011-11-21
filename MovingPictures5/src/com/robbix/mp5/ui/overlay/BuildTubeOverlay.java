@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +12,7 @@ import com.robbix.mp5.utils.BorderRegion;
 import com.robbix.mp5.utils.LShapedRegion;
 import com.robbix.mp5.utils.LinearRegion;
 import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.RGraphics;
 import com.robbix.mp5.utils.RIterable;
 
 public class BuildTubeOverlay extends InputOverlay
@@ -26,7 +26,7 @@ public class BuildTubeOverlay extends InputOverlay
 		this.showTubeConnectivity = true;
 	}
 	
-	public void paintImpl(Graphics g)
+	public void paintImpl(RGraphics g)
 	{
 		drawSelectedUnitBox(g, crane);
 		
@@ -41,31 +41,35 @@ public class BuildTubeOverlay extends InputOverlay
 				{
 					LinearRegion region = getLinearDragRegion();
 					available = canPlaceTube(region);
-					panel.draw(g, available ? GREEN : RED, region);
+					g.setColor(available ? GREEN.getFill() : RED.getFill());
+					g.fillRegion(region);
 				}
 				else if (getShiftOption() == 2)
 				{
 					BorderRegion region = getBorderDragRegion();
 					available = canPlaceTube(region);
-					panel.draw(g, available ? GREEN : RED, region);
+					g.setColor(available ? GREEN.getFill() : RED.getFill());
+					g.fillBorderRegion(region);
 				}
 				else
 				{
 					LShapedRegion region = getLShapedDragRegion(getShiftOption() == 0);
 					available = canPlaceTube(region);
-					panel.draw(g, available ? GREEN : RED, region);
+					g.setColor(available ? GREEN.getFill() : RED.getFill());
+					g.fillLShapedRegion(region);
 				}
 			}
 			else
 			{
 				available = canPlaceTube(pos);
-				panel.draw(g, available ? GREEN : RED, pos);
+				g.setColor(available ? GREEN.getFill() : RED.getFill());
+				g.fillPosition(pos);
 			}
 			
 			if (!available)
 			{
 				g.setColor(Color.WHITE);
-				panel.draw(g, "Occupied", pos);
+				g.drawString("Occupied", pos);
 			}
 		}
 	}

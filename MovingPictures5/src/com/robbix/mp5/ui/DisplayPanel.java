@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -34,11 +35,11 @@ import com.robbix.mp5.ui.overlay.InputOverlay;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.AnimatedCursor;
-import com.robbix.mp5.utils.BorderRegion;
-import com.robbix.mp5.utils.ColorScheme;
 import com.robbix.mp5.utils.CostMap;
-import com.robbix.mp5.utils.LShapedRegion;
+import com.robbix.mp5.utils.GridMetrics;
 import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.RGraphics;
+import com.robbix.mp5.utils.RImage;
 import com.robbix.mp5.utils.Region;
 import com.robbix.mp5.utils.Utils;
 
@@ -84,7 +85,6 @@ public class DisplayPanel extends JComponent
 	private DisplayPanelView view;
 	
 	private boolean showGrid = false;
-	private boolean showUnitLayerState = false;
 	private boolean showTubeConnectivity = false;
 	private boolean showTerrainCostMap = false;
 	private boolean showBackground = true;
@@ -763,8 +763,10 @@ public class DisplayPanel extends JComponent
 	 * Paints the visible rect of the map, including terrain, units and
 	 * overlays.
 	 */
-	public void paintComponent(Graphics g)
+	public void paintComponent(Graphics g0)
 	{
+		RGraphics g = new RGraphics((Graphics2D) g0);
+		g.setGridMetrics(new GridMetrics(scroll.x, scroll.y, tileSize, scale));
 		drawLetterBox(g);
 		Rectangle rect = getDisplayRect();
 		Region region = getRegion(rect);
@@ -777,7 +779,7 @@ public class DisplayPanel extends JComponent
 		else
 		{
 			g.setColor(getBackground());
-			fill(g, rect);
+			g.fillRect(rect);
 		}
 		
 		if (showGrid && tileSize >= 8)
@@ -812,7 +814,7 @@ public class DisplayPanel extends JComponent
 	 * Draws the background-colored letterboxes around the
 	 * map display area.
 	 */
-	private void drawLetterBox(Graphics g)
+	private void drawLetterBox(RGraphics g)
 	{
 		g.setColor(letterBoxColor);
 		int hSpace = getHorizontalLetterBoxSpace();
@@ -820,19 +822,13 @@ public class DisplayPanel extends JComponent
 		
 		if (getWidth() > getTotalWidth())
 		{
-			// Left side, including top/bottom corners
 			g.fillRect(0, 0, hSpace, getHeight());
-			
-			// Right side, including top/bottom corners
 			g.fillRect(getWidth() - hSpace - 1, 0, hSpace + 1, getHeight());
 		}
 		
 		if (getHeight() > getTotalHeight())
 		{
-			// Top side
 			g.fillRect(hSpace, 0, getWidth() - hSpace * 2, vSpace);
-			
-			// Bottom side
 			g.fillRect(hSpace, getHeight() - vSpace - 1, getWidth() - hSpace * 2, vSpace + 1);
 		}
 	}
@@ -841,7 +837,7 @@ public class DisplayPanel extends JComponent
 	 * Draws terrain (surface or cost map) depending on options using
 	 * Graphics g in the visible rect.
 	 */
-	private void drawTerrain(Graphics g, Rectangle rect)
+	private void drawTerrain(RGraphics g, Rectangle rect)
 	{
 		synchronized (cacheLock)
 		{
@@ -852,12 +848,9 @@ public class DisplayPanel extends JComponent
 			if ((cachedBackground == null) || (time - lastRefreshTime > 1000))
 			{
 				lastRefreshTime = time;
-				cachedBackground = new BufferedImage(
-					rect.width,
-					rect.height,
-					BufferedImage.TYPE_INT_RGB
-				);
-				Graphics cg = cachedBackground.getGraphics();
+				cachedBackground = new RImage(rect.width, rect.height, false);
+				RGraphics cg = new RGraphics((Graphics2D) cachedBackground.getGraphics());
+				cg.setGridMetrics(g.getGridMetrics());
 				cg.translate(min(0, -scroll.x), min(0, -scroll.y));
 				
 				if (showTerrainCostMap) drawCostMap(cg, region);
@@ -874,7 +867,7 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Draws the terrain costmap using Graphics g with in given visible Region.
 	 */
-	private void drawCostMap(Graphics g, Region region)
+	private void drawCostMap(RGraphics g, Region region)
 	{
 		CostMap costMap = map.getTerrainCostMap();
 		g.setFont(costMapFont);
@@ -882,8 +875,8 @@ public class DisplayPanel extends JComponent
 		for (Position pos : region)
 		{
 			Color color = Utils.getGrayscale(costMap.getScaleFactor(pos));
-			ColorScheme colors = ColorScheme.withFillOnly(color);
-			draw(g, colors, pos);
+			g.setColor(color);
+			g.fillPosition(pos);
 			
 			if (scale >= -1)
 			{
@@ -896,7 +889,7 @@ public class DisplayPanel extends JComponent
 				else if (scale == -1) costLabel = String.valueOf((int) cost);
 				
 				if (costLabel != null)
-					draw(g, costLabel, pos);
+					g.drawString(costLabel, pos);
 			}
 		}
 	}
@@ -904,7 +897,7 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Draws the terrain surface image using Graphics g in the visible Region.
 	 */
-	private void drawSurface(Graphics g, Region region)
+	private void drawSurface(RGraphics g, Region region)
 	{
 		for (Position pos : region)
 		{
@@ -912,11 +905,12 @@ public class DisplayPanel extends JComponent
 			
 			if (scale >= minShowUnitScale)
 			{
-				draw(g, tile.getImage(), pos);
+				g.drawImage(tile.getImage(), pos);
 			}
 			else
 			{
-				draw(g, ColorScheme.withFillOnly(tile.getAverageColor()), pos);
+				g.setColor(tile.getAverageColor());
+				g.fillPosition(pos);
 			}
 			
 			if (map.hasMinePlatform(pos))
@@ -931,15 +925,13 @@ public class DisplayPanel extends JComponent
 	}
 	
 	/**
-	 * Draws grid of size tileSize over Region in Color.BLACK.
+	 * Draws grid of size tileSize over Region.
 	 */
-	private void drawGrid(Graphics g, Rectangle rect, Region region)
+	private void drawGrid(RGraphics g, Rectangle rect, Region region)
 	{
-		// Vertical lines
 		for (int x = max(1, region.x); x < region.getMaxX(); ++x)
 			g.drawLine(x * tileSize + scroll.x, 0, x * tileSize + scroll.x, getHeight() - 1);
 		
-		// Horizontal lines
 		for (int y = max(1, region.y); y < region.getMaxY(); ++y)
 			g.drawLine(0, y * tileSize + scroll.y, getWidth() - 1, y * tileSize + scroll.y);
 	}
@@ -947,10 +939,10 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Highlights tubes and buildings as active/potentially active or disabled.
 	 */
-	private void drawTubeConnectivity(Graphics g, Region region)
+	private void drawTubeConnectivity(RGraphics g, Region region)
 	{
-		ColorScheme transGreen = InputOverlay.GREEN.getFillOnly();
-		ColorScheme transRed = InputOverlay.RED.getFillOnly();
+		Color transGreen = InputOverlay.GREEN.getFill();
+		Color transRed = InputOverlay.RED.getFill();
 		
 		for (int x = region.x; x < region.getMaxX(); ++x)
 		for (int y = region.y; y < region.getMaxY(); ++y)
@@ -959,14 +951,16 @@ public class DisplayPanel extends JComponent
 			Unit occupant = map.getUnit(pos);
 			boolean needsConnection = occupant != null && occupant.needsConnection();
 			boolean isSource = occupant != null && occupant.isConnectionSource();
-			boolean hasConnection = occupant != null && occupant.isConnected();
+			boolean hasConnection = occupant != null && !occupant.needsConnection()
+													 && occupant.isConnected();
 			
 			if (map.hasTube(pos) || needsConnection)
 			{
-				ColorScheme colors = (map.isAlive(pos) || hasConnection || isSource)
+				Color colors = (map.isAlive(pos) || hasConnection || isSource)
 					? transGreen
 					: transRed;
-				draw(g, colors, pos);
+				g.setColor(colors);
+				g.fillPosition(pos);
 			}
 		}
 	}
@@ -975,27 +969,17 @@ public class DisplayPanel extends JComponent
 	 * Gets the sprite for the given Unit in its current state and renders it
 	 * along with any overlays - i.e. the UnitLayer state.
 	 */
-	private void drawUnit(Graphics g, Unit unit)
+	private void drawUnit(RGraphics g, Unit unit)
 	{
-		ColorScheme colors = ColorScheme.withFillOnly(unit.getOwner().getColor());
-		
 		if (!unit.isTurret() && scale < minShowUnitScale)
 		{
-			draw(g, colors, unit.getOccupiedBounds());
+			g.setColor(unit.getOwner().getColor());
+			g.fillRegion(unit.getOccupiedBounds());
 			return;
 		}
 		
 		Point2D point = unit.getAbsPoint();
 		Sprite sprite = sprites.getSprite(unit);
-		
-		if (showUnitLayerState && !unit.isTurret())
-		{
-			for (Position pos : unit.getFootprint().iterator(unit.getPosition()))
-				draw(g, InputOverlay.RED, pos);
-			
-			for (Position pos : unit.getMap().getReservations(unit))
-				draw(g, InputOverlay.BLUE, pos);
-		}
 		
 		if (showShadows && !unit.isTurret())
 		{
@@ -1006,10 +990,10 @@ public class DisplayPanel extends JComponent
 			drawShadow(g, sprite, shadowPoint);
 		}
 		
-		if (sprite == SpriteSet.BLANK_SPRITE)
+		if (!unit.isTurret() && sprite == SpriteSet.BLANK_SPRITE)
 		{
-			if (!unit.isTurret())
-				draw(g, colors, unit.getOccupiedBounds());
+			g.setColor(unit.getOwner().getColor());
+			g.fillRegion(unit.getOccupiedBounds());
 		}
 		else
 		{
@@ -1031,7 +1015,7 @@ public class DisplayPanel extends JComponent
 	 * Green "active" lights are not draw for guard posts.
 	 * Unit must be owned by current viewing player to have status light drawn.
 	 */
-	private void drawStatusLight(Graphics g, Unit unit)
+	private void drawStatusLight(RGraphics g, Unit unit)
 	{
 		if (!currentPlayer.owns(unit))
 			return;
@@ -1053,78 +1037,34 @@ public class DisplayPanel extends JComponent
 		}
 	}
 	
+	private static final Color COMMON_ORE_COLOR = new Color(255, 92, 0);
+	private static final Color RARE_ORE_COLOR = new Color(255, 255, 106);
+	
 	/**
 	 * Draws a ResourceDeposit at that deposit's position.
 	 */
-	private void drawResourceDeposit(Graphics g, ResourceDeposit res)
+	private void drawResourceDeposit(RGraphics g, ResourceDeposit res)
 	{
 		if (scale < -1)
 		{
-			ColorScheme colors = ColorScheme.withFillOnly(
-				res.getType() == ResourceType.COMMON_ORE
-				? new Color(255, 92, 0)
-				: new Color(255, 255, 106));
-			draw(g, colors, res.getPosition());
-			return;
+			Color color = res.getType() == ResourceType.COMMON_ORE
+				? COMMON_ORE_COLOR
+				: RARE_ORE_COLOR;
+			g.setColor(color);
+			g.fillPosition(res.getPosition());
 		}
-		
-		Sprite sprite = res.isSurveyedBy(currentPlayer)
-			? sprites.getSprite(res)
-			: sprites.getUnknownDepositSprite();
-		
-		draw(g, sprite, res.getPosition());
+		else
+		{
+			Sprite sprite = res.isSurveyedBy(currentPlayer)
+				? sprites.getSprite(res)
+				: sprites.getUnknownDepositSprite();
+			draw(g, sprite, res.getPosition());
+		}
 	}
 	
 	/*------------------------------------------------------------------------------------------[*]
 	 * Draw helpers. Helpers account for tileSize and scrollPoint.
 	 */
-	
-	public void draw(Graphics g, ColorScheme colors, Position pos)
-	{
-		pos.draw(g, colors, getViewPoint(), tileSize);
-	}
-	
-	public void draw(Graphics g, ColorScheme colors, Region region)
-	{
-		region.draw(g, colors, getViewPoint(), tileSize);
-	}
-	
-	public void drawOutline(Graphics g, ColorScheme colors, Region region)
-	{
-		region.draw(g, colors.getEdgeOnly(), getViewPoint(), tileSize);
-	}
-	
-	public void draw(Graphics g, ColorScheme colors, LShapedRegion region)
-	{
-		region.draw(g, colors, getViewPoint(), tileSize);
-	}
-	
-	public void draw(Graphics g, ColorScheme colors, BorderRegion region)
-	{
-		region.draw(g, colors, getViewPoint(), tileSize);
-	}
-	
-	public void draw(Graphics g, String string, Position pos)
-	{
-		int x = pos.x * tileSize + (tileSize / 2) + scroll.x;
-		int y = pos.y * tileSize + (tileSize / 2) + scroll.y;
-		Rectangle2D bounds = g.getFontMetrics().getStringBounds(string, g);
-		int cx = (int) bounds.getCenterX();
-		int cy = (int) bounds.getCenterY();
-		g.drawString(string, x - cx, y - cy);
-	}
-	
-	public void draw(Graphics g, String string, Region region)
-	{
-		int w = region.w / 2 * tileSize + (region.w % 2 == 0 ? 0 : tileSize / 2);
-		int h = region.h / 2 * tileSize + (region.h % 2 == 0 ? 0 : tileSize / 2);
-		int x = region.x * tileSize + w + scroll.x;
-		int y = region.y * tileSize + h + scroll.y;
-		Rectangle2D bounds = g.getFontMetrics().getStringBounds(string, g);
-		int cx = (int) bounds.getCenterX();
-		int cy = (int) bounds.getCenterY();
-		g.drawString(string, x - cx, y - cy);
-	}
 	
 	public void draw(Graphics g, Sprite sprite, Position pos)
 	{
@@ -1207,11 +1147,6 @@ public class DisplayPanel extends JComponent
 			(int) (b.getX() * tileSize + scroll.x),
 			(int) (b.getY() * tileSize + scroll.y)
 		);
-	}
-	
-	private void fill(Graphics g, Rectangle rect)
-	{
-		g.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 	
 	public void draw(Graphics g, Image img, Position pos)

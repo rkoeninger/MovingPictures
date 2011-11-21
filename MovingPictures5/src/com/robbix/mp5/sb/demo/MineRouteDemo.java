@@ -36,7 +36,7 @@ public class MineRouteDemo extends Demo
 				"dockOpen"
 			},
 			new Player[]{
-				new Player(1, "Mining Operation", 200)
+				new Player("Mining Operation", 200)
 			},
 			1
 		);

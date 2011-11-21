@@ -3,6 +3,7 @@ package com.robbix.mp5.player;
 import java.awt.Color;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.unit.Cost;
@@ -10,6 +11,8 @@ import com.robbix.mp5.unit.Unit;
 
 public class Player
 {
+	private static final AtomicInteger nextSerial = new AtomicInteger();
+	
 	private String name;
 	private int id;
 	private int colorHue;
@@ -18,9 +21,9 @@ public class Player
 	private Map<ResourceType, Integer> resources;
 	private Population population;
 	
-	public Player(int id, String name, int colorHue)
+	public Player(String name, int colorHue)
 	{
-		this.id = id;
+		this.id = nextSerial.getAndIncrement();
 		this.name = name;
 		this.colorHue = colorHue;
 		this.color = new Color(Color.HSBtoRGB(colorHue / 360.0f, 1.0f, 1.0f));

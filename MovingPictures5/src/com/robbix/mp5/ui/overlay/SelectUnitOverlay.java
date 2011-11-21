@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -9,6 +8,7 @@ import java.util.Set;
 import com.robbix.mp5.Game;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.RGraphics;
 import com.robbix.mp5.utils.RIterator;
 
 public class SelectUnitOverlay extends InputOverlay
@@ -24,11 +24,12 @@ public class SelectUnitOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintImpl(Graphics g)
+	public void paintImpl(RGraphics g)
 	{
 		if (isDragging())
 		{
-			panel.draw(g, WHITE, getDragRegion());
+			g.setColor(WHITE.getFill());
+			g.fillRegion(getDragRegion());
 		}
 	}
 	

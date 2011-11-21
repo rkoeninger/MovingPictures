@@ -1,13 +1,13 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
-import java.awt.Graphics;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.BuildMineTask;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.RGraphics;
 import com.robbix.mp5.utils.Region;
 
 public class BuildMineOverlay extends InputOverlay
@@ -25,7 +25,7 @@ public class BuildMineOverlay extends InputOverlay
 		this.hue = mine.getOwner().getColorHue();
 	}
 	
-	public void paintImpl(Graphics g)
+	public void paintImpl(RGraphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -42,8 +42,8 @@ public class BuildMineOverlay extends InputOverlay
 				g.setColor(Color.WHITE);
 				Region inner = mine.getFootprint().getInnerRegion();
 				
-				if (inner.w == 1 && inner.h == 1) panel.draw(g, toolTip, pos);
-				                             else panel.draw(g, toolTip, inner.move(pos));
+				if (inner.w == 1 && inner.h == 1) g.drawString(toolTip, pos);
+				                             else g.drawString(toolTip, inner.move(pos));
 			}
 		}
 	}

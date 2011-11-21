@@ -1,12 +1,11 @@
 package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
-import java.awt.Graphics;
 
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.Sprite;
-import com.robbix.mp5.utils.ColorScheme;
 import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.RGraphics;
 
 public class PlaceFixtureOverlay extends InputOverlay
 {
@@ -20,7 +19,7 @@ public class PlaceFixtureOverlay extends InputOverlay
 			
 	}
 	
-	public void paintImpl(Graphics g)
+	public void paintImpl(RGraphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -28,14 +27,14 @@ public class PlaceFixtureOverlay extends InputOverlay
 				fixtureSprite = panel.getSpriteLibrary().getTranslucentSprite(fixture, 0.75f);
 			
 			Position pos = getCursorPosition();
-			ColorScheme colors = panel.getMap().canPlaceFixture(fixture, pos) ? GREEN : RED;
-			panel.draw(g, colors, pos);
+			g.setColor(panel.getMap().canPlaceFixture(fixture, pos) ? GREEN.getFill() : RED.getFill());
+			g.fillPosition(pos);
 			panel.draw(g, fixtureSprite, pos);
 			
 			if (!panel.getMap().canPlaceFixture(fixture, pos))
 			{
 				g.setColor(Color.WHITE);
-				panel.draw(g, "Obstructed", pos);
+				g.drawString("Obstructed", pos);
 			}
 		}
 	}

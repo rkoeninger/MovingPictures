@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,6 +8,7 @@ import java.util.List;
 import com.robbix.mp5.ai.task.BulldozeRegionTask;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.RGraphics;
 import com.robbix.mp5.utils.Region;
 
 public class SelectBulldozeOverlay extends InputOverlay
@@ -20,14 +20,16 @@ public class SelectBulldozeOverlay extends InputOverlay
 		this.dozer = dozer;
 	}
 	
-	public void paintImpl(Graphics g)
+	public void paintImpl(RGraphics g)
 	{
 		drawSelectedUnitBox(g, dozer);
 		
 		if (isCursorOnGrid())
 		{
-			if (isDragging()) panel.draw(g, GREEN, getDragRegion());
-			             else panel.draw(g, GREEN, getCursorPosition());
+			g.setColor(GREEN.getFill());
+			
+			if (isDragging()) g.fillRegion(getDragRegion());
+			             else g.fillPosition(getCursorPosition());
 		}
 	}
 	

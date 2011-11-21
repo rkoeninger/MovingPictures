@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +16,7 @@ import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
 import com.robbix.mp5.utils.JListDialog;
 import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.RGraphics;
 
 public class CommandUnitOverlay extends InputOverlay
 {
@@ -41,7 +41,7 @@ public class CommandUnitOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintImpl(Graphics g)
+	public void paintImpl(RGraphics g)
 	{
 		if (unit.getPosition() == null)
 			return;

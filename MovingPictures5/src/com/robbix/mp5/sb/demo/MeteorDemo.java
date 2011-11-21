@@ -26,7 +26,7 @@ public class MeteorDemo extends Demo
 				"meteor"
 			},
 			new Player[]{
-				new Player(1, "Targets", 45)
+				new Player("Targets", 45)
 			},
 			1
 		);

@@ -1,7 +1,5 @@
 package com.robbix.mp5.utils;
 
-import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -16,29 +14,10 @@ import java.awt.geom.Rectangle2D;
  */
 public class Region implements RIterable<Position>
 {
-	/**
-	 * The x-coordinate of the upper-left corner of this Region.
-	 */
 	public final int x;
-
-	/**
-	 * The y-coordinate of the upper-left corner of this Region.
-	 */
 	public final int y;
-	
-	/**
-	 * The width of this Region. Measured in the same units as x and y.
-	 */
 	public final int w;
-
-	/**
-	 * The height of this Region. Measured in the same units as x and y.
-	 */
 	public final int h;
-	
-	/**
-	 * The amount of area contained by this Region. Equal to (w * h).
-	 */
 	public final int a;
 	
 	// Extra functions provided for consitency with other naming conventions.
@@ -428,24 +407,5 @@ public class Region implements RIterable<Position>
 			
 			return new Position(x + xPrime, y + yPrime);
 		}
-	}
-	
-	public void draw(Graphics g, ColorScheme colors, Point offset, int edgeSize)
-	{
-		g.setColor(colors.fill);
-		g.fillRect(
-			x * edgeSize + offset.x,
-			y * edgeSize + offset.y,
-			w * edgeSize,
-			h * edgeSize
-		);
-		
-		g.setColor(colors.edge);
-		g.drawRect(
-			x * edgeSize + offset.x,
-			y * edgeSize + offset.y,
-			w * edgeSize,
-			h * edgeSize
-		);
 	}
 }

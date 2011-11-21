@@ -1,9 +1,9 @@
 package com.robbix.mp5.ui.overlay;
 
-import java.awt.Graphics;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.mp5.utils.RGraphics;
 
 public class SelectAttackTargetOverlay extends InputOverlay
 {
@@ -16,7 +16,7 @@ public class SelectAttackTargetOverlay extends InputOverlay
 		this.attacker = unit;
 	}
 	
-	public void paintImpl(Graphics g)
+	public void paintImpl(RGraphics g)
 	{
 		drawSelectedUnitBox(g, attacker.getChassis());
 	}

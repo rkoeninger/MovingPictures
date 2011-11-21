@@ -3,7 +3,6 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 import java.awt.DefaultKeyboardFocusManager;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.KeyEventPostProcessor;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -28,6 +27,7 @@ import com.robbix.mp5.utils.ColorScheme;
 import com.robbix.mp5.utils.LShapedRegion;
 import com.robbix.mp5.utils.LinearRegion;
 import com.robbix.mp5.utils.Position;
+import com.robbix.mp5.utils.RGraphics;
 import com.robbix.mp5.utils.Region;
 import com.robbix.mp5.utils.Utils;
 
@@ -110,21 +110,22 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		panel.setShowTubeConnectivity(false);
 	}
 	
-	public void paint(Graphics g)
+	public void paint(RGraphics g)
 	{
 		if (!requiresPaintOnGrid || isCursorOnGrid())
 			paintImpl(g);
 	}
 	
-	public void paintImpl(Graphics g){}
+	public void paintImpl(RGraphics g){}
 	
-	public void drawSelectedUnitBox(Graphics g, Unit unit)
+	public void drawSelectedUnitBox(RGraphics g, Unit unit)
 	{
 		if (unit.isDead() || unit.isFloating()) return;
 		
 		if (panel.getScale() < 0)
 		{
-			panel.draw(g, WHITE.getEdgeOnly(), unit.getPosition());
+			g.setColor(Color.WHITE);
+			g.drawPosition(unit.getPosition());
 			return;
 		}
 		
@@ -195,13 +196,13 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	/**
 	 * Returns tooltip text so it can be drawn on top of unit placement sprite.
 	 */
-	public String drawUnitFootprint(Graphics g, UnitType type, Position pos)
+	public String drawUnitFootprint(RGraphics g, UnitType type, Position pos)
 	{
 		Footprint fp = type.getFootprint();
 		Region inner = fp.getInnerRegion().move(pos);
 		Region outer = inner.stretch(1);
 		LayeredMap map = panel.getMap();
-		ColorScheme scheme = null;
+		Color color;
 		String toolTip = null;
 		
 		if (type.getName().endsWith("Mine"))
@@ -210,7 +211,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			boolean available = map.canPlaceUnit(pos, fp);
 			boolean hasDeposit = map.canPlaceMine(pos);
 			
-			scheme = onMap && available && hasDeposit ? GREEN : RED;
+			color = onMap && available && hasDeposit ? GREEN.getFill() : RED.getFill();
 			
 			if      (!onMap)      toolTip = "Out of bounds";
 			else if (!available)  toolTip = "Occupied";
@@ -223,7 +224,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			boolean connected = !type.needsConnection() || map.willConnect(pos, fp);
 			boolean noDeposit = !containsDeposit(outer);
 			
-			scheme = onMap && available ? (connected && noDeposit ? GREEN : YELLOW) : RED;
+			color = onMap && available ? (connected && noDeposit ? GREEN.getFill() : YELLOW.getFill()) : RED.getFill();
 			
 			if      (!onMap)     toolTip = "Out of bounds";
 			else if (!available) toolTip = "Occupied";
@@ -235,19 +236,24 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 			boolean onMap = map.getBounds().contains(inner);
 			boolean available = map.canPlaceUnit(pos, fp);
 			
-			scheme = onMap && available ? GREEN : RED;
+			color = onMap && available ? GREEN.getFill() : RED.getFill();
 			
 			if      (!onMap)     toolTip = "Out of bounds";
 			else if (!available) toolTip = "Occupied";
 		}
 		
-		panel.draw(g, scheme, inner);
+		g.setColor(color);
+		g.fillRegion(inner);
+		
+		g.setColor(WHITE.getFill());
 		
 		for (Position tubePos : fp.getTubePositions())
-			panel.draw(g, WHITE.getFillOnly(), tubePos.shift(inner.x, inner.y));
+			g.fillPosition(tubePos.shift(inner.x, inner.y));
+		
+		g.setColor(WHITE.getEdge());
 		
 		if (type.isStructureType() || type.isGuardPostType())
-			panel.drawOutline(g, WHITE, outer);
+			g.drawRegion(outer);
 		
 		return toolTip;
 	}

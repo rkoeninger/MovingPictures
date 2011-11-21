@@ -36,11 +36,11 @@ public class CombatDemo extends Demo
 				"rocketLaunch"
 			},
 			new Player[]{
-				new Player(1, "Axen", 320),
-				new Player(2, "Emma", 200),
-				new Player(3, "Nguyen", 40),
-				new Player(4, "Frost", 160),
-				new Player(5, "Brook", 95)
+				new Player("Axen", 320),
+				new Player("Emma", 200),
+				new Player("Nguyen", 40),
+				new Player("Frost", 160),
+				new Player("Brook", 95)
 			},
 			5
 		);

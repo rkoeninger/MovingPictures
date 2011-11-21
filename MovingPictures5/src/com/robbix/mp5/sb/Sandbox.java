@@ -950,7 +950,7 @@ public class Sandbox extends JApplet
 						break;
 				}
 				
-				Player newPlayer = new Player(game.getPlayers().size(), name, colorHue);
+				Player newPlayer = new Player(name, colorHue);
 				game.addPlayer(newPlayer);
 				selectPlayer(newPlayer.getID());
 			}
