@@ -1,17 +1,14 @@
 package com.robbix.mp5.ui.ani;
 
-import java.awt.Graphics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.concurrent.atomic.AtomicReference;
-
-import javax.swing.SwingUtilities;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
+import com.robbix.utils.RGraphics;
 
 public abstract class AmbientAnimation
 {
@@ -41,9 +38,9 @@ public abstract class AmbientAnimation
     /**
      * Graphics object is translated to the bounding rectangle
      */
-    public abstract void paint(Graphics g);
+    public abstract void paint(RGraphics g);
     
-    public abstract void step(AtomicReference<Runnable> ref);
+    public abstract void step();
     
     /**
      * Returns true if this animation is done - it is no longer
@@ -58,7 +55,7 @@ public abstract class AmbientAnimation
     
     protected void playSoundLater(final String sound, final Position pos)
     {
-    	SwingUtilities.invokeLater(new Runnable()
+    	Game.game.doLater(new Runnable()
     	{
     		public void run()
     		{
@@ -69,7 +66,7 @@ public abstract class AmbientAnimation
     
     protected void doSplashDamageLater(final Position pos, final double amount, final double range)
     {
-    	SwingUtilities.invokeLater(new Runnable()
+    	Game.game.doLater(new Runnable()
     	{
     		public void run()
     		{
@@ -80,7 +77,7 @@ public abstract class AmbientAnimation
     
     protected void doDamageLater(final Unit attacker, final Unit target, final double amount)
     {
-    	SwingUtilities.invokeLater(new Runnable()
+    	Game.game.doLater(new Runnable()
     	{
     		public void run()
     		{

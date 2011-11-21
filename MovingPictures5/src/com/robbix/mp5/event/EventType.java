@@ -1,8 +1,15 @@
-package com.robbix.mp5.ambevent;
+package com.robbix.mp5.event;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AmbientEventType
+/**
+ * Event types include things like "aDeath" and "aRocket". This includes events that
+ * are visible, like a death explosion, that are not themselves visible, like
+ * the creation of a new unit (the new unit is visible), events that modify something
+ * in the window but on the DisplayPanel, like getting money, and events that may be
+ * totally invisible, like research being completed.
+ */
+public class EventType
 {
 	private static AtomicInteger nextSerial = new AtomicInteger();
 	
@@ -11,12 +18,12 @@ public class AmbientEventType
 	private int effectAreaW;
 	private int effectAreaH;
 	
-	public AmbientEventType(String name)
+	public EventType(String name)
 	{
 		this(name, -1, -1);
 	}
 	
-	public AmbientEventType(String name, int w, int h)
+	public EventType(String name, int w, int h)
 	{
 		this.name = name;
 		this.serial = nextSerial.getAndIncrement();
@@ -52,5 +59,10 @@ public class AmbientEventType
 	public int getSerial()
 	{
 		return serial;
+	}
+	
+	public Event newEvent()
+	{
+		return null;
 	}
 }

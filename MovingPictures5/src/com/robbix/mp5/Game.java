@@ -44,6 +44,7 @@ import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.utils.Direction;
 import com.robbix.utils.Position;
+import com.robbix.utils.RIterator;
 import com.robbix.utils.Region;
 import com.robbix.utils.Utils;
 
@@ -105,6 +106,7 @@ public class Game
 	private UnitFactory factory;
 	private CursorSet cursorSet;
 	private Set<Trigger> triggers;
+	private List<Runnable> pendingDoLaters;
 	
 	private GameListener.Helper listenerHelper = new GameListener.Helper();
 	
@@ -117,6 +119,34 @@ public class Game
 		players = new HashMap<Integer, Player>();
 		players.put(0, defaultPlayer);
 		triggers = Collections.synchronizedSet(new HashSet<Trigger>());
+		pendingDoLaters = new ArrayList<Runnable>();
+	}
+	
+	public void doLater(Runnable doRun)
+	{
+		pendingDoLaters.add(doRun);
+	}
+	
+	public RIterator<Runnable> getAndClearDoLaters()
+	{
+		try
+		{
+			return RIterator.iterate(pendingDoLaters);
+		}
+		finally
+		{
+			pendingDoLaters.clear();
+		}
+	}
+	
+	public RIterator<Runnable> getDoLaters()
+	{
+		return RIterator.iterate(pendingDoLaters);
+	}
+	
+	public void clearDoLaters()
+	{
+		pendingDoLaters.clear();
 	}
 	
 	public void setSoundOn(boolean soundOn)

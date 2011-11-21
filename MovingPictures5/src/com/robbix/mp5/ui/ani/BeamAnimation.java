@@ -1,13 +1,12 @@
 package com.robbix.mp5.ui.ani;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.utils.RGraphics;
 
 public abstract class BeamAnimation extends WeaponAnimation
 {
@@ -24,7 +23,7 @@ public abstract class BeamAnimation extends WeaponAnimation
 		this.damage = damage;
 	}
 	
-	public void paint(Graphics g)
+	public void paint(RGraphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
 		g.setColor(getColor(frame));
@@ -38,7 +37,7 @@ public abstract class BeamAnimation extends WeaponAnimation
 	
 	public abstract Color getColor(int frame);
 	
-	public void step(AtomicReference<Runnable> callback)
+	public void step()
 	{
 		if (frame == 0)
 		{

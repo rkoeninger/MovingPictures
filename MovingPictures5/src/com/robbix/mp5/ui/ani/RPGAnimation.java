@@ -1,11 +1,9 @@
 package com.robbix.mp5.ui.ani;
 
-import java.awt.Graphics;
 import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
@@ -14,6 +12,7 @@ import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Direction;
 import com.robbix.utils.Position;
+import com.robbix.utils.RGraphics;
 import com.robbix.utils.Utils;
 
 public class RPGAnimation extends WeaponAnimation
@@ -71,7 +70,7 @@ public class RPGAnimation extends WeaponAnimation
 		return frame >= totalFrameCount;
 	}
 	
-	public void step(AtomicReference<Runnable> ref)
+	public void step()
 	{
 		if (frame == 0)
 		{
@@ -103,7 +102,7 @@ public class RPGAnimation extends WeaponAnimation
 		frame++;
 	}
 	
-	public void paint(Graphics g)
+	public void paint(RGraphics g)
 	{
 		SpriteSet rocketSprites = lib.getAmbientSpriteSet("aRocket");
 		SpriteGroup puff1 = rocketSprites.get("smokePuff1");

@@ -1,14 +1,13 @@
 package com.robbix.mp5.ui.ani;
 
-import java.awt.Graphics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.utils.Position;
+import com.robbix.utils.RGraphics;
 
 public class MeteorAnimation extends AmbientAnimation
 {
@@ -48,7 +47,7 @@ public class MeteorAnimation extends AmbientAnimation
 		return bounds;
 	}
 	
-	public void paint(Graphics g)
+	public void paint(RGraphics g)
 	{
 		SpriteGroup forming = lib.getAmbientSpriteGroup("aMeteor", "forming");
 		SpriteGroup flying  = lib.getAmbientSpriteGroup("aMeteor", "flying");
@@ -79,7 +78,7 @@ public class MeteorAnimation extends AmbientAnimation
 		}
 	}
 	
-	public void step(AtomicReference<Runnable> ref)
+	public void step()
 	{
 		if (frame > frameCount - 9 && !impactSoundPlayed)
 		{

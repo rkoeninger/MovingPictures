@@ -1,19 +1,19 @@
-package com.robbix.mp5.ambevent;
+package com.robbix.mp5.event;
 
-public class AmbientEvent
+public abstract class Event
 {
-	private AmbientEventType type;
+	private EventType type;
 	private String arg;
 	private int step;
 	private int length;
 	
-	private AmbientEvent(AmbientEventType type, String arg)
+	protected Event(EventType type, String arg)
 	{
 		this.type = type;
 		this.arg = arg;
 	}
 	
-	public AmbientEventType getType()
+	public EventType getType()
 	{
 		return type;
 	}
@@ -27,4 +27,6 @@ public class AmbientEvent
 	{
 		return step >= length;
 	}
+	
+	public abstract void step();
 }

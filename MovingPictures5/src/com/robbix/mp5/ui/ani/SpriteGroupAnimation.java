@@ -1,15 +1,14 @@
 package com.robbix.mp5.ui.ani;
 
-import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
+import com.robbix.utils.RGraphics;
 
 public class SpriteGroupAnimation extends AmbientAnimation
 {
@@ -52,12 +51,12 @@ public class SpriteGroupAnimation extends AmbientAnimation
 		return new Rectangle(x, y, w, h);
 	}
 	
-	public void step(AtomicReference<Runnable> ref)
+	public void step()
 	{
 		frame++;
 	}
 	
-	public void paint(Graphics g)
+	public void paint(RGraphics g)
 	{
 		panel.draw(g, sprites.getFrame(frame), point, player);
 	}

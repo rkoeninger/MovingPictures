@@ -2,13 +2,7 @@ package com.robbix.mp5;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-
 import javax.swing.Timer;
 
 import com.robbix.mp5.map.LayeredMap;
@@ -27,7 +21,6 @@ public class Engine
 	private Runnable animationCycle;
 	private Timer timer;
 	private int frame;
-	private List<Runnable> scheduledTasks;
 	
 	public Engine(Game game)
 	{
@@ -38,7 +31,6 @@ public class Engine
 		animationCycle = new AnimationCycle();
 		timer = new Timer(DEFAULT_DELAY, new ThreadCycle());
 		frame = 0;
-		scheduledTasks = new ArrayList<Runnable>();
 	}
 	
 	public synchronized void play()
@@ -97,17 +89,6 @@ public class Engine
 		return frame;
 	}
 	
-	public void doLater(Runnable doRun)
-	{
-		if (doRun == null)
-			return;
-		
-		synchronized (scheduledTasks)
-		{
-			scheduledTasks.add(doRun);
-		}
-	}
-	
 	private class ThreadCycle implements ActionListener
 	{
 		public void actionPerformed(ActionEvent e)
@@ -121,8 +102,6 @@ public class Engine
 	
 	private class AnimationCycle implements Runnable
 	{
-		Set<Runnable> callbacks = new HashSet<Runnable>();
-		AtomicReference<Runnable> returnValue = new AtomicReference<Runnable>();
 		long prevTime;
 		int framePeriod = 32;
 		double fps = 0.0;
@@ -163,16 +142,12 @@ public class Engine
 					unit.step();
 					
 					if (unit.hasTurret())
-					{
 						unit.getTurret().step();
-					}
 				}
 				
 				/*
 				 * Animation
 				 */
-				callbacks.clear();
-				
 				synchronized (panel.getAnimations())
 				{
 					Iterator<AmbientAnimation> animationItr =
@@ -181,36 +156,15 @@ public class Engine
 					while (animationItr.hasNext())
 					{
 						AmbientAnimation animation = animationItr.next();
-						animation.step(returnValue);
-							
-						if (returnValue.get() != null)
-						{
-							callbacks.add(returnValue.get());
-							returnValue.set(null);
-						}
+						animation.step();
 						
 						if (animation.isDone())
-						{
 							animationItr.remove();
-						}
 					}
 				}
 				
-				for (Runnable toRun : callbacks)
-				{
-					if (toRun != null)
-					{
-						toRun.run();
-					}
-				}
-				
-				synchronized (scheduledTasks)
-				{
-					for (Runnable doRun : scheduledTasks)
-					{
-						doRun.run();
-					}
-				}
+				for (Runnable doRun : game.getAndClearDoLaters())
+					doRun.run();
 				
 				for (DisplayPanel panel : game.getDisplays())
 					panel.repaint();
