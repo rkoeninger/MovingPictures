@@ -7,7 +7,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.robbix.mp5.utils.Direction;
+import com.robbix.utils.Direction;
 
 public class UnitType
 {

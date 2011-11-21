@@ -1,7 +1,7 @@
 package com.robbix.mp5.ai;
 
-import com.robbix.mp5.utils.CostMap;
-import com.robbix.mp5.utils.Position;
+import com.robbix.utils.CostMap;
+import com.robbix.utils.Position;
 
 public interface Pathfinder
 {

@@ -4,8 +4,8 @@ package com.robbix.mp5.ui.overlay;
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.RGraphics;
+import com.robbix.utils.Position;
+import com.robbix.utils.RGraphics;
 
 public class SelectMineRouteOverlay extends InputOverlay
 {

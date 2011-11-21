@@ -2,7 +2,7 @@ package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.ui.ani.WeaponAnimation;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.Direction;
+import com.robbix.utils.Direction;
 
 public class AttackTask extends Task
 {

@@ -5,7 +5,7 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.Position;
+import com.robbix.utils.Position;
 
 public class MineRouteTask extends Task
 {

@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
-import com.robbix.mp5.utils.Position;
+import com.robbix.utils.Position;
 
 public class MeteorAnimation extends AmbientAnimation
 {

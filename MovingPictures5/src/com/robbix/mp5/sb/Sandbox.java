@@ -83,13 +83,13 @@ import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
-import com.robbix.mp5.utils.AnimatedButton;
-import com.robbix.mp5.utils.JListDialog;
-import com.robbix.mp5.utils.JSliderMenuItem;
-import com.robbix.mp5.utils.RImage;
-import com.robbix.mp5.utils.RMenuItem;
-import com.robbix.mp5.utils.RRadioButtonMenuItem;
-import com.robbix.mp5.utils.Utils;
+import com.robbix.utils.AnimatedButton;
+import com.robbix.utils.JListDialog;
+import com.robbix.utils.JSliderMenuItem;
+import com.robbix.utils.RImage;
+import com.robbix.utils.RMenuItem;
+import com.robbix.utils.RRadioButtonMenuItem;
+import com.robbix.utils.Utils;
 
 /**
  * Sandbox test suite, main window.

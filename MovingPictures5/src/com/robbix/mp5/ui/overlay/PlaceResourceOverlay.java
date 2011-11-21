@@ -6,9 +6,9 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.ColorScheme;
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.RGraphics;
+import com.robbix.utils.ColorScheme;
+import com.robbix.utils.Position;
+import com.robbix.utils.RGraphics;
 
 public class PlaceResourceOverlay extends InputOverlay
 {

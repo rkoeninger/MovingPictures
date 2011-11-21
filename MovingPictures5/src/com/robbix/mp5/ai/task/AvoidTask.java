@@ -1,9 +1,9 @@
 package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.Filter;
-import com.robbix.mp5.utils.Position;
+import com.robbix.utils.Direction;
+import com.robbix.utils.Filter;
+import com.robbix.utils.Position;
 
 public class AvoidTask extends Task
 {

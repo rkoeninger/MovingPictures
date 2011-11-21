@@ -3,7 +3,7 @@ package com.robbix.mp5.sb.demo;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.UnitFactory;
-import com.robbix.mp5.utils.Position;
+import com.robbix.utils.Position;
 
 public class MeteorDemo extends Demo
 {

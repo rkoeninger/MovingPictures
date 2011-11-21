@@ -21,9 +21,9 @@ import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
-import com.robbix.mp5.utils.AutoArrayList;
-import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.Utils;
+import com.robbix.utils.AutoArrayList;
+import com.robbix.utils.Direction;
+import com.robbix.utils.Utils;
 
 /**
  * Async module loading is not enabled by default.

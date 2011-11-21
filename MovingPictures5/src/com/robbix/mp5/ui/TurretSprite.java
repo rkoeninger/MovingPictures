@@ -2,8 +2,8 @@ package com.robbix.mp5.ui;
 
 import java.awt.geom.Point2D;
 
-import com.robbix.mp5.utils.Offset;
-import com.robbix.mp5.utils.RImage;
+import com.robbix.utils.Offset;
+import com.robbix.utils.RImage;
 
 public class TurretSprite extends Sprite
 {

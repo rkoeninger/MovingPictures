@@ -2,7 +2,7 @@ package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.Filter;
+import com.robbix.utils.Filter;
 
 public class SelfDestructAttackTask extends Task
 {

@@ -5,8 +5,8 @@ import com.robbix.mp5.Game;
 import static com.robbix.mp5.unit.Activity.*;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.Position;
+import com.robbix.utils.Direction;
+import com.robbix.utils.Position;
 
 public class MineTask extends Task
 {

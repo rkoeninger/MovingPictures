@@ -7,8 +7,8 @@ import java.util.Map;
 
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Cargo;
-import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.RImage;
+import com.robbix.utils.Direction;
+import com.robbix.utils.RImage;
 
 public abstract class SpriteSet
 {

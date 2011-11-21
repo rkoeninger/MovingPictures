@@ -8,8 +8,8 @@ import java.util.Set;
 import com.robbix.mp5.Game;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.RGraphics;
-import com.robbix.mp5.utils.RIterator;
+import com.robbix.utils.RGraphics;
+import com.robbix.utils.RIterator;
 
 public class SelectUnitOverlay extends InputOverlay
 {

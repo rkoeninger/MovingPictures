@@ -19,14 +19,14 @@ import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.CostMap;
-import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.Filter;
-import com.robbix.mp5.utils.Grid;
-import com.robbix.mp5.utils.Neighbors;
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.RIterator;
-import com.robbix.mp5.utils.Region;
+import com.robbix.utils.CostMap;
+import com.robbix.utils.Direction;
+import com.robbix.utils.Filter;
+import com.robbix.utils.Grid;
+import com.robbix.utils.Neighbors;
+import com.robbix.utils.Position;
+import com.robbix.utils.RIterator;
+import com.robbix.utils.Region;
 
 // TODO: Reassess defensive bounds checking (add checked exception?)
 public class LayeredMap

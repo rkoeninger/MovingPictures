@@ -5,8 +5,8 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.Filter;
-import com.robbix.mp5.utils.Position;
+import com.robbix.utils.Filter;
+import com.robbix.utils.Position;
 
 public class BuildMineTask extends Task
 {

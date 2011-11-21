@@ -2,8 +2,8 @@ package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
 
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.RGraphics;
+import com.robbix.utils.Position;
+import com.robbix.utils.RGraphics;
 
 public class PlaceBulldozeOverlay extends InputOverlay
 {

@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import com.robbix.mp5.utils.AnimatedCursor;
-import com.robbix.mp5.utils.RImage;
-import com.robbix.mp5.utils.RNode;
+import com.robbix.utils.AnimatedCursor;
+import com.robbix.utils.RImage;
+import com.robbix.utils.RNode;
 
 public class CursorSet
 {

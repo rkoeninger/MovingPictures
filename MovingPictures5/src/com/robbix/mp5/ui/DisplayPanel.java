@@ -34,14 +34,14 @@ import com.robbix.mp5.ui.ani.AmbientAnimation;
 import com.robbix.mp5.ui.overlay.InputOverlay;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.AnimatedCursor;
-import com.robbix.mp5.utils.CostMap;
-import com.robbix.mp5.utils.GridMetrics;
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.RGraphics;
-import com.robbix.mp5.utils.RImage;
-import com.robbix.mp5.utils.Region;
-import com.robbix.mp5.utils.Utils;
+import com.robbix.utils.AnimatedCursor;
+import com.robbix.utils.CostMap;
+import com.robbix.utils.GridMetrics;
+import com.robbix.utils.Position;
+import com.robbix.utils.RGraphics;
+import com.robbix.utils.RImage;
+import com.robbix.utils.Region;
+import com.robbix.utils.Utils;
 
 @SuppressWarnings("serial")
 public class DisplayPanel extends JComponent

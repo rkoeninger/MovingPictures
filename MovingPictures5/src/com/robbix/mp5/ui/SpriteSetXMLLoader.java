@@ -12,12 +12,12 @@ import java.util.Map;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.HealthBracket;
-import com.robbix.mp5.utils.AutoArrayList;
-import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.FileFormatException;
-import com.robbix.mp5.utils.Offset;
-import com.robbix.mp5.utils.RImage;
-import com.robbix.mp5.utils.RNode;
+import com.robbix.utils.AutoArrayList;
+import com.robbix.utils.Direction;
+import com.robbix.utils.FileFormatException;
+import com.robbix.utils.Offset;
+import com.robbix.utils.RImage;
+import com.robbix.utils.RNode;
 
 import static com.robbix.mp5.unit.Activity.*;
 

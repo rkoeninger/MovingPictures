@@ -12,9 +12,9 @@ import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.Utils;
+import com.robbix.utils.Direction;
+import com.robbix.utils.Position;
+import com.robbix.utils.Utils;
 
 public class AcidCloudAnimation extends WeaponAnimation
 {

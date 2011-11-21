@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.RIterator;
-import com.robbix.mp5.utils.Region;
-import com.robbix.mp5.utils.ShiftingIterator;
+import com.robbix.utils.Position;
+import com.robbix.utils.RIterator;
+import com.robbix.utils.Region;
+import com.robbix.utils.ShiftingIterator;
 
 /**
  * The origin of relative Positions in the Footprint is

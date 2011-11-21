@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.robbix.mp5.utils.Offset;
-import com.robbix.mp5.utils.RImage;
+import com.robbix.utils.Offset;
+import com.robbix.utils.RImage;
 
 public class Sprite
 {

@@ -3,8 +3,8 @@ package com.robbix.mp5.ai.task;
 import java.util.List;
 
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.Position;
+import com.robbix.utils.Direction;
+import com.robbix.utils.Position;
 
 public class PathTask extends Task
 {

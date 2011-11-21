@@ -6,9 +6,9 @@ import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.BuildMineTask;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.RGraphics;
-import com.robbix.mp5.utils.Region;
+import com.robbix.utils.Position;
+import com.robbix.utils.RGraphics;
+import com.robbix.utils.Region;
 
 public class BuildMineOverlay extends InputOverlay
 {

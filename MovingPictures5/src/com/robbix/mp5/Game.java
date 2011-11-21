@@ -42,10 +42,10 @@ import com.robbix.mp5.ui.ani.WeaponAnimation;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
-import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.Region;
-import com.robbix.mp5.utils.Utils;
+import com.robbix.utils.Direction;
+import com.robbix.utils.Position;
+import com.robbix.utils.Region;
+import com.robbix.utils.Utils;
 
 public class Game
 {

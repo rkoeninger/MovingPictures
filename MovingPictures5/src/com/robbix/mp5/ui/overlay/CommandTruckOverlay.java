@@ -13,9 +13,9 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.mp5.utils.JListDialog;
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.RGraphics;
+import com.robbix.utils.JListDialog;
+import com.robbix.utils.Position;
+import com.robbix.utils.RGraphics;
 
 public class CommandTruckOverlay extends InputOverlay
 {

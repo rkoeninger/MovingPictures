@@ -22,14 +22,14 @@ import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
-import com.robbix.mp5.utils.BorderRegion;
-import com.robbix.mp5.utils.ColorScheme;
-import com.robbix.mp5.utils.LShapedRegion;
-import com.robbix.mp5.utils.LinearRegion;
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.RGraphics;
-import com.robbix.mp5.utils.Region;
-import com.robbix.mp5.utils.Utils;
+import com.robbix.utils.BorderRegion;
+import com.robbix.utils.ColorScheme;
+import com.robbix.utils.LShapedRegion;
+import com.robbix.utils.LinearRegion;
+import com.robbix.utils.Position;
+import com.robbix.utils.RGraphics;
+import com.robbix.utils.Region;
+import com.robbix.utils.Utils;
 
 public abstract class InputOverlay
 implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener

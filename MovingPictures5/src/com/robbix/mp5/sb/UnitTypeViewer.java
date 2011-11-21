@@ -35,7 +35,7 @@ import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
-import com.robbix.mp5.utils.RTreeNode;
+import com.robbix.utils.RTreeNode;
 
 public class UnitTypeViewer extends JFrame
 {

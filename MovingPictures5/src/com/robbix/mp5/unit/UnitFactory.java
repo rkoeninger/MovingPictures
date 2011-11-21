@@ -17,9 +17,9 @@ import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.ai.task.TurretTask;
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
-import com.robbix.mp5.utils.FileFormatException;
-import com.robbix.mp5.utils.Filter;
-import com.robbix.mp5.utils.RNode;
+import com.robbix.utils.FileFormatException;
+import com.robbix.utils.Filter;
+import com.robbix.utils.RNode;
 
 public class UnitFactory
 {

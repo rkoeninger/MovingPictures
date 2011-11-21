@@ -10,9 +10,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.robbix.mp5.ai.task.Task;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
-import com.robbix.mp5.utils.Direction;
-import com.robbix.mp5.utils.Position;
-import com.robbix.mp5.utils.Region;
+import com.robbix.utils.Direction;
+import com.robbix.utils.Position;
+import com.robbix.utils.Region;
 
 import static com.robbix.mp5.unit.Activity.*;
 
