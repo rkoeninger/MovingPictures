@@ -31,7 +31,7 @@ public class FactoryDemo extends Demo
 				"structureBuild"
 			},
 			new Player[]{
-				new Player("Factories", 275)
+				new Player(1, "Factories", 275)
 			},
 			1
 		);

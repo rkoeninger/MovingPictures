@@ -115,7 +115,7 @@ public class Game
 	private Game()
 	{
 		displays = Collections.synchronizedList(new ArrayList<DisplayPanel>());
-		defaultPlayer = new Player("Default", 240);
+		defaultPlayer = new Player(0, "Default", 240);
 		players = new HashMap<Integer, Player>();
 		players.put(0, defaultPlayer);
 		triggers = Collections.synchronizedSet(new HashSet<Trigger>());
