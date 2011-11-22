@@ -131,7 +131,7 @@ public class Game
 	{
 		try
 		{
-			return RIterator.iterate(pendingDoLaters);
+			return RIterator.iterate(new ArrayList<Runnable>(pendingDoLaters));
 		}
 		finally
 		{
