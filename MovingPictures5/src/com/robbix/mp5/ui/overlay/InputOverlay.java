@@ -17,6 +17,7 @@ import java.awt.geom.Point2D;
 
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.DisplayPanel;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
@@ -27,7 +28,6 @@ import com.robbix.utils.ColorScheme;
 import com.robbix.utils.LShapedRegion;
 import com.robbix.utils.LinearRegion;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.Region;
 import com.robbix.utils.Utils;
 
@@ -110,15 +110,15 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		panel.setShowTubeConnectivity(false);
 	}
 	
-	public void paint(RGraphics g)
+	public void paint(DisplayGraphics g)
 	{
 		if (!requiresPaintOnGrid || isCursorOnGrid())
 			paintImpl(g);
 	}
 	
-	public void paintImpl(RGraphics g){}
+	public void paintImpl(DisplayGraphics g){}
 	
-	public void drawSelectedUnitBox(RGraphics g, Unit unit)
+	public void drawSelectedUnitBox(DisplayGraphics g, Unit unit)
 	{
 		if (unit.isDead() || unit.isFloating()) return;
 		
@@ -196,7 +196,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	/**
 	 * Returns tooltip text so it can be drawn on top of unit placement sprite.
 	 */
-	public String drawUnitFootprint(RGraphics g, UnitType type, Position pos)
+	public String drawUnitFootprint(DisplayGraphics g, UnitType type, Position pos)
 	{
 		Footprint fp = type.getFootprint();
 		Region inner = fp.getInnerRegion().move(pos);

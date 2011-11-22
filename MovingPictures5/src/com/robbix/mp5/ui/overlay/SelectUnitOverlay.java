@@ -7,8 +7,8 @@ import java.util.Set;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.player.Player;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.RIterator;
 
 public class SelectUnitOverlay extends InputOverlay
@@ -24,7 +24,7 @@ public class SelectUnitOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		if (isDragging())
 		{

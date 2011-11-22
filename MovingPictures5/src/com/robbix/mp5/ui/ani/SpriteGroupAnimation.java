@@ -6,9 +6,9 @@ import java.awt.geom.Rectangle2D;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.player.Player;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
-import com.robbix.utils.RGraphics;
 
 public class SpriteGroupAnimation extends AmbientAnimation
 {
@@ -56,10 +56,10 @@ public class SpriteGroupAnimation extends AmbientAnimation
 		frame++;
 	}
 	
-	public void paint(RGraphics g)
+	public void paint(DisplayGraphics g)
 	{
-		if (player != null) sprites.getFrame(frame).paint(g, point, player.getColorHue());
-		               else sprites.getFrame(frame).paint(g, point);
+		int hue = player != null ? player.getColorHue() : -1;
+		g.drawSprite(sprites.getFrame(frame), point, hue);
 	}
 	
 	public boolean isDone()

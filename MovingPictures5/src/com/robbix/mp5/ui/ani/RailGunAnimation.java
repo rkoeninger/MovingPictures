@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
@@ -12,7 +13,6 @@ import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Direction;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 
 public class RailGunAnimation extends WeaponAnimation
 {
@@ -98,7 +98,7 @@ public class RailGunAnimation extends WeaponAnimation
 		frame++;
 	}
 	
-	public void paint(RGraphics g)
+	public void paint(DisplayGraphics g)
 	{
 		SpriteSet rocketSprites = lib.getAmbientSpriteSet("aRocket");
 		SpriteGroup ring1 = rocketSprites.get("smokeRing1");
@@ -141,7 +141,7 @@ public class RailGunAnimation extends WeaponAnimation
 					- ring2.getFrameCount());
 			}
 			
-			ringSprite.paint(g, ring.point);
+			g.drawSprite(ringSprite, ring.point);
 		}
 		
 		if (!explosionTime)
@@ -154,7 +154,7 @@ public class RailGunAnimation extends WeaponAnimation
 				getFireImpact().getX() + distance * Math.cos(angle) * progress,
 				getFireImpact().getY() + distance * Math.sin(angle) * progress
 			);
-			rocketSprite.paint(g, rocketPoint);
+			g.drawSprite(rocketSprite, rocketPoint);
 		}
 	}
 }

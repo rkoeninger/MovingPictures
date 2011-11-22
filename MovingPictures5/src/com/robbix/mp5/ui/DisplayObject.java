@@ -2,7 +2,6 @@ package com.robbix.mp5.ui;
 
 import java.awt.geom.Rectangle2D;
 
-import com.robbix.utils.RGraphics;
 
 public class DisplayObject
 {
@@ -23,7 +22,7 @@ public class DisplayObject
 		return false;
 	}
 	
-	public void paint(RGraphics g)
+	public void paint(DisplayGraphics g)
 	{
 		
 	}

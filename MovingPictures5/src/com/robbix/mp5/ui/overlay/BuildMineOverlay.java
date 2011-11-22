@@ -4,10 +4,10 @@ import java.awt.Color;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.BuildMineTask;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.Region;
 
 public class BuildMineOverlay extends InputOverlay
@@ -25,7 +25,7 @@ public class BuildMineOverlay extends InputOverlay
 		this.hue = mine.getOwner().getColorHue();
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -35,7 +35,7 @@ public class BuildMineOverlay extends InputOverlay
 			Position center = mine.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawUnitFootprint(g, mine.getType(), pos);
-			mineSprite.paint(g, pos, hue);
+			g.drawSprite(mineSprite, pos, hue);
 			
 			if (toolTip != null)
 			{

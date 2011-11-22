@@ -2,12 +2,12 @@ package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
 
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 
 public class PlaceBulldozeOverlay extends InputOverlay
 {
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		if (isCursorOnGrid())
 		{

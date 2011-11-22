@@ -3,11 +3,11 @@ package com.robbix.mp5.ui.ani;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 
 public class MeteorAnimation extends AmbientAnimation
 {
@@ -47,7 +47,7 @@ public class MeteorAnimation extends AmbientAnimation
 		return bounds;
 	}
 	
-	public void paint(RGraphics g)
+	public void paint(DisplayGraphics g)
 	{
 		SpriteGroup forming = lib.getAmbientSpriteGroup("aMeteor", "forming");
 		SpriteGroup flying  = lib.getAmbientSpriteGroup("aMeteor", "flying");
@@ -58,12 +58,12 @@ public class MeteorAnimation extends AmbientAnimation
 			double progress = (frameCount - frame) / (double)(frameCount);
 			double x = point.getX() + distance *  Math.cos(angle) * progress;
 			double y = point.getY() + distance * -Math.sin(angle) * progress;
-			forming.getFrame(frame).paint(g, new Point2D.Double(x, y));
+			g.drawSprite(forming.getFrame(frame), new Point2D.Double(x, y));
 		}
 		else if (frame > frameCount - 9)
 		{
 			int spriteFrame = impact.getFrameCount() - (frameCount - frame + 1);
-			impact.getFrame(spriteFrame).paint(g, point);
+			g.drawSprite(impact.getFrame(spriteFrame), point);
 		}
 		else
 		{
@@ -71,7 +71,7 @@ public class MeteorAnimation extends AmbientAnimation
 			double progress = (frameCount - frame) / (double)(frameCount);
 			double x = point.getX() + distance *  Math.cos(angle) * progress;
 			double y = point.getY() + distance * -Math.sin(angle) * progress;
-			sprite.paint(g, new Point2D.Double(x, y));
+			g.drawSprite(sprite, new Point2D.Double(x, y));
 		}
 	}
 	

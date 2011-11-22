@@ -1,4 +1,4 @@
-package com.robbix.utils;
+package com.robbix.mp5.ui;
 
 import static com.robbix.utils.Direction.E;
 import static com.robbix.utils.Direction.N;
@@ -33,27 +33,36 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
+import com.robbix.utils.BorderRegion;
+import com.robbix.utils.Direction;
+import com.robbix.utils.GridMetrics;
+import com.robbix.utils.LShapedRegion;
+import com.robbix.utils.Neighbors;
+import com.robbix.utils.Offset;
+import com.robbix.utils.Position;
+import com.robbix.utils.Region;
+
 /**
  * Methods that accept robbix/utils objects as parameters refer to
  * this RGraphics' GridMetrics to determine placement.
  */
-public class RGraphics extends Graphics2D
+public class DisplayGraphics extends Graphics2D
 {
 	private Graphics2D g;
 	private GridMetrics gm;
 	
-	public RGraphics(Graphics2D g)
+	public DisplayGraphics(Graphics2D g)
 	{
 		this.g = g;
 		this.gm = new GridMetrics();
 	}
 	
-	public RGraphics create()
+	public DisplayGraphics create()
 	{
 		Graphics created = g.create();
 		
 		if (created instanceof Graphics2D)
-			return new RGraphics((Graphics2D) created);
+			return new DisplayGraphics((Graphics2D) created);
 		
 		throw new ClassCastException("Only works for Graphics2D");
 	}
@@ -333,6 +342,34 @@ public class RGraphics extends Graphics2D
 	public void drawImage(Image img, Point2D p, Offset offset)
 	{
 		drawImage(img, p, offset.dx, offset.dy);
+	}
+	
+	public void drawSprite(Sprite sprite, Position pos)
+	{
+		int xOff = sprite.getXOffset(gm.scale);
+		int yOff = sprite.getYOffset(gm.scale);
+		drawImage(sprite.getImage(), pos, xOff, yOff);
+	}
+	
+	public void drawSprite(Sprite sprite, Position pos, int hue)
+	{
+		int xOff = sprite.getXOffset(gm.scale);
+		int yOff = sprite.getYOffset(gm.scale);
+		drawImage(sprite.getImage(hue), pos, xOff, yOff);
+	}
+	
+	public void drawSprite(Sprite sprite, Point2D p)
+	{
+		int xOff = sprite.getXOffset(gm.scale);
+		int yOff = sprite.getYOffset(gm.scale);
+		drawImage(sprite.getImage(), p, xOff, yOff);
+	}
+	
+	public void drawSprite(Sprite sprite, Point2D p, int hue)
+	{
+		int xOff = sprite.getXOffset(gm.scale);
+		int yOff = sprite.getYOffset(gm.scale);
+		drawImage(sprite.getImage(hue), p, xOff, yOff);
 	}
 	
 	public void drawString(String str, Position pos)

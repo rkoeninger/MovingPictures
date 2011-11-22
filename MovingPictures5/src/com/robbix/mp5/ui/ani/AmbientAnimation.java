@@ -5,10 +5,10 @@ import java.awt.geom.Rectangle2D;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ui.DisplayPanel;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 
 public abstract class AmbientAnimation
 {
@@ -38,7 +38,7 @@ public abstract class AmbientAnimation
     /**
      * Graphics object is translated to the bounding rectangle
      */
-    public abstract void paint(RGraphics g);
+    public abstract void paint(DisplayGraphics g);
     
     public abstract void step();
     

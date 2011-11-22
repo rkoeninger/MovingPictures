@@ -6,13 +6,13 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.Region;
 
 public class PlaceUnitOverlay extends InputOverlay
@@ -37,7 +37,7 @@ public class PlaceUnitOverlay extends InputOverlay
 		this.showTubeConnectivity = unit.needsConnection() || unit.isConnectionSource();
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -50,10 +50,10 @@ public class PlaceUnitOverlay extends InputOverlay
 			Position center = unit.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawUnitFootprint(g, unit.getType(), pos);
-			unitSprite.paint(g, pos, hue);
+			g.drawSprite(unitSprite, pos, hue);
 			
 			if (unit.hasTurret())
-				turretSprite.paint(g, pos, hue);
+				g.drawSprite(turretSprite, pos, hue);
 			
 			if (toolTip != null)
 			{

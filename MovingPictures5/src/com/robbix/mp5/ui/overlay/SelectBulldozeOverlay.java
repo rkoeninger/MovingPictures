@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.List;
 
 import com.robbix.mp5.ai.task.BulldozeRegionTask;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.Region;
 
 public class SelectBulldozeOverlay extends InputOverlay
@@ -20,7 +20,7 @@ public class SelectBulldozeOverlay extends InputOverlay
 		this.dozer = dozer;
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		drawSelectedUnitBox(g, dozer);
 		

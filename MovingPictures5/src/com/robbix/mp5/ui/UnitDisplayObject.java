@@ -5,7 +5,6 @@ import java.awt.geom.Rectangle2D;
 
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.Utils;
 
 public class UnitDisplayObject extends DisplayObject
@@ -33,12 +32,12 @@ public class UnitDisplayObject extends DisplayObject
 		);
 	}
 	
-	public void paint(RGraphics g)
+	public void paint(DisplayGraphics g)
 	{
 		drawUnit(g, unit);
 	}
 	
-	private void drawUnit(RGraphics g, Unit unit)
+	private void drawUnit(DisplayGraphics g, Unit unit)
 	{
 		if (!unit.isTurret() && panel.getScale() < panel.getMinimumShowUnitScale())
 		{
@@ -67,8 +66,8 @@ public class UnitDisplayObject extends DisplayObject
 		}
 		else
 		{
-			if (unit.getOwner() != null) sprite.paint(g, point, unit.getOwner().getColorHue());
-                                    else sprite.paint(g, point);
+			int hue = unit.getOwner() != null ? unit.getOwner().getColorHue() : -1;
+			g.drawSprite(sprite, point, hue);
 		}
 		
 		if (unit.hasTurret())
@@ -81,7 +80,7 @@ public class UnitDisplayObject extends DisplayObject
 		}
 	}
 	
-	private void drawStatusLight(RGraphics g, Unit unit)
+	private void drawStatusLight(DisplayGraphics g, Unit unit)
 	{
 		if (!panel.getCurrentPlayer().owns(unit))
 			return;
@@ -90,16 +89,17 @@ public class UnitDisplayObject extends DisplayObject
 		
 		if (unit.isIdle())
 		{
-			panel.getSpriteLibrary().getSprite("aStructureStatus", "idle").paint(g, pos);
+			g.drawSprite(panel.getSpriteLibrary().getSprite("aStructureStatus", "idle"), pos);
 		}
 		else if (unit.isDisabled())
 		{
 			SpriteGroup seq = panel.getSpriteLibrary().getAmbientSpriteGroup("aStructureStatus", "disabled");
-			seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount())).paint(g, pos);
+			int index = Utils.getTimeBasedIndex(100, seq.getSpriteCount());
+			g.drawSprite(seq.getSprite(index), pos);
 		}
 		else if (unit.isStructure())
 		{
-			panel.getSpriteLibrary().getSprite("aStructureStatus", "active").paint(g, pos);
+			g.drawSprite(panel.getSpriteLibrary().getSprite("aStructureStatus", "active"), pos);
 		}
 	}
 }

@@ -10,13 +10,13 @@ import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.DockTask;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitType;
 import com.robbix.utils.JListDialog;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 
 public class CommandUnitOverlay extends InputOverlay
 {
@@ -41,7 +41,7 @@ public class CommandUnitOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		if (unit.getPosition() == null)
 			return;

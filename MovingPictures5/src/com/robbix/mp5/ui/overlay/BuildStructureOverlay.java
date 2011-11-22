@@ -5,11 +5,11 @@ import java.awt.Color;
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.ConVecConstructTask;
 import com.robbix.mp5.map.LayeredMap;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.Region;
 
 public class BuildStructureOverlay extends InputOverlay
@@ -28,7 +28,7 @@ public class BuildStructureOverlay extends InputOverlay
 		this.hue = structure.getOwner().getColorHue();
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -38,7 +38,7 @@ public class BuildStructureOverlay extends InputOverlay
 			Position center = structure.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawUnitFootprint(g, structure.getType(), pos);
-			structSprite.paint(g, pos, hue);
+			g.drawSprite(structSprite, pos, hue);
 			
 			if (toolTip != null)
 			{

@@ -3,9 +3,9 @@ package com.robbix.mp5.ui.overlay;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.MineRouteTask;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 
 public class SelectMineRouteOverlay extends InputOverlay
 {
@@ -23,7 +23,7 @@ public class SelectMineRouteOverlay extends InputOverlay
 		this.trucks = trucks;
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		for (Unit truck : trucks)
 			drawSelectedUnitBox(g, truck);

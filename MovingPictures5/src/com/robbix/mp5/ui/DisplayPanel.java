@@ -38,7 +38,6 @@ import com.robbix.utils.AnimatedCursor;
 import com.robbix.utils.CostMap;
 import com.robbix.utils.GridMetrics;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.RImage;
 import com.robbix.utils.Region;
 import com.robbix.utils.Utils;
@@ -786,7 +785,7 @@ public class DisplayPanel extends JComponent
 	 */
 	public void paintComponent(Graphics g0)
 	{
-		RGraphics g = new RGraphics((Graphics2D) g0);
+		DisplayGraphics g = new DisplayGraphics((Graphics2D) g0);
 		g.setGridMetrics(new GridMetrics(scroll.x, scroll.y, tileSize, scale));
 		drawLetterBox(g);
 		Rectangle rect = getDisplayRect();
@@ -839,7 +838,7 @@ public class DisplayPanel extends JComponent
 	 * Draws the background-colored letterboxes around the
 	 * map display area.
 	 */
-	private void drawLetterBox(RGraphics g)
+	private void drawLetterBox(DisplayGraphics g)
 	{
 		g.setColor(letterBoxColor);
 		int hSpace = getHorizontalLetterBoxSpace();
@@ -862,7 +861,7 @@ public class DisplayPanel extends JComponent
 	 * Draws terrain (surface or cost map) depending on options using
 	 * Graphics g in the visible rect.
 	 */
-	private void drawTerrain(RGraphics g, Rectangle rect)
+	private void drawTerrain(DisplayGraphics g, Rectangle rect)
 	{
 		synchronized (cacheLock)
 		{
@@ -874,7 +873,7 @@ public class DisplayPanel extends JComponent
 			{
 				lastRefreshTime = time;
 				cachedBackground = new RImage(rect.width, rect.height, false);
-				RGraphics cg = new RGraphics((Graphics2D) cachedBackground.getGraphics());
+				DisplayGraphics cg = new DisplayGraphics((Graphics2D) cachedBackground.getGraphics());
 				cg.setGridMetrics(g.getGridMetrics());
 				cg.translate(min(0, -scroll.x), min(0, -scroll.y));
 				
@@ -892,7 +891,7 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Draws the terrain costmap using Graphics g with in given visible Region.
 	 */
-	private void drawCostMap(RGraphics g, Region region)
+	private void drawCostMap(DisplayGraphics g, Region region)
 	{
 		CostMap costMap = map.getTerrainCostMap();
 		g.setFont(costMapFont);
@@ -922,7 +921,7 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Draws the terrain surface image using Graphics g in the visible Region.
 	 */
-	private void drawSurface(RGraphics g, Region region)
+	private void drawSurface(DisplayGraphics g, Region region)
 	{
 		for (Position pos : region)
 		{
@@ -940,11 +939,11 @@ public class DisplayPanel extends JComponent
 			
 			if (map.hasMinePlatform(pos))
 			{
-				sprites.getSprite("aCommonMine", "platform").paint(g, pos);
+				g.drawSprite(sprites.getSprite("aCommonMine", "platform"), pos);
 			}
 			else if (map.hasGeyser(pos))
 			{
-				sprites.getSprite("aGeyser", "geyser").paint(g, pos);
+				g.drawSprite(sprites.getSprite("aGeyser", "geyser"), pos);
 			}
 		}
 	}
@@ -952,7 +951,7 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Draws grid of size tileSize over Region.
 	 */
-	private void drawGrid(RGraphics g, Rectangle rect, Region region)
+	private void drawGrid(DisplayGraphics g, Rectangle rect, Region region)
 	{
 		for (int x = max(1, region.x); x < region.getMaxX(); ++x)
 			g.drawLine(x * tileSize + scroll.x, 0, x * tileSize + scroll.x, getHeight() - 1);
@@ -964,7 +963,7 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Highlights tubes and buildings as active/potentially active or disabled.
 	 */
-	private void drawTubeConnectivity(RGraphics g, Region region)
+	private void drawTubeConnectivity(DisplayGraphics g, Region region)
 	{
 		Color transGreen = InputOverlay.GREEN.getFill();
 		Color transRed = InputOverlay.RED.getFill();
@@ -994,7 +993,7 @@ public class DisplayPanel extends JComponent
 	 * Gets the sprite for the given Unit in its current state and renders it
 	 * along with any overlays - i.e. the UnitLayer state.
 	 */
-	private void drawUnit(RGraphics g, Unit unit)
+	private void drawUnit(DisplayGraphics g, Unit unit)
 	{
 		if (!unit.isTurret() && scale < minShowUnitScale)
 		{
@@ -1022,8 +1021,8 @@ public class DisplayPanel extends JComponent
 		}
 		else
 		{
-			if (unit.getOwner() != null) sprite.paint(g, point, unit.getOwner().getColorHue());
-			                        else sprite.paint(g, point);
+			int hue = unit.getOwner() != null ? unit.getOwner().getColorHue() : -1;
+			g.drawSprite(sprite, point, hue);
 		}
 		
 		if (unit.hasTurret())
@@ -1041,7 +1040,7 @@ public class DisplayPanel extends JComponent
 	 * Green "active" lights are not draw for guard posts.
 	 * Unit must be owned by current viewing player to have status light drawn.
 	 */
-	private void drawStatusLight(RGraphics g, Unit unit)
+	private void drawStatusLight(DisplayGraphics g, Unit unit)
 	{
 		if (!currentPlayer.owns(unit))
 			return;
@@ -1050,16 +1049,17 @@ public class DisplayPanel extends JComponent
 		
 		if (unit.isIdle())
 		{
-			sprites.getSprite("aStructureStatus", "idle").paint(g, pos);
+			g.drawSprite(sprites.getSprite("aStructureStatus", "idle"), pos);
 		}
 		else if (unit.isDisabled())
 		{
 			SpriteGroup seq = sprites.getAmbientSpriteGroup("aStructureStatus", "disabled");
-			seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount())).paint(g, pos);
+			int index = Utils.getTimeBasedIndex(100, seq.getSpriteCount());
+			g.drawSprite(seq.getSprite(index), pos);
 		}
 		else if (unit.isStructure())
 		{
-			sprites.getSprite("aStructureStatus", "active").paint(g, pos);
+			g.drawSprite(sprites.getSprite("aStructureStatus", "active"), pos);
 		}
 	}
 	
@@ -1069,7 +1069,7 @@ public class DisplayPanel extends JComponent
 	/**
 	 * Draws a ResourceDeposit at that deposit's position.
 	 */
-	private void drawResourceDeposit(RGraphics g, ResourceDeposit res)
+	private void drawResourceDeposit(DisplayGraphics g, ResourceDeposit res)
 	{
 		if (scale < -1)
 		{
@@ -1084,7 +1084,7 @@ public class DisplayPanel extends JComponent
 			Sprite sprite = res.isSurveyedBy(currentPlayer)
 				? sprites.getSprite(res)
 				: sprites.getUnknownDepositSprite();
-			sprite.paint(g, res.getPosition());
+			g.drawSprite(sprite, res.getPosition());
 		}
 	}
 	

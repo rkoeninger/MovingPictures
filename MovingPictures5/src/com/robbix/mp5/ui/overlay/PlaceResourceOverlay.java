@@ -4,11 +4,11 @@ import java.awt.Color;
 
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.ColorScheme;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 
 public class PlaceResourceOverlay extends InputOverlay
 {
@@ -21,7 +21,7 @@ public class PlaceResourceOverlay extends InputOverlay
 		this.res = res;
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		if (resSprite == null)
 			resSprite = panel.getSpriteLibrary().getTranslucentDefault(res, 0.5f);
@@ -47,7 +47,7 @@ public class PlaceResourceOverlay extends InputOverlay
 		
 		g.setColor(colors.getFill());
 		g.fillPosition(pos);
-		resSprite.paint(g, pos);
+		g.drawSprite(resSprite, pos);
 		
 		if (toolTip != null)
 		{

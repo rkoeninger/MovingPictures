@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.ui.SpriteLibrary;
@@ -12,7 +13,6 @@ import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Direction;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.Utils;
 
 public class AcidCloudAnimation extends WeaponAnimation
@@ -108,7 +108,7 @@ public class AcidCloudAnimation extends WeaponAnimation
 		frame++;
 	}
 	
-	public void paint(RGraphics g)
+	public void paint(DisplayGraphics g)
 	{
 		SpriteSet rocketSprites = lib.getAmbientSpriteSet("aRocket");
 		SpriteGroup puff1 = rocketSprites.get("smokePuff1");
@@ -140,7 +140,7 @@ public class AcidCloudAnimation extends WeaponAnimation
 				continue;
 			}
 			
-			puffGroup.getFrame(puffFrame).paint(g, puff.point);
+			g.drawSprite(puffGroup.getFrame(puffFrame), puff.point);
 		}
 		
 		if (frame < rocketFrameCount)
@@ -153,7 +153,7 @@ public class AcidCloudAnimation extends WeaponAnimation
 				getFireImpact().getX() + distance * Math.cos(angle) * progress,
 				getFireImpact().getY() + distance * Math.sin(angle) * progress
 			);
-			rocketSprite.paint(g, rocketPoint);
+			g.drawSprite(rocketSprite, rocketPoint);
 		}
 		else if (frame < totalFrameCount)
 		{
@@ -191,7 +191,7 @@ public class AcidCloudAnimation extends WeaponAnimation
 					- cloud2.getFrameCount());
 			}
 			
-			acidSprite.paint(g, targetPos.getCenterPoint());
+			g.drawSprite(acidSprite, targetPos.getCenterPoint());
 		}
 	}
 }

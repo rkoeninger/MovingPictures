@@ -3,9 +3,9 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 
 import com.robbix.mp5.map.LayeredMap;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 
 public class PlaceFixtureOverlay extends InputOverlay
 {
@@ -19,7 +19,7 @@ public class PlaceFixtureOverlay extends InputOverlay
 			
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		if (isCursorOnGrid())
 		{
@@ -29,7 +29,7 @@ public class PlaceFixtureOverlay extends InputOverlay
 			Position pos = getCursorPosition();
 			g.setColor(panel.getMap().canPlaceFixture(fixture, pos) ? GREEN.getFill() : RED.getFill());
 			g.fillPosition(pos);
-			fixtureSprite.paint(g, pos);
+			g.drawSprite(fixtureSprite, pos);
 			
 			if (!panel.getMap().canPlaceFixture(fixture, pos))
 			{

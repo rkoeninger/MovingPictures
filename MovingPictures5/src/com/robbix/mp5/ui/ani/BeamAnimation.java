@@ -3,9 +3,9 @@ package com.robbix.mp5.ui.ani;
 import java.awt.Color;
 import java.awt.Stroke;
 
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.unit.Unit;
-import com.robbix.utils.RGraphics;
 
 public abstract class BeamAnimation extends WeaponAnimation
 {
@@ -22,7 +22,7 @@ public abstract class BeamAnimation extends WeaponAnimation
 		this.damage = damage;
 	}
 	
-	public void paint(RGraphics g)
+	public void paint(DisplayGraphics g)
 	{
 		g.setColor(getColor(frame));
 		Stroke oldStroke = g.getStroke();

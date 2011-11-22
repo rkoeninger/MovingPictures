@@ -7,12 +7,12 @@ import java.util.List;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap.Fixture;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.BorderRegion;
 import com.robbix.utils.LShapedRegion;
 import com.robbix.utils.LinearRegion;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.RIterable;
 
 public class BuildTubeOverlay extends InputOverlay
@@ -26,7 +26,7 @@ public class BuildTubeOverlay extends InputOverlay
 		this.showTubeConnectivity = true;
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		drawSelectedUnitBox(g, crane);
 		

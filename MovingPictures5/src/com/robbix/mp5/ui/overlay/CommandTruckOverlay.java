@@ -10,12 +10,12 @@ import com.robbix.mp5.ai.task.MineTask;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.player.Player;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.JListDialog;
 import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 
 public class CommandTruckOverlay extends InputOverlay
 {
@@ -47,7 +47,7 @@ public class CommandTruckOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		for (Unit truck : trucks)
 			drawSelectedUnitBox(g, truck);

@@ -1,13 +1,10 @@
 package com.robbix.mp5.ui;
 
 import java.awt.Color;
-import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.robbix.utils.Offset;
-import com.robbix.utils.Position;
-import com.robbix.utils.RGraphics;
 import com.robbix.utils.RImage;
 
 public class Sprite
@@ -64,7 +61,7 @@ public class Sprite
 	
 	public RImage getImage(int hue, boolean cache)
 	{
-		if (baseHue == -1 || hue == baseHue)
+		if (baseHue < 0 || hue < 0 || hue == baseHue)
 			return baseImage;
 		
 		RImage img = hueMap.get(hue);
@@ -125,25 +122,5 @@ public class Sprite
 	public Sprite getFadedCopy(double alpha)
 	{
 		return new Sprite(baseImage.getFadedCopy(alpha), baseHue, offset);
-	}
-	
-	public void paint(RGraphics g, Position pos)
-	{
-		g.drawImage(baseImage, pos, offset);
-	}
-	
-	public void paint(RGraphics g, Position pos, int hue)
-	{
-		g.drawImage(getImage(hue), pos, offset);
-	}
-	
-	public void paint(RGraphics g, Point2D absPoint)
-	{
-		g.drawImage(baseImage, absPoint, offset);
-	}
-	
-	public void paint(RGraphics g, Point2D absPoint, int hue)
-	{
-		g.drawImage(getImage(hue), absPoint, offset);
 	}
 }

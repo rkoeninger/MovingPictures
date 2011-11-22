@@ -6,10 +6,10 @@ import java.util.Set;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.player.Player;
+import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.JListDialog;
-import com.robbix.utils.RGraphics;
 
 public class CommandGroupOverlay extends InputOverlay
 {
@@ -36,7 +36,7 @@ public class CommandGroupOverlay extends InputOverlay
 		panel.showStatus((Unit)null);
 	}
 	
-	public void paintImpl(RGraphics g)
+	public void paintImpl(DisplayGraphics g)
 	{
 		for (Unit unit : units)
 			drawSelectedUnitBox(g, unit);
