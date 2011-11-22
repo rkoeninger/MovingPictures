@@ -141,7 +141,7 @@ public class RailGunAnimation extends WeaponAnimation
 					- ring2.getFrameCount());
 			}
 			
-			panel.draw(g, ringSprite, ring.point);
+			ringSprite.paint(g, ring.point);
 		}
 		
 		if (!explosionTime)
@@ -154,7 +154,7 @@ public class RailGunAnimation extends WeaponAnimation
 				getFireImpact().getX() + distance * Math.cos(angle) * progress,
 				getFireImpact().getY() + distance * Math.sin(angle) * progress
 			);
-			panel.draw(g, rocketSprite, rocketPoint);
+			rocketSprite.paint(g, rocketPoint);
 		}
 	}
 }

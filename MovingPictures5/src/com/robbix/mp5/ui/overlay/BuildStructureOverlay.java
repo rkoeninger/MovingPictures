@@ -38,7 +38,7 @@ public class BuildStructureOverlay extends InputOverlay
 			Position center = structure.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawUnitFootprint(g, structure.getType(), pos);
-			panel.draw(g, structSprite, hue, pos);
+			structSprite.paint(g, pos, hue);
 			
 			if (toolTip != null)
 			{

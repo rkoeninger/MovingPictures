@@ -1,7 +1,6 @@
 package com.robbix.mp5.ui.ani;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Stroke;
 
 import com.robbix.mp5.ui.SpriteLibrary;
@@ -25,12 +24,11 @@ public abstract class BeamAnimation extends WeaponAnimation
 	
 	public void paint(RGraphics g)
 	{
-		Graphics2D g2d = (Graphics2D) g;
 		g.setColor(getColor(frame));
-		Stroke oldStroke = g2d.getStroke();
-		g2d.setStroke(getStroke(frame, panel.getScale()));
-		panel.draw(g, getTrackedFireOrigin(), getTrackedFireImpact());
-		g2d.setStroke(oldStroke);
+		Stroke oldStroke = g.getStroke();
+		g.setStroke(getStroke(frame, panel.getScale()));
+		g.drawLine(getTrackedFireOrigin(), getTrackedFireImpact());
+		g.setStroke(oldStroke);
 	}
 	
 	public abstract Stroke getStroke(int frame, int scale);

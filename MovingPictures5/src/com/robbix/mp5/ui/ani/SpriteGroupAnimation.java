@@ -58,7 +58,8 @@ public class SpriteGroupAnimation extends AmbientAnimation
 	
 	public void paint(RGraphics g)
 	{
-		panel.draw(g, sprites.getFrame(frame), point, player);
+		if (player != null) sprites.getFrame(frame).paint(g, point, player.getColorHue());
+		               else sprites.getFrame(frame).paint(g, point);
 	}
 	
 	public boolean isDone()

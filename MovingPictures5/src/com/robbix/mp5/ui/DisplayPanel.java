@@ -79,8 +79,9 @@ public class DisplayPanel extends JComponent
 	private LinkedList<InputOverlay> overlays;
 	private InputOverlay.ListenerAdapter adapter;
 	
-	private List<AmbientAnimation> animations =
-		new LinkedList<AmbientAnimation>();
+	private List<AmbientAnimation> animations = new LinkedList<AmbientAnimation>();
+	
+	private List<DisplayObject> displayObjects = new LinkedList<DisplayObject>();
 	
 	private DisplayPanelView view;
 	
@@ -201,6 +202,16 @@ public class DisplayPanel extends JComponent
 			
 			cursor.show(this);
 		}
+	}
+	
+	public Player getCurrentPlayer()
+	{
+		return currentPlayer;
+	}
+	
+	public Point2D getShadowOffset()
+	{
+		return new Point2D.Double(shadowXOffset, shadowYOffset);
 	}
 	
 	public void setShowGrid(boolean showGrid)
@@ -747,6 +758,16 @@ public class DisplayPanel extends JComponent
 		);
 	}
 	
+	public Rectangle2D getGridDisplayRect()
+	{
+		return new Rectangle2D.Double(
+			max(0, scroll.x) / (double) tileSize,
+			max(0, scroll.y) / (double) tileSize,
+			min(getTotalWidth(),  getWidth())  / (double) tileSize,
+			min(getTotalHeight(), getHeight()) / (double) tileSize
+		);
+	}
+	
 	/**
 	 * Gets the region of positions currently visible on this display.
 	 */
@@ -794,6 +815,10 @@ public class DisplayPanel extends JComponent
 		for (Unit unit : map.getUnitIterator(true))
 			if (region.intersects(unit.getOccupiedBounds()))
 				drawUnit(g, unit);
+		
+		for (DisplayObject dObj : displayObjects)
+			if (absRect.intersects(dObj.getBounds()))
+				dObj.paint(g);
 		
 		synchronized (animations)
 		{
@@ -915,11 +940,11 @@ public class DisplayPanel extends JComponent
 			
 			if (map.hasMinePlatform(pos))
 			{
-				draw(g, sprites.getSprite("aCommonMine", "platform"), pos);
+				sprites.getSprite("aCommonMine", "platform").paint(g, pos);
 			}
 			else if (map.hasGeyser(pos))
 			{
-				draw(g, sprites.getSprite("aGeyser", "geyser"), pos);
+				sprites.getSprite("aGeyser", "geyser").paint(g, pos);
 			}
 		}
 	}
@@ -997,7 +1022,8 @@ public class DisplayPanel extends JComponent
 		}
 		else
 		{
-			draw(g, sprite, point, unit.getOwner());
+			if (unit.getOwner() != null) sprite.paint(g, point, unit.getOwner().getColorHue());
+			                        else sprite.paint(g, point);
 		}
 		
 		if (unit.hasTurret())
@@ -1024,16 +1050,16 @@ public class DisplayPanel extends JComponent
 		
 		if (unit.isIdle())
 		{
-			draw(g, sprites.getSprite("aStructureStatus", "idle"), pos);
+			sprites.getSprite("aStructureStatus", "idle").paint(g, pos);
 		}
 		else if (unit.isDisabled())
 		{
 			SpriteGroup seq = sprites.getAmbientSpriteGroup("aStructureStatus", "disabled");
-			draw(g, seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount())), pos);
+			seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount())).paint(g, pos);
 		}
 		else if (unit.isStructure())
 		{
-			draw(g, sprites.getSprite("aStructureStatus", "active"), pos);
+			sprites.getSprite("aStructureStatus", "active").paint(g, pos);
 		}
 	}
 	
@@ -1058,7 +1084,7 @@ public class DisplayPanel extends JComponent
 			Sprite sprite = res.isSurveyedBy(currentPlayer)
 				? sprites.getSprite(res)
 				: sprites.getUnknownDepositSprite();
-			draw(g, sprite, res.getPosition());
+			sprite.paint(g, res.getPosition());
 		}
 	}
 	
@@ -1066,93 +1092,11 @@ public class DisplayPanel extends JComponent
 	 * Draw helpers. Helpers account for tileSize and scrollPoint.
 	 */
 	
-	public void draw(Graphics g, Sprite sprite, Position pos)
-	{
-		Image img = sprite.getImage();
-		int x = pos.x * tileSize + scroll.x + sprite.getXOffset(scale);
-		int y = pos.y * tileSize + scroll.y + sprite.getYOffset(scale);
-		int w = img.getWidth(null);
-		int h = img.getHeight(null);
-		int w2 = scale < 0 ? w >> -scale : w << scale;
-		int h2 = scale < 0 ? h >> -scale : h << scale;
-		g.drawImage(
-			img,
-			x, y, x + w2, y + h2,
-			0, 0, w, h,
-			null
-		);
-	}
-	
-	public void draw(Graphics g, Sprite sprite, int hue, Position pos)
-	{
-		Image img = sprite.getImage(hue);
-		int x = pos.x * tileSize + scroll.x + sprite.getXOffset(scale);
-		int y = pos.y * tileSize + scroll.y + sprite.getYOffset(scale);
-		int w = img.getWidth(null);
-		int h = img.getHeight(null);
-		int w2 = scale < 0 ? w >> -scale : w << scale;
-		int h2 = scale < 0 ? h >> -scale : h << scale;
-		g.drawImage(
-			img,
-			x, y, x + w2, y + h2,
-			0, 0, w, h,
-			null
-		);
-	}
-	
-	public void draw(Graphics g, Sprite sprite, Point2D absPoint, Player owner)
-	{
-		Image img = owner == null ? sprite.getImage() : sprite.getImage(owner.getColorHue());
-		int x = (int) (absPoint.getX() * tileSize) + scroll.x + sprite.getXOffset(scale);
-		int y = (int) (absPoint.getY() * tileSize) + scroll.y + sprite.getYOffset(scale);
-		int w = img.getWidth(null);
-		int h = img.getHeight(null);
-		int w2 = scale < 0 ? w >> -scale : w << scale;
-		int h2 = scale < 0 ? h >> -scale : h << scale;
-		g.drawImage(
-			img,
-			x, y, x + w2, y + h2,
-			0, 0, w, h,
-			null
-		);
-	}
-	
 	private void drawShadow(Graphics g, Sprite sprite, Point2D absPoint)
 	{
 		Image img = sprite.getShadow();
 		int x = (int) (absPoint.getX() * tileSize) + scroll.x + sprite.getXOffset(scale);
 		int y = (int) (absPoint.getY() * tileSize) + scroll.y + sprite.getYOffset(scale);
-		int w = img.getWidth(null);
-		int h = img.getHeight(null);
-		int w2 = scale < 0 ? w >> -scale : w << scale;
-		int h2 = scale < 0 ? h >> -scale : h << scale;
-		g.drawImage(
-			img,
-			x, y, x + w2, y + h2,
-			0, 0, w, h,
-			null
-		);
-	}
-	
-	public void draw(Graphics g, Sprite sprite, Point2D absPoint)
-	{
-		draw(g, sprite, absPoint, null);
-	}
-	
-	public void draw(Graphics g, Point2D a, Point2D b)
-	{
-		g.drawLine(
-			(int) (a.getX() * tileSize + scroll.x),
-			(int) (a.getY() * tileSize + scroll.y),
-			(int) (b.getX() * tileSize + scroll.x),
-			(int) (b.getY() * tileSize + scroll.y)
-		);
-	}
-	
-	public void draw(Graphics g, Image img, Position pos)
-	{
-		int x = pos.x * tileSize + scroll.x;
-		int y = pos.y * tileSize + scroll.y;
 		int w = img.getWidth(null);
 		int h = img.getHeight(null);
 		int w2 = scale < 0 ? w >> -scale : w << scale;

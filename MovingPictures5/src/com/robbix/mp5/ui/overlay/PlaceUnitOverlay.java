@@ -50,10 +50,10 @@ public class PlaceUnitOverlay extends InputOverlay
 			Position center = unit.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawUnitFootprint(g, unit.getType(), pos);
-			panel.draw(g, unitSprite, hue, pos);
+			unitSprite.paint(g, pos, hue);
 			
 			if (unit.hasTurret())
-				panel.draw(g, turretSprite, hue, pos);
+				turretSprite.paint(g, pos, hue);
 			
 			if (toolTip != null)
 			{

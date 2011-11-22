@@ -58,23 +58,20 @@ public class MeteorAnimation extends AmbientAnimation
 			double progress = (frameCount - frame) / (double)(frameCount);
 			double x = point.getX() + distance *  Math.cos(angle) * progress;
 			double y = point.getY() + distance * -Math.sin(angle) * progress;
-			
-			panel.draw(g, forming.getFrame(frame), new Point2D.Double(x, y));
+			forming.getFrame(frame).paint(g, new Point2D.Double(x, y));
 		}
 		else if (frame > frameCount - 9)
 		{
 			int spriteFrame = impact.getFrameCount() - (frameCount - frame + 1);
-			panel.draw(g, impact.getFrame(spriteFrame), point);
+			impact.getFrame(spriteFrame).paint(g, point);
 		}
 		else
 		{
 			Sprite sprite = flying.getFrame(frame % flying.getFrameCount());
-			
 			double progress = (frameCount - frame) / (double)(frameCount);
 			double x = point.getX() + distance *  Math.cos(angle) * progress;
 			double y = point.getY() + distance * -Math.sin(angle) * progress;
-			
-			panel.draw(g, sprite, new Point2D.Double(x, y));
+			sprite.paint(g, new Point2D.Double(x, y));
 		}
 	}
 	

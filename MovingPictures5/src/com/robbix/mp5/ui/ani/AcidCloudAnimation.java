@@ -140,7 +140,7 @@ public class AcidCloudAnimation extends WeaponAnimation
 				continue;
 			}
 			
-			panel.draw(g, puffGroup.getFrame(puffFrame), puff.point);
+			puffGroup.getFrame(puffFrame).paint(g, puff.point);
 		}
 		
 		if (frame < rocketFrameCount)
@@ -153,7 +153,7 @@ public class AcidCloudAnimation extends WeaponAnimation
 				getFireImpact().getX() + distance * Math.cos(angle) * progress,
 				getFireImpact().getY() + distance * Math.sin(angle) * progress
 			);
-			panel.draw(g, rocketSprite, rocketPoint);
+			rocketSprite.paint(g, rocketPoint);
 		}
 		else if (frame < totalFrameCount)
 		{
@@ -191,7 +191,7 @@ public class AcidCloudAnimation extends WeaponAnimation
 					- cloud2.getFrameCount());
 			}
 			
-			panel.draw(g, acidSprite, targetPos.getCenterPoint());
+			acidSprite.paint(g, targetPos.getCenterPoint());
 		}
 	}
 }

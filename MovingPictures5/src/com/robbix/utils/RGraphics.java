@@ -23,6 +23,7 @@ import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -252,6 +253,36 @@ public class RGraphics extends Graphics2D
 		if (neighbors.has(W)) drawEdge(pos, W);
 	}
 	
+	public void drawLine(Point2D a, Point2D b)
+	{
+		g.drawLine(
+			(int) (a.getX() * gm.tileSize) + gm.xOffset,
+			(int) (a.getY() * gm.tileSize) + gm.yOffset,
+			(int) (b.getX() * gm.tileSize) + gm.xOffset,
+			(int) (b.getY() * gm.tileSize) + gm.yOffset
+		);
+	}
+	
+	public void drawRect(Rectangle2D rect)
+	{
+		g.drawRect(
+			(int) (rect.getX() * gm.tileSize) + gm.xOffset,
+			(int) (rect.getY() * gm.tileSize) + gm.yOffset,
+			(int) (rect.getWidth()  * gm.tileSize),
+			(int) (rect.getHeight() * gm.tileSize)
+		);
+	}
+	
+	public void fillRect(Rectangle2D rect)
+	{
+		g.fillRect(
+			(int) (rect.getX() * gm.tileSize) + gm.xOffset,
+			(int) (rect.getY() * gm.tileSize) + gm.yOffset,
+			(int) (rect.getWidth()  * gm.tileSize),
+			(int) (rect.getHeight() * gm.tileSize)
+		);
+	}
+	
 	public void drawImage(Image img, Position pos, int xOffset, int yOffset)
 	{
 		int x = pos.x * gm.tileSize + gm.xOffset + xOffset;
@@ -276,6 +307,32 @@ public class RGraphics extends Graphics2D
 	public void drawImage(Image img, Position pos, Offset offset)
 	{
 		drawImage(img, pos, offset.dx, offset.dy);
+	}
+	
+	public void drawImage(Image img, Point2D p, int xOffset, int yOffset)
+	{
+		int x = (int) (p.getX() * gm.tileSize) + gm.xOffset + xOffset;
+		int y = (int) (p.getY() * gm.tileSize) + gm.yOffset + yOffset; 
+		int w = img.getWidth(null);
+		int h = img.getHeight(null);
+		int w2 = gm.scale < 0 ? w >> -gm.scale : w << gm.scale;
+		int h2 = gm.scale < 0 ? h >> -gm.scale : h << gm.scale;
+		g.drawImage(
+			img,
+			x, y, x + w2, y + h2,
+			0, 0, w, h,
+			null
+		);
+	}
+	
+	public void drawImage(Image img, Point2D p)
+	{
+		drawImage(img, p, 0, 0);
+	}
+	
+	public void drawImage(Image img, Point2D p, Offset offset)
+	{
+		drawImage(img, p, offset.dx, offset.dy);
 	}
 	
 	public void drawString(String str, Position pos)
