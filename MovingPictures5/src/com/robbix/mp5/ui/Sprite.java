@@ -12,47 +12,47 @@ public class Sprite
 {
 	private static final Color SHADOW = new Color(0, 0, 0, 127);
 	private Offset offset;
-	private int baseHue;
+	private RColor baseColor;
 	private RImage baseImage;
 	private RImage shadow;
-	private Map<Integer, RImage> hueMap;
+	private Map<RColor, RImage> colorMap;
 	
-	public Sprite(RImage image, int baseHue, Offset offset)
+	public Sprite(RImage image, Color baseColor, Offset offset)
 	{
 		this.baseImage = image;
-		this.baseHue = baseHue;
+		this.baseColor = RColor.fromColor(baseColor);
 		this.offset = offset;
 		
-		if (baseHue >= 0 && baseHue < 360)
+		if (this.baseColor != null)
 		{
-			this.hueMap = new HashMap<Integer, RImage>();
-			hueMap.put(baseHue, image);
+			this.colorMap = new HashMap<RColor, RImage>();
+			colorMap.put(this.baseColor, image);
 		}
 	}
 	
 	public Sprite(RImage image)
 	{
-		this(image, -1, new Offset());
+		this(image, null, new Offset());
 	}
 	
 	public Sprite(RImage image, int xOff, int yOff)
 	{
-		this(image, -1, new Offset(xOff, yOff));
+		this(image, null, new Offset(xOff, yOff));
 	}
 	
-	public Sprite(RImage image, int baseHue, int xOff, int yOff)
+	public Sprite(RImage image, Color baseColor, int xOff, int yOff)
 	{
-		this(image, baseHue, new Offset(xOff, yOff));
+		this(image, baseColor, new Offset(xOff, yOff));
 	}
 	
 	public Sprite(RImage image, Offset offset)
 	{
-		this(image, -1, offset);
+		this(image, null, offset);
 	}
 	
-	public int getBaseTeamHue()
+	public RColor getBaseColor()
 	{
-		return baseHue;
+		return baseColor;
 	}
 	
 	public RImage getImage()
@@ -60,32 +60,28 @@ public class Sprite
 		return baseImage;
 	}
 	
-	public RImage getImage(int hue, boolean cache)
+	public RImage getImage(Color color, boolean cache)
 	{
-		if (baseHue < 0 || hue < 0 || hue == baseHue)
+		if (baseColor == null || color == null || baseColor.equals(color))
 			return baseImage;
 		
-		RImage img = hueMap.get(hue);
+		RColor rColor = RColor.fromColor(color);
+		RImage img = colorMap.get(rColor);
 		
 		if (img == null)
 		{
-			img = baseImage.getRecoloredCopy(baseHue, hue);
+			img = baseImage.getRecoloredCopy(baseColor, color);
 			
 			if (cache)
-				hueMap.put(hue, img);
+				colorMap.put(rColor, img);
 		}
 		
 		return img;
 	}
 	
-	public RImage getImage(int hue)
+	public RImage getImage(RColor color)
 	{
-		return getImage(hue, true);
-	}
-	
-	public RImage getImage(Color reColor)
-	{
-		return baseImage.getRecoloredCopy(RColor.getHue(baseHue), reColor);
+		return getImage(color, true);
 	}
 	
 	public Offset getOffset()
@@ -126,6 +122,6 @@ public class Sprite
 	
 	public Sprite getFadedCopy(double alpha)
 	{
-		return new Sprite(baseImage.getFadedCopy(alpha), baseHue, offset);
+		return new Sprite(baseImage.getFadedCopy(alpha), baseColor, offset);
 	}
 }

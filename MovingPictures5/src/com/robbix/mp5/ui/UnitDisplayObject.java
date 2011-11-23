@@ -5,6 +5,7 @@ import java.awt.geom.Rectangle2D;
 
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
+import com.robbix.utils.RColor;
 import com.robbix.utils.Utils;
 
 public class UnitDisplayObject extends DisplayObject
@@ -66,8 +67,8 @@ public class UnitDisplayObject extends DisplayObject
 		}
 		else
 		{
-			int hue = unit.getOwner() != null ? unit.getOwner().getColorHue() : -1;
-			g.draw(sprite, point, hue);
+			RColor color = unit.getOwner() != null ? unit.getOwner().getColor() : null;
+			g.draw(sprite, point, color);
 		}
 		
 		if (unit.hasTurret())

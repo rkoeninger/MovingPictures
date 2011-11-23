@@ -13,6 +13,7 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.utils.Position;
+import com.robbix.utils.RColor;
 import com.robbix.utils.Utils;
 
 public class MineRouteDemo extends Demo
@@ -36,7 +37,7 @@ public class MineRouteDemo extends Demo
 				"dockOpen"
 			},
 			new Player[]{
-				new Player(1, "Mining Operation", 200)
+				new Player(1, "Mining Operation", RColor.getHue(200))
 			},
 			1
 		);

@@ -86,6 +86,7 @@ import com.robbix.mp5.unit.UnitType;
 import com.robbix.utils.AnimatedButton;
 import com.robbix.utils.JListDialog;
 import com.robbix.utils.JSliderMenuItem;
+import com.robbix.utils.RColor;
 import com.robbix.utils.RImage;
 import com.robbix.utils.RMenuItem;
 import com.robbix.utils.RRadioButtonMenuItem;
@@ -487,9 +488,9 @@ public class Sandbox extends JApplet
 		statusesPanel.add(playerStatusLabel);
 		
 		RImage img = RImage.read(new File(resDir, "art/edenLogo.png"));
-		edenIconSprite = new Sprite(img, 240, 0, 0);
+		edenIconSprite = new Sprite(img, RColor.getHue(240), 0, 0);
 		img = RImage.read(new File(resDir, "art/plymouthLogo.png"));
-		plymouthIconSprite = new Sprite(img, 240, 0, 0);
+		plymouthIconSprite = new Sprite(img, RColor.getHue(240), 0, 0);
 		img = RImage.read(new File(resDir, "art/neutralLogo.png"));
 		neutralIcon = new ImageIcon(img);
 		
@@ -950,7 +951,7 @@ public class Sandbox extends JApplet
 						break;
 				}
 				
-				Player newPlayer = new Player(game.getPlayers().size(), name, colorHue);
+				Player newPlayer = new Player(game.getPlayers().size(), name, RColor.getHue(colorHue));
 				game.addPlayer(newPlayer);
 				selectPlayer(newPlayer.getID());
 			}
@@ -1164,7 +1165,7 @@ public class Sandbox extends JApplet
 		{
 			String civ = unit.getType().getCiv();
 			Sprite sprite = "Eden".equals(civ) ? edenIconSprite : plymouthIconSprite;
-			label = new JLabel(new ImageIcon(sprite.getImage(unit.getOwner().getColorHue())));
+			label = new JLabel(new ImageIcon(sprite.getImage(unit.getOwner().getColor())));
 		}
 		
 		label.setBorder(new EmptyBorder(4, 4, 0, 4));

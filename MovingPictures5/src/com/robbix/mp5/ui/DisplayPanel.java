@@ -1023,8 +1023,8 @@ public class DisplayPanel extends JComponent
 		}
 		else
 		{
-			int hue = unit.getOwner() != null ? unit.getOwner().getColorHue() : -1;
-			g.draw(sprite, point, hue);
+			RColor color = unit.getOwner() != null ? unit.getOwner().getColor() : null;
+			g.draw(sprite, point, color);
 		}
 		
 		if (unit.hasTurret())

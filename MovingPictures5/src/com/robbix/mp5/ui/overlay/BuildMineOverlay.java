@@ -6,14 +6,16 @@ import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.BuildMineTask;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
+import com.robbix.utils.RColor;
 import com.robbix.utils.Region;
 
 public class BuildMineOverlay extends InputOverlay
 {
 	private Sprite mineSprite;
-	private int hue;
+	private RColor color;
 	
 	private Unit miner;
 	private Unit mine;
@@ -22,20 +24,20 @@ public class BuildMineOverlay extends InputOverlay
 	{
 		this.miner = miner;
 		this.mine = mine;
-		this.hue = mine.getOwner().getColorHue();
+		this.color = mine.getOwner().getColor();
 	}
 	
 	public void paintImpl(DisplayGraphics g)
 	{
 		if (isCursorOnGrid())
 		{
-			if (mineSprite == null)
+			if (mineSprite == null || mineSprite == SpriteSet.BLANK_SPRITE)
 				mineSprite = panel.getSpriteLibrary().getTranslucentDefault(mine, 0.5f);
 			
 			Position center = mine.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawUnitFootprint(g, mine.getType(), pos);
-			g.draw(mineSprite, pos, hue);
+			g.draw(mineSprite, pos, color);
 			
 			if (toolTip != null)
 			{

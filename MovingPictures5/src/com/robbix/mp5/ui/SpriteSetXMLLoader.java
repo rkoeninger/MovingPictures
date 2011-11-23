@@ -16,6 +16,7 @@ import com.robbix.utils.AutoArrayList;
 import com.robbix.utils.Direction;
 import com.robbix.utils.FileFormatException;
 import com.robbix.utils.Offset;
+import com.robbix.utils.RColor;
 import com.robbix.utils.RImage;
 import com.robbix.utils.RNode;
 
@@ -71,8 +72,7 @@ class SpriteSetXMLLoader
 	public SpriteSet loadVehicle(File dir, RNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
-		Color color = rootNode.getColorAttribute("color");
-		int playerColorHue = getHueInt(color);
+		RColor color = RColor.fromColor(rootNode.getColorAttribute("color"));
 		
 		SpriteSet spriteSet = unitType.contains("Truck")
 			? SpriteSet.forTrucks(unitType)
@@ -115,7 +115,7 @@ class SpriteSetXMLLoader
 					for (int i = 0; i < frameCount; ++i)
 					{
 						RImage img = loadFrame(activityDir, fileNumber++);
-						Sprite sprite = new Sprite(img, playerColorHue, dirOffset);
+						Sprite sprite = new Sprite(img, color, dirOffset);
 						tempList.add(sprite);
 					}
 					
@@ -148,7 +148,7 @@ class SpriteSetXMLLoader
 					for (int i = 0; i < perTurnFrameCount; ++i)
 					{
 						RImage img = loadFrame(activityDir, fileNumber++);
-						Sprite sprite = new Sprite(img, playerColorHue, dirOffset);
+						Sprite sprite = new Sprite(img, color, dirOffset);
 						tempList.add(sprite);
 					}
 					
@@ -186,7 +186,7 @@ class SpriteSetXMLLoader
 						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
-					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
+					Sprite sprite = new Sprite(img, color, frameOffset);
 					tempList.add(sprite);
 				}
 				
@@ -223,7 +223,7 @@ class SpriteSetXMLLoader
 							frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 						}
 						
-						Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
+						Sprite sprite = new Sprite(img, color, frameOffset);
 						tempList.add(sprite);
 					}
 					
@@ -247,7 +247,7 @@ class SpriteSetXMLLoader
 						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
-					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
+					Sprite sprite = new Sprite(img, color, frameOffset);
 					tempList.add(sprite);
 				}
 				
@@ -265,8 +265,7 @@ class SpriteSetXMLLoader
 	public SpriteSet loadStructure(File dir, RNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
-		Color color = rootNode.getColorAttribute("color");
-		int playerColorHue = getHueInt(color);
+		RColor color = RColor.fromColor(rootNode.getColorAttribute("color"));
 		
 		SpriteSet spriteSet = SpriteSet.forStructures(unitType);
 		
@@ -292,7 +291,7 @@ class SpriteSetXMLLoader
 					Offset healthOffset = healthNode.getOffsetAttributes();
 					healthOffset = healthOffset.add(activityOffset);
 					RImage img = loadFrame(activityDir, fileNumber);
-					Sprite sprite = new Sprite(img, playerColorHue, healthOffset);
+					Sprite sprite = new Sprite(img, color, healthOffset);
 					tempList.set(hb.ordinal(), sprite);
 				}
 				
@@ -317,7 +316,7 @@ class SpriteSetXMLLoader
 						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
-					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
+					Sprite sprite = new Sprite(img, color, frameOffset);
 					tempList.add(sprite);
 				}
 				
@@ -342,7 +341,7 @@ class SpriteSetXMLLoader
 						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
-					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
+					Sprite sprite = new Sprite(img, color, frameOffset);
 					tempList.add(sprite);
 				}
 				
@@ -360,8 +359,7 @@ class SpriteSetXMLLoader
 	public SpriteSet loadTurret(File dir, RNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
-		Color color = rootNode.getColorAttribute("color");
-		int playerColorHue = getHueInt(color);
+		RColor color = RColor.fromColor(rootNode.getColorAttribute("color"));
 		
 		SpriteSet spriteSet = SpriteSet.forTurrets(unitType);
 		
@@ -400,7 +398,7 @@ class SpriteSetXMLLoader
 				);
 			}
 			RImage img = loadFrame(activityDir, fileNumber++);
-			Sprite sprite = new TurretSprite(img, playerColorHue, dirOffset, hotspot);
+			Sprite sprite = new TurretSprite(img, color, dirOffset, hotspot);
 			tempList.set(direction.ordinal(), sprite);
 		}
 		
@@ -415,8 +413,7 @@ class SpriteSetXMLLoader
 	public SpriteSet loadGuardPost(File dir, RNode rootNode) throws IOException
 	{
 		String unitType = rootNode.getAttribute("unitType");
-		Color color = rootNode.getColorAttribute("color");
-		int playerColorHue = getHueInt(color);
+		RColor color = RColor.fromColor(rootNode.getColorAttribute("color"));
 		
 		SpriteSet spriteSet = SpriteSet.forGuardPosts(unitType);
 		
@@ -453,7 +450,7 @@ class SpriteSetXMLLoader
 						);
 					}
 					RImage img = loadFrame(activityDir, fileNumber++);
-					Sprite sprite = new TurretSprite(img, playerColorHue, dirOffset, hotspot);
+					Sprite sprite = new TurretSprite(img, color, dirOffset, hotspot);
 					tempList.set(direction.ordinal(), sprite);
 				}
 				
@@ -478,7 +475,7 @@ class SpriteSetXMLLoader
 						frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 					}
 					
-					Sprite sprite = new Sprite(img, playerColorHue, frameOffset);
+					Sprite sprite = new Sprite(img, color, frameOffset);
 					tempList.add(sprite);
 				}
 				
@@ -525,7 +522,7 @@ class SpriteSetXMLLoader
 					frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 				}
 				
-				Sprite sprite = new Sprite(img, -1, frameOffset);
+				Sprite sprite = new Sprite(img, null, frameOffset);
 				tempList.add(sprite);
 			}
 			
@@ -621,12 +618,5 @@ class SpriteSetXMLLoader
 		
 		for (int i = 0; i < size; ++i)
 			list.add(null);
-	}
-	
-	private static int getHueInt(Color color)
-	{
-		float[] hsb = new float[4];
-		Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
-		return (int) (hsb[0] * 360);
 	}
 }

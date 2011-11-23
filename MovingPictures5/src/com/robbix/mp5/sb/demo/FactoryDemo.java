@@ -11,6 +11,7 @@ import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.utils.Position;
+import com.robbix.utils.RColor;
 
 public class FactoryDemo extends Demo
 {
@@ -31,7 +32,7 @@ public class FactoryDemo extends Demo
 				"structureBuild"
 			},
 			new Player[]{
-				new Player(1, "Factories", 275)
+				new Player(1, "Factories", RColor.getHue(275))
 			},
 			1
 		);

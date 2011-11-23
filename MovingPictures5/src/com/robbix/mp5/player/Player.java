@@ -1,29 +1,27 @@
 package com.robbix.mp5.player;
 
-import java.awt.Color;
 import java.util.EnumMap;
 import java.util.Map;
 
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.unit.Cost;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.utils.RColor;
 
 public class Player
 {
 	private String name;
 	private int id;
-	private int colorHue;
-	private Color color;
+	private RColor color;
 	
 	private Map<ResourceType, Integer> resources;
 	private Population population;
 	
-	public Player(int id, String name, int colorHue)
+	public Player(int id, String name, RColor color)
 	{
 		this.id = id;
 		this.name = name;
-		this.colorHue = colorHue;
-		this.color = new Color(Color.HSBtoRGB(colorHue / 360.0f, 1.0f, 1.0f));
+		this.color = color;
 		this.resources = new EnumMap<ResourceType, Integer>(ResourceType.class);
 	}
 	
@@ -37,12 +35,7 @@ public class Player
 		return id;
 	}
 	
-	public int getColorHue()
-	{
-		return colorHue;
-	}
-	
-	public Color getColor()
+	public RColor getColor()
 	{
 		return color;
 	}

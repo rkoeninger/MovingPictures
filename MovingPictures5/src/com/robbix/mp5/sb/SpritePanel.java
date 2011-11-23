@@ -15,6 +15,7 @@ import javax.swing.Timer;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.unit.HealthBracket;
+import com.robbix.utils.RColor;
 
 public class SpritePanel extends JComponent
 {
@@ -27,7 +28,7 @@ public class SpritePanel extends JComponent
 	
 	private Timer timer;
 	private int frame = 0;
-	private int hue = 240;
+	private RColor color = RColor.getHue(240);
 	private int tileSize = 32;
 	private int fpw;
 	private int fph;
@@ -186,7 +187,7 @@ public class SpritePanel extends JComponent
 		boolean centered = fpw == 0 && fph == 0;
 		int w = centered ? 0 : fpw * tileSize;
 		int h = centered ? 0 : fph * tileSize;
-		Image img = sprite.getImage(hue, false);
+		Image img = sprite.getImage(color, false);
 		int x = (getWidth()  - w) / 2 + sprite.getXOffset();
 		int y = (getHeight() - h) / 2 + sprite.getYOffset();
 		g.drawImage(img, x, y, null);
@@ -230,14 +231,14 @@ public class SpritePanel extends JComponent
 		return timer.getDelay();
 	}
 	
-	public void setHue(int hue)
+	public void setTeamColor(RColor color)
 	{
-		this.hue = hue;
+		this.color = color;
 	}
 	
-	public int getHue()
+	public RColor getTeamColor()
 	{
-		return hue;
+		return color;
 	}
 	
 	public void setGridVisible(boolean grid)

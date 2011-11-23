@@ -4,6 +4,7 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.utils.Position;
+import com.robbix.utils.RColor;
 
 public class MeteorDemo extends Demo
 {
@@ -26,7 +27,7 @@ public class MeteorDemo extends Demo
 				"meteor"
 			},
 			new Player[]{
-				new Player(1, "Targets", 45)
+				new Player(1, "Targets", RColor.getHue(45))
 			},
 			1
 		);

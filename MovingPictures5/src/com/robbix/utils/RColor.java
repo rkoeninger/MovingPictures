@@ -13,6 +13,14 @@ public class RColor extends Color
 	public static final RColor BLACK = new RColor(0, 0, 0, 255);
 	public static final RColor WHITE = new RColor(255, 255, 255, 255);
 	
+	public static RColor fromColor(Color color)
+	{
+		if (color == null)
+			return null;
+		
+		return color instanceof RColor ? (RColor) color : new RColor(color);
+	}
+	
 	public static RColor fromHSB(float[] hsb)
 	{
 		return new RColor(HSBtoRGBInt(hsb));
@@ -121,6 +129,63 @@ public class RColor extends Color
 	{
 		getHSB(f);
 		f[3] = (float) intToFloat(getAlpha(), 255);
+	}
+	
+	public float getHue()
+	{
+		int r = getRed();
+		int g = getGreen();
+		int b = getBlue();
+		int cmax = max(max(r, g), b);
+		int cmin = min(min(r, g), b);
+		float cdiff = cmax - cmin;
+		
+		if (cmax == 0 || cdiff == 0)
+			return 0;
+		
+		float redc   = (cmax - r) / cdiff;
+		float greenc = (cmax - g) / cdiff;
+		float bluec  = (cmax - b) / cdiff;
+		float hue;
+		
+		if      (r == cmax) hue = bluec - greenc;
+		else if (g == cmax) hue = 2.0f + redc - bluec;
+		else                hue = 4.0f + greenc - redc;
+		
+		hue = hue / 6.0f;
+		
+		if (hue < 0)
+			hue = hue + 1.0f;
+		
+		return hue;
+	}
+	
+	public float getSaturation()
+	{
+		int r = getRed();
+		int g = getGreen();
+		int b = getBlue();
+		int cmax = max(max(r, g), b);
+		int cmin = min(min(r, g), b);
+		float cdiff = cmax - cmin;
+		
+		if (cmax == 0 || cdiff == 0)
+			return 0;
+		
+		return cdiff / cmax;
+	}
+	
+	public float getBrightness()
+	{
+		int r = getRed();
+		int g = getGreen();
+		int b = getBlue();
+		return max(max(r, g), b) / 255.0f;
+	}
+	
+	public int getHueInt()
+	{
+		return (int) (getHue() * 360);
 	}
 	
 	public RColor invert()

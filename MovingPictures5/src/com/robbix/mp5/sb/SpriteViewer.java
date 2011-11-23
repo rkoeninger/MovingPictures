@@ -51,6 +51,7 @@ import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
+import com.robbix.utils.RColor;
 import com.robbix.utils.RTreeNode;
 
 public class SpriteViewer extends JFrame
@@ -60,10 +61,13 @@ public class SpriteViewer extends JFrame
 		boolean lazy = Arrays.asList(args).contains("-lazyLoadSprites");
 		
 		Sandbox.trySystemLookAndFeel();
+		Game game = Game.of();
 		UnitFactory factory = UnitFactory.load(new File("./res/units"));
+		game.add(factory);
 		SpriteLibrary lib = SpriteLibrary.load(new File("./res/sprites"), lazy);
 		lib.setAsyncModeEnabled(true);
-		JFrame slViewer = new SpriteViewer(Game.of(lib, factory));
+		game.add(lib);
+		JFrame slViewer = new SpriteViewer(game);
 		slViewer.setIconImages(Sandbox.getWindowIcons());
 		slViewer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		slViewer.setVisible(true);
@@ -375,7 +379,7 @@ public class SpriteViewer extends JFrame
 			}
 			else if (arg0.getSource() == hueSlider)
 			{
-				preview.setHue(hueSlider.getValue());
+				preview.setTeamColor(RColor.getHue(hueSlider.getValue()));
 				preview.repaint();
 			}
 		}

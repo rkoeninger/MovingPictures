@@ -6,6 +6,7 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.ColorScheme;
 import com.robbix.utils.Position;
@@ -23,7 +24,7 @@ public class PlaceResourceOverlay extends InputOverlay
 	
 	public void paintImpl(DisplayGraphics g)
 	{
-		if (resSprite == null)
+		if (resSprite == null || resSprite == SpriteSet.BLANK_SPRITE)
 			resSprite = panel.getSpriteLibrary().getTranslucentDefault(res, 0.5f);
 		
 		Position pos = getCursorPosition();

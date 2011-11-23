@@ -42,10 +42,15 @@ public class UnitTypeViewer extends JFrame
 	public static void main(String[] args) throws IOException
 	{
 		Sandbox.trySystemLookAndFeel();
+		Game game = Game.of();
 		UnitFactory factory = UnitFactory.load(new File("./res/units"));
+		game.add(factory);
 		SoundBank sounds = SoundBank.loadLazy(new File("./res/sounds"));
+		game.add(sounds);
 		SpriteLibrary lib = SpriteLibrary.loadLazy(new File("./res/sprites"));
-		JFrame ufViewer = new UnitTypeViewer(Game.of(lib, factory, sounds));
+		lib.setAsyncModeEnabled(true);
+		game.add(lib);
+		JFrame ufViewer = new UnitTypeViewer(game);
 		ufViewer.setIconImages(Sandbox.getWindowIcons());
 		ufViewer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ufViewer.setVisible(true);

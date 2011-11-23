@@ -40,6 +40,7 @@ import com.robbix.utils.LShapedRegion;
 import com.robbix.utils.Neighbors;
 import com.robbix.utils.Offset;
 import com.robbix.utils.Position;
+import com.robbix.utils.RColor;
 import com.robbix.utils.Region;
 
 /**
@@ -302,11 +303,11 @@ public class DisplayGraphics extends Graphics2D
 		drawImage(sprite.getImage(), pos, xOff, yOff);
 	}
 	
-	public void draw(Sprite sprite, Position pos, int hue)
+	public void draw(Sprite sprite, Position pos, Color color)
 	{
 		int xOff = sprite.getXOffset(gm.scale);
 		int yOff = sprite.getYOffset(gm.scale);
-		drawImage(sprite.getImage(hue), pos, xOff, yOff);
+		drawImage(sprite.getImage(RColor.fromColor(color)), pos, xOff, yOff);
 	}
 	
 	public void draw(Sprite sprite, Point2D p)
@@ -316,11 +317,11 @@ public class DisplayGraphics extends Graphics2D
 		drawImage(sprite.getImage(), p, xOff, yOff);
 	}
 	
-	public void draw(Sprite sprite, Point2D p, int hue)
+	public void draw(Sprite sprite, Point2D p, Color color)
 	{
 		int xOff = sprite.getXOffset(gm.scale);
 		int yOff = sprite.getYOffset(gm.scale);
-		drawImage(sprite.getImage(hue), p, xOff, yOff);
+		drawImage(sprite.getImage(RColor.fromColor(color)), p, xOff, yOff);
 	}
 	
 	public void drawString(String str, Position pos)

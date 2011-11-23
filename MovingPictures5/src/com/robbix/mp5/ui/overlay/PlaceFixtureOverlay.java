@@ -5,6 +5,7 @@ import java.awt.Color;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
+import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.utils.Position;
 
 public class PlaceFixtureOverlay extends InputOverlay
@@ -23,7 +24,7 @@ public class PlaceFixtureOverlay extends InputOverlay
 	{
 		if (isCursorOnGrid())
 		{
-			if (fixtureSprite == null)
+			if (fixtureSprite == null || fixtureSprite == SpriteSet.BLANK_SPRITE)
 				fixtureSprite = panel.getSpriteLibrary().getTranslucentSprite(fixture, 0.75f);
 			
 			Position pos = getCursorPosition();

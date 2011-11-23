@@ -9,6 +9,7 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteGroup;
+import com.robbix.utils.RColor;
 
 public class SpriteGroupAnimation extends AmbientAnimation
 {
@@ -58,8 +59,8 @@ public class SpriteGroupAnimation extends AmbientAnimation
 	
 	public void paint(DisplayGraphics g)
 	{
-		int hue = player != null ? player.getColorHue() : -1;
-		g.draw(sprites.getFrame(frame), point, hue);
+		RColor color = player != null ? player.getColor() : null;
+		g.draw(sprites.getFrame(frame), point, color);
 	}
 	
 	public boolean isDone()

@@ -9,6 +9,7 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.utils.Position;
+import com.robbix.utils.RColor;
 
 public class CombatDemo extends Demo
 {
@@ -36,11 +37,11 @@ public class CombatDemo extends Demo
 				"rocketLaunch"
 			},
 			new Player[]{
-				new Player(1, "Axen", 320),
-				new Player(2, "Emma", 200),
-				new Player(3, "Nguyen", 40),
-				new Player(4, "Frost", 160),
-				new Player(5, "Brook", 95)
+				new Player(1, "Axen", RColor.getHue(320)),
+				new Player(2, "Emma", RColor.getHue(200)),
+				new Player(3, "Nguyen", RColor.getHue(40)),
+				new Player(4, "Frost", RColor.getHue(160)),
+				new Player(5, "Brook", RColor.getHue(95))
 			},
 			5
 		);

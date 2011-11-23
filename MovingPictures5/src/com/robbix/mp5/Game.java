@@ -44,6 +44,7 @@ import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.utils.Direction;
 import com.robbix.utils.Position;
+import com.robbix.utils.RColor;
 import com.robbix.utils.RIterator;
 import com.robbix.utils.Region;
 import com.robbix.utils.Utils;
@@ -70,8 +71,6 @@ public class Game
 		game.cursorSet = CursorSet.load(new File(root, "cursors"));
 		game.addDisplay(new DisplayPanel(game));
 		
-		Game.game = game;
-		
 		return game;
 	}
 	
@@ -80,17 +79,7 @@ public class Game
 		Game game = new Game();
 		
 		for (Object thing : stuff)
-		{
-			if      (thing instanceof SpriteLibrary)game.spriteLib = (SpriteLibrary) thing;
-			else if (thing instanceof SoundBank)    game.sounds = (SoundBank) thing;
-			else if (thing instanceof UnitFactory)  game.factory = (UnitFactory) thing;
-			else if (thing instanceof TileSet)      game.tileSet = (TileSet) thing;
-			else if (thing instanceof CursorSet)    game.cursorSet = (CursorSet) thing;
-			else if (thing instanceof LayeredMap)   game.map = (LayeredMap) thing;
-			else if (thing instanceof DisplayPanel) game.addDisplay((DisplayPanel) thing);
-		}
-		
-		Game.game = game;
+			game.add(thing);
 		
 		return game;
 	}
@@ -115,11 +104,26 @@ public class Game
 	private Game()
 	{
 		displays = Collections.synchronizedList(new ArrayList<DisplayPanel>());
-		defaultPlayer = new Player(0, "Default", 240);
+		defaultPlayer = new Player(0, "Default", RColor.getGray(96));
 		players = new HashMap<Integer, Player>();
 		players.put(0, defaultPlayer);
 		triggers = Collections.synchronizedSet(new HashSet<Trigger>());
 		pendingDoLaters = new ArrayList<Runnable>();
+		Game.game = this;
+	}
+	
+	public void add(Object... stuff)
+	{
+		for (Object thing : stuff)
+		{
+			if      (thing instanceof SpriteLibrary)spriteLib = (SpriteLibrary) thing;
+			else if (thing instanceof SoundBank)    sounds = (SoundBank) thing;
+			else if (thing instanceof UnitFactory)  factory = (UnitFactory) thing;
+			else if (thing instanceof TileSet)      tileSet = (TileSet) thing;
+			else if (thing instanceof CursorSet)    cursorSet = (CursorSet) thing;
+			else if (thing instanceof LayeredMap)   map = (LayeredMap) thing;
+			else if (thing instanceof DisplayPanel) addDisplay((DisplayPanel) thing);
+		}
 	}
 	
 	public void doLater(Runnable doRun)
