@@ -1,5 +1,7 @@
 package com.robbix.utils;
 
+import static java.lang.Math.abs;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -176,7 +178,7 @@ public class RImage extends BufferedImage
 				raster.getPixel(x, y, pixel);
 				RColor.RGBtoHSB(pixel, hsb);
 				
-				if (Math.abs(hsb[0] - startHSB[0]) <= 0.015)
+				if (hsbMatch(hsb, startHSB))
 				{
 					hsb[0] = endHSB[0];
 					hsb[1] *= endHSB[1];
@@ -186,6 +188,13 @@ public class RImage extends BufferedImage
 				}
 			}
 		}
+	}
+	
+	private boolean hsbMatch(float[] a, float[] b)
+	{
+		return abs(a[0] - b[0]) <= 0.015
+			&& abs(a[1] - b[1]) <= 0.5
+			&& abs(a[2] - b[2]) <= 0.7;
 	}
 	
 	/**
@@ -285,12 +294,11 @@ public class RImage extends BufferedImage
 	public RImage getResizedCopy(Dimension dim)
 	{
 		RImage resized = new RImage(dim.width, dim.height, hasAlpha());
-		resized.getGraphics().drawImage(
-			this,
-			0, 0, dim.width, dim.height,
-			0, 0, getWidth(), getHeight(),
-			null
-		);
+		int w0 = getWidth();
+		int h0 = getHeight();
+		int w1 = dim.width;
+		int h1 = dim.height;
+		resized.getGraphics().drawImage(this, 0, 0, w1, h1, 0, 0, w0, h0, null);
 		return resized;
 	}
 	
