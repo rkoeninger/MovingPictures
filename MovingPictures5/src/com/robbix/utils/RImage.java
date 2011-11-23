@@ -187,6 +187,37 @@ public class RImage extends BufferedImage
 	/**
 	 * Modifies this image.
 	 */
+	public void recolor(Color startColor, Color endColor)
+	{
+		WritableRaster raster = getRaster();
+		int[] pixel = new int[]{0, 0, 0, 255};
+		float[] hsb = new float[4];
+		float[] startHSB = new RColor(startColor).getHSB();
+		float[] endHSB = new RColor(endColor).getHSB();
+		
+		for (int x = 0; x < getWidth();  ++x)
+		for (int y = 0; y < getHeight(); ++y)
+		{
+			if (getRGB(x, y) >> 24 != 0)
+			{
+				raster.getPixel(x, y, pixel);
+				RColor.RGBtoHSB(pixel, hsb);
+				
+				if (Math.abs(hsb[0] - startHSB[0]) <= 0.015)
+				{
+					hsb[0] = endHSB[0] / 360.0f;
+					hsb[1] *= endHSB[1];
+					hsb[2] *= endHSB[2];
+					int rgb = RColor.HSBtoRGBInt(hsb);
+					setRGB(x, y, rgb | (pixel[3] << 24));
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Modifies this image.
+	 */
 	public void mask(Color fgColor)
 	{
 		if (!hasAlpha() && fgColor.getAlpha() != 255)
@@ -249,6 +280,16 @@ public class RImage extends BufferedImage
 	{
 		RImage copy = copy();
 		copy.recolor(startHue, endHue);
+		return copy;
+	}
+	
+	/**
+	 * Creates new image, does not modify this one.
+	 */
+	public RImage getRecoloredCopy(Color startColor, Color endColor)
+	{
+		RImage copy = copy();
+		copy.recolor(startColor, endColor);
 		return copy;
 	}
 	

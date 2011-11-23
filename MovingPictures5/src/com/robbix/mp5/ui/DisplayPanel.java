@@ -10,7 +10,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
@@ -38,6 +37,7 @@ import com.robbix.utils.AnimatedCursor;
 import com.robbix.utils.CostMap;
 import com.robbix.utils.GridMetrics;
 import com.robbix.utils.Position;
+import com.robbix.utils.RColor;
 import com.robbix.utils.RImage;
 import com.robbix.utils.Region;
 import com.robbix.utils.Utils;
@@ -113,7 +113,7 @@ public class DisplayPanel extends JComponent
 		this.tileSize = tiles.getTileSize();
 		this.normalScale = 0;
 		this.maxScale = 3;
-		this.minScale = -Utils.log2(tileSize);
+		this.minScale = getMinScale(tileSize);
 		this.cursors = cursors;
 		this.overlays = new LinkedList<InputOverlay>();
 		setBackground(BACKGROUND_BLUE);
@@ -137,6 +137,15 @@ public class DisplayPanel extends JComponent
 		this.setScale(that.getScale());
 		this.setViewPoint(that.getViewX(), that.getViewY());
 		this.currentPlayer = that.currentPlayer;
+	}
+	
+	private static int getMinScale(long tileSize)
+	{
+		for (int b = 0; b < 64; ++b)
+			if (((tileSize >> b) & 1) != 0)
+				return -b;
+		
+		throw new ArithmeticException();
 	}
 	
 	public DisplayPanelView getView()
@@ -680,10 +689,9 @@ public class DisplayPanel extends JComponent
 	public Point getCenteredPoint(Position pos)
 	{
 		int half = tileSize / 2;
-		return new Point(
-			pos.x * tileSize + half + scroll.x,
-			pos.y * tileSize + half + scroll.y
-		);
+		int x = pos.x * tileSize + half + scroll.x;
+		int y = pos.y * tileSize + half + scroll.y;
+		return new Point(x, y);
 	}
 	
 	/**
@@ -696,10 +704,8 @@ public class DisplayPanel extends JComponent
 		int minY = (int) floor((rect.y - scroll.y) / (double) tileSize);
 		int maxX = (int) ceil((rect.x - scroll.x + rect.width) / (double) tileSize);
 		int maxY = (int) ceil((rect.y - scroll.y + rect.height) / (double) tileSize);
-		
-		return map.getBounds().getIntersection(
-			new Region(minX, minY, maxX - minX, maxY - minY)
-		);
+		Region region = new Region(minX, minY, maxX - minX, maxY - minY);
+		return map.getBounds().getIntersection(region);
 	}
 	
 	/**
@@ -712,10 +718,8 @@ public class DisplayPanel extends JComponent
 		int minY = (int) ceil((rect.y - scroll.y) / (double) tileSize);
 		int maxX = (int) floor((rect.x - scroll.x + rect.width) / (double) tileSize);
 		int maxY = (int) floor((rect.y - scroll.y + rect.height) / (double) tileSize);
-		
-		return map.getBounds().getIntersection(
-			new Region(minX, minY, maxX - minX, maxY - minY)
-		);
+		Region region = new Region(minX, minY, maxX - minX, maxY - minY);
+		return map.getBounds().getIntersection(region);
 	}
 	
 	/**
@@ -898,13 +902,13 @@ public class DisplayPanel extends JComponent
 		
 		for (Position pos : region)
 		{
-			Color color = Utils.getGrayscale(costMap.getScaleFactor(pos));
+			RColor color = RColor.getGray(costMap.getScaleFactor(pos), 0.5);
 			g.setColor(color);
 			g.fill(pos);
 			
 			if (scale >= -1)
 			{
-				g.setColor(Utils.getBlackWhiteComplement(color));
+				g.setColor(color.invert().toBlackWhite());
 				double cost = costMap.get(pos);
 				String costLabel = null;
 				
@@ -1009,7 +1013,7 @@ public class DisplayPanel extends JComponent
 				point.getX() + shadowXOffset,
 				point.getY() + shadowYOffset
 			);
-			drawShadow(g, sprite, shadowPoint);
+			g.drawImage(sprite.getShadow(), shadowPoint);
 		}
 		
 		if (!unit.isTurret() && sprite == SpriteSet.BLANK_SPRITE)
@@ -1084,26 +1088,5 @@ public class DisplayPanel extends JComponent
 				: sprites.getUnknownDepositSprite();
 			g.draw(sprite, res.getPosition());
 		}
-	}
-	
-	/*------------------------------------------------------------------------------------------[*]
-	 * Draw helpers. Helpers account for tileSize and scrollPoint.
-	 */
-	
-	private void drawShadow(Graphics g, Sprite sprite, Point2D absPoint)
-	{
-		Image img = sprite.getShadow();
-		int x = (int) (absPoint.getX() * tileSize) + scroll.x + sprite.getXOffset(scale);
-		int y = (int) (absPoint.getY() * tileSize) + scroll.y + sprite.getYOffset(scale);
-		int w = img.getWidth(null);
-		int h = img.getHeight(null);
-		int w2 = scale < 0 ? w >> -scale : w << scale;
-		int h2 = scale < 0 ? h >> -scale : h << scale;
-		g.drawImage(
-			img,
-			x, y, x + w2, y + h2,
-			0, 0, w, h,
-			null
-		);
 	}
 }

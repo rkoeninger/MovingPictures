@@ -28,6 +28,7 @@ import com.robbix.utils.ColorScheme;
 import com.robbix.utils.LShapedRegion;
 import com.robbix.utils.LinearRegion;
 import com.robbix.utils.Position;
+import com.robbix.utils.RColor;
 import com.robbix.utils.Region;
 import com.robbix.utils.Utils;
 
@@ -172,8 +173,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		double hpHue = 0.333 - (1.0 - hpFactor) * 0.333;
 		int hpAlpha = (int) ((2.0 - hpFactor) * 127);
 		
-		Color hpColor = Color.getHSBColor((float) hpHue, 1.0f, 1.0f);
-		hpColor = Utils.getTranslucency(hpColor, hpAlpha);
+		Color hpColor = RColor.getHue(hpHue).toTranslucent(hpAlpha);
 		
 		g.setColor(Color.BLACK);
 		g.fillRect(nwCornerX + 7, nwCornerY - 2, hpBarLength, 4);

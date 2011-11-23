@@ -51,9 +51,12 @@ public class DisplayGraphics extends Graphics2D
 	private Graphics2D g;
 	private GridMetrics gm;
 	
-	public DisplayGraphics(Graphics2D g)
+	public DisplayGraphics(Graphics g)
 	{
-		this.g = g;
+		if (! (g instanceof Graphics2D))
+			throw new ClassCastException("Only works for Graphics2D");
+		
+		this.g = (Graphics2D) g;
 		this.gm = new GridMetrics();
 	}
 	

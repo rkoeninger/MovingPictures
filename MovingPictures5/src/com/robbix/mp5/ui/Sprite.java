@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.robbix.utils.Offset;
+import com.robbix.utils.RColor;
 import com.robbix.utils.RImage;
 
 public class Sprite
@@ -68,8 +69,7 @@ public class Sprite
 		
 		if (img == null)
 		{
-			img = baseImage.copy();
-			img.recolor(baseHue, hue);
+			img = baseImage.getRecoloredCopy(baseHue, hue);
 			
 			if (cache)
 				hueMap.put(hue, img);
@@ -81,6 +81,11 @@ public class Sprite
 	public RImage getImage(int hue)
 	{
 		return getImage(hue, true);
+	}
+	
+	public RImage getImage(Color reColor)
+	{
+		return baseImage.getRecoloredCopy(RColor.getHue(baseHue), reColor);
 	}
 	
 	public Offset getOffset()

@@ -25,10 +25,10 @@ public class TurretTask extends Task
 		}
 		else
 		{
-			if (Utils.RNG.nextInt(100) > 0)
+			if (Utils.randInt(0, 100) > 0)
 				return;
 			
-			unit.rotate(Utils.RNG.nextInt(3) - 1);
+			unit.rotate(Utils.randInt(-1, 1));
 		}
 	}
 }

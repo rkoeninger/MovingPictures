@@ -6,29 +6,29 @@ public class ColorScheme
 {
 	public static ColorScheme withEdgeOnly(Color edge)
 	{
-		return new ColorScheme(edge, Utils.CLEAR);
+		return new ColorScheme(edge, RColor.CLEAR);
 	}
 	
 	public static ColorScheme withFillOnly(Color fill)
 	{
-		return new ColorScheme(Utils.CLEAR, fill);
+		return new ColorScheme(RColor.CLEAR, fill);
 	}
 	
 	public static ColorScheme withTranslucentBody(Color edge)
 	{
-		return new ColorScheme(edge, Utils.getTranslucency(edge, 0.5f));
+		return new ColorScheme(edge, new RColor(edge).toTranslucent(127));
 	}
 	
-	public final Color edge;
-	public final Color fill;
+	public final RColor edge;
+	public final RColor fill;
 	
-	public Color getEdge(){ return edge; }
-	public Color getFill(){ return fill; }
+	public RColor getEdge(){ return edge; }
+	public RColor getFill(){ return fill; }
 	
 	public ColorScheme(Color edge, Color fill)
 	{
-		this.edge = edge;
-		this.fill = fill;
+		this.edge = new RColor(edge);
+		this.fill = new RColor(fill);
 	}
 	
 	public ColorScheme getEdgeOnly()
