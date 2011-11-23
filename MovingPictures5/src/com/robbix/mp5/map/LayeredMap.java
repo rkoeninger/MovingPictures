@@ -338,8 +338,11 @@ public class LayeredMap
 				spot.alive |= occupant != null && occupant.isConnected();
 				spot.alive |= grid.get(adj).alive;
 				
-				// Refresh tube tile for new neighbor
-				grid.get(adj).tileCode = tileSet.getTubeTile(getTubeNeighbors(adj));
+				if (hasTube(adj))
+				{
+					// Refresh tube tile for new neighbor
+					grid.get(adj).tileCode = tileSet.getTubeTile(getTubeNeighbors(adj));
+				}
 			}
 		}
 		
@@ -747,7 +750,7 @@ public class LayeredMap
 			{
 				boolean contained = bounds.contains(bullPos);
 				
-				if (contained && !hasWall(bullPos) && !hasTube(bullPos))
+				if (contained && !hasFixture(bullPos))
 					bulldoze(bullPos);
 			}
 			
@@ -762,7 +765,7 @@ public class LayeredMap
 					&& (grid.get(tubePos).occupant.isStructure()
 				|| grid.get(tubePos).occupant.getType().isGuardPostType());
 				
-				if (!occupied && !hasWall(tubePos) && !hasTube(tubePos))
+				if (!occupied && !hasFixture(tubePos))
 					putTube(tubePos);
 			}
 		}
