@@ -77,107 +77,69 @@ public class DisplayGraphics extends Graphics2D
 		return gm;
 	}
 	
-	public void drawRect(Rectangle rect)
-	{
-		g.drawRect(rect.x, rect.y, rect.width, rect.height);
-	}
-	
-	public void fillRect(Rectangle rect)
-	{
-		g.fillRect(rect.x, rect.y, rect.width, rect.height);
-	}
-	
 	public void drawLine(Point a, Point b)
 	{
 		g.drawLine(a.x, a.y, b.x, b.y);
 	}
 	
-	public void drawPosition(Position pos)
+	public void draw(Position pos)
 	{
 		int x = pos.x * gm.tileSize + gm.xOffset;
 		int y = pos.y * gm.tileSize + gm.yOffset;
 		g.drawRect(x, y, gm.tileSize, gm.tileSize);
 	}
 	
-	public void fillPosition(Position pos)
+	public void fill(Position pos)
 	{
 		int x = pos.x * gm.tileSize + gm.xOffset;
 		int y = pos.y * gm.tileSize + gm.yOffset;
 		g.fillRect(x, y, gm.tileSize, gm.tileSize);
 	}
 	
-	public void drawRegion(Region region)
+	public void draw(Region region)
 	{
 		int x = region.x * gm.tileSize + gm.xOffset;
 		int y = region.y * gm.tileSize + gm.yOffset;
 		g.drawRect(x, y, region.w * gm.tileSize, region.h * gm.tileSize);
 	}
 	
-	public void fillRegion(Region region)
+	public void fill(Region region)
 	{
 		int x = region.x * gm.tileSize + gm.xOffset;
 		int y = region.y * gm.tileSize + gm.yOffset;
 		g.fillRect(x, y, region.w * gm.tileSize, region.h * gm.tileSize);
 	}
 	
-	public void drawBorderRegion(BorderRegion region)
+	public void draw(BorderRegion region)
 	{
-		int x = region.x * gm.tileSize + gm.xOffset;
-		int y = region.y * gm.tileSize + gm.yOffset;
-		g.drawRect(x, y, region.w * gm.tileSize, region.h * gm.tileSize);
+		int x0 = region.x * gm.tileSize + gm.xOffset;
+		int y0 = region.y * gm.tileSize + gm.yOffset;
+		int x1 = (region.x + 1) * gm.tileSize + gm.xOffset;
+		int y1 = (region.y + 1) * gm.tileSize + gm.yOffset;
+		int w1 = (region.w - 2) * gm.tileSize;
+		int h1 = (region.h - 2) * gm.tileSize;
+		g.drawRect(x0, y0, region.w * gm.tileSize, region.h * gm.tileSize);
 		
-		if (region.w > 2 && region.h > 2)
-		{
-			g.drawRect(
-				(region.x + 1) * gm.tileSize + gm.xOffset,
-				(region.y + 1) * gm.tileSize + gm.yOffset,
-				(region.w - 2) * gm.tileSize,
-				(region.h - 2) * gm.tileSize
-			);
-		}
+		if (w1 * h1 > 0)
+			g.drawRect(x1, y1, w1, h1);
 	}
 	
-	public void fillBorderRegion(BorderRegion region)
+	public void fill(BorderRegion region)
 	{
-		g.fillRect(
-			region.x * gm.tileSize + gm.xOffset,
-			region.y * gm.tileSize + gm.yOffset,
-			region.w * gm.tileSize,
-			gm.tileSize
-		);
-		
-		if (region.h > 1)
-		{
-			g.fillRect(
-				region.x * gm.tileSize + gm.xOffset,
-				(region.y + region.h - 1) * gm.tileSize + gm.yOffset,
-				region.w * gm.tileSize,
-				gm.tileSize
-			);
-		}
-		
-		if (region.h > 2)
-		{
-			g.fillRect(
-				region.x * gm.tileSize + gm.xOffset,
-				(region.y + 1) * gm.tileSize + gm.yOffset,
-				gm.tileSize,
-				(region.h - 2) * gm.tileSize
-			);
-			
-			if (region.w > 1)
-			{
-				g.fillRect(
-					(region.x + region.w - 1) * gm.tileSize + gm.xOffset,
-					(region.y + 1) * gm.tileSize + gm.yOffset,
-					gm.tileSize,
-					(region.h - 2) * gm.tileSize
-				);
-			}
-		}
+		int x0 = region.x * gm.tileSize + gm.xOffset;
+		int y0 = region.y * gm.tileSize + gm.yOffset;
+		int y1 = (region.y + 1) * gm.tileSize + gm.yOffset;
+		int xn = (region.x + region.w - 1) * gm.tileSize + gm.xOffset;
+		int yn = (region.y + region.h - 1) * gm.tileSize + gm.yOffset;
+		int w0 = region.w * gm.tileSize;
+		int h1 = (region.h - 2) * gm.tileSize;
+		g.fillRect(x0, y0, w0, gm.tileSize);
+		g.fillRect(x0, yn, w0, gm.tileSize);
+		g.fillRect(x0, y1, gm.tileSize, h1);
+		g.fillRect(xn, y1, gm.tileSize, h1);
 	}
 	
-	public void drawLShapedRegion(LShapedRegion region)
+	public void draw(LShapedRegion region)
 	{
 		drawEdges(region.getFirstEnd(), Neighbors.allBut(region.getFirstLegDirection()));
 		drawEdges(region.getSecondEnd(), Neighbors.allBut(region.getSecondLegDirection()));
@@ -193,7 +155,6 @@ public class DisplayGraphics extends Graphics2D
 		int ty0 = to.y * gm.tileSize + gm.yOffset;
 		int tx1 = tx0 + gm.tileSize;
 		int ty1 = ty0 + gm.tileSize;
-		
 		int fx0 = from.x * gm.tileSize + gm.xOffset;
 		int fy0 = from.y * gm.tileSize + gm.yOffset;
 		int fx1 = fx0 + gm.tileSize;
@@ -205,36 +166,6 @@ public class DisplayGraphics extends Graphics2D
 		case S: g.drawLine(fx0, fy1, tx0, ty0); g.drawLine(fx1, fy1, tx1, ty0); break;
 		case E: g.drawLine(fx1, fy0, tx0, ty0); g.drawLine(fx1, fy1, tx0, ty1); break;
 		case W: g.drawLine(fx0, fy0, tx1, ty0); g.drawLine(fx0, fy1, tx1, ty1); break;
-		}
-	}
-	
-	public void fillLShapedRegion(LShapedRegion region)
-	{
-		fillPosition(region.getFirstEnd());
-		fillPosition(region.getSecondEnd());
-		fillPosition(region.getElbow());
-		fillLeg(region.getElbow(), region.getFirstEnd());
-		fillLeg(region.getElbow(), region.getSecondEnd());
-	}
-	
-	private void fillLeg(Position from, Position to)
-	{
-		int tx0 = to.x * gm.tileSize + gm.xOffset;
-		int ty0 = to.y * gm.tileSize + gm.yOffset;
-		int tx1 = tx0 + gm.tileSize;
-		int ty1 = ty0 + gm.tileSize;
-		
-		int fx0 = from.x * gm.tileSize + gm.xOffset;
-		int fy0 = from.y * gm.tileSize + gm.yOffset;
-		int fx1 = fx0 + gm.tileSize;
-		int fy1 = fy0 + gm.tileSize;
-		
-		switch (Direction.getDirection(from, to))
-		{
-		case N: g.fillRect(tx0, ty1, fx1 - fx0, fy0 - ty1); break;
-		case S: g.fillRect(fx0, fy1, fx1 - fx0, ty0 - fy1); break;
-		case E: g.fillRect(fx1, fy0, tx0 - fx1, ty1 - ty0); break;
-		case W: g.fillRect(tx1, ty0, fx0 - tx1, ty1 - ty0); break;
 		}
 	}
 	
@@ -262,34 +193,60 @@ public class DisplayGraphics extends Graphics2D
 		if (neighbors.has(W)) drawEdge(pos, W);
 	}
 	
+	public void fill(LShapedRegion region)
+	{
+		fill(region.getFirstEnd());
+		fill(region.getSecondEnd());
+		fill(region.getElbow());
+		fillLeg(region.getElbow(), region.getFirstEnd());
+		fillLeg(region.getElbow(), region.getSecondEnd());
+	}
+	
+	private void fillLeg(Position from, Position to)
+	{
+		int tx0 = to.x * gm.tileSize + gm.xOffset;
+		int ty0 = to.y * gm.tileSize + gm.yOffset;
+		int tx1 = tx0 + gm.tileSize;
+		int ty1 = ty0 + gm.tileSize;
+		int fx0 = from.x * gm.tileSize + gm.xOffset;
+		int fy0 = from.y * gm.tileSize + gm.yOffset;
+		int fx1 = fx0 + gm.tileSize;
+		int fy1 = fy0 + gm.tileSize;
+		
+		switch (Direction.getDirection(from, to))
+		{
+		case N: g.fillRect(tx0, ty1, fx1 - fx0, fy0 - ty1); break;
+		case S: g.fillRect(fx0, fy1, fx1 - fx0, ty0 - fy1); break;
+		case E: g.fillRect(fx1, fy0, tx0 - fx1, ty1 - ty0); break;
+		case W: g.fillRect(tx1, ty0, fx0 - tx1, ty1 - ty0); break;
+		}
+	}
+	
 	public void drawLine(Point2D a, Point2D b)
 	{
-		g.drawLine(
-			(int) (a.getX() * gm.tileSize) + gm.xOffset,
-			(int) (a.getY() * gm.tileSize) + gm.yOffset,
-			(int) (b.getX() * gm.tileSize) + gm.xOffset,
-			(int) (b.getY() * gm.tileSize) + gm.yOffset
-		);
+		int x0 = (int) (a.getX() * gm.tileSize) + gm.xOffset;
+		int y0 = (int) (a.getY() * gm.tileSize) + gm.yOffset;
+		int x1 = (int) (b.getX() * gm.tileSize) + gm.xOffset;
+		int y1 = (int) (b.getY() * gm.tileSize) + gm.yOffset;
+		g.drawLine(x0, y0, x1, y1);
 	}
 	
 	public void drawRect(Rectangle2D rect)
 	{
-		g.drawRect(
-			(int) (rect.getX() * gm.tileSize) + gm.xOffset,
-			(int) (rect.getY() * gm.tileSize) + gm.yOffset,
-			(int) (rect.getWidth()  * gm.tileSize),
-			(int) (rect.getHeight() * gm.tileSize)
-		);
+		int x = (int) (rect.getX() * gm.tileSize) + gm.xOffset;
+		int y = (int) (rect.getY() * gm.tileSize) + gm.yOffset;
+		int w = (int) (rect.getWidth()  * gm.tileSize);
+		int h = (int) (rect.getHeight() * gm.tileSize);
+		g.drawRect(x, y, w, h);
 	}
 	
 	public void fillRect(Rectangle2D rect)
 	{
-		g.fillRect(
-			(int) (rect.getX() * gm.tileSize) + gm.xOffset,
-			(int) (rect.getY() * gm.tileSize) + gm.yOffset,
-			(int) (rect.getWidth()  * gm.tileSize),
-			(int) (rect.getHeight() * gm.tileSize)
-		);
+		int x = (int) (rect.getX() * gm.tileSize) + gm.xOffset;
+		int y = (int) (rect.getY() * gm.tileSize) + gm.yOffset;
+		int w = (int) (rect.getWidth()  * gm.tileSize);
+		int h = (int) (rect.getHeight() * gm.tileSize);
+		g.fillRect(x, y, w, h);
 	}
 	
 	public void drawImage(Image img, Position pos, int xOffset, int yOffset)
@@ -298,14 +255,7 @@ public class DisplayGraphics extends Graphics2D
 		int y = pos.y * gm.tileSize + gm.yOffset + yOffset; 
 		int w = img.getWidth(null);
 		int h = img.getHeight(null);
-		int w2 = gm.scale < 0 ? w >> -gm.scale : w << gm.scale;
-		int h2 = gm.scale < 0 ? h >> -gm.scale : h << gm.scale;
-		g.drawImage(
-			img,
-			x, y, x + w2, y + h2,
-			0, 0, w, h,
-			null
-		);
+		g.drawImage(img, x, y, x + scale(w), y + scale(h), 0, 0, w, h, null);
 	}
 	
 	public void drawImage(Image img, Position pos)
@@ -324,14 +274,12 @@ public class DisplayGraphics extends Graphics2D
 		int y = (int) (p.getY() * gm.tileSize) + gm.yOffset + yOffset; 
 		int w = img.getWidth(null);
 		int h = img.getHeight(null);
-		int w2 = gm.scale < 0 ? w >> -gm.scale : w << gm.scale;
-		int h2 = gm.scale < 0 ? h >> -gm.scale : h << gm.scale;
-		g.drawImage(
-			img,
-			x, y, x + w2, y + h2,
-			0, 0, w, h,
-			null
-		);
+		g.drawImage(img, x, y, x + scale(w), y + scale(h), 0, 0, w, h, null);
+	}
+	
+	private int scale(int length)
+	{
+		return gm.scale < 0 ? length >> -gm.scale : length << gm.scale;
 	}
 	
 	public void drawImage(Image img, Point2D p)
@@ -344,28 +292,28 @@ public class DisplayGraphics extends Graphics2D
 		drawImage(img, p, offset.dx, offset.dy);
 	}
 	
-	public void drawSprite(Sprite sprite, Position pos)
+	public void draw(Sprite sprite, Position pos)
 	{
 		int xOff = sprite.getXOffset(gm.scale);
 		int yOff = sprite.getYOffset(gm.scale);
 		drawImage(sprite.getImage(), pos, xOff, yOff);
 	}
 	
-	public void drawSprite(Sprite sprite, Position pos, int hue)
+	public void draw(Sprite sprite, Position pos, int hue)
 	{
 		int xOff = sprite.getXOffset(gm.scale);
 		int yOff = sprite.getYOffset(gm.scale);
 		drawImage(sprite.getImage(hue), pos, xOff, yOff);
 	}
 	
-	public void drawSprite(Sprite sprite, Point2D p)
+	public void draw(Sprite sprite, Point2D p)
 	{
 		int xOff = sprite.getXOffset(gm.scale);
 		int yOff = sprite.getYOffset(gm.scale);
 		drawImage(sprite.getImage(), p, xOff, yOff);
 	}
 	
-	public void drawSprite(Sprite sprite, Point2D p, int hue)
+	public void draw(Sprite sprite, Point2D p, int hue)
 	{
 		int xOff = sprite.getXOffset(gm.scale);
 		int yOff = sprite.getYOffset(gm.scale);

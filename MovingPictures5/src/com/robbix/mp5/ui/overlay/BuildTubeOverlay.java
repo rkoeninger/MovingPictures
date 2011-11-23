@@ -42,28 +42,36 @@ public class BuildTubeOverlay extends InputOverlay
 					LinearRegion region = getLinearDragRegion();
 					available = canPlaceTube(region);
 					g.setColor(available ? GREEN.getFill() : RED.getFill());
-					g.fillRegion(region);
+					g.fill(region);
+					g.setColor(available ? Color.green : Color.RED);
+					g.draw(region);
 				}
 				else if (getShiftOption() == 2)
 				{
 					BorderRegion region = getBorderDragRegion();
 					available = canPlaceTube(region);
 					g.setColor(available ? GREEN.getFill() : RED.getFill());
-					g.fillBorderRegion(region);
+					g.fill(region);
+					g.setColor(available ? Color.green : Color.RED);
+					g.draw(region);
 				}
 				else
 				{
 					LShapedRegion region = getLShapedDragRegion(getShiftOption() == 0);
 					available = canPlaceTube(region);
 					g.setColor(available ? GREEN.getFill() : RED.getFill());
-					g.fillLShapedRegion(region);
+					g.fill(region);
+					g.setColor(available ? Color.green : Color.RED);
+					g.draw(region);
 				}
 			}
 			else
 			{
 				available = canPlaceTube(pos);
 				g.setColor(available ? GREEN.getFill() : RED.getFill());
-				g.fillPosition(pos);
+				g.fill(pos);
+				g.setColor(available ? Color.green : Color.RED);
+				g.draw(pos);
 			}
 			
 			if (!available)

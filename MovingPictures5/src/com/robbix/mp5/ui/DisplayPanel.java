@@ -799,7 +799,7 @@ public class DisplayPanel extends JComponent
 		else
 		{
 			g.setColor(getBackground());
-			g.fillRect(rect);
+			g.fill(rect);
 		}
 		
 		if (showGrid && tileSize >= 8)
@@ -900,7 +900,7 @@ public class DisplayPanel extends JComponent
 		{
 			Color color = Utils.getGrayscale(costMap.getScaleFactor(pos));
 			g.setColor(color);
-			g.fillPosition(pos);
+			g.fill(pos);
 			
 			if (scale >= -1)
 			{
@@ -934,16 +934,16 @@ public class DisplayPanel extends JComponent
 			else
 			{
 				g.setColor(tile.getAverageColor());
-				g.fillPosition(pos);
+				g.fill(pos);
 			}
 			
 			if (map.hasMinePlatform(pos))
 			{
-				g.drawSprite(sprites.getSprite("aCommonMine", "platform"), pos);
+				g.draw(sprites.getSprite("aCommonMine", "platform"), pos);
 			}
 			else if (map.hasGeyser(pos))
 			{
-				g.drawSprite(sprites.getSprite("aGeyser", "geyser"), pos);
+				g.draw(sprites.getSprite("aGeyser", "geyser"), pos);
 			}
 		}
 	}
@@ -975,16 +975,14 @@ public class DisplayPanel extends JComponent
 			Unit occupant = map.getUnit(pos);
 			boolean needsConnection = occupant != null && occupant.needsConnection();
 			boolean isSource = occupant != null && occupant.isConnectionSource();
-			boolean hasConnection = occupant != null && !occupant.needsConnection()
+			boolean hasConnection = occupant != null && occupant.needsConnection()
 													 && occupant.isConnected();
 			
-			if (map.hasTube(pos) || needsConnection)
+			if (map.hasTube(pos) || needsConnection || isSource)
 			{
-				Color colors = (map.isAlive(pos) || hasConnection || isSource)
-					? transGreen
-					: transRed;
-				g.setColor(colors);
-				g.fillPosition(pos);
+				boolean alive = (map.isAlive(pos) || hasConnection || isSource);
+				g.setColor(alive ? transGreen : transRed);
+				g.fill(pos);
 			}
 		}
 	}
@@ -998,7 +996,7 @@ public class DisplayPanel extends JComponent
 		if (!unit.isTurret() && scale < minShowUnitScale)
 		{
 			g.setColor(unit.getOwner().getColor());
-			g.fillRegion(unit.getOccupiedBounds());
+			g.fill(unit.getOccupiedBounds());
 			return;
 		}
 		
@@ -1017,12 +1015,12 @@ public class DisplayPanel extends JComponent
 		if (!unit.isTurret() && sprite == SpriteSet.BLANK_SPRITE)
 		{
 			g.setColor(unit.getOwner().getColor());
-			g.fillRegion(unit.getOccupiedBounds());
+			g.fill(unit.getOccupiedBounds());
 		}
 		else
 		{
 			int hue = unit.getOwner() != null ? unit.getOwner().getColorHue() : -1;
-			g.drawSprite(sprite, point, hue);
+			g.draw(sprite, point, hue);
 		}
 		
 		if (unit.hasTurret())
@@ -1049,17 +1047,17 @@ public class DisplayPanel extends JComponent
 		
 		if (unit.isIdle())
 		{
-			g.drawSprite(sprites.getSprite("aStructureStatus", "idle"), pos);
+			g.draw(sprites.getSprite("aStructureStatus", "idle"), pos);
 		}
 		else if (unit.isDisabled())
 		{
 			SpriteGroup seq = sprites.getAmbientSpriteGroup("aStructureStatus", "disabled");
 			int index = Utils.getTimeBasedIndex(100, seq.getSpriteCount());
-			g.drawSprite(seq.getSprite(index), pos);
+			g.draw(seq.getSprite(index), pos);
 		}
 		else if (unit.isStructure())
 		{
-			g.drawSprite(sprites.getSprite("aStructureStatus", "active"), pos);
+			g.draw(sprites.getSprite("aStructureStatus", "active"), pos);
 		}
 	}
 	
@@ -1077,14 +1075,14 @@ public class DisplayPanel extends JComponent
 				? COMMON_ORE_COLOR
 				: RARE_ORE_COLOR;
 			g.setColor(color);
-			g.fillPosition(res.getPosition());
+			g.fill(res.getPosition());
 		}
 		else
 		{
 			Sprite sprite = res.isSurveyedBy(currentPlayer)
 				? sprites.getSprite(res)
 				: sprites.getUnknownDepositSprite();
-			g.drawSprite(sprite, res.getPosition());
+			g.draw(sprite, res.getPosition());
 		}
 	}
 	

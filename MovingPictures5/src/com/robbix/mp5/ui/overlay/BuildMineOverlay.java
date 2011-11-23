@@ -35,7 +35,7 @@ public class BuildMineOverlay extends InputOverlay
 			Position center = mine.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawUnitFootprint(g, mine.getType(), pos);
-			g.drawSprite(mineSprite, pos, hue);
+			g.draw(mineSprite, pos, hue);
 			
 			if (toolTip != null)
 			{

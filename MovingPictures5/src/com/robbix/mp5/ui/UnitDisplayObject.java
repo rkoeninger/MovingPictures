@@ -42,7 +42,7 @@ public class UnitDisplayObject extends DisplayObject
 		if (!unit.isTurret() && panel.getScale() < panel.getMinimumShowUnitScale())
 		{
 			g.setColor(unit.getOwner().getColor());
-			g.fillRegion(unit.getOccupiedBounds());
+			g.fill(unit.getOccupiedBounds());
 			return;
 		}
 		
@@ -62,12 +62,12 @@ public class UnitDisplayObject extends DisplayObject
 		if (!unit.isTurret() && sprite == SpriteSet.BLANK_SPRITE)
 		{
 			g.setColor(unit.getOwner().getColor());
-			g.fillRegion(unit.getOccupiedBounds());
+			g.fill(unit.getOccupiedBounds());
 		}
 		else
 		{
 			int hue = unit.getOwner() != null ? unit.getOwner().getColorHue() : -1;
-			g.drawSprite(sprite, point, hue);
+			g.draw(sprite, point, hue);
 		}
 		
 		if (unit.hasTurret())
@@ -89,17 +89,17 @@ public class UnitDisplayObject extends DisplayObject
 		
 		if (unit.isIdle())
 		{
-			g.drawSprite(panel.getSpriteLibrary().getSprite("aStructureStatus", "idle"), pos);
+			g.draw(panel.getSpriteLibrary().getSprite("aStructureStatus", "idle"), pos);
 		}
 		else if (unit.isDisabled())
 		{
 			SpriteGroup seq = panel.getSpriteLibrary().getAmbientSpriteGroup("aStructureStatus", "disabled");
 			int index = Utils.getTimeBasedIndex(100, seq.getSpriteCount());
-			g.drawSprite(seq.getSprite(index), pos);
+			g.draw(seq.getSprite(index), pos);
 		}
 		else if (unit.isStructure())
 		{
-			g.drawSprite(panel.getSpriteLibrary().getSprite("aStructureStatus", "active"), pos);
+			g.draw(panel.getSpriteLibrary().getSprite("aStructureStatus", "active"), pos);
 		}
 	}
 }

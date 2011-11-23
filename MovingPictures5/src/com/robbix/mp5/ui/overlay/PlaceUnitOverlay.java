@@ -8,7 +8,6 @@ import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
-import com.robbix.mp5.ui.SpriteSet;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
@@ -41,19 +40,19 @@ public class PlaceUnitOverlay extends InputOverlay
 	{
 		if (isCursorOnGrid())
 		{
-			if (unitSprite == null || unitSprite == SpriteSet.BLANK_SPRITE)
+			if (unitSprite == null)
 				unitSprite = panel.getSpriteLibrary().getTranslucentDefault(unit, 0.5);
 			
-			if ((turretSprite == null || turretSprite == SpriteSet.BLANK_SPRITE) && unit.hasTurret())
+			if (turretSprite == null && unit.hasTurret())
 				unitSprite = panel.getSpriteLibrary().getTranslucentDefault(unit.getTurret(), 0.5);
 			
 			Position center = unit.getFootprint().getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawUnitFootprint(g, unit.getType(), pos);
-			g.drawSprite(unitSprite, pos, hue);
+			g.draw(unitSprite, pos, hue);
 			
 			if (unit.hasTurret())
-				g.drawSprite(turretSprite, pos, hue);
+				g.draw(turretSprite, pos, hue);
 			
 			if (toolTip != null)
 			{

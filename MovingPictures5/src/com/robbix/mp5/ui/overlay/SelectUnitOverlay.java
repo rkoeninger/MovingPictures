@@ -29,7 +29,7 @@ public class SelectUnitOverlay extends InputOverlay
 		if (isDragging())
 		{
 			g.setColor(WHITE.getFill());
-			g.fillRegion(getDragRegion());
+			g.fill(getDragRegion());
 		}
 	}
 	

@@ -46,8 +46,8 @@ public class PlaceResourceOverlay extends InputOverlay
 		}
 		
 		g.setColor(colors.getFill());
-		g.fillPosition(pos);
-		g.drawSprite(resSprite, pos);
+		g.fill(pos);
+		g.draw(resSprite, pos);
 		
 		if (toolTip != null)
 		{

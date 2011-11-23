@@ -59,7 +59,7 @@ public class SpriteGroupAnimation extends AmbientAnimation
 	public void paint(DisplayGraphics g)
 	{
 		int hue = player != null ? player.getColorHue() : -1;
-		g.drawSprite(sprites.getFrame(frame), point, hue);
+		g.draw(sprites.getFrame(frame), point, hue);
 	}
 	
 	public boolean isDone()

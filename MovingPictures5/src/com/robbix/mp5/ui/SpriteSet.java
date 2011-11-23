@@ -1,5 +1,6 @@
 package com.robbix.mp5.ui;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,7 @@ import com.robbix.utils.RImage;
 
 public abstract class SpriteSet
 {
-	public static final Sprite BLANK_SPRITE = new Sprite(new RImage(32, 32, false), 0, 0);
+	public static final Sprite BLANK_SPRITE = new Sprite(new RImage(32, 32, new Color(0, 0, 0, 0)), 0, 0);
 	
 	public static final SpriteGroup BLANK_GROUP = new SpriteGroup(BLANK_SPRITE, true)
 	{

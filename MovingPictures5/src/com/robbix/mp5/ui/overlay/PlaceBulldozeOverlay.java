@@ -13,7 +13,7 @@ public class PlaceBulldozeOverlay extends InputOverlay
 		{
 			Position pos = getCursorPosition();
 			g.setColor(panel.getMap().isBulldozed(pos) ? YELLOW.getFill() : GREEN.getFill());
-			g.fillPosition(pos);
+			g.fill(pos);
 			
 			if (panel.getMap().isBulldozed(pos))
 			{

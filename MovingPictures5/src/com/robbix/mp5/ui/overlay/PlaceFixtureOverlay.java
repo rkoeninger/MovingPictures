@@ -28,8 +28,8 @@ public class PlaceFixtureOverlay extends InputOverlay
 			
 			Position pos = getCursorPosition();
 			g.setColor(panel.getMap().canPlaceFixture(fixture, pos) ? GREEN.getFill() : RED.getFill());
-			g.fillPosition(pos);
-			g.drawSprite(fixtureSprite, pos);
+			g.fill(pos);
+			g.draw(fixtureSprite, pos);
 			
 			if (!panel.getMap().canPlaceFixture(fixture, pos))
 			{

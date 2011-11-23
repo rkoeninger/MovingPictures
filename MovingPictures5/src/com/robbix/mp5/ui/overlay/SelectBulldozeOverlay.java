@@ -28,8 +28,8 @@ public class SelectBulldozeOverlay extends InputOverlay
 		{
 			g.setColor(GREEN.getFill());
 			
-			if (isDragging()) g.fillRegion(getDragRegion());
-			             else g.fillPosition(getCursorPosition());
+			if (isDragging()) g.fill(getDragRegion());
+			             else g.fill(getCursorPosition());
 		}
 	}
 	

@@ -134,7 +134,7 @@ public class RPGAnimation extends WeaponAnimation
 				continue;
 			}
 			
-			g.drawSprite(puffGroup.getFrame(puffFrame), puff.point);
+			g.draw(puffGroup.getFrame(puffFrame), puff.point);
 		}
 		
 		if (frame < rocketFrameCount)
@@ -147,13 +147,13 @@ public class RPGAnimation extends WeaponAnimation
 				getFireImpact().getX() + distance * Math.cos(angle) * progress,
 				getFireImpact().getY() + distance * Math.sin(angle) * progress
 			);
-			g.drawSprite(rocketSprite, rocketPoint);
+			g.draw(rocketSprite, rocketPoint);
 		}
 		else if (frame < totalFrameCount)
 		{
 			SpriteGroup explosionGroup = rocketSprites.get("explosion");
 			Sprite explosionSprite = explosionGroup.getFrame(frame - rocketFrameCount);
-			g.drawSprite(explosionSprite, getFireImpact());
+			g.draw(explosionSprite, getFireImpact());
 		}
 	}
 }

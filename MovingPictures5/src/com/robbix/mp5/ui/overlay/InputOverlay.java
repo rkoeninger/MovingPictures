@@ -125,7 +125,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		if (panel.getScale() < 0)
 		{
 			g.setColor(Color.WHITE);
-			g.drawPosition(unit.getPosition());
+			g.draw(unit.getPosition());
 			return;
 		}
 		
@@ -243,17 +243,17 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		}
 		
 		g.setColor(color);
-		g.fillRegion(inner);
+		g.fill(inner);
 		
 		g.setColor(WHITE.getFill());
 		
 		for (Position tubePos : fp.getTubePositions())
-			g.fillPosition(tubePos.shift(inner.x, inner.y));
+			g.fill(tubePos.shift(inner.x, inner.y));
 		
 		g.setColor(WHITE.getEdge());
 		
 		if (type.isStructureType() || type.isGuardPostType())
-			g.drawRegion(outer);
+			g.draw(outer);
 		
 		return toolTip;
 	}
