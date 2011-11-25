@@ -1,6 +1,7 @@
 package com.robbix.mp5.sb;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
@@ -70,7 +71,6 @@ import com.robbix.mp5.sb.demo.Demo;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.DisplayPanelView;
 import com.robbix.mp5.ui.PlayerStatus;
-import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.TitleBar;
 import com.robbix.mp5.ui.UnitStatus;
 import com.robbix.mp5.ui.overlay.PlaceBulldozeOverlay;
@@ -143,9 +143,9 @@ public class Sandbox extends JApplet
 	private static ButtonGroup playerSelectButtonGroup;
 	private static boolean showFrameRate = false;
 	
-	private static Sprite edenIconSprite;
-	private static Sprite plymouthIconSprite;
-	private static ImageIcon neutralIcon;
+	private static RImage edenLogo;
+	private static RImage plymouthLogo;
+	private static RImage neutralLogo;
 	
 	private static ActionListener listener = new MenuItemListener();
 	
@@ -457,7 +457,7 @@ public class Sandbox extends JApplet
 		soundMenu.add(setAudioFormatMenuItem);
 		terrainMenu.add(placeWallMenuItem);
 		terrainMenu.add(placeTubeMenuItem);
-		terrainMenu.add(placeGeyserMenuItem);
+//		terrainMenu.add(placeGeyserMenuItem);
 		terrainMenu.add(placeBulldozeMenuItem);
 		placeResourceMenu.add(placeCommon1);
 		placeResourceMenu.add(placeCommon2);
@@ -487,12 +487,9 @@ public class Sandbox extends JApplet
 		statusesPanel.add(unitStatusLabel);
 		statusesPanel.add(playerStatusLabel);
 		
-		RImage img = RImage.read(new File(resDir, "art/edenLogo.png"));
-		edenIconSprite = new Sprite(img, RColor.getHue(240), 0, 0);
-		img = RImage.read(new File(resDir, "art/plymouthLogo.png"));
-		plymouthIconSprite = new Sprite(img, RColor.getHue(240), 0, 0);
-		img = RImage.read(new File(resDir, "art/neutralLogo.png"));
-		neutralIcon = new ImageIcon(img);
+		edenLogo     = RImage.read(new File(resDir, "art/edenLogo.png"));
+		plymouthLogo = RImage.read(new File(resDir, "art/plymouthLogo.png"));
+		neutralLogo  = RImage.read(new File(resDir, "art/neutralLogo.png"));
 		
 		commandBar = loadCommandBar();
 		
@@ -1155,19 +1152,20 @@ public class Sandbox extends JApplet
 	
 	private static JLabel getLogoPanel(Unit unit)
 	{
-		JLabel label = null;
+		RImage img = null;
 		
 		if (unit == null)
 		{
-			label = new JLabel(neutralIcon);
+			img = neutralLogo;
 		}
 		else
 		{
 			String civ = unit.getType().getCiv();
-			Sprite sprite = "Eden".equals(civ) ? edenIconSprite : plymouthIconSprite;
-			label = new JLabel(new ImageIcon(sprite.getImage(unit.getOwner().getColor())));
+			img = "Eden".equals(civ) ? edenLogo : plymouthLogo;
+			img = img.getRecoloredCopy(Color.BLUE, unit.getOwner().getColor());
 		}
 		
+		JLabel label = new JLabel(new ImageIcon(img));
 		label.setBorder(new EmptyBorder(4, 4, 0, 4));
 		return label;
 	}

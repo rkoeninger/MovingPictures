@@ -399,6 +399,11 @@ public class DisplayPanel extends JComponent
 		return animations;
 	}
 	
+	public void addDisplayObject(DisplayObject dObj)
+	{
+		displayObjects.add(dObj);
+	}
+	
 	public int getTotalWidth()
 	{
 		return map.getWidth() * tileSize;
@@ -1010,10 +1015,24 @@ public class DisplayPanel extends JComponent
 		if (showShadows && !unit.isTurret())
 		{
 			Point2D shadowPoint = new Point2D.Double(
-				point.getX() + shadowXOffset,
-				point.getY() + shadowYOffset
+				point.getX() + shadowXOffset + (sprite.getXOffset(scale) / 32.0),
+				point.getY() + shadowYOffset + (sprite.getYOffset(scale) / 32.0)
 			);
 			g.drawImage(sprite.getShadow(), shadowPoint);
+			
+			if (unit.hasTurret())
+			{
+				Sprite turretSprite = sprites.getSprite(unit.getTurret());
+				
+				if (turretSprite != null && turretSprite != SpriteSet.BLANK_SPRITE)
+				{
+					shadowPoint = new Point2D.Double(
+						point.getX() + shadowXOffset + (turretSprite.getXOffset(scale) / 32.0),
+						point.getY() + shadowYOffset + (turretSprite.getYOffset(scale) / 32.0)
+					);
+					g.drawImage(turretSprite.getShadow(), shadowPoint);
+				}
+			}
 		}
 		
 		if (!unit.isTurret() && sprite == SpriteSet.BLANK_SPRITE)

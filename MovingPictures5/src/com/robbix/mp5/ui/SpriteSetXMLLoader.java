@@ -494,7 +494,7 @@ class SpriteSetXMLLoader
 	{
 		String eventType = rootNode.getAttribute("eventType");
 		double trans = rootNode.getFloatAttribute("translucency", 1.0);
-		
+		Color color = rootNode.getColorAttribute("color", null);
 		SpriteSet spriteSet = SpriteSet.forAmbient(eventType);
 		
 		for (RNode eventNode : rootNode.getNodes("Event"))
@@ -522,7 +522,7 @@ class SpriteSetXMLLoader
 					frameOffset = frameOffset.add(offsetNodes.get(i).getOffsetAttributes());
 				}
 				
-				Sprite sprite = new Sprite(img, null, frameOffset);
+				Sprite sprite = new Sprite(img, color, frameOffset);
 				tempList.add(sprite);
 			}
 			

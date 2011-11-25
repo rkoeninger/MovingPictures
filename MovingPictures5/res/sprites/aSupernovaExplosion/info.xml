@@ -4,6 +4,7 @@
 		   path="."
 		   fileNumber="16057"
 		   frameCount="13"
+		   delay="3"
 		   x="-88"
 		   y="-88">
 		<OffsetFrame x="89" y="87"/>
