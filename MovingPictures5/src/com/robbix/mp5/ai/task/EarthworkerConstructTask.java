@@ -1,7 +1,8 @@
 package com.robbix.mp5.ai.task;
 
-import static com.robbix.mp5.map.LayeredMap.*;
 import static com.robbix.mp5.unit.Activity.*;
+
+import com.robbix.mp5.map.Fixture;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Filter;
 import com.robbix.utils.Position;

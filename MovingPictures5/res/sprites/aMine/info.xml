@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SpriteSet type="ambient" eventType="aCommonMine">
+<SpriteSet type="ambient" eventType="aMine">
 	<Event name="platform"
 		   path="."
 		   fileNumber="18589"

@@ -26,7 +26,7 @@ public class MineRouteDemo extends Demo
 				"eCargoTruck",
 				"eCommandCenter",
 				"eCommonSmelter",
-				"aCommonMine",
+				"aMine",
 				"eCommonMine",
 				"aResource",
 				"aStructureStatus"

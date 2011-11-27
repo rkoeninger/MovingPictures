@@ -1,10 +1,12 @@
-package com.robbix.mp5.ui;
+package com.robbix.mp5.ui.obj;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.map.ResourceType;
+import com.robbix.mp5.ui.DisplayGraphics;
+import com.robbix.mp5.ui.Sprite;
 import com.robbix.utils.Position;
 
 public class ResourceDepositDisplayObject extends DisplayObject

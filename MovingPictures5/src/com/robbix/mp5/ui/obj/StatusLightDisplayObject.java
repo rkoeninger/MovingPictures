@@ -1,8 +1,10 @@
-package com.robbix.mp5.ui;
+package com.robbix.mp5.ui.obj;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import com.robbix.mp5.ui.DisplayGraphics;
+import com.robbix.mp5.ui.SpriteGroup;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
 import com.robbix.utils.Utils;

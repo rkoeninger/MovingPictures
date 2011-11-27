@@ -1,4 +1,4 @@
-package com.robbix.mp5.ui;
+package com.robbix.mp5.ui.obj;
 
 import com.robbix.mp5.event.VisibleEvent;
 

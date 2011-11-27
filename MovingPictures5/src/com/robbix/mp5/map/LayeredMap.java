@@ -1,7 +1,8 @@
 package com.robbix.mp5.map;
 
-import static com.robbix.mp5.ui.DisplayLayer.OVERLAY;
-import static com.robbix.mp5.ui.DisplayLayer.UNIT;
+import static com.robbix.mp5.ui.obj.DisplayLayer.OVERLAY;
+import static com.robbix.mp5.ui.obj.DisplayLayer.UNDER_UNIT;
+import static com.robbix.mp5.ui.obj.DisplayLayer.UNIT;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,9 +17,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import com.robbix.mp5.ui.DisplayPanel;
-import com.robbix.mp5.ui.ResourceDepositDisplayObject;
-import com.robbix.mp5.ui.StatusLightDisplayObject;
-import com.robbix.mp5.ui.UnitDisplayObject;
+import com.robbix.mp5.ui.obj.GeyserDisplayObject;
+import com.robbix.mp5.ui.obj.MagmaVentDisplayObject;
+import com.robbix.mp5.ui.obj.MinePlatformDisplayObject;
+import com.robbix.mp5.ui.obj.ResourceDepositDisplayObject;
+import com.robbix.mp5.ui.obj.StatusLightDisplayObject;
+import com.robbix.mp5.ui.obj.UnitDisplayObject;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
@@ -80,18 +84,6 @@ public class LayeredMap
 		reader.close();
 		
 		return map;
-	}
-	
-	public static enum Fixture
-	{
-		WALL(false), TUBE(true), MINE_PLATFORM(true), GEYSER(false);
-		
-		private final boolean passable;
-		
-		private Fixture(boolean passable)
-		{
-			this.passable = passable;
-		}
 	}
 	
 	private static final int WALL_MAX_HP = 500;
@@ -272,11 +264,8 @@ public class LayeredMap
 		case GEYSER:
 			putGeyser(pos);
 			return;
-		case MINE_PLATFORM:
-			if (!canPlaceFixture(fixture, pos))
-				throw new IllegalStateException();
-			
-			grid.get(pos).fixture = fixture;
+		case MAGMA:
+			putMagmaVent(pos);
 			return;
 		}
 		
@@ -373,7 +362,25 @@ public class LayeredMap
 		spot.fixture = Fixture.GEYSER;
 		costMap.setInfinite(pos);
 		
-		refreshPanel(new Region(pos).stretch(1));
+		for (DisplayPanel panel : panels)
+			panel.addDisplayObject(new GeyserDisplayObject(pos), UNIT);
+	}
+	
+	public void putMagmaVent(Position pos)
+	{
+		if (!bounds.contains(pos))
+			return;
+		
+		Spot spot = grid.get(pos);
+		
+		if (spot.fixture != null)
+			throw new IllegalStateException("fixture present " + pos);
+		
+		spot.fixture = Fixture.MAGMA;
+		costMap.setInfinite(pos);
+		
+		for (DisplayPanel panel : panels)
+			panel.addDisplayObject(new MagmaVentDisplayObject(pos), UNIT);
 	}
 	
 	public boolean isAlive(Position pos)
@@ -565,12 +572,12 @@ public class LayeredMap
 		return grid.get(pos).fixture == Fixture.GEYSER;
 	}
 	
-	public boolean hasMinePlatform(Position pos)
+	public boolean hasMagmaVent(Position pos)
 	{
 		if (!bounds.contains(pos))
 			return false;
 		
-		return grid.get(pos).fixture == Fixture.MINE_PLATFORM;
+		return grid.get(pos).fixture == Fixture.MAGMA;
 	}
 	
 	public int getFixtureHP(Position pos)
@@ -777,17 +784,15 @@ public class LayeredMap
 		}
 		
 		assessConnections();
+		boolean mine = unit.isMine();
 		
 		for (DisplayPanel panel : panels)
 		{
 			panel.addDisplayObject(new UnitDisplayObject(unit), UNIT);
 			panel.addDisplayObject(new StatusLightDisplayObject(unit), OVERLAY);
-		}
-		
-		if (unit.isMine())
-		{
-			grid.get(pos).fixture = Fixture.MINE_PLATFORM;
-			refreshPanel(pos);
+			
+			if (mine)
+				panel.addDisplayObject(new MinePlatformDisplayObject(unit), UNDER_UNIT);
 		}
 	}
 	
@@ -1038,16 +1043,7 @@ public class LayeredMap
 				panel.refresh();
 		}
 	}
-
-	private void refreshPanel(Position pos)
-	{
-		synchronized (panels)
-		{
-			for (DisplayPanel panel : panels)
-				panel.refresh(pos);
-		}
-	}
-
+	
 	private void refreshPanel(Region region)
 	{
 		synchronized (panels)

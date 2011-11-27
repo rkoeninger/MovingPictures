@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.robbix.mp5.Game;
-import com.robbix.mp5.map.LayeredMap.Fixture;
+import com.robbix.mp5.map.Fixture;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.BorderRegion;

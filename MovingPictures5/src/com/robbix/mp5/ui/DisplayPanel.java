@@ -27,6 +27,8 @@ import com.robbix.mp5.map.Tile;
 import com.robbix.mp5.map.TileSet;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.ani.AmbientAnimation;
+import com.robbix.mp5.ui.obj.DisplayLayer;
+import com.robbix.mp5.ui.obj.DisplayObject;
 import com.robbix.mp5.ui.overlay.InputOverlay;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
@@ -816,7 +818,7 @@ public class DisplayPanel extends JComponent
 		
 		for (Position pos : region)
 		{
-			RColor color = RColor.getGray(costMap.getScaleFactor(pos), 0.5);
+			RColor color = RColor.getGray(costMap.getScaleFactor(pos));
 			g.setColor(color);
 			g.fill(pos);
 			
@@ -853,15 +855,6 @@ public class DisplayPanel extends JComponent
 			{
 				g.setColor(tile.getAverageColor());
 				g.fill(pos);
-			}
-			
-			if (map.hasMinePlatform(pos))
-			{
-				g.draw(sprites.getSprite("aCommonMine", "platform"), pos);
-			}
-			else if (map.hasGeyser(pos))
-			{
-				g.draw(sprites.getSprite("aGeyser", "geyser"), pos);
 			}
 		}
 	}

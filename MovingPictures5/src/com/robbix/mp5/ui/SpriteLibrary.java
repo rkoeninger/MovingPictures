@@ -15,7 +15,7 @@ import com.robbix.mp5.Game;
 import com.robbix.mp5.Modular;
 import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ModuleListener;
-import com.robbix.mp5.map.LayeredMap;
+import com.robbix.mp5.map.Fixture;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.HealthBracket;
@@ -398,25 +398,14 @@ public class SpriteLibrary implements Modular
 		return sprite.getFadedCopy(aFactor);
 	}
 	
-	public Sprite getSprite(LayeredMap.Fixture fixture)
+	public Sprite getSprite(Fixture fixture)
 	{
-		switch (fixture)
-		{
-		case TUBE:          return getSprite("oTerrainFixture", "tube");
-		case WALL:          return getSprite("oTerrainFixture", "wall");
-		case GEYSER:        return getSprite("aGeyser",         "geyser");
-		case MINE_PLATFORM: return getSprite("aCommonMine",     "platform");
-		}
-		
-		throw new IllegalArgumentException("invalid fixture " + fixture);
+		return getSpriteGroup(fixture).getFirst();
 	}
 	
-	public Sprite getTranslucentSprite(LayeredMap.Fixture fixture, double aFactor)
+	public Sprite getTranslucentSprite(Fixture fixture, double aFactor)
 	{
 		Sprite sprite = getSprite(fixture);
-		
-		if (sprite == null)
-			return null;
 		
 		if (sprite == SpriteSet.BLANK_SPRITE)
 			return sprite;
@@ -424,14 +413,37 @@ public class SpriteLibrary implements Modular
 		return sprite.getFadedCopy(aFactor);
 	}
 	
+	public SpriteGroup getSpriteGroup(Fixture fixture)
+	{
+		switch (fixture)
+		{
+		case TUBE:   return getSpriteGroup("oTerrainFixture", "tube");
+		case WALL:   return getSpriteGroup("oTerrainFixture", "wall");
+		case GEYSER: return getSpriteGroup("aGeyser",         "geyser");
+		case MAGMA:  return getSpriteGroup("aMagmaVent",      "magmaVent");
+		}
+		
+		throw new IllegalArgumentException("invalid fixture " + fixture);
+	}
+	
 	public Sprite getSprite(String setName, String eventName)
 	{
 		SpriteGroup group = getAmbientSpriteGroup(setName, eventName);
 		
 		if (group == null)
-			return null;
+			return SpriteSet.BLANK_SPRITE;
 		
 		return group.getFirst();
+	}
+	
+	public SpriteGroup getSpriteGroup(String setName, String eventName)
+	{
+		SpriteGroup group = getAmbientSpriteGroup(setName, eventName);
+		
+		if (group == null)
+			return SpriteSet.BLANK_GROUP;
+		
+		return group;
 	}
 	
 	public SpriteGroup getAmbientSpriteGroup(String setName, String eventName)

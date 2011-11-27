@@ -22,9 +22,9 @@ import com.robbix.mp5.ai.task.EarthworkerConstructTask;
 import com.robbix.mp5.ai.task.PathTask;
 import com.robbix.mp5.ai.task.RotateTask;
 import com.robbix.mp5.ai.task.SteerTask;
+import com.robbix.mp5.map.Fixture;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.TileSet;
-import com.robbix.mp5.map.LayeredMap.Fixture;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.CursorSet;
 import com.robbix.mp5.ui.DisplayPanel;
@@ -475,7 +475,11 @@ public class Game
 	
 	public void doMove(Unit unit, Position pos, boolean interrupt, double distance)
 	{
-		if (unit.isStructure() || unit.getType().isGuardPostType() || unit.isDead()) return;
+		if (unit.isStructure() || unit.getType().isGuardPostType() || unit.isDead())
+			return;
+		
+		if (map.getTerrainCostMap().isInfinite(pos))
+			return;
 		
 		List<Position> path = new AStar().getPath(
 			map.getTerrainCostMap(),
@@ -484,16 +488,13 @@ public class Game
 			distance
 		);
 		
-		if (path == null) return;
+		if (path == null)
+			return;
 		
-		if (interrupt)
-		{
-			unit.assignNow(new PathTask(path));
-		}
-		else
-		{
-			unit.assignNext(new PathTask(path));
-		}
+		PathTask task = new PathTask(path);
+		
+		if (interrupt) unit.assignNow(task);
+		          else unit.assignNext(task);
 	}
 	
 	public void doApproach(Unit unit, Position pos)

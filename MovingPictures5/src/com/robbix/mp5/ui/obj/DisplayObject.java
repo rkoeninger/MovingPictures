@@ -1,9 +1,11 @@
-package com.robbix.mp5.ui;
+package com.robbix.mp5.ui.obj;
 
 import java.awt.geom.Rectangle2D;
 
+import com.robbix.mp5.ui.DisplayGraphics;
+import com.robbix.mp5.ui.DisplayPanel;
 
-public class DisplayObject
+public abstract class DisplayObject
 {
 	protected DisplayPanel panel;
 	
@@ -17,23 +19,14 @@ public class DisplayObject
 		return panel;
 	}
 	
-	public boolean isAlive()
-	{
-		return false;
-	}
+	public abstract boolean isAlive();
 	
-	public void paint(DisplayGraphics g)
-	{
-		
-	}
+	public abstract void paint(DisplayGraphics g);
 	
 	/**
 	 * Bounds should wrap as closely around the phenomena as possible
 	 * without excluding any of it. This way, phenomena won't pop on and off
 	 * the screen around the edges.
 	 */
-	public Rectangle2D getBounds()
-	{
-		return null;
-	}
+	public abstract Rectangle2D getBounds();
 }

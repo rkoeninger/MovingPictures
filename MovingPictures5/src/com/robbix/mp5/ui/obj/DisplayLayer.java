@@ -1,4 +1,4 @@
-package com.robbix.mp5.ui;
+package com.robbix.mp5.ui.obj;
 
 import java.awt.geom.Rectangle2D;
 import java.util.Comparator;

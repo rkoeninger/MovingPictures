@@ -64,7 +64,7 @@ import com.robbix.mp5.Engine;
 import com.robbix.mp5.Game;
 import com.robbix.mp5.GameListener;
 import com.robbix.mp5.MeteorShowerTrigger;
-import com.robbix.mp5.map.LayeredMap;
+import com.robbix.mp5.map.Fixture;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.sb.demo.Demo;
@@ -170,6 +170,7 @@ public class Sandbox extends JApplet
 	private static JMenuItem spawnMeteorMenuItem;
 	private static JMenuItem meteorShowerMenuItem;
 	private static JMenuItem placeGeyserMenuItem;
+	private static JMenuItem placeMagmaVentMenuItem;
 	private static JMenuItem placeWallMenuItem;
 	private static JMenuItem placeTubeMenuItem;
 	private static JMenuItem placeBulldozeMenuItem;
@@ -307,6 +308,7 @@ public class Sandbox extends JApplet
 		spawnMeteorMenuItem    = new JMenuItem("Spawn Meteor");
 		meteorShowerMenuItem   = new JMenuItem("Meteor Shower");
 		placeGeyserMenuItem    = new JMenuItem("Place Geyser");
+		placeMagmaVentMenuItem = new JMenuItem("Place Magma Vent");
 		placeWallMenuItem      = new JMenuItem("Place Wall");
 		placeTubeMenuItem      = new JMenuItem("Place Tube");
 		placeBulldozeMenuItem  = new JMenuItem("Bulldoze");
@@ -418,6 +420,7 @@ public class Sandbox extends JApplet
 		placeRare3            .addActionListener(listener);
 		placeBulldozeMenuItem .addActionListener(listener);
 		placeGeyserMenuItem   .addActionListener(listener);
+		placeMagmaVentMenuItem.addActionListener(listener);
 		placeWallMenuItem     .addActionListener(listener);
 		placeTubeMenuItem     .addActionListener(listener);
 		removeAllUnitsMenuItem.addActionListener(listener);
@@ -457,7 +460,8 @@ public class Sandbox extends JApplet
 		soundMenu.add(setAudioFormatMenuItem);
 		terrainMenu.add(placeWallMenuItem);
 		terrainMenu.add(placeTubeMenuItem);
-//		terrainMenu.add(placeGeyserMenuItem);
+		terrainMenu.add(placeGeyserMenuItem);
+		terrainMenu.add(placeMagmaVentMenuItem);
 		terrainMenu.add(placeBulldozeMenuItem);
 		placeResourceMenu.add(placeCommon1);
 		placeResourceMenu.add(placeCommon2);
@@ -873,15 +877,19 @@ public class Sandbox extends JApplet
 			}
 			else if (e.getSource() == placeGeyserMenuItem)
 			{
-				panel.pushOverlay(new PlaceFixtureOverlay(LayeredMap.Fixture.GEYSER));
+				panel.pushOverlay(new PlaceFixtureOverlay(Fixture.GEYSER));
 			}
 			else if (e.getSource() == placeWallMenuItem)
 			{
-				panel.pushOverlay(new PlaceFixtureOverlay(LayeredMap.Fixture.WALL));
+				panel.pushOverlay(new PlaceFixtureOverlay(Fixture.WALL));
 			}
 			else if (e.getSource() == placeTubeMenuItem)
 			{
-				panel.pushOverlay(new PlaceFixtureOverlay(LayeredMap.Fixture.TUBE));
+				panel.pushOverlay(new PlaceFixtureOverlay(Fixture.TUBE));
+			}
+			else if (e.getSource() == placeMagmaVentMenuItem)
+			{
+				panel.pushOverlay(new PlaceFixtureOverlay(Fixture.MAGMA));
 			}
 			else if (e.getSource() == pauseMenuItem)
 			{
