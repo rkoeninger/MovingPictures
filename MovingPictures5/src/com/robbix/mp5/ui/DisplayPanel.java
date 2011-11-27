@@ -1,7 +1,5 @@
 package com.robbix.mp5.ui;
 
-import static java.lang.Math.ceil;
-import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -17,6 +15,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,8 +23,6 @@ import javax.swing.JComponent;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap;
-import com.robbix.mp5.map.ResourceDeposit;
-import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.map.Tile;
 import com.robbix.mp5.map.TileSet;
 import com.robbix.mp5.player.Player;
@@ -40,7 +37,6 @@ import com.robbix.utils.Position;
 import com.robbix.utils.RColor;
 import com.robbix.utils.RImage;
 import com.robbix.utils.Region;
-import com.robbix.utils.Utils;
 
 @SuppressWarnings("serial")
 public class DisplayPanel extends JComponent
@@ -50,9 +46,7 @@ public class DisplayPanel extends JComponent
 	private TileSet tiles;
 	private CursorSet cursors;
 	
-	private Point scroll = new Point();
-	private int tileSize = 32;
-	private int scale = 0;
+	private GridMetrics gm = new GridMetrics(0, 0, 32, 0);
 	private int minScale, maxScale, normalScale;
 	private int minShowUnitScale = -2;
 	
@@ -80,7 +74,7 @@ public class DisplayPanel extends JComponent
 	
 	private List<AmbientAnimation> animations = new LinkedList<AmbientAnimation>();
 	
-	private List<DisplayObject> displayObjects = new LinkedList<DisplayObject>();
+	private EnumMap<DisplayLayer, List<DisplayObject>> displayLayers;
 	
 	private DisplayPanelView view;
 	
@@ -110,18 +104,23 @@ public class DisplayPanel extends JComponent
 		map.addDisplayPanel(this);
 		this.sprites = sprites;
 		this.tiles = tiles;
-		this.tileSize = tiles.getTileSize();
+		this.gm.tileSize = tiles.getTileSize();
 		this.normalScale = 0;
 		this.maxScale = 3;
-		this.minScale = getMinScale(tileSize);
+		this.minScale = getMinScale(gm.tileSize);
 		this.cursors = cursors;
 		this.overlays = new LinkedList<InputOverlay>();
+		this.displayLayers = new EnumMap<DisplayLayer, List<DisplayObject>>(DisplayLayer.class);
+		
+		for (DisplayLayer layer : DisplayLayer.values())
+			displayLayers.put(layer, new LinkedList<DisplayObject>());
+		
 		setBackground(BACKGROUND_BLUE);
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
 		Dimension size = new Dimension(
-			map.getWidth()  * tileSize,
-			map.getHeight() * tileSize
+			map.getWidth()  * gm.tileSize,
+			map.getHeight() * gm.tileSize
 		);
 		setPreferredSize(size);
 		this.adapter = new InputOverlay.ListenerAdapter();
@@ -399,19 +398,23 @@ public class DisplayPanel extends JComponent
 		return animations;
 	}
 	
-	public void addDisplayObject(DisplayObject dObj)
+	public void addDisplayObject(DisplayObject dObj, DisplayLayer layer)
 	{
-		displayObjects.add(dObj);
+		synchronized (displayLayers)
+		{
+			dObj.setDisplayPanel(this);
+			displayLayers.get(layer).add(dObj);
+		}
 	}
 	
 	public int getTotalWidth()
 	{
-		return map.getWidth() * tileSize;
+		return map.getWidth() * gm.tileSize;
 	}
 	
 	public int getTotalHeight()
 	{
-		return map.getHeight() * tileSize;
+		return map.getHeight() * gm.tileSize;
 	}
 	
 	public int getVerticalLetterBoxSpace()
@@ -426,76 +429,66 @@ public class DisplayPanel extends JComponent
 	
 	public Point getViewPoint()
 	{
-		return new Point(scroll);
+		return gm.getOffset();
 	}
 	
 	public Point getViewCenterPoint()
 	{
-		return new Point(
-			 (getWidth()  / 2) - scroll.x,
-			 (getHeight() / 2) - scroll.y
-		);
+		return new Point((getWidth()  / 2) - gm.xOffset, (getHeight() / 2) - gm.yOffset);
+	}
+	
+	public GridMetrics getGridMetrics()
+	{
+		return gm;
 	}
 	
 	public int getViewX()
 	{
-		return scroll.x;
+		return gm.xOffset;
 	}
 	
 	public int getViewY()
 	{
-		return scroll.y;
+		return gm.yOffset;
 	}
 	
 	public void setViewPoint(int x, int y)
 	{
-		int oldScrollX = scroll.x;
-		int oldScrollY = scroll.y;
+		int oldScrollX = gm.xOffset;
+		int oldScrollY = gm.yOffset;
 		
-		scroll.x = x;
-		scroll.y = y;
-		centerAsNeeded();
+		gm.xOffset = x;
+		gm.yOffset = y;
+		alignVisibleArea();
 		
-		if (scroll.x != oldScrollX || scroll.y != oldScrollY)
+		if (gm.xOffset != oldScrollX || gm.yOffset != oldScrollY)
 			refresh();
 	}
 	
 	public void shiftViewPoint(int dx, int dy)
 	{
-		setViewPoint(
-			scroll.x + dx,
-			scroll.y + dy
-		);
+		setViewPoint(gm.xOffset + dx, gm.yOffset + dy);
 	}
 	
 	public void setViewCenterPoint(int x, int y)
 	{
-		setViewPoint(
-			(getWidth()  / 2) - x,
-			(getHeight() / 2) - y
-		);
+		setViewPoint((getWidth()  / 2) - x, (getHeight() / 2) - y);
 	}
 	
 	public void setViewCenterPosition(Position pos)
 	{
 		setViewPoint(
-			(getWidth()  / 2) - (pos.x * tileSize + tileSize / 2),
-			(getHeight() / 2) - (pos.y * tileSize + tileSize / 2)
+			(getWidth()  / 2) - (pos.x * gm.tileSize + gm.tileSize / 2),
+			(getHeight() / 2) - (pos.y * gm.tileSize + gm.tileSize / 2)
 		);
 	}
 	
-	private void centerAsNeeded()
+	private void alignVisibleArea()
 	{
-		int diffWidth  = getWidth()  - getTotalWidth();
-		int diffHeight = getHeight() - getTotalHeight();
-		
-		scroll.x = (diffWidth > 0)
-			? diffWidth / 2
-			: max(min(scroll.x, 0), diffWidth);
-		
-		scroll.y = (diffHeight > 0)
-			? diffHeight / 2
-			: max(min(scroll.y, 0), diffHeight);
+		int diffX = getWidth()  - getTotalWidth();
+		int diffY = getHeight() - getTotalHeight();
+		gm.xOffset = (diffX > 0) ? diffX / 2 : max(min(gm.xOffset, 0), diffX);
+		gm.yOffset = (diffY > 0) ? diffY / 2 : max(min(gm.yOffset, 0), diffY);
 	}
 	
 	public void zoomIn()
@@ -522,40 +515,40 @@ public class DisplayPanel extends JComponent
 	
 	public void zoomIn(Position pos)
 	{
-		zoomIn(getPoint(pos));
+		zoomIn(gm.getPoint(pos));
 	}
 	
 	public void zoomOut(Position pos)
 	{
-		zoomOut(getPoint(pos));
+		zoomOut(gm.getPoint(pos));
 	}
 	
 	public void zoomNormal(Position pos)
 	{
-		zoomNormal(getPoint(pos));
+		zoomNormal(gm.getPoint(pos));
 	}
 	
 	public void zoomIn(Point center)
 	{
-		if (scale < maxScale)
+		if (gm.scale < maxScale)
 		{
-			setScaleCentered(scale + 1, center);
+			setScaleCentered(gm.scale + 1, center);
 			refresh(getDisplayRegion());
 		}
 	}
 	
 	public void zoomOut(Point center)
 	{
-		if (scale > minScale)
+		if (gm.scale > minScale)
 		{
-			setScaleCentered(scale - 1, center);
+			setScaleCentered(gm.scale - 1, center);
 			refresh(getDisplayRegion());
 		}
 	}
 	
 	public void zoomNormal(Point center)
 	{
-		if (scale != normalScale)
+		if (gm.scale != normalScale)
 		{
 			setScaleCentered(normalScale, center);
 			refresh(getDisplayRegion());
@@ -569,7 +562,7 @@ public class DisplayPanel extends JComponent
 	public void reshape(int x, int y, int width, int height)
 	{
 		super.reshape(x, y, width, height);
-		centerAsNeeded();
+		alignVisibleArea();
 		refresh();
 	}
 	
@@ -599,7 +592,7 @@ public class DisplayPanel extends JComponent
 	 */
 	public int getTileSize()
 	{
-		return tileSize;
+		return gm.tileSize;
 	}
 	
 	/**
@@ -612,7 +605,7 @@ public class DisplayPanel extends JComponent
 	 */
 	public int getScale()
 	{
-		return scale;
+		return gm.scale;
 	}
 	
 	/**
@@ -630,11 +623,11 @@ public class DisplayPanel extends JComponent
 			? normalTileSize >> -scale
 			: normalTileSize << scale;
 		
-		this.tileSize = newTileSize;
-		this.scale = scale;
+		gm.tileSize = newTileSize;
+		gm.scale = scale;
 		setPreferredSize(new Dimension(
-			map.getWidth()  * tileSize,
-			map.getHeight() * tileSize
+			map.getWidth()  * gm.tileSize,
+			map.getHeight() * gm.tileSize
 		));
 	}
 	
@@ -646,97 +639,6 @@ public class DisplayPanel extends JComponent
 		setViewCenterPoint(
 			(int) (xFraction * getTotalWidth()),
 			(int) (yFraction * getTotalHeight())
-		);
-	}
-	
-	/**
-	 * Translates a pixel Point on the panel to a grid Position on the map.
-	 */
-	public Position getPosition(Point point)
-	{
-		return getPosition(point.x, point.y);
-	}
-	
-	/**
-	 * Translates a pair of pixel co-ordinates on the panel
-	 * to a grid Position on the map.
-	 */
-	public Position getPosition(int x, int y)
-	{
-		if (x < max(0, scroll.x)
-		 || y < max(0, scroll.y)
-		 || x > min(getWidth(),  scroll.x + getTotalWidth())
-		 || y > min(getHeight(), scroll.y + getTotalHeight()))
-			return null;
-		
-		return new Position(
-			(x - scroll.x) / tileSize,
-			(y - scroll.y) / tileSize
-		);
-	}
-	
-	/**
-	 * Translates a grid Position on the map to a pixel Point on the panel
-	 * that is the upper-left corner of that grid Position as drawn.
-	 */
-	public Point getPoint(Position pos)
-	{
-		return new Point(
-			pos.x * tileSize + scroll.x,
-			pos.y * tileSize + scroll.y
-		);
-	}
-	
-	/**
-	 * Translates a grid Position on the map to a pixel Point on the panel
-	 * that is in the center of that grid Position as drawn.
-	 */
-	public Point getCenteredPoint(Position pos)
-	{
-		int half = tileSize / 2;
-		int x = pos.x * tileSize + half + scroll.x;
-		int y = pos.y * tileSize + half + scroll.y;
-		return new Point(x, y);
-	}
-	
-	/**
-	 * Translates a pixel Rectangle on the panel to a grid Region,
-	 * including all grid spots the Rectangle intersects.
-	 */
-	public Region getRegion(Rectangle rect)
-	{
-		int minX = (int) floor((rect.x - scroll.x) / (double) tileSize);
-		int minY = (int) floor((rect.y - scroll.y) / (double) tileSize);
-		int maxX = (int) ceil((rect.x - scroll.x + rect.width) / (double) tileSize);
-		int maxY = (int) ceil((rect.y - scroll.y + rect.height) / (double) tileSize);
-		Region region = new Region(minX, minY, maxX - minX, maxY - minY);
-		return map.getBounds().getIntersection(region);
-	}
-	
-	/**
-	 * Translates a pixel Rectangle on the panel to a grid Region,
-	 * including only grid spots fully enclosed by the Rectangle.
-	 */
-	public Region getEnclosedRegion(Rectangle rect)
-	{
-		int minX = (int) ceil((rect.x - scroll.x) / (double) tileSize);
-		int minY = (int) ceil((rect.y - scroll.y) / (double) tileSize);
-		int maxX = (int) floor((rect.x - scroll.x + rect.width) / (double) tileSize);
-		int maxY = (int) floor((rect.y - scroll.y + rect.height) / (double) tileSize);
-		Region region = new Region(minX, minY, maxX - minX, maxY - minY);
-		return map.getBounds().getIntersection(region);
-	}
-	
-	/**
-	 * Translates a grid Region on the map to a pixel Rectangle on the panel.
-	 */
-	public Rectangle getRectangle(Region region)
-	{
-		return new Rectangle(
-			region.x * tileSize + scroll.x,
-			region.y * tileSize + scroll.y,
-			region.w * tileSize,
-			region.h * tileSize
 		);
 	}
 	
@@ -759,8 +661,8 @@ public class DisplayPanel extends JComponent
 	public Rectangle getDisplayRect()
 	{
 		return new Rectangle(
-			max(0, scroll.x),
-			max(0, scroll.y),
+			max(0, gm.xOffset),
+			max(0, gm.yOffset),
 			min(getTotalWidth(),  getWidth()),
 			min(getTotalHeight(), getHeight())
 		);
@@ -769,10 +671,10 @@ public class DisplayPanel extends JComponent
 	public Rectangle2D getGridDisplayRect()
 	{
 		return new Rectangle2D.Double(
-			max(0, scroll.x) / (double) tileSize,
-			max(0, scroll.y) / (double) tileSize,
-			min(getTotalWidth(),  getWidth())  / (double) tileSize,
-			min(getTotalHeight(), getHeight()) / (double) tileSize
+			max(0, gm.xOffset) / (double) gm.tileSize,
+			max(0, gm.yOffset) / (double) gm.tileSize,
+			min(getTotalWidth(),  getWidth())  / (double) gm.tileSize,
+			min(getTotalHeight(), getHeight()) / (double) gm.tileSize
 		);
 	}
 	
@@ -781,7 +683,7 @@ public class DisplayPanel extends JComponent
 	 */
 	public Region getDisplayRegion()
 	{
-		return getRegion(getDisplayRect());
+		return gm.getRegion(getDisplayRect());
 	}
 	
 	/*------------------------------------------------------------------------------------------[*]
@@ -795,10 +697,10 @@ public class DisplayPanel extends JComponent
 	public void paintComponent(Graphics g0)
 	{
 		DisplayGraphics g = new DisplayGraphics((Graphics2D) g0);
-		g.setGridMetrics(new GridMetrics(scroll.x, scroll.y, tileSize, scale));
+		g.setGridMetrics(gm);
 		drawLetterBox(g);
 		Rectangle rect = getDisplayRect();
-		Region region = getRegion(rect);
+		Region region = gm.getRegion(rect);
 		Rectangle2D absRect = region.getAbsRect();
 		
 		if (showBackground)
@@ -811,33 +713,39 @@ public class DisplayPanel extends JComponent
 			g.fill(rect);
 		}
 		
-		if (showGrid && tileSize >= 8)
+		if (showGrid && gm.scale >= -2)
 		{
 			g.setColor(Color.BLACK);
 			drawGrid(g, rect, region);
 		}
 		
-		if (showTubeConnectivity)
+		if (showTubeConnectivity && gm.scale >= -2)
 			drawTubeConnectivity(g, region);
 		
-		for (Unit unit : map.getUnitIterator(true))
-			if (region.intersects(unit.getOccupiedBounds()))
-				drawUnit(g, unit);
-		
-		for (DisplayObject dObj : displayObjects)
-			if (absRect.intersects(dObj.getBounds()))
-				dObj.paint(g);
+		synchronized (displayLayers)
+		{
+			for (DisplayLayer layer : DisplayLayer.values())
+			{
+				List<DisplayObject> list = displayLayers.get(layer);
+				
+				if (layer.comparator != null)
+				{
+					list = new ArrayList<DisplayObject>(list);
+					Collections.sort(list, layer.comparator);
+				}
+				
+				for (DisplayObject dObj : list)
+					if (dObj.isAlive() && absRect.intersects(dObj.getBounds()))
+						dObj.paint(g);
+			}
+		}
 		
 		synchronized (animations)
 		{
 			for (AmbientAnimation animation : animations)
-				if (absRect.intersects(animation.getBounds()) && scale >= minShowUnitScale)
+				if (absRect.intersects(animation.getBounds()) && gm.scale >= minShowUnitScale)
 					animation.paint(g);
 		}
-		
-		for (ResourceDeposit res : map.getResourceDeposits())
-			if (region.contains(res.getPosition()))
-				drawResourceDeposit(g, res);
 		
 		if (! overlays.isEmpty())
 			overlays.getFirst().paint(g);
@@ -882,9 +790,10 @@ public class DisplayPanel extends JComponent
 			{
 				lastRefreshTime = time;
 				cachedBackground = new RImage(rect.width, rect.height, false);
-				DisplayGraphics cg = new DisplayGraphics((Graphics2D) cachedBackground.getGraphics());
+				Graphics2D bg = (Graphics2D) cachedBackground.getGraphics();
+				DisplayGraphics cg = new DisplayGraphics(bg);
 				cg.setGridMetrics(g.getGridMetrics());
-				cg.translate(min(0, -scroll.x), min(0, -scroll.y));
+				cg.translate(min(0, -gm.xOffset), min(0, -gm.yOffset));
 				
 				if (showTerrainCostMap) drawCostMap(cg, region);
 								   else drawSurface(cg, region);
@@ -911,15 +820,15 @@ public class DisplayPanel extends JComponent
 			g.setColor(color);
 			g.fill(pos);
 			
-			if (scale >= -1)
+			if (gm.scale >= -1)
 			{
 				g.setColor(color.invert().toBlackWhite());
 				double cost = costMap.get(pos);
 				String costLabel = null;
 				
 				if (costMap.isInfinite(pos)) costLabel = "Inf";
-				else if (scale >= 0)  costLabel = String.format("%.2f", cost);
-				else if (scale == -1) costLabel = String.valueOf((int) cost);
+				else if (gm.scale >= 0)  costLabel = String.format("%.2f", cost);
+				else if (gm.scale == -1) costLabel = String.valueOf((int) cost);
 				
 				if (costLabel != null)
 					g.drawString(costLabel, pos);
@@ -936,7 +845,7 @@ public class DisplayPanel extends JComponent
 		{
 			Tile tile = tiles.getTile(map.getTileCode(pos));
 			
-			if (scale >= minShowUnitScale)
+			if (gm.scale >= minShowUnitScale)
 			{
 				g.drawImage(tile.getImage(), pos);
 			}
@@ -963,10 +872,10 @@ public class DisplayPanel extends JComponent
 	private void drawGrid(DisplayGraphics g, Rectangle rect, Region region)
 	{
 		for (int x = max(1, region.x); x < region.getMaxX(); ++x)
-			g.drawLine(x * tileSize + scroll.x, 0, x * tileSize + scroll.x, getHeight() - 1);
+			g.drawLine(x * gm.tileSize + gm.xOffset, 0, x * gm.tileSize + gm.xOffset, getHeight() - 1);
 		
 		for (int y = max(1, region.y); y < region.getMaxY(); ++y)
-			g.drawLine(0, y * tileSize + scroll.y, getWidth() - 1, y * tileSize + scroll.y);
+			g.drawLine(0, y * gm.tileSize + gm.yOffset, getWidth() - 1, y * gm.tileSize + gm.yOffset);
 	}
 	
 	/**
@@ -974,138 +883,22 @@ public class DisplayPanel extends JComponent
 	 */
 	private void drawTubeConnectivity(DisplayGraphics g, Region region)
 	{
-		Color transGreen = InputOverlay.GREEN.getFill();
-		Color transRed = InputOverlay.RED.getFill();
-		
 		for (int x = region.x; x < region.getMaxX(); ++x)
 		for (int y = region.y; y < region.getMaxY(); ++y)
 		{
 			Position pos = new Position(x, y);
 			Unit occupant = map.getUnit(pos);
 			boolean needsConnection = occupant != null && occupant.needsConnection();
-			boolean isSource = occupant != null && occupant.isConnectionSource();
-			boolean hasConnection = occupant != null && occupant.needsConnection()
-													 && occupant.isConnected();
+			boolean isSource        = occupant != null && occupant.isConnectionSource();
+			boolean hasConnection   = occupant != null && occupant.needsConnection()
+			                                           && occupant.isConnected();
 			
 			if (map.hasTube(pos) || needsConnection || isSource)
 			{
 				boolean alive = (map.isAlive(pos) || hasConnection || isSource);
-				g.setColor(alive ? transGreen : transRed);
+				g.setColor(alive ? InputOverlay.TRANS_GREEN : InputOverlay.TRANS_RED);
 				g.fill(pos);
 			}
-		}
-	}
-	
-	/**
-	 * Gets the sprite for the given Unit in its current state and renders it
-	 * along with any overlays - i.e. the UnitLayer state.
-	 */
-	private void drawUnit(DisplayGraphics g, Unit unit)
-	{
-		if (!unit.isTurret() && scale < minShowUnitScale)
-		{
-			g.setColor(unit.getOwner().getColor());
-			g.fill(unit.getOccupiedBounds());
-			return;
-		}
-		
-		Point2D point = unit.getAbsPoint();
-		Sprite sprite = sprites.getSprite(unit);
-		
-		if (showShadows && !unit.isTurret())
-		{
-			Point2D shadowPoint = new Point2D.Double(
-				point.getX() + shadowXOffset + (sprite.getXOffset(scale) / 32.0),
-				point.getY() + shadowYOffset + (sprite.getYOffset(scale) / 32.0)
-			);
-			g.drawImage(sprite.getShadow(), shadowPoint);
-			
-			if (unit.hasTurret())
-			{
-				Sprite turretSprite = sprites.getSprite(unit.getTurret());
-				
-				if (turretSprite != null && turretSprite != SpriteSet.BLANK_SPRITE)
-				{
-					shadowPoint = new Point2D.Double(
-						point.getX() + shadowXOffset + (turretSprite.getXOffset(scale) / 32.0),
-						point.getY() + shadowYOffset + (turretSprite.getYOffset(scale) / 32.0)
-					);
-					g.drawImage(turretSprite.getShadow(), shadowPoint);
-				}
-			}
-		}
-		
-		if (!unit.isTurret() && sprite == SpriteSet.BLANK_SPRITE)
-		{
-			g.setColor(unit.getOwner().getColor());
-			g.fill(unit.getOccupiedBounds());
-		}
-		else
-		{
-			RColor color = unit.getOwner() != null ? unit.getOwner().getColor() : null;
-			g.draw(sprite, point, color);
-		}
-		
-		if (unit.hasTurret())
-		{
-			drawUnit(g, unit.getTurret());
-		}
-		else if (unit.isGuardPost() || unit.isStructure())
-		{
-			drawStatusLight(g, unit);
-		}
-	}
-	
-	/**
-	 * Draws upper-left corner status light for structures and guard posts.
-	 * Green "active" lights are not draw for guard posts.
-	 * Unit must be owned by current viewing player to have status light drawn.
-	 */
-	private void drawStatusLight(DisplayGraphics g, Unit unit)
-	{
-		if (!currentPlayer.owns(unit))
-			return;
-		
-		Position pos = unit.getPosition();
-		
-		if (unit.isIdle())
-		{
-			g.draw(sprites.getSprite("aStructureStatus", "idle"), pos);
-		}
-		else if (unit.isDisabled())
-		{
-			SpriteGroup seq = sprites.getAmbientSpriteGroup("aStructureStatus", "disabled");
-			int index = Utils.getTimeBasedIndex(100, seq.getSpriteCount());
-			g.draw(seq.getSprite(index), pos);
-		}
-		else if (unit.isStructure())
-		{
-			g.draw(sprites.getSprite("aStructureStatus", "active"), pos);
-		}
-	}
-	
-	private static final Color COMMON_ORE_COLOR = new Color(255, 92, 0);
-	private static final Color RARE_ORE_COLOR = new Color(255, 255, 106);
-	
-	/**
-	 * Draws a ResourceDeposit at that deposit's position.
-	 */
-	private void drawResourceDeposit(DisplayGraphics g, ResourceDeposit res)
-	{
-		if (scale < -1)
-		{
-			Color color = res.getType() == ResourceType.COMMON_ORE
-				? COMMON_ORE_COLOR
-				: RARE_ORE_COLOR;
-			g.setColor(color);
-			g.fill(res.getPosition());
-		}
-		else
-		{
-			Sprite sprite = res.isSurveyedBy(currentPlayer)
-				? sprites.getSprite(res)
-				: sprites.getUnknownDepositSprite();
-			g.draw(sprite, res.getPosition());
 		}
 	}
 }

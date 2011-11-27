@@ -1,21 +1,24 @@
 package com.robbix.mp5.map;
 
+import static com.robbix.mp5.ui.DisplayLayer.OVERLAY;
+import static com.robbix.mp5.ui.DisplayLayer.UNIT;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.TreeSet;
-
 import com.robbix.mp5.ui.DisplayPanel;
+import com.robbix.mp5.ui.ResourceDepositDisplayObject;
+import com.robbix.mp5.ui.StatusLightDisplayObject;
+import com.robbix.mp5.ui.UnitDisplayObject;
 import com.robbix.mp5.unit.Footprint;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
@@ -221,6 +224,9 @@ public class LayeredMap
 		grid.get(pos).deposit = deposit;
 		deposit.setPosition(pos);
 		deposits.add(deposit);
+		
+		for (DisplayPanel panel : panels)
+			panel.addDisplayObject(new ResourceDepositDisplayObject(deposit), OVERLAY);
 	}
 	
 	public void removeResourceDeposit(Position pos)
@@ -772,6 +778,12 @@ public class LayeredMap
 		
 		assessConnections();
 		
+		for (DisplayPanel panel : panels)
+		{
+			panel.addDisplayObject(new UnitDisplayObject(unit), UNIT);
+			panel.addDisplayObject(new StatusLightDisplayObject(unit), OVERLAY);
+		}
+		
 		if (unit.isMine())
 		{
 			grid.get(pos).fixture = Fixture.MINE_PLATFORM;
@@ -1013,16 +1025,7 @@ public class LayeredMap
 	
 	public RIterator<Unit> getUnitIterator()
 	{
-		return getUnitIterator(false);
-	}
-	
-	public RIterator<Unit> getUnitIterator(boolean zorder)
-	{
-		Set<Unit> copy = zorder ? new TreeSet<Unit>(Z_ORDER_UNIT)
-								: new HashSet<Unit>();
-		
-		copy.addAll(units);
-		return RIterator.iterate(copy);
+		return RIterator.iterate(new HashSet<Unit>(units));
 	}
 	
 	// unused - as it should be for optimality's sake
@@ -1053,40 +1056,4 @@ public class LayeredMap
 				panel.refresh(region);
 		}
 	}
-	
-	/**
-	 * Compares two Units for z-order.
-	 * 
-	 * Sorted just like Z_ORDER_POS but all the structures on a row
-	 * come after all the vehicles on the same row.
-	 */
-	private static final Comparator<Unit> Z_ORDER_UNIT =
-	new Comparator<Unit>()
-	{
-		private final int A =  1;
-		private final int B = -1;
-		
-		public int compare(Unit a, Unit b)
-		{
-			final Position posA = a.getPosition();
-			final Position posB = b.getPosition();
-			
-			if (posA.y > posB.y) return A;
-			if (posA.y < posB.y) return B;
-			
-			final boolean structA = a.isStructure() && !a.isMine();
-			final boolean structB = b.isStructure() && !b.isMine();
-			
-			if ( structA && !structB) return A;
-			if (!structA &&  structB) return B;
-			
-			if (posA.x > posB.x) return A;
-			if (posA.x < posB.x) return B;
-			
-			if (b.isMine()) return A;
-			if (a.isMine()) return B;
-			
-			return 0; // Should this be possible?
-		}
-	};
 }

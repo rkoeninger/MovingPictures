@@ -277,8 +277,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public boolean isCursorOnGrid()
 	{
-		return currentPoint != null
-			&& panel.getPosition(currentPoint) != null;
+		return currentPoint != null && panel.getGridMetrics().getPosition(currentPoint) != null;
 	}
 	
 	public Point getCursorPoint()
@@ -291,7 +290,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		if (currentPoint == null)
 			return null;
 		
-		return panel.getPosition(currentPoint);
+		return panel.getGridMetrics().getPosition(currentPoint);
 	}
 	
 	public boolean isDragging()
@@ -306,24 +305,24 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public Region getDragRegion()
 	{
-		return dragArea == null ? null : panel.getRegion(dragArea);
+		return dragArea == null ? null : panel.getGridMetrics().getRegion(dragArea);
 	}
 	
 	public Region getEnclosedDragRegion()
 	{
-		return dragArea == null ? null : panel.getEnclosedRegion(dragArea);
+		return dragArea == null ? null : panel.getGridMetrics().getEnclosedRegion(dragArea);
 	}
 	
 	public boolean isDragRegionLinear()
 	{
-		Region fullRegion = panel.getRegion(dragArea);
+		Region fullRegion = panel.getGridMetrics().getRegion(dragArea);
 		return fullRegion.w == 1 || fullRegion.h == 1;
 	}
 	
 	public LinearRegion getLinearDragRegion()
 	{
-		Position origin = panel.getPosition(pressedPoint);
-		Region fullRegion = panel.getRegion(dragArea);
+		Position origin = panel.getGridMetrics().getPosition(pressedPoint);
+		Region fullRegion = panel.getGridMetrics().getRegion(dragArea);
 		int endX = origin.x;
 		int endY = origin.y;
 		
@@ -346,8 +345,8 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public LShapedRegion getLShapedDragRegion(boolean verticalFirst)
 	{
-		Position origin = panel.getPosition(pressedPoint);
-		Region fullRegion = panel.getRegion(dragArea);
+		Position origin = panel.getGridMetrics().getPosition(pressedPoint);
+		Region fullRegion = panel.getGridMetrics().getRegion(dragArea);
 		
 		int farX = origin.x == fullRegion.x ? fullRegion.getMaxX() - 1 : fullRegion.getX();
 		int farY = origin.y == fullRegion.y ? fullRegion.getMaxY() - 1 : fullRegion.getY();
@@ -357,7 +356,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	
 	public BorderRegion getBorderDragRegion()
 	{
-		return new BorderRegion(panel.getRegion(dragArea));
+		return new BorderRegion(panel.getGridMetrics().getRegion(dragArea));
 	}
 	
 	public boolean isShiftDown()
@@ -456,7 +455,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	private boolean panelContains(int x, int y) // in terms of relative co-ords
 	{
 		Point p = new Point(x, y);
-		return panel.getPosition(p) != null;
+		return panel.getGridMetrics().getPosition(p) != null;
 	}
 	
 	private void prepCursorPoint(int x, int y) // in terms of relative co-ords

@@ -26,10 +26,10 @@ public class UnitDisplayObject extends DisplayObject
 	{
 		Point2D absPoint = unit.getAbsPoint();
 		return new Rectangle2D.Double(
-			absPoint.getX(),
-			absPoint.getY(),
-			unit.getWidth(),
-			unit.getHeight()
+			absPoint.getX() - 0.5,
+			absPoint.getY() - 0.5,
+			unit.getWidth() + 1,
+			unit.getHeight() + 1
 		);
 	}
 	
@@ -54,10 +54,24 @@ public class UnitDisplayObject extends DisplayObject
 		{
 			Point2D shadowOffset = panel.getShadowOffset();
 			Point2D shadowPoint = new Point2D.Double(
-				point.getX() + shadowOffset.getX(),
-				point.getY() + shadowOffset.getY()
+				point.getX() + shadowOffset.getX() + (sprite.getXOffset(panel.getScale()) / 32.0),
+				point.getY() + shadowOffset.getY() + (sprite.getYOffset(panel.getScale()) / 32.0)
 			);
 			g.drawImage(sprite.getShadow(), shadowPoint);
+			
+			if (unit.hasTurret())
+			{
+				Sprite turretSprite = panel.getSpriteLibrary().getSprite(unit.getTurret());
+				
+				if (turretSprite != null && turretSprite != SpriteSet.BLANK_SPRITE)
+				{
+					shadowPoint = new Point2D.Double(
+						point.getX() + shadowOffset.getX() + (turretSprite.getXOffset(panel.getScale()) / 32.0),
+						point.getY() + shadowOffset.getY() + (turretSprite.getYOffset(panel.getScale()) / 32.0)
+					);
+					g.drawImage(turretSprite.getShadow(), shadowPoint);
+				}
+			}
 		}
 		
 		if (!unit.isTurret() && sprite == SpriteSet.BLANK_SPRITE)
