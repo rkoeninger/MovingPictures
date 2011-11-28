@@ -3,6 +3,7 @@ package com.robbix.mp5;
 import static com.robbix.mp5.unit.Activity.BUILD;
 import static com.robbix.mp5.unit.Activity.COLLAPSE;
 
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import com.robbix.mp5.ui.ani.WeaponAnimation;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
+import com.robbix.utils.CostMap;
 import com.robbix.utils.Direction;
 import com.robbix.utils.Position;
 import com.robbix.utils.RColor;
@@ -478,15 +480,12 @@ public class Game
 		if (unit.isStructure() || unit.getType().isGuardPostType() || unit.isDead())
 			return;
 		
-		if (map.getTerrainCostMap().isInfinite(pos))
+		CostMap costMap = map.getTerrainCostMap();
+		
+		if (costMap.isInfinite(pos))
 			return;
 		
-		List<Position> path = new AStar().getPath(
-			map.getTerrainCostMap(),
-			unit.getPosition(),
-			pos,
-			distance
-		);
+		List<Position> path = new AStar().getPath(costMap, unit.getPosition(), pos, distance);
 		
 		if (path == null)
 			return;
@@ -559,7 +558,7 @@ public class Game
 		
 		if (!map.getBounds().contains(minePos))
 			return false;
-
+		
 		map.remove(miner);
 		Unit mine = factory.newUnit("eCommonMine", miner.getOwner());
 		doBuild(mine, minePos);
@@ -569,97 +568,49 @@ public class Game
 	public void kill(Unit unit)
 	{
 		unit.setHP(0);
+		Point2D point = unit.getAbsPoint();
+		Position pos = unit.getPosition();
+		map.remove(unit);
 		
 		if (unit.getType().isGuardPostType())
 		{
-			Position pos = unit.getPosition();
 			SpriteGroup seq = spriteLib.getAmbientSpriteGroup("aDeath", "guardPostKilled");
-			getDisplay().cueAnimation(new SpriteGroupAnimation(
-				seq,
-				unit.getAbsPoint(),
-				2
-			));
-			map.remove(unit);
+			getDisplay().cueAnimation(new SpriteGroupAnimation(seq, point, 2));
 			Game.game.playSound("structureExplosion", pos);
 			doSplashDamage(pos, 100, 1);
 		}
 		else if (unit.isStructure())
 		{
-			Position pos = unit.getPosition();
 			SpriteGroup seq = spriteLib.getUnitSpriteSet(unit.getType()).get(COLLAPSE);
-			getDisplay().cueAnimation(new SpriteGroupAnimation(
-				seq,
-				unit.getOwner(),
-				unit.getAbsPoint(),
-				2
-			));
-			
+			getDisplay().cueAnimation(new SpriteGroupAnimation(seq, unit.getOwner(), point, 2));
 			String eventName = null;
 			int fpWidth = unit.getFootprint().getWidth();
 			int fpHeight = unit.getFootprint().getHeight();
 			
-			if (fpWidth == 4 && fpHeight == 3)
-			{
-				eventName = "collapseSmoke3";
-			}
-			else if (fpWidth == 3 && fpHeight == 3)
-			{
-				eventName = "collapseSmoke2";
-			}
-			else if (fpWidth == 5 && fpHeight == 4)
-			{
-				eventName = "collapseSmoke5";
-			}
-			else if (fpWidth == 3 && fpHeight == 2)
-			{
-				eventName = "collapseSmoke1";
-			}
-			else if (fpWidth == 2 && fpHeight == 2)
-			{
-				eventName = "collapseSmoke6";
-			}
-			else if (fpWidth == 2 && fpHeight == 1)
-			{
-				eventName = "collapseSmoke5";
-			}
-			else if (fpWidth == 1 && fpHeight == 2)
-			{
-				eventName = "collapseSmoke5";
-			}
-			else if (fpWidth == 1 && fpHeight == 1)
-			{
-				eventName = "collapseSmoke5";
-			}
+			if      (fpWidth == 4 && fpHeight == 3) eventName = "collapseSmoke3";
+			else if (fpWidth == 3 && fpHeight == 3) eventName = "collapseSmoke2";
+			else if (fpWidth == 5 && fpHeight == 4) eventName = "collapseSmoke5";
+			else if (fpWidth == 3 && fpHeight == 2) eventName = "collapseSmoke1";
+			else if (fpWidth == 2 && fpHeight == 2) eventName = "collapseSmoke6";
+			else if (fpWidth == 2 && fpHeight == 1) eventName = "collapseSmoke5";
+			else if (fpWidth == 1 && fpHeight == 2) eventName = "collapseSmoke5";
+			else if (fpWidth == 1 && fpHeight == 1) eventName = "collapseSmoke5";
 			
 			seq = spriteLib.getAmbientSpriteGroup("aDeath", eventName);
-			getDisplay().cueAnimation(new SpriteGroupAnimation(
-				seq,
-				unit.getAbsPoint(),
-				2
-			));
-			map.remove(unit);
+			getDisplay().cueAnimation(new SpriteGroupAnimation(seq, point, 2));
 			Game.game.playSound("structureCollapse3", pos);
 		}
 		else if (unit.isArachnid())
 		{
-			map.remove(unit);
-			getDisplay().cueAnimation(new SpriteGroupAnimation(
-				spriteLib.getAmbientSpriteGroup("aDeath", "arachnidKilled"),
-				unit.getOwner(),
-				unit.getAbsPoint(),
-				2
-			));
-			Game.game.playSound("smallExplosion1");
+			SpriteGroup group = spriteLib.getAmbientSpriteGroup("aDeath", "arachnidKilled");
+			getDisplay().cueAnimation(new SpriteGroupAnimation(group, unit.getOwner(), point, 2));
+			Game.game.playSound("smallExplosion1", pos);
 		}
 		else
 		{
-			map.remove(unit);
-			getDisplay().cueAnimation(new SpriteGroupAnimation(
-				spriteLib.getAmbientSpriteGroup("aDeath", "vehicleKilled"),
-				unit.getAbsPoint(),
-				2
-			));
-			Game.game.playSound("smallExplosion1");
+			SpriteGroup group = spriteLib.getAmbientSpriteGroup("aDeath", "vehicleKilled");
+			getDisplay().cueAnimation(new SpriteGroupAnimation(group, point, 2));
+			Game.game.playSound("smallExplosion1", pos);
 		}
 	}
 	

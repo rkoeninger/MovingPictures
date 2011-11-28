@@ -63,9 +63,7 @@ public class DisplayPanel extends JComponent
 	private static Color BACKGROUND_BLUE = new Color(127, 127, 255);
 	private Color letterBoxColor = Color.BLACK;
 	
-	private UnitStatus unitStatus;
-	private PlayerStatus playerStatus;
-	private TitleBar titleBar;
+	private DisplayWindow window;
 	
 	private Player currentPlayer;
 	
@@ -292,25 +290,15 @@ public class DisplayPanel extends JComponent
 		if (!overlays.isEmpty()) overlays.get(0).onCommand(command);
 	}
 	
-	public void setUnitStatus(UnitStatus status)
+	public void setDisplayWindow(DisplayWindow window)
 	{
-		this.unitStatus = status;
-	}
-	
-	public void setPlayerStatus(PlayerStatus status)
-	{
-		this.playerStatus = status;
-	}
-	
-	public void setTitleBar(TitleBar titleBar)
-	{
-		this.titleBar = titleBar;
+		this.window = window;
 	}
 	
 	public void showStatus(Unit unit)
 	{
-		if (unitStatus != null)
-			unitStatus.showStatus(unit);
+		if (window != null)
+			window.showStatus(unit);
 		
 		if (unit != null)
 			showStatus(unit.getOwner());
@@ -318,16 +306,16 @@ public class DisplayPanel extends JComponent
 	
 	public void showStatus(Player player)
 	{
-		if (playerStatus != null)
-			playerStatus.showStatus(player);
+		if (window != null)
+			window.showStatus(player);
 		
 		currentPlayer = player;
 	}
 	
 	public void showFrameNumber(int frameNumber, double frameRate)
 	{
-		if (titleBar != null)
-			titleBar.showFrameNumber(frameNumber, frameRate);
+		if (window != null)
+			window.showFrameNumber(frameNumber, frameRate);
 	}
 	
 	public void completeOverlays()
@@ -729,16 +717,17 @@ public class DisplayPanel extends JComponent
 			for (DisplayLayer layer : DisplayLayer.values())
 			{
 				List<DisplayObject> list = displayLayers.get(layer);
-				
-				if (layer.comparator != null)
-				{
-					list = new ArrayList<DisplayObject>(list);
-					Collections.sort(list, layer.comparator);
-				}
+				List<DisplayObject> listCopy = new ArrayList<DisplayObject>();
 				
 				for (DisplayObject dObj : list)
 					if (dObj.isAlive() && absRect.intersects(dObj.getBounds()))
-						dObj.paint(g);
+						listCopy.add(dObj);
+				
+				if (layer.comparator != null)
+					Collections.sort(listCopy, layer.comparator);
+				
+				for (DisplayObject dObj : listCopy)
+					dObj.paint(g);
 			}
 		}
 		

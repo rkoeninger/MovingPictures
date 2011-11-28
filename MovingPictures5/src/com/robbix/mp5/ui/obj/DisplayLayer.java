@@ -24,30 +24,39 @@ class Comparators
 {
 	static final Comparator<DisplayObject> Z_ORDER = new Comparator<DisplayObject>()
 	{
-		private static final int A_MORE_SOUTH = 1;
-		private static final int B_MORE_SOUTH = -1;
+		private static final int A_ON_TOP = 1;
+		private static final int B_ON_TOP = -1;
 		
 		public int compare(DisplayObject dObj1, DisplayObject dObj2)
 		{
 			Rectangle2D a = dObj1.getBounds();
 			Rectangle2D b = dObj2.getBounds();
 			
-			if (a.getHeight() > b.getHeight())
+			if (a.getY() > b.getY())
 			{
-				if (a.getY() > b.getY()) return A_MORE_SOUTH;
-				if (a.getY() < b.getY()) return B_MORE_SOUTH;
+				if (a.getMaxY() > b.getMaxY())
+				{
+					return A_ON_TOP;
+				}
+				if (a.getMaxY() < b.getMaxY())
+				{
+					return a.getMaxY() >= b.getMaxY() - 1 ? A_ON_TOP : B_ON_TOP;
+				}
 			}
-			else if (a.getHeight() < b.getHeight())
+			if (b.getY() > a.getY())
 			{
-				if (a.getY() > b.getY()) return B_MORE_SOUTH;
-				if (a.getY() < b.getY()) return A_MORE_SOUTH;
+				if (b.getMaxY() > a.getMaxY())
+				{
+					return B_ON_TOP;
+				}
+				if (b.getMaxY() < a.getMaxY())
+				{
+					return b.getMaxY() >= a.getMaxY() - 1 ? B_ON_TOP : A_ON_TOP;
+				}
 			}
 			
-			if (a.getY() > b.getY()) return A_MORE_SOUTH;
-			if (a.getY() < b.getY()) return B_MORE_SOUTH;
-
-			if (a.getX() > b.getX()) return A_MORE_SOUTH;
-			if (a.getX() < b.getX()) return B_MORE_SOUTH;
+			if (a.getX() > b.getX()) return A_ON_TOP;
+			if (a.getX() < b.getX()) return B_ON_TOP;
 			
 			return 0;
 		}

@@ -21,6 +21,7 @@ public class FactoryDemo extends Demo
 			"30-20-plain",
 			new String[]{
 				"eConVec",
+				"eCargoTruck",
 				"eCommandCenter",
 				"eCommonSmelter",
 				"eStructureFactory",
@@ -77,7 +78,6 @@ public class FactoryDemo extends Demo
 		map.putUnit(truck1,  new Position(9,  11));
 		map.putUnit(truck2,  new Position(10, 11));
 		map.putUnit(truck3,  new Position(11, 11));
-		
 		map.putResourceDeposit(deposit1, new Position(28, 18));
 		map.putResourceDeposit(deposit2, new Position(5, 16));
 	}

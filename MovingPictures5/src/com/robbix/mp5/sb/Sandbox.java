@@ -70,9 +70,7 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.sb.demo.Demo;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.DisplayPanelView;
-import com.robbix.mp5.ui.PlayerStatus;
-import com.robbix.mp5.ui.TitleBar;
-import com.robbix.mp5.ui.UnitStatus;
+import com.robbix.mp5.ui.DisplayWindow;
 import com.robbix.mp5.ui.overlay.PlaceBulldozeOverlay;
 import com.robbix.mp5.ui.overlay.PlaceFixtureOverlay;
 import com.robbix.mp5.ui.overlay.PlaceResourceOverlay;
@@ -151,15 +149,15 @@ public class Sandbox extends JApplet
 	
 	private static JSliderMenuItem volumeSliderMenuItem;
 	private static JSliderMenuItem throttleSliderMenuItem;
+	private static JCheckBoxMenuItem showGridMenuItem;
+	private static JCheckBoxMenuItem showShadowsMenuItem;
+	private static JCheckBoxMenuItem showCostMapMenuItem;
 	private static JMenuItem pauseMenuItem;
 	private static JMenuItem stepMenuItem;
 	private static JMenuItem spriteLibMenuItem;
 	private static JMenuItem unitLibMenuItem;
 	private static JMenuItem soundPlayerMenuItem;
 	private static JMenuItem exitMenuItem;
-	private static JMenuItem showGridMenuItem;
-	private static JMenuItem showShadowsMenuItem;
-	private static JMenuItem showCostMapMenuItem;
 	private static JMenuItem scrollBarsMenuItem;
 	private static JMenuItem frameRateMenuItem;
 	private static JMenuItem scrollSpeedMenuItem;
@@ -250,33 +248,11 @@ public class Sandbox extends JApplet
 		game.getSoundBank().setVolume(0.5f);
 		
 		/*-------------------------------------------------------------------------------------[*]
-		 * Prepare live-updating status labels
-		 */
-		UnitStatusLabel unitStatusLabel = new UnitStatusLabel();
-		PlayerStatusLabel playerStatusLabel = new PlayerStatusLabel();
-		
-		TitleBar titleBar = new TitleBar()
-		{
-			public void showFrameNumber(int frameNumber, double frameRate)
-			{
-				if (showFrameRate)
-				{
-					frame.setTitle(String.format(
-						"Moving Pictures - [%1$d] %2$.2f fps",
-						frameNumber,
-						frameRate
-					));
-				}
-			}
-		};
-		
-		/*-------------------------------------------------------------------------------------[*]
 		 * Build UI
 		 */
+		MyDisplayWindow windowInterface = new MyDisplayWindow();
 		panel = game.getDisplay();
-		panel.setUnitStatus(unitStatusLabel);
-		panel.setPlayerStatus(playerStatusLabel);
-		panel.setTitleBar(titleBar);
+		panel.setDisplayWindow(windowInterface);
 		panel.pushOverlay(new SelectUnitOverlay());
 		panel.showStatus(currentPlayer);
 		
@@ -295,9 +271,9 @@ public class Sandbox extends JApplet
 		unitLibMenuItem        = new JMenuItem("Unit Library");
 		soundPlayerMenuItem    = new JMenuItem("Sound Player");
 		exitMenuItem           = new JMenuItem("Exit");
-		showGridMenuItem       = new JMenuItem(panel.isShowingGrid() ? "Hide Grid" : "Show Grid");
-		showShadowsMenuItem    = new JMenuItem(panel.isShowingShadows() ? "Hide Shadows" : "Show Shadows");
-		showCostMapMenuItem    = new JMenuItem(panel.isShowingCostMap() ? "Show Surface" : "Show Cost Map");
+		showGridMenuItem       = new JCheckBoxMenuItem("Grid", panel.isShowingGrid());
+		showShadowsMenuItem    = new JCheckBoxMenuItem("Shadows", panel.isShowingShadows());
+		showCostMapMenuItem    = new JCheckBoxMenuItem("Cost Map", panel.isShowingCostMap());
 		scrollBarsMenuItem     = new JMenuItem("Scroll Bars");
 		frameRateMenuItem      = new JMenuItem("Frame Rate");
 		scrollSpeedMenuItem    = new JMenuItem("Scroll Speed");
@@ -318,26 +294,24 @@ public class Sandbox extends JApplet
 		placeRare1             = new JMenuItem("Rare Low");
 		placeRare2             = new JMenuItem("Rare Med");
 		placeRare3             = new JMenuItem("Rare High");
-		playSoundMenuItem      = new JCheckBoxMenuItem("Play Sounds");
-		playMusicMenuItem      = new JCheckBoxMenuItem("Play Music");
+		playSoundMenuItem      = new JCheckBoxMenuItem("Play Sounds", game.isSoundOn());
+		playMusicMenuItem      = new JCheckBoxMenuItem("Play Music", false);
 		setAudioFormatMenuItem = new JMenuItem("Set Format...");
 		removeAllUnitsMenuItem = new JMenuItem("Remove All");
 		addPlayerMenuItem      = new JMenuItem("Add Player...");
 		aboutMenuItem          = new JMenuItem("About");
-		
-		final JMenuBar menuBar        = new JMenuBar();
-		final JMenu engineMenu        = new JMenu("Engine");
-		final JMenu displayMenu       = new JMenu("Display");
-		final JMenu terrainMenu       = new JMenu("Terrain");
-		final JMenu unitMenu          = new JMenu("Units");
-		final JMenu disastersMenu     = new JMenu("Disasters");
-		final JMenu placeResourceMenu = new JMenu("Add Ore");
-		final JMenu soundMenu         = new JMenu("Sound");
-		final JMenu addUnitMenu       = new JMenu("Add");
-		final JMenu helpMenu          = new JMenu("Help");
+		JMenu engineMenu       = new JMenu("Engine");
+		JMenu displayMenu      = new JMenu("Display");
+		JMenu terrainMenu      = new JMenu("Terrain");
+		JMenu unitMenu         = new JMenu("Units");
+		JMenu disastersMenu    = new JMenu("Disasters");
+		JMenu placeResourceMenu= new JMenu("Add Ore");
+		JMenu soundMenu        = new JMenu("Sound");
+		JMenu addUnitMenu      = new JMenu("Add");
+		JMenu helpMenu         = new JMenu("Help");
+		JMenuBar menuBar       = new JMenuBar();
 		stepMenuItem.setEnabled(false);
 		playerMenu = new JMenu("Players");
-		playSoundMenuItem.setSelected(game.getSoundBank().isRunning());
 		playerMenu.add(addPlayerMenuItem);
 		playerMenu.addSeparator();
 		
@@ -397,9 +371,9 @@ public class Sandbox extends JApplet
 		spriteLibMenuItem     .addActionListener(listener);
 		unitLibMenuItem       .addActionListener(listener);
 		soundPlayerMenuItem   .addActionListener(listener);
-		showGridMenuItem      .addActionListener(listener);
-		showShadowsMenuItem   .addActionListener(listener);
-		showCostMapMenuItem   .addActionListener(listener);
+		showGridMenuItem      .addChangeListener((ChangeListener) listener);
+		showShadowsMenuItem   .addChangeListener((ChangeListener) listener);
+		showCostMapMenuItem   .addChangeListener((ChangeListener) listener);
 		scrollSpeedMenuItem   .addActionListener(listener);
 		scrollBarsMenuItem    .addActionListener(listener);
 		frameRateMenuItem     .addActionListener(listener);
@@ -488,8 +462,8 @@ public class Sandbox extends JApplet
 		
 		JPanel statusesPanel = new JPanel();
 		statusesPanel.setLayout(new GridLayout(2, 1));
-		statusesPanel.add(unitStatusLabel);
-		statusesPanel.add(playerStatusLabel);
+		statusesPanel.add(windowInterface.unitLabel);
+		statusesPanel.add(windowInterface.playerLabel);
 		
 		edenLogo     = RImage.read(new File(resDir, "art/edenLogo.png"));
 		plymouthLogo = RImage.read(new File(resDir, "art/plymouthLogo.png"));
@@ -509,7 +483,7 @@ public class Sandbox extends JApplet
 		
 		Rectangle windowBounds = frame.getGraphicsConfiguration().getBounds();
 		
-		int w = Math.min(frame.getWidth(), windowBounds.width);
+		int w = Math.min(frame.getWidth(),  windowBounds.width);
 		int h = Math.min(frame.getHeight(), windowBounds.height);
 		int x = windowBounds.x + (windowBounds.width  - w) / 2;
 		int y = windowBounds.y + (windowBounds.height - h) / 2;
@@ -553,6 +527,18 @@ public class Sandbox extends JApplet
 				int current = volumeSliderMenuItem.getValue();
 				int max = volumeSliderMenuItem.getMaximum();
 				game.getSoundBank().setVolume(current / (float) max);
+			}
+			else if (e.getSource() == showGridMenuItem)
+			{
+				panel.setShowGrid(showGridMenuItem.isSelected());
+			}
+			else if (e.getSource() == showShadowsMenuItem)
+			{
+				panel.setShowShadows(showShadowsMenuItem.isSelected());
+			}
+			else if (e.getSource() == showCostMapMenuItem)
+			{
+				panel.setShowCostMap(showCostMapMenuItem.isSelected());
 			}
 		}
 		
@@ -614,30 +600,6 @@ public class Sandbox extends JApplet
 				}
 				
 				sbPlayer.setVisible(true);
-			}
-			else if (e.getSource() == showGridMenuItem)
-			{
-				panel.setShowGrid(!panel.isShowingGrid());
-				showGridMenuItem.setText(panel.isShowingGrid()
-					? "Hide Grid"
-					: "Show Grid"
-				);
-			}
-			else if (e.getSource() == showShadowsMenuItem)
-			{
-				panel.setShowShadows(!panel.isShowingShadows());
-				showShadowsMenuItem.setText(panel.isShowingShadows()
-					? "Hide Shadows"
-					: "Show Shadows"
-				);
-			}
-			else if (e.getSource() == showCostMapMenuItem)
-			{
-				panel.setShowCostMap(!panel.isShowingCostMap());
-				showCostMapMenuItem.setText(panel.isShowingCostMap()
-					? "Show Surface"
-					: "Show Cost Map"
-				);
 			}
 			else if (e.getSource() == scrollSpeedMenuItem)
 			{
@@ -956,7 +918,8 @@ public class Sandbox extends JApplet
 						break;
 				}
 				
-				Player newPlayer = new Player(game.getPlayers().size(), name, RColor.getHue(colorHue));
+				RColor color = RColor.getHue(colorHue);
+				Player newPlayer = new Player(game.getPlayers().size(), name, color);
 				game.addPlayer(newPlayer);
 				selectPlayer(newPlayer.getID());
 			}
@@ -981,7 +944,8 @@ public class Sandbox extends JApplet
 				{
 					UnitFactory factory = game.getUnitFactory();
 					factory.setDefaultOwner(currentPlayer);
-					panel.pushOverlay(new PlaceUnitOverlay(factory, src.get(UnitType.class), currentPlayer));
+					UnitType type = src.get(UnitType.class);
+					panel.pushOverlay(new PlaceUnitOverlay(factory, type, currentPlayer));
 				}
 			}
 			else if (e.getSource() instanceof AnimatedButton)
@@ -996,49 +960,34 @@ public class Sandbox extends JApplet
 		}
 	}
 	
-	private static class UnitStatusLabel extends JLabel
-	implements UnitStatus, ActionListener
+	private static class MyDisplayWindow implements DisplayWindow, ActionListener
 	{
-		private static final long serialVersionUID = 1L;
+		JLabel unitLabel;
+		JLabel playerLabel;
 		Unit myUnit = null;
+		Player myPlayer = null;
 		Timer timer;
 		
-		public UnitStatusLabel()
+		public MyDisplayWindow()
 		{
-			setPreferredSize(new Dimension(100, 20));
+			unitLabel = new JLabel();
+			unitLabel.setPreferredSize(new Dimension(100, 20));
+			playerLabel = new JLabel();
+			playerLabel.setPreferredSize(new Dimension(100, 20));
 			timer = new Timer(100, this);
 			timer.start();
 		}
 		
 		public synchronized void actionPerformed(ActionEvent e)
 		{
-			setText(myUnit != null ? myUnit.getStatusString() : "");
+			unitLabel.setText(myUnit != null ? myUnit.getStatusString() : "");
+			playerLabel.setText(myPlayer != null ? myPlayer.getStatusString() : "");
 		}
 		
 		public synchronized void showStatus(Unit unit)
 		{
 			myUnit = unit;
 			showCommandButtons(unit);
-		}
-	}
-	
-	private static class PlayerStatusLabel extends JLabel
-	implements PlayerStatus, ActionListener
-	{
-		private static final long serialVersionUID = 1L;
-		Player myPlayer = null;
-		Timer timer;
-		
-		public PlayerStatusLabel()
-		{
-			setPreferredSize(new Dimension(100, 20));
-			timer = new Timer(100, this);
-			timer.start();
-		}
-		
-		public synchronized void actionPerformed(ActionEvent e)
-		{
-			setText(myPlayer != null ? myPlayer.getStatusString() : "");
 		}
 		
 		public synchronized void showStatus(Player player)
@@ -1048,6 +997,12 @@ public class Sandbox extends JApplet
 			
 			if (player != null && !player.equals(oldMyPlayer))
 				selectPlayer(player.getID());
+		}
+		
+		public void showFrameNumber(int number, double rate)
+		{
+			if (showFrameRate)
+				frame.setTitle(String.format("Moving Pictures - [%1$d] %2$.2f fps", number, rate));
 		}
 	}
 	

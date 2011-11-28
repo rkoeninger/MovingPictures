@@ -57,9 +57,14 @@ public class UnitDisplayObject extends DisplayObject
 		if (panel.isShowingShadows() && !unit.isTurret())
 		{
 			Point2D shadowOffset = panel.getShadowOffset();
+			double px = point.getX();
+			double py = point.getY();
+			double sx = shadowOffset.getX();
+			double sy = shadowOffset.getY();
+			double scaleFactor = 32.0 * Math.pow(2, panel.getScale());
 			Point2D shadowPoint = new Point2D.Double(
-				point.getX() + shadowOffset.getX() + (sprite.getXOffset(panel.getScale()) / 32.0),
-				point.getY() + shadowOffset.getY() + (sprite.getYOffset(panel.getScale()) / 32.0)
+				px + sx + (sprite.getXOffset(panel.getScale()) / scaleFactor),
+				py + sy + (sprite.getYOffset(panel.getScale()) / scaleFactor)
 			);
 			g.drawImage(sprite.getShadow(), shadowPoint);
 			
@@ -70,8 +75,8 @@ public class UnitDisplayObject extends DisplayObject
 				if (turretSprite != null && turretSprite != SpriteSet.BLANK_SPRITE)
 				{
 					shadowPoint = new Point2D.Double(
-						point.getX() + shadowOffset.getX() + (turretSprite.getXOffset(panel.getScale()) / 32.0),
-						point.getY() + shadowOffset.getY() + (turretSprite.getYOffset(panel.getScale()) / 32.0)
+						px + sx + (turretSprite.getXOffset(panel.getScale()) / scaleFactor),
+						py + sy + (turretSprite.getYOffset(panel.getScale()) / scaleFactor)
 					);
 					g.drawImage(turretSprite.getShadow(), shadowPoint);
 				}
