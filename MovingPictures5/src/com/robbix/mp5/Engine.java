@@ -110,6 +110,8 @@ public class Engine
 		{
 			synchronized (Engine.this)
 			{
+				game.setFrame(frame);
+				
 				long time = System.nanoTime();
 				
 				if (frame % framePeriod == 0 && frame != 0)

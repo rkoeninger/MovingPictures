@@ -99,6 +99,8 @@ public class Game
 	private Set<Trigger> triggers;
 	private List<Runnable> pendingDoLaters;
 	
+	private int frame = 0;
+	
 	private GameListener.Helper listenerHelper = new GameListener.Helper();
 	
 	private boolean soundOn;
@@ -126,6 +128,16 @@ public class Game
 			else if (thing instanceof LayeredMap)   map = (LayeredMap) thing;
 			else if (thing instanceof DisplayPanel) addDisplay((DisplayPanel) thing);
 		}
+	}
+	
+	public void setFrame(int frame)
+	{
+		this.frame = frame;
+	}
+	
+	public int getFrame()
+	{
+		return frame;
 	}
 	
 	public void doLater(Runnable doRun)

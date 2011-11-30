@@ -77,6 +77,24 @@ public class AcidCloudAnimation extends WeaponAnimation
 		if (frame == 0)
 		{
 			playSoundLater("rocketLaunch", getAttacker().getPosition());
+			
+			for (int p = 0; p < 12; ++p)
+			{
+				SmokePuff puff = new SmokePuff();
+				puff.startingFrame = Utils.randInt(0, 12);
+				puff.puffNumber = Utils.randInt(1, 3);
+				double spreadAngle = Utils.randFloat(0, 2 * Math.PI);
+				double x = getFireOrigin().getX();
+				double y = getFireOrigin().getY();
+				x += Utils.randFloat(-0.25, 0.25);
+				y += Utils.randFloat(-0.25, 0.25);
+				x += Math.cos(angle) * -0.5;
+				y += Math.sin(angle) * -0.5;
+				x += Math.cos(spreadAngle) * (p / 24.0);
+				y += Math.sin(spreadAngle) * (p / 24.0);
+				puff.point = new Point2D.Double(x, y);
+				puffs.add(puff);
+			}
 		}
 		
 		if ((frame + 1) % 2 == 0 && frame > 4 && frame < rocketFrameCount)
