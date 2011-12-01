@@ -36,6 +36,9 @@ public class StatusLightDisplayObject extends DisplayObject
 	
 	public void paint(DisplayGraphics g)
 	{
+		if (panel.getScale() < panel.getMinimumShowUnitScale())
+			return;
+		
 		if (unit.isGuardPost() || unit.isStructure())
 		{
 			if (!panel.getCurrentPlayer().owns(unit))

@@ -273,6 +273,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	public void onRightClick(){}
 	public void onMiddleClick(){}
 	public void onAreaDragged(){}
+	public void onLeftClickDrag(){}
 	public void onCommand(Command command){}
 	
 	public boolean isCursorOnGrid()
@@ -428,6 +429,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		if (isCursorOnGrid() && pressedPoint != null)
 		{
 			prepNormalDragArea(e.getX(), e.getY());
+			onLeftClickDrag();
 		}
 	}
 	

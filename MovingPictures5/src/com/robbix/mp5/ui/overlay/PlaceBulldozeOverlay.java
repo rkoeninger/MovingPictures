@@ -25,7 +25,18 @@ public class PlaceBulldozeOverlay extends InputOverlay
 	
 	public void onLeftClick()
 	{
-		panel.getMap().bulldoze(getCursorPosition());
-		panel.refresh();
+		bulldoze();
+	}
+	
+	public void onLeftClickDrag()
+	{
+		bulldoze();
+	}
+	
+	private void bulldoze()
+	{
+		Position pos = getCursorPosition();
+		panel.getMap().bulldoze(pos);
+		panel.refresh(pos);
 	}
 }

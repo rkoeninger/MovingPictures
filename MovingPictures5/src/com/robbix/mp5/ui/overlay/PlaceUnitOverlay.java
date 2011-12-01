@@ -2,6 +2,7 @@ package com.robbix.mp5.ui.overlay;
 
 import java.awt.Color;
 
+import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
 import com.robbix.mp5.map.ResourceType;
@@ -69,6 +70,16 @@ public class PlaceUnitOverlay extends InputOverlay
 	
 	public void onLeftClick()
 	{
+		attemptPlacement(true);
+	}
+	
+	public void onLeftClickDrag()
+	{
+		attemptPlacement(false);
+	}
+	
+	private void attemptPlacement(boolean playErrorSound)
+	{
 		Position center = unit.getFootprint().getCenter();
 		Position pos = getCursorPosition().subtract(center);
 		LayeredMap map = panel.getMap();
@@ -80,7 +91,12 @@ public class PlaceUnitOverlay extends InputOverlay
 				ResourceDeposit res = map.getResourceDeposit(pos.shift(1, 0));
 				
 				if (res == null || res.getType() != ResourceType.COMMON_ORE)
+				{
+					if (playErrorSound)
+						Game.game.playSound("structureError");
+					
 					return;
+				}
 			}
 			
 			map.putUnit(unit, pos);
@@ -94,6 +110,11 @@ public class PlaceUnitOverlay extends InputOverlay
 			{
 				complete();
 			}
+		}
+		else
+		{
+			if (playErrorSound)
+				Game.game.playSound("structureError");
 		}
 	}
 }

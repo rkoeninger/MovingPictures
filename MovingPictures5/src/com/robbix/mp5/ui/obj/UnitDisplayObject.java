@@ -23,7 +23,7 @@ public class UnitDisplayObject extends DisplayObject
 	
 	public boolean isAlive()
 	{
-		return !unit.isDead() && !unit.isFloating();
+		return !unit.isDead() && !unit.isFloating() && !unit.isDismissed();
 	}
 	
 	public Rectangle2D getBounds()

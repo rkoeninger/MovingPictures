@@ -81,6 +81,8 @@ public class Unit
 	
 	private Object[] spriteArgs;
 	
+	private boolean dismissed;
+	
 	public Unit(UnitType type)
 	{
 		this.serial = nextSerial.getAndIncrement();
@@ -105,6 +107,16 @@ public class Unit
 		{
 			spriteArgs = new Object[1];
 		}
+	}
+	
+	public void dismiss()
+	{
+		dismissed = true;
+	}
+	
+	public boolean isDismissed()
+	{
+		return dismissed;
 	}
 	
 	public int getSerial()

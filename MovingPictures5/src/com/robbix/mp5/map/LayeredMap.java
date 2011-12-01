@@ -865,6 +865,7 @@ public class LayeredMap
 		
 //		unit.setPosition(null);
 //		unit.setContainer(null);
+		unit.dismiss();
 		
 		units.remove(unit);
 		assessConnections();
