@@ -601,7 +601,7 @@ public class Game
 			
 			if      (fpWidth == 4 && fpHeight == 3) eventName = "collapseSmoke3";
 			else if (fpWidth == 3 && fpHeight == 3) eventName = "collapseSmoke2";
-			else if (fpWidth == 5 && fpHeight == 4) eventName = "collapseSmoke5";
+			else if (fpWidth == 5 && fpHeight == 4) eventName = "collapseSmoke4";
 			else if (fpWidth == 3 && fpHeight == 2) eventName = "collapseSmoke1";
 			else if (fpWidth == 2 && fpHeight == 2) eventName = "collapseSmoke6";
 			else if (fpWidth == 2 && fpHeight == 1) eventName = "collapseSmoke5";

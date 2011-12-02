@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<Event type="aDeath">
+	<Instance arg="vehicleDeath">
+		<Footprint w="1" h="1"/>
+	</Instance>
+	<Instance arg="collapseSmoke1">
+		<Footprint w="3" h="2"/>
+	</Instance>
+	<Instance arg="collapseSmoke2">
+		<Footprint w="3" h="3"/>
+	</Instance>
+	<Instance arg="collapseSmoke3">
+		<Footprint w="4" h="3"/>
+	</Instance>
+	<Instance arg="collapseSmoke4">
+		<Footprint w="5" h="4"/>
+	</Instance>
+	<Instance arg="collapseSmoke5">
+		<Footprint w="1" h="1"/>
+		<Footprint w="1" h="2"/>
+		<Footprint w="2" h="1"/>
+	</Instance>
+	<Instance arg="collapseSmoke2">
+		<Footprint w="2" h="2"/>
+	</Instance>
+</Event>

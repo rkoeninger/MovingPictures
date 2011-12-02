@@ -21,11 +21,30 @@
 			  offsetY="-6"
 			  useOffsets="move"/>
 	
+	<Activity name="move"
+			  cargo="rareOre"
+			  path="./moveRareOre"
+			  majorTurnFrameCount="3"
+			  minorTurnFrameCount="1"
+			  fileNumber="10203"
+			  offsetX="-5"
+			  offsetY="-6"
+			  useOffsets="move"/>
+	
 	<Activity name="dump"
 			  cargo="commonOre"
 			  path="./dumpCommonOre"
 			  perTurnFrameCount="15"
 			  fileNumber="21315"
+			  offsetX="-5"
+			  offsetY="-6"
+			  useOffsets="dump"/>
+	
+	<Activity name="dump"
+			  cargo="rareOre"
+			  path="./dumpRareOre"
+			  perTurnFrameCount="15"
+			  fileNumber="21555"
 			  offsetX="-5"
 			  offsetY="-6"
 			  useOffsets="dump"/>
@@ -43,6 +62,24 @@
 			  path="./dockDownCommonOre"
 			  cargo="commonOre"
 			  fileNumber="7354"
+			  frameCount="120"
+			  offsetX="-11"
+			  offsetY="-8"
+			  useOffsets="dockDown"/>
+			  
+	<Activity name="dockUp"
+			  path="./dockUpRareOre"
+			  cargo="rareOre"
+			  fileNumber="5961"
+			  frameCount="125"
+			  offsetX="-11"
+			  offsetY="-8"
+			  useOffsets="dockUp"/>
+			  
+	<Activity name="dockDown"
+			  path="./dockDownRareOre"
+			  cargo="rareOre"
+			  fileNumber="6274"
 			  frameCount="120"
 			  offsetX="-11"
 			  offsetY="-8"
@@ -70,6 +107,14 @@
 			  path="./mineCommonOre"
 			  cargo="commonOre"
 			  fileNumber="4691"
+			  frameCount="60"
+			  offsetX="-9"
+			  offsetY="-1"/>
+	
+	<Activity name="mineLoad"
+			  path="./mineRareOre"
+			  cargo="rareOre"
+			  fileNumber="4631"
 			  frameCount="60"
 			  offsetX="-9"
 			  offsetY="-1"/>
