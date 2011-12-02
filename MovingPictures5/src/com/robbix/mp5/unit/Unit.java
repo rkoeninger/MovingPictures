@@ -361,6 +361,11 @@ public class Unit
 		return type.isConnectionSource() && !isDisabled() && !isDead();
 	}
 	
+	public boolean carriesConnection()
+	{
+		return type.isStructureType() || type.isGuardPostType();
+	}
+	
 	public String getStatusString()
 	{
 		return String.format("#%1$d %2$s%7$s%3$s %4$d/%5$d %6$s",

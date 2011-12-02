@@ -238,8 +238,6 @@ public class CommandUnitOverlay extends InputOverlay
 	
 	private void minerConstruct()
 	{
-		Player owner = unit.getOwner();
-		Unit mine = Game.game.getUnitFactory().newUnit("eCommonMine", owner);
-		push(new BuildMineOverlay(unit, mine));
+		push(new BuildMineOverlay(unit));
 	}
 }

@@ -194,6 +194,36 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 	}
 	
 	/**
+	 * Like drawUnitFootprint(), but for a mine of undetermined type (common/rare).
+	 */
+	public String drawMineFootprint(DisplayGraphics g, Position pos)
+	{
+		Footprint fp = Footprint.STRUCT_2_BY_1_NO_W_SIDE;
+		Region inner = fp.getInnerRegion().move(pos);
+		Region outer = inner.stretch(1);
+		LayeredMap map = panel.getMap();
+		Color color;
+		String toolTip = null;
+		
+		boolean onMap = map.getBounds().contains(inner);
+		boolean available = map.canPlaceUnit(pos, fp);
+		boolean hasDeposit = map.hasResourceDeposit(pos.shift(1, 0));
+		
+		color = onMap && available && hasDeposit ? GREEN.getFill() : RED.getFill();
+		
+		if      (!onMap)      toolTip = "Out of bounds";
+		else if (!available)  toolTip = "Occupied";
+		else if (!hasDeposit) toolTip = "No resource deposit";
+		
+		g.setColor(color);
+		g.fill(inner);
+		g.setColor(WHITE.getEdge());
+		g.draw(outer);
+		
+		return toolTip;
+	}
+	
+	/**
 	 * Returns tooltip text so it can be drawn on top of unit placement sprite.
 	 */
 	public String drawUnitFootprint(DisplayGraphics g, UnitType type, Position pos)
@@ -204,18 +234,21 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		LayeredMap map = panel.getMap();
 		Color color;
 		String toolTip = null;
+		boolean rare = type.is("Rare");
 		
 		if (type.getName().endsWith("Mine"))
 		{
 			boolean onMap = map.getBounds().contains(inner);
 			boolean available = map.canPlaceUnit(pos, fp);
-			boolean hasDeposit = map.canPlaceMine(pos);
+			boolean hasDeposit = map.hasResourceDeposit(pos.shift(1, 0));
+			boolean correctDeposit = hasDeposit && map.canPlaceMine(pos, rare);
 			
-			color = onMap && available && hasDeposit ? GREEN.getFill() : RED.getFill();
+			color = onMap && available && correctDeposit ? GREEN.getFill() : RED.getFill();
 			
-			if      (!onMap)      toolTip = "Out of bounds";
-			else if (!available)  toolTip = "Occupied";
-			else if (!hasDeposit) toolTip = "No resource deposit";
+			if      (!onMap)          toolTip = "Out of bounds";
+			else if (!available)      toolTip = "Occupied";
+			else if (!hasDeposit)     toolTip = "No resource deposit";
+			else if (!correctDeposit) toolTip = "Wrong deposit type";
 		}
 		else if (type.isStructureType() || type.isGuardPostType())
 		{

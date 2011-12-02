@@ -5,7 +5,6 @@ import java.awt.Color;
 import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.ResourceDeposit;
-import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
@@ -90,7 +89,7 @@ public class PlaceUnitOverlay extends InputOverlay
 			{
 				ResourceDeposit res = map.getResourceDeposit(pos.shift(1, 0));
 				
-				if (res == null || res.getType() != ResourceType.COMMON_ORE)
+				if (res == null || (res.isRare() != unit.is("Rare")))
 				{
 					if (playErrorSound)
 						Game.game.playSound("structureError");

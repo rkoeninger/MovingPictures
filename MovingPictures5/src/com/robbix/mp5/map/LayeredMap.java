@@ -330,7 +330,7 @@ public class LayeredMap
 			if (bounds.contains(adj) && (hasTube(adj) || isOccupied(adj)))
 			{
 				Unit occupant = getUnit(adj);
-				spot.alive |= occupant != null && occupant.isConnected();
+				spot.alive |= occupant != null && occupant.carriesConnection() && occupant.isConnected();
 				spot.alive |= grid.get(adj).alive;
 				
 				if (hasTube(adj))
@@ -686,14 +686,14 @@ public class LayeredMap
 		if (!bounds.contains(fp.getInnerRegion().move(pos)))
 			return false;
 		
-		for (Position occupied : fp.iterator(pos))
+		for (Position occupied : fp.getInnerRegion().iterator(pos))
 			if (!canPlaceUnit(occupied))
 				return false;
 		
 		return true;
 	}
 	
-	public boolean canPlaceMine(Position pos)
+	public boolean canPlaceMine(Position pos, boolean rare)
 	{
 		if (!bounds.contains(pos))
 			return false;
@@ -704,7 +704,7 @@ public class LayeredMap
 			return false;
 		
 		ResourceDeposit deposit = getResourceDeposit(pos);
-		return deposit != null && deposit.isCommon();
+		return deposit != null && (deposit.isRare() == rare);
 	}
 	
 	public boolean willConnect(Position pos, Footprint fp)

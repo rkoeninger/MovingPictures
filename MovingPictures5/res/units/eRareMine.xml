@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<UnitType type="structure" unitType="eCommonMine" civ="Eden">
-	<DisplayName>Common Ore Mine</DisplayName>
-	<Acknowledgement>commonMine</Acknowledgement>
+<UnitType type="structure" unitType="eRareMine" civ="Eden">
+	<DisplayName>Rare Ore Mine</DisplayName>
+	<Acknowledgement>rareMine</Acknowledgement>
 	<Commands>
 		<Command>mine</Command>
 	</Commands>

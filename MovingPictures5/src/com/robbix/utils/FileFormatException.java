@@ -24,4 +24,9 @@ public class FileFormatException extends IOException
 	{
 		return file;
 	}
+	
+	public String toString()
+	{
+		return super.toString() + " [" + file + "]";
+	}
 }
