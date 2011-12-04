@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<UnitType type="tank" unitType="pMicrowavePanther" civ="Plymouth">
+	<DisplayName>Microwave Panther</DisplayName>
+	<Commands/>
+	<Cost>
+		<Resource type="common ore" amount="500"/>
+		<Resource type="rare ore" amount="150"/>
+	</Cost>
+	<Chassis>pPantherChassis</Chassis>
+	<Turret>pMicrowaveSingleTurret</Turret>
+</UnitType>

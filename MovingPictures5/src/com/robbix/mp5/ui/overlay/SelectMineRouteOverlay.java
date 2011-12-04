@@ -1,6 +1,5 @@
 package com.robbix.mp5.ui.overlay;
 
-
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.ui.DisplayGraphics;
@@ -15,6 +14,7 @@ public class SelectMineRouteOverlay extends InputOverlay
 	public SelectMineRouteOverlay(Unit truck)
 	{
 		this(new Unit[]{truck});
+		this.requiresPaintOnGrid = false;
 	}
 	
 	public SelectMineRouteOverlay(Unit[] trucks)
@@ -37,11 +37,23 @@ public class SelectMineRouteOverlay extends InputOverlay
 		{
 			if (selected.isMine())
 			{
+				if (smelter != null && smelter.is("Common") && !selected.is("Common"))
+				{
+					Game.game.playSound("beep4");
+					return;
+				}
+				
 				mine = selected;
 				Game.game.playSound("beep6");
 			}
 			else if (selected.isSmelter())
 			{
+				if (mine != null && mine.is("Common") && !selected.is("Common"))
+				{
+					Game.game.playSound("beep4");
+					return;
+				}
+				
 				smelter = selected;
 				Game.game.playSound("beep6");
 			}

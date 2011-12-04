@@ -3,20 +3,20 @@ package com.robbix.mp5.ui.obj;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 
-import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.Ore;
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.utils.Position;
 
-public class ResourceDepositDisplayObject extends DisplayObject
+public class OreDisplayObject extends DisplayObject
 {
 	private static final Color COMMON_ORE_COLOR = new Color(255, 92, 0);
 	private static final Color RARE_ORE_COLOR = new Color(255, 255, 106);
 	
-	private ResourceDeposit res;
+	private Ore res;
 	
-	public ResourceDepositDisplayObject(ResourceDeposit res)
+	public OreDisplayObject(Ore res)
 	{
 		this.res = res;
 	}

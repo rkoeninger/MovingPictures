@@ -8,7 +8,7 @@ import java.util.List;
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.MineRouteTask;
 import com.robbix.mp5.map.LayeredMap;
-import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.Ore;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
@@ -72,8 +72,8 @@ public class MineRouteDemo extends Demo
 		for (int x = 2;  x < 46; x += 4)
 		for (int y = 38; y < 45; y += 4)
 		{
-			ResourceDeposit res = ResourceDeposit.get2BarCommon();
-			map.putResourceDeposit(res, new Position(x + 1, y));
+			Ore res = Ore.get2BarCommon();
+			map.putOre(res, new Position(x + 1, y));
 			Unit mine = factory.newUnit("eCommonMine", 1);
 			map.putUnit(mine, new Position(x, y));
 			mines.add(mine);

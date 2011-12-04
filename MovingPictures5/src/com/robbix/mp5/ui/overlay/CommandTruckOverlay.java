@@ -8,7 +8,7 @@ import com.robbix.mp5.ai.task.DockTask;
 import com.robbix.mp5.ai.task.DumpTask;
 import com.robbix.mp5.ai.task.MineTask;
 import com.robbix.mp5.map.LayeredMap;
-import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.Ore;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.unit.Cargo;
@@ -139,7 +139,7 @@ public class CommandTruckOverlay extends InputOverlay
 			if (map.getBounds().contains(adj))
 			{
 				Unit mine = map.getUnit(adj);
-				ResourceDeposit deposit = map.getResourceDeposit(adj);
+				Ore deposit = map.getOre(adj);
 				
 				if (mine != null && mine.getType().getName().contains("Mine"))
 				{

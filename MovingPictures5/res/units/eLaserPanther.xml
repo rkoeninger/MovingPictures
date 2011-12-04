@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<UnitType type="tank" unitType="eLaserPanther" civ="Eden">
+	<DisplayName>Microwave Panther</DisplayName>
+	<Commands/>
+	<Cost>
+		<Resource type="common ore" amount="500"/>
+		<Resource type="rare ore" amount="150"/>
+	</Cost>
+	<Chassis>ePantherChassis</Chassis>
+	<Turret>eLaserSingleTurret</Turret>
+</UnitType>

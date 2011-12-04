@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteSet type="vehicle" unitType="ePantherChassis" color="#0000ff">
+	<Activity name="move"
+			  path="./move"
+			  majorTurnFrameCount="1"
+			  minorTurnFrameCount="0"
+			  fileNumber="2375"
+			  offsetX="-1"
+			  offsetY="-1">
+		<Direction name="e"  offsetX="-14" offsetY="0"/>
+		<Direction name="ne" offsetX="-17" offsetY="7"/>
+		<Direction name="n"  offsetX="-14" offsetY="5"/>
+		<Direction name="nw" offsetX="-7"  offsetY="7"/>
+		<Direction name="w"  offsetX="-5"  offsetY="-1"/>
+		<Direction name="sw" offsetX="-12" offsetY="-1"/>
+		<Direction name="s"  offsetX="-13" offsetY="-4"/>
+		<Direction name="se" offsetX="-15" offsetY="-1"/>
+	</Activity>
+</SpriteSet>

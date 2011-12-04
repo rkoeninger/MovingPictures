@@ -117,7 +117,7 @@
 			  fileNumber="4631"
 			  frameCount="60"
 			  offsetX="-9"
-			  offsetY="-1"/>
+			  offsetY="3"/>
 	
 	<DirectionOffsetFrames name="move">
 		<Direction name="e"   offsetX="-9"  offsetY="9"/>

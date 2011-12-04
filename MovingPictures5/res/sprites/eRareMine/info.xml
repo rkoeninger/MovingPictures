@@ -2,136 +2,129 @@
 <SpriteSet type="structure" unitType="eRareMine" color="#0000ff">
 	<Activity name="still"
 			  path="./still"
-			  offsetX="24"
-			  offsetY="-31">
-		<HealthState health="green"
-					 fileNumber="4107"/>
-		<HealthState health="yellow"
-					 fileNumber="4108"
-					 offsetX="0"
-					 offsetY="2"/>
-		<HealthState health="red"
-					 fileNumber="4109"
-					 offsetX="0"
-					 offsetY="4"/>
+			  offsetX="20"
+			  offsetY="-17">
+		<HealthState health="green"  fileNumber="4107"/>
+		<HealthState health="yellow" fileNumber="4108"/>
+		<HealthState health="red"    fileNumber="4109"/>
 	</Activity>
-	<!--Activity name="collapse"
+	<Activity name="collapse"
 			  path="./collapse"
-			  fileNumber="14165"
+			  fileNumber="4110"
 			  frameCount="4"
-			  offsetX="-41"
-			  offsetY="-33">
-		<OffsetFrame offsetX="65" offsetY="9"/>
-		<OffsetFrame offsetX="64" offsetY="13"/>
-		<OffsetFrame offsetX="63" offsetY="17"/>
-		<OffsetFrame offsetX="63" offsetY="26"/>
-	</Activity-->
+			  offsetX="-22"
+			  offsetY="-29">
+		<OffsetFrame offsetX="41" offsetY="11"/>
+		<OffsetFrame offsetX="43" offsetY="17"/>
+		<OffsetFrame offsetX="42" offsetY="23"/>
+		<OffsetFrame offsetX="42" offsetY="27"/>
+	</Activity>
 	<Activity name="build"
 			  path="./build2"
 			  fileNumber="4006"
 			  frameCount="101"
-			  offsetX="-41"
-			  offsetY="-33">
-		<OffsetFrame offsetX="65" offsetY="32"/>
-		<OffsetFrame offsetX="47" offsetY="32"/>
-		<OffsetFrame offsetX="68" offsetY="30"/>
-		<OffsetFrame offsetX="68" offsetY="29"/>
-		<OffsetFrame offsetX="68" offsetY="28"/>
-		<OffsetFrame offsetX="68" offsetY="27"/>
-		<OffsetFrame offsetX="68" offsetY="26"/>
-		<OffsetFrame offsetX="68" offsetY="25"/>
-		<OffsetFrame offsetX="68" offsetY="24"/>
-		<OffsetFrame offsetX="71" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="68" offsetY="23"/>
-		<OffsetFrame offsetX="69" offsetY="23"/>
-		<OffsetFrame offsetX="70" offsetY="23"/>
-		<OffsetFrame offsetX="71" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="72" offsetY="23"/>
-		<OffsetFrame offsetX="69" offsetY="23"/>
-		<OffsetFrame offsetX="70" offsetY="23"/>
-		<OffsetFrame offsetX="69" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="67" offsetY="23"/>
-		<OffsetFrame offsetX="68" offsetY="21"/>
-		<OffsetFrame offsetX="67" offsetY="18"/>
-		<OffsetFrame offsetX="67" offsetY="18"/>
-		<OffsetFrame offsetX="67" offsetY="18"/>
-		<OffsetFrame offsetX="67" offsetY="17"/>
-		<OffsetFrame offsetX="67" offsetY="16"/>
-		<OffsetFrame offsetX="67" offsetY="15"/>
-		<OffsetFrame offsetX="67" offsetY="14"/>
-		<OffsetFrame offsetX="67" offsetY="13"/>
-		<OffsetFrame offsetX="67" offsetY="12"/>
-		<OffsetFrame offsetX="67" offsetY="11"/>
-		<OffsetFrame offsetX="67" offsetY="10"/>
-		<OffsetFrame offsetX="67" offsetY="9"/>
-		<OffsetFrame offsetX="67" offsetY="8"/>
-		<OffsetFrame offsetX="67" offsetY="7"/>
-		<OffsetFrame offsetX="67" offsetY="6"/>
-		<OffsetFrame offsetX="67" offsetY="5"/>
-		<OffsetFrame offsetX="67" offsetY="4"/>
-		<OffsetFrame offsetX="67" offsetY="3"/>
-		<OffsetFrame offsetX="67" offsetY="7"/>
-		<OffsetFrame offsetX="67" offsetY="6"/>
-		<OffsetFrame offsetX="67" offsetY="5"/>
-		<OffsetFrame offsetX="67" offsetY="4"/>
-		<OffsetFrame offsetX="67" offsetY="3"/>
-		<OffsetFrame offsetX="67" offsetY="7"/>
-		<OffsetFrame offsetX="67" offsetY="6"/>
-		<OffsetFrame offsetX="67" offsetY="5"/>
-		<OffsetFrame offsetX="67" offsetY="4"/>
-		<OffsetFrame offsetX="67" offsetY="3"/>
-		<OffsetFrame offsetX="67" offsetY="7"/>
-		<OffsetFrame offsetX="67" offsetY="6"/>
-		<OffsetFrame offsetX="67" offsetY="5"/>
-		<OffsetFrame offsetX="67" offsetY="4"/>
-		<OffsetFrame offsetX="67" offsetY="3"/>
-		<OffsetFrame offsetX="67" offsetY="7"/>
-		<OffsetFrame offsetX="67" offsetY="6"/>
-		<OffsetFrame offsetX="67" offsetY="5"/>
-		<OffsetFrame offsetX="67" offsetY="4"/>
-		<OffsetFrame offsetX="67" offsetY="3"/>
-		<OffsetFrame offsetX="67" offsetY="7"/>
-		<OffsetFrame offsetX="67" offsetY="6"/>
-		<OffsetFrame offsetX="67" offsetY="5"/>
-		<OffsetFrame offsetX="67" offsetY="4"/>
-		<OffsetFrame offsetX="67" offsetY="3"/>
-		<OffsetFrame offsetX="67" offsetY="7"/>
-		<OffsetFrame offsetX="67" offsetY="6"/>
-		<OffsetFrame offsetX="67" offsetY="5"/>
-		<OffsetFrame offsetX="67" offsetY="4"/>
+			  offsetX="11"
+			  offsetY="-28">
+		<OffsetFrame offsetX="14" offsetY="27"/>
+		<OffsetFrame offsetX="-4" offsetY="25"/>
+		<OffsetFrame offsetX="17" offsetY="26"/>
+		<OffsetFrame offsetX="17" offsetY="25"/>
+		<OffsetFrame offsetX="17" offsetY="24"/>
+		<OffsetFrame offsetX="17" offsetY="23"/>
+		<OffsetFrame offsetX="17" offsetY="22"/>
+		<OffsetFrame offsetX="17" offsetY="21"/>
+		<OffsetFrame offsetX="17" offsetY="20"/>
+		<OffsetFrame offsetX="16" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="16" offsetY="19"/>
+		<OffsetFrame offsetX="17" offsetY="19"/>
+		<OffsetFrame offsetX="18" offsetY="19"/>
+		<OffsetFrame offsetX="19" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="20" offsetY="19"/>
+		<OffsetFrame offsetX="19" offsetY="19"/>
+		<OffsetFrame offsetX="18" offsetY="19"/>
+		<OffsetFrame offsetX="17" offsetY="19"/>
+		<OffsetFrame offsetX="16" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="15" offsetY="19"/>
+		<OffsetFrame offsetX="14" offsetY="16"/>
+		<OffsetFrame offsetX="12" offsetY="14"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="13"/>
+		<OffsetFrame offsetX="9" offsetY="12"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
+		<OffsetFrame offsetX="9" offsetY="11"/>
 	</Activity>
 </SpriteSet>

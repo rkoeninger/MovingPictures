@@ -207,7 +207,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		
 		boolean onMap = map.getBounds().contains(inner);
 		boolean available = map.canPlaceUnit(pos, fp);
-		boolean hasDeposit = map.hasResourceDeposit(pos.shift(1, 0));
+		boolean hasDeposit = map.hasOre(pos.shift(1, 0));
 		
 		color = onMap && available && hasDeposit ? GREEN.getFill() : RED.getFill();
 		
@@ -240,7 +240,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		{
 			boolean onMap = map.getBounds().contains(inner);
 			boolean available = map.canPlaceUnit(pos, fp);
-			boolean hasDeposit = map.hasResourceDeposit(pos.shift(1, 0));
+			boolean hasDeposit = map.hasOre(pos.shift(1, 0));
 			boolean correctDeposit = hasDeposit && map.canPlaceMine(pos, rare);
 			
 			color = onMap && available && correctDeposit ? GREEN.getFill() : RED.getFill();
@@ -296,7 +296,7 @@ implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 		LayeredMap map = panel.getMap();
 		
 		for (Position pos : region)
-			if (map.getBounds().contains(pos) && map.hasResourceDeposit(pos))
+			if (map.getBounds().contains(pos) && map.hasOre(pos))
 				return true;
 		
 		return false;

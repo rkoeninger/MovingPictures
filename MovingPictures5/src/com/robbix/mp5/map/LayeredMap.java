@@ -20,7 +20,7 @@ import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.obj.GeyserDisplayObject;
 import com.robbix.mp5.ui.obj.MagmaVentDisplayObject;
 import com.robbix.mp5.ui.obj.MinePlatformDisplayObject;
-import com.robbix.mp5.ui.obj.ResourceDepositDisplayObject;
+import com.robbix.mp5.ui.obj.OreDisplayObject;
 import com.robbix.mp5.ui.obj.StatusLightDisplayObject;
 import com.robbix.mp5.ui.obj.UnitDisplayObject;
 import com.robbix.mp5.unit.Footprint;
@@ -51,7 +51,7 @@ public class LayeredMap
 		map.grid = new Grid<Spot>(w, h);
 		map.sources = new HashSet<Position>();
 		map.units = new HashSet<Unit>();
-		map.deposits = new HashSet<ResourceDeposit>();
+		map.deposits = new HashSet<Ore>();
 		map.bounds = new Region(0, 0, w, h);
 		
 		for (int x = 0; x < w; ++x)
@@ -96,7 +96,7 @@ public class LayeredMap
 		public Fixture fixture;
 		public int fixtureHP;
 		public String tileCode;
-		public ResourceDeposit deposit;
+		public Ore deposit;
 		public boolean alive;
 		
 		public boolean isTube()
@@ -115,7 +115,7 @@ public class LayeredMap
 	private Grid<Spot> grid;
 	private Set<Position> sources;
 	private Set<Unit> units;
-	private Set<ResourceDeposit> deposits;
+	private Set<Ore> deposits;
 	private CostMap costMap;
 	private TileSet tileSet;
 	private Region bounds;
@@ -200,12 +200,12 @@ public class LayeredMap
 			&& grid.get(pos).fixture == null;
 	}
 	
-	public Set<ResourceDeposit> getResourceDeposits()
+	public Set<Ore> getOres()
 	{
 		return deposits;
 	}
 	
-	public void putResourceDeposit(ResourceDeposit deposit, Position pos)
+	public void putOre(Ore deposit, Position pos)
 	{
 		if (! bounds.contains(pos))
 			return;
@@ -218,32 +218,32 @@ public class LayeredMap
 		deposits.add(deposit);
 		
 		for (DisplayPanel panel : panels)
-			panel.addDisplayObject(new ResourceDepositDisplayObject(deposit), OVERLAY);
+			panel.addDisplayObject(new OreDisplayObject(deposit), OVERLAY);
 	}
 	
-	public void removeResourceDeposit(Position pos)
+	public void removeOre(Position pos)
 	{
 		if (! bounds.contains(pos))
 			return;
 		
-		ResourceDeposit deposit = grid.get(pos).deposit;
+		Ore deposit = grid.get(pos).deposit;
 		
 		deposits.remove(deposit);
 		deposit.setPosition(null);
 		grid.get(pos).deposit = null;
 	}
 	
-	public ResourceDeposit getResourceDeposit(Position pos)
+	public Ore getOre(Position pos)
 	{
 		return bounds.contains(pos) ? grid.get(pos).deposit : null;
 	}
 	
-	public boolean hasResourceDeposit(Position pos)
+	public boolean hasOre(Position pos)
 	{
 		return bounds.contains(pos) && grid.get(pos).deposit != null;
 	}
 	
-	public boolean canPlaceResourceDeposit(Position pos)
+	public boolean canPutOre(Position pos)
 	{
 		return bounds.contains(pos) && grid.get(pos).deposit == null;
 	}
@@ -703,7 +703,7 @@ public class LayeredMap
 		if (!bounds.contains(pos))
 			return false;
 		
-		ResourceDeposit deposit = getResourceDeposit(pos);
+		Ore deposit = getOre(pos);
 		return deposit != null && (deposit.isRare() == rare);
 	}
 	

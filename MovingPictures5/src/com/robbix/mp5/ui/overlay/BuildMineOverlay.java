@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.ai.task.BuildMineTask;
-import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.Ore;
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
@@ -39,7 +39,7 @@ public class BuildMineOverlay extends InputOverlay
 			Position center = fp.getCenter();
 			Position pos = getCursorPosition().subtract(center);
 			String toolTip = drawMineFootprint(g, pos);
-			ResourceDeposit res = panel.getMap().getResourceDeposit(pos.shift(1, 0));
+			Ore res = panel.getMap().getOre(pos.shift(1, 0));
 			
 			if (res != null)
 			{
@@ -71,7 +71,7 @@ public class BuildMineOverlay extends InputOverlay
 		Position center = fp.getCenter();
 		Position pos = getCursorPosition().subtract(center);
 		Position minerPos = pos.shift(1, 0);
-		ResourceDeposit res = panel.getMap().getResourceDeposit(pos.shift(1, 0));
+		Ore res = panel.getMap().getOre(pos.shift(1, 0));
 		
 		if (panel.getMap().canPlaceUnit(pos) && res != null)
 		{
@@ -85,12 +85,12 @@ public class BuildMineOverlay extends InputOverlay
 		}
 	}
 	
-	private Unit getMine(ResourceDeposit res)
+	private Unit getMine(Ore res)
 	{
 		return Game.game.getUnitFactory().newUnit(getMineType(res), miner.getOwner());
 	}
 	
-	private UnitType getMineType(ResourceDeposit res)
+	private UnitType getMineType(Ore res)
 	{
 		String typeName = miner.getType().getName().substring(0, 1);
 		typeName += res.isRare() ? "Rare" : "Common";

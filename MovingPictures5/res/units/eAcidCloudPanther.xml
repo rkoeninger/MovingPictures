@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<UnitType type="tank" unitType="eAcidCloudPanther" civ="Eden">
+	<DisplayName>Acid Cloud Panther</DisplayName>
+	<Commands/>
+	<Cost>
+		<Resource type="common ore" amount="1000"/>
+		<Resource type="rare ore" amount="600"/>
+	</Cost>
+	<Chassis>ePantherChassis</Chassis>
+	<Turret>eAcidCloudSingleTurret</Turret>
+</UnitType>

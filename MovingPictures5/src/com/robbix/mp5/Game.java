@@ -563,7 +563,7 @@ public class Game
 		
 		Position pos = miner.getPosition();
 		
-		if (!map.hasResourceDeposit(pos))
+		if (!map.hasOre(pos))
 			return false;
 		
 		Position minePos = pos.shift(-1, 0);

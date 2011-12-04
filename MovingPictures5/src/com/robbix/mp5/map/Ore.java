@@ -4,11 +4,11 @@ import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.utils.Position;
 
-public class ResourceDeposit implements Cloneable
+public class Ore implements Cloneable
 {
-	public static ResourceDeposit get1BarCommon()
+	public static Ore get1BarCommon()
 	{
-		return new ResourceDeposit(
+		return new Ore(
 			ResourceType.COMMON_ORE,
 			YieldRange.LOW,
 			100,
@@ -19,9 +19,9 @@ public class ResourceDeposit implements Cloneable
 		);
 	}
 	
-	public static ResourceDeposit get2BarCommon()
+	public static Ore get2BarCommon()
 	{
-		return new ResourceDeposit(
+		return new Ore(
 			ResourceType.COMMON_ORE,
 			YieldRange.MEDIUM,
 			200,
@@ -32,9 +32,9 @@ public class ResourceDeposit implements Cloneable
 		);
 	}
 	
-	public static ResourceDeposit get3BarCommon()
+	public static Ore get3BarCommon()
 	{
-		return new ResourceDeposit(
+		return new Ore(
 			ResourceType.COMMON_ORE,
 			YieldRange.HIGH,
 			300,
@@ -45,9 +45,9 @@ public class ResourceDeposit implements Cloneable
 		);
 	}
 	
-	public static ResourceDeposit get1BarRare()
+	public static Ore get1BarRare()
 	{
-		return new ResourceDeposit(
+		return new Ore(
 			ResourceType.RARE_ORE,
 			YieldRange.LOW,
 			100,
@@ -58,9 +58,9 @@ public class ResourceDeposit implements Cloneable
 		);
 	}
 	
-	public static ResourceDeposit get2BarRare()
+	public static Ore get2BarRare()
 	{
-		return new ResourceDeposit(
+		return new Ore(
 			ResourceType.RARE_ORE,
 			YieldRange.MEDIUM,
 			200,
@@ -71,9 +71,9 @@ public class ResourceDeposit implements Cloneable
 		);
 	}
 	
-	public static ResourceDeposit get3BarRare()
+	public static Ore get3BarRare()
 	{
-		return new ResourceDeposit(
+		return new Ore(
 			ResourceType.RARE_ORE,
 			YieldRange.HIGH,
 			300,
@@ -101,7 +101,7 @@ public class ResourceDeposit implements Cloneable
 	
 	private Position pos;
 	
-	public ResourceDeposit(
+	public Ore(
 		ResourceType type,
 		YieldRange range,
 		int yield)
@@ -109,7 +109,7 @@ public class ResourceDeposit implements Cloneable
 		this(type, range, yield, yield, yield, 1, 1);
 	}
 	
-	public ResourceDeposit(
+	public Ore(
 		ResourceType type,
 		YieldRange range,
 		int headYield,
@@ -127,9 +127,9 @@ public class ResourceDeposit implements Cloneable
 		this.middleLoads = middleLoads;
 	}
 	
-	public ResourceDeposit clone()
+	public Ore clone()
 	{
-		return new ResourceDeposit(
+		return new Ore(
 			type,
 			range,
 			headYield,

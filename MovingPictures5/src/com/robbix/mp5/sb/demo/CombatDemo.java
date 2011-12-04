@@ -24,6 +24,8 @@ public class CombatDemo extends Demo
 				"pMicrowaveSingleTurret",
 				"eRailGunSingleTurret",
 				"pRPGSingleTurret",
+				"ePantherChassis",
+				"pPantherChassis",
 				"aRocket",
 				"aAcidCloud",
 				"eAcidCloudSingleTurret",
@@ -75,7 +77,7 @@ public class CombatDemo extends Demo
 			tank.assignNow(new SteerTask(center));
 		}
 
-		for (int x = 1;  x <= 11;  ++x)
+		for (int x = 1;  x <= 11; ++x)
 		for (int y = 31; y <= 46; ++y)
 		{
 			Unit tank = factory.newUnit("pRPGLynx", 3);
@@ -94,7 +96,7 @@ public class CombatDemo extends Demo
 		for (int x = 20; x <= 29; ++x)
 		for (int y = 20; y <= 29; ++y)
 		{
-			Unit tank = factory.newUnit("eAcidCloudLynx", 5);
+			Unit tank = factory.newUnit("eAcidCloudPanther", 5);
 			map.putUnit(tank, new Position(x, y));
 		}
 	}

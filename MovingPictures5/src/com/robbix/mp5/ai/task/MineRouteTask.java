@@ -2,7 +2,7 @@ package com.robbix.mp5.ai.task;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap;
-import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.Ore;
 import com.robbix.mp5.unit.Cargo;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.utils.Position;
@@ -21,20 +21,13 @@ public class MineRouteTask extends Task
 	{
 		super(true, Task.TRUCK_ONLY);
 		
-		String mineType = mine.getType().getName();
-		String smelterType = smelter.getType().getName();
-		
-		if (!mineType.contains("Mine"))
+		if (!mine.isMine())
 			throw new IllegalArgumentException("1st arg not a mine");
-		if (!smelterType.contains("Smelter"))
+		if (!smelter.isSmelter())
 			throw new IllegalArgumentException("2nd arg not a smelter");
 		
-		boolean mineIsCommon = mineType.contains("Common");
-		boolean smelterIsCommon = smelterType.contains("Common");
-		
-		if (mineIsCommon != smelterIsCommon)
-			throw new IllegalArgumentException(
-				"Mine and smelter not same type");
+		if (mine.is("Common") != smelter.is("Common"))
+			throw new IllegalArgumentException("Mine and smelter not same type");
 		
 		mineDock = mine.getPosition();
 		resPosition = mineDock.shift(1, 0);
@@ -62,7 +55,7 @@ public class MineRouteTask extends Task
 				if (!mine.isDisabled())
 				{
 					LayeredMap map = unit.getContainer();
-					ResourceDeposit deposit = map.getResourceDeposit(resPosition);
+					Ore deposit = map.getOre(resPosition);
 					unit.assignNext(new MineTask(deposit.getLoad()));
 				}
 			}

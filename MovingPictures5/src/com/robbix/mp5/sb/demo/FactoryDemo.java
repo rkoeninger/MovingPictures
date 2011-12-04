@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.robbix.mp5.Game;
 import com.robbix.mp5.map.LayeredMap;
-import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.Ore;
 import com.robbix.mp5.map.ResourceType;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.unit.Cargo;
@@ -66,8 +66,8 @@ public class FactoryDemo extends Demo
 		convec3.setCargo(Cargo.newConVecCargo("eCommonSmelter"));
 		convec4.setCargo(Cargo.newConVecCargo("eCommandCenter"));
 		
-		ResourceDeposit deposit1 = ResourceDeposit.get2BarCommon();
-		ResourceDeposit deposit2 = ResourceDeposit.get3BarCommon();
+		Ore deposit1 = Ore.get2BarCommon();
+		Ore deposit2 = Ore.get3BarCommon();
 		
 		map.putUnit(convec1, new Position(9,  7));
 		map.putUnit(convec2, new Position(10, 7));
@@ -78,7 +78,7 @@ public class FactoryDemo extends Demo
 		map.putUnit(truck1,  new Position(9,  11));
 		map.putUnit(truck2,  new Position(10, 11));
 		map.putUnit(truck3,  new Position(11, 11));
-		map.putResourceDeposit(deposit1, new Position(28, 18));
-		map.putResourceDeposit(deposit2, new Position(5, 16));
+		map.putOre(deposit1, new Position(28, 18));
+		map.putOre(deposit2, new Position(5, 16));
 	}
 }

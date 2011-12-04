@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<UnitType type="chassis" unitType="ePantherChassis" civ="Eden">
+	<DisplayName>Panther Chassis</DisplayName>
+	<Acknowledgement>panther</Acknowledgement>
+	<Commands/>
+	<Cost>
+		<Resource type="common ore" amount="200"/>
+		<Resource type="rare ore" amount="100"/>
+	</Cost>
+	<Stats hp="250"
+		   speed="1"
+		   sightRange="8"
+		   armor="medium"
+		   rotationSpeed="1"
+		   rotationDegree="8"/>
+</UnitType>

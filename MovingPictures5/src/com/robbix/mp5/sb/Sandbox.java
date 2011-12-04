@@ -65,7 +65,7 @@ import com.robbix.mp5.Game;
 import com.robbix.mp5.GameListener;
 import com.robbix.mp5.MeteorShowerTrigger;
 import com.robbix.mp5.map.Fixture;
-import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.Ore;
 import com.robbix.mp5.player.Player;
 import com.robbix.mp5.sb.demo.Demo;
 import com.robbix.mp5.ui.DisplayPanel;
@@ -811,27 +811,27 @@ public class Sandbox extends JApplet
 			}
 			else if (e.getSource() == placeCommon1)
 			{
-				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get1BarCommon()));
+				panel.pushOverlay(new PlaceResourceOverlay(Ore.get1BarCommon()));
 			}
 			else if (e.getSource() == placeCommon2)
 			{
-				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get2BarCommon()));
+				panel.pushOverlay(new PlaceResourceOverlay(Ore.get2BarCommon()));
 			}
 			else if (e.getSource() == placeCommon3)
 			{
-				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get3BarCommon()));
+				panel.pushOverlay(new PlaceResourceOverlay(Ore.get3BarCommon()));
 			}
 			else if (e.getSource() == placeRare1)
 			{
-				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get1BarRare()));
+				panel.pushOverlay(new PlaceResourceOverlay(Ore.get1BarRare()));
 			}
 			else if (e.getSource() == placeRare2)
 			{
-				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get2BarRare()));
+				panel.pushOverlay(new PlaceResourceOverlay(Ore.get2BarRare()));
 			}
 			else if (e.getSource() == placeRare3)
 			{
-				panel.pushOverlay(new PlaceResourceOverlay(ResourceDeposit.get3BarRare()));
+				panel.pushOverlay(new PlaceResourceOverlay(Ore.get3BarRare()));
 			}
 			else if (e.getSource() == placeBulldozeMenuItem)
 			{

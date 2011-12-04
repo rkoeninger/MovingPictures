@@ -3,7 +3,7 @@ package com.robbix.mp5.ui.overlay;
 import java.awt.Color;
 
 import com.robbix.mp5.map.LayeredMap;
-import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.Ore;
 import com.robbix.mp5.ui.DisplayGraphics;
 import com.robbix.mp5.ui.Sprite;
 import com.robbix.mp5.ui.SpriteSet;
@@ -15,9 +15,9 @@ public class PlaceResourceOverlay extends InputOverlay
 {
 	private Sprite resSprite;
 	
-	private ResourceDeposit res;
+	private Ore res;
 	
-	public PlaceResourceOverlay(ResourceDeposit res)
+	public PlaceResourceOverlay(Ore res)
 	{
 		this.res = res;
 	}
@@ -32,7 +32,7 @@ public class PlaceResourceOverlay extends InputOverlay
 		ColorScheme colors = null;
 		String toolTip = null;
 		
-		if (panel.getMap().canPlaceResourceDeposit(pos))
+		if (panel.getMap().canPutOre(pos))
 		{
 			Unit occupant = panel.getMap().getUnit(pos);
 			colors = hasNeighboringDeposit(pos) || isImmobile(occupant) ? YELLOW : GREEN;
@@ -61,10 +61,10 @@ public class PlaceResourceOverlay extends InputOverlay
 	{
 		Position pos = getCursorPosition();
 		
-		if (panel.getMap().canPlaceResourceDeposit(pos))
+		if (panel.getMap().canPutOre(pos))
 		{
-			panel.getMap().putResourceDeposit(res, pos);
-			res = (ResourceDeposit)res.clone();
+			panel.getMap().putOre(res, pos);
+			res = (Ore)res.clone();
 			panel.refresh();
 		}
 	}
@@ -80,6 +80,6 @@ public class PlaceResourceOverlay extends InputOverlay
 		Position wPos = pos.shift(-1, 0);
 		Position ePos = pos.shift(1, 0);
 		
-		return map.hasResourceDeposit(wPos) || map.hasResourceDeposit(ePos);
+		return map.hasOre(wPos) || map.hasOre(ePos);
 	}
 }

@@ -16,7 +16,7 @@ import com.robbix.mp5.Modular;
 import com.robbix.mp5.ModuleEvent;
 import com.robbix.mp5.ModuleListener;
 import com.robbix.mp5.map.Fixture;
-import com.robbix.mp5.map.ResourceDeposit;
+import com.robbix.mp5.map.Ore;
 import com.robbix.mp5.unit.Activity;
 import com.robbix.mp5.unit.HealthBracket;
 import com.robbix.mp5.unit.Unit;
@@ -369,23 +369,23 @@ public class SpriteLibrary implements Modular
 		return seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount()));
 	}
 	
-	public SpriteGroup getSpriteGroup(ResourceDeposit res)
+	public SpriteGroup getSpriteGroup(Ore res)
 	{
 		return getAmbientSpriteGroup("aResource", res.toString());
 	}
 	
-	public Sprite getSprite(ResourceDeposit res)
+	public Sprite getSprite(Ore res)
 	{
 		SpriteGroup seq = getSpriteGroup(res);
 		return seq.getSprite(Utils.getTimeBasedIndex(100, seq.getSpriteCount()));
 	}
 	
-	public Sprite getDefaultSprite(ResourceDeposit res)
+	public Sprite getDefaultSprite(Ore res)
 	{
 		return getSpriteGroup(res).getFirst();
 	}
 	
-	public Sprite getTranslucentDefault(ResourceDeposit res, double aFactor)
+	public Sprite getTranslucentDefault(Ore res, double aFactor)
 	{
 		Sprite sprite = getDefaultSprite(res);
 		

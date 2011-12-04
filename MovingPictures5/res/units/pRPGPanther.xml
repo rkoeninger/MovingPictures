@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<UnitType type="tank" unitType="pRPGPanther" civ="Plymouth">
+	<DisplayName>RPG Panther</DisplayName>
+	<Commands/>
+	<Cost>
+		<Resource type="common ore" amount="700"/>
+		<Resource type="rare ore" amount="250"/>
+	</Cost>
+	<Chassis>pPantherChassis</Chassis>
+	<Turret>pRPGSingleTurret</Turret>
+</UnitType>
