@@ -20,20 +20,10 @@ public class SpriteGroupAnimation extends AmbientAnimation
 	
 	public SpriteGroupAnimation(SpriteGroup group, Point2D point)
 	{
-		this(group, null, point, 1);
-	}
-	
-	public SpriteGroupAnimation(SpriteGroup group, Point2D point, int delay)
-	{
-		this(group, null, point, delay);
+		this(group, null, point);
 	}
 	
 	public SpriteGroupAnimation(SpriteGroup group, Player player, Point2D point)
-	{
-		this(group, player, point, 1);
-	}
-	
-	public SpriteGroupAnimation(SpriteGroup group, Player player, Point2D point, int delay)
 	{
 		super(Game.game.getSpriteLibrary());
 		this.sprites = group;

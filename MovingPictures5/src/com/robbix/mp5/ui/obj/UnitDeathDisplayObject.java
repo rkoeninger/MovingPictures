@@ -33,11 +33,12 @@ public class UnitDeathDisplayObject extends DisplayObject
 		this.point = unit.getAbsPoint();
 		this.timeOfDeath = timeOfDeath;
 		this.selfDestructed = selfDestructed;
+		Point2D absPoint = unit.getAbsPoint();
 		this.bounds = new Rectangle2D.Double(
-			point.getX() - 1,
-			point.getY() - 1,
-			type.getFootprint().getWidth() + 2,
-			type.getFootprint().getHeight() + 2
+			absPoint.getX() - 0.5,
+			absPoint.getY() - 0.5,
+			unit.getWidth() + 1,
+			unit.getHeight() + 1
 		);
 	}
 	
@@ -54,7 +55,8 @@ public class UnitDeathDisplayObject extends DisplayObject
 	public boolean isAlive()
 	{
 		int frame = Game.game.getFrame() - timeOfDeath;
-		return (group != null && frame < group.getFrameCount()) || frame >= 32;
+		int frameCount = group != null ? group.getFrameCount() : 32;
+		return frame < frameCount;
 	}
 	
 	public void paint(DisplayGraphics g)

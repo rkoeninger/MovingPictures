@@ -873,6 +873,9 @@ public class DisplayPanel extends JComponent
 		}
 	}
 	
+	/**
+	 * Draws listed display objects layer by layer, sorting as required.
+	 */
 	private void drawObjects(DisplayGraphics g, Rectangle2D absRect)
 	{
 		synchronized (displayLayers)

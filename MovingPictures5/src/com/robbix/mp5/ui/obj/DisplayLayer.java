@@ -5,14 +5,19 @@ import java.util.Comparator;
 
 public enum DisplayLayer
 {
-	SURFACE(null),
-	UNDER_UNIT(null),
+	SURFACE,
+	UNDER_UNIT,
 	UNIT(Comparators.Z_ORDER),
-	OVER_UNIT(Comparators.Z_ORDER),
-	AIR(null),
-	OVERLAY(null);
+	OVER_UNIT,
+	AIR,
+	OVERLAY;
 	
 	public final Comparator<DisplayObject> comparator;
+	
+	private DisplayLayer()
+	{
+		this.comparator = null;
+	}
 	
 	private DisplayLayer(Comparator<DisplayObject> comparator)
 	{
