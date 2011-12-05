@@ -21,6 +21,11 @@ public class OreDisplayObject extends DisplayObject
 		this.res = res;
 	}
 	
+	public DisplayLayer getDisplayLayer()
+	{
+		return DisplayLayer.OVERLAY;
+	}
+	
 	public boolean isAlive()
 	{
 		return res.getPosition() != null;

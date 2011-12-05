@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -397,6 +398,11 @@ public class DisplayPanel extends JComponent
 		}
 	}
 	
+	public void addDisplayObject(DisplayObject dObj)
+	{
+		addDisplayObject(dObj, dObj.getDisplayLayer());
+	}
+	
 	public int getTotalWidth()
 	{
 		return map.getWidth() * gm.tileSize;
@@ -712,24 +718,7 @@ public class DisplayPanel extends JComponent
 		if (showTubeConnectivity && gm.scale >= -2)
 			drawTubeConnectivity(g, region);
 		
-		synchronized (displayLayers)
-		{
-			for (DisplayLayer layer : DisplayLayer.values())
-			{
-				List<DisplayObject> list = displayLayers.get(layer);
-				List<DisplayObject> listCopy = new ArrayList<DisplayObject>();
-				
-				for (DisplayObject dObj : list)
-					if (dObj.isAlive() && absRect.intersects(dObj.getBounds()))
-						listCopy.add(dObj);
-				
-				if (layer.comparator != null)
-					Collections.sort(listCopy, layer.comparator);
-				
-				for (DisplayObject dObj : listCopy)
-					dObj.paint(g);
-			}
-		}
+		drawObjects(g, absRect);
 		
 		synchronized (animations)
 		{
@@ -880,6 +869,40 @@ public class DisplayPanel extends JComponent
 				boolean alive = (map.isAlive(pos) || hasConnection || isSource);
 				g.setColor(alive ? InputOverlay.TRANS_GREEN : InputOverlay.TRANS_RED);
 				g.fill(pos);
+			}
+		}
+	}
+	
+	private void drawObjects(DisplayGraphics g, Rectangle2D absRect)
+	{
+		synchronized (displayLayers)
+		{
+			for (DisplayLayer layer : DisplayLayer.values())
+			{
+				List<DisplayObject> list = displayLayers.get(layer);
+				List<DisplayObject> listCopy = new ArrayList<DisplayObject>();
+				
+				Iterator<DisplayObject> dObjItr = list.iterator();
+				
+				while (dObjItr.hasNext())
+				{
+					DisplayObject dObj = dObjItr.next();
+					
+					if (!dObj.isAlive())
+					{
+						dObjItr.remove();
+						continue;
+					}
+					
+					if (absRect.intersects(dObj.getBounds()))
+						listCopy.add(dObj);
+				}
+				
+				if (layer.comparator != null)
+					Collections.sort(listCopy, layer.comparator);
+				
+				for (DisplayObject dObj : listCopy)
+					dObj.paint(g);
 			}
 		}
 	}

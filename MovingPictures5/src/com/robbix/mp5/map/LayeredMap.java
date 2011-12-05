@@ -1,9 +1,5 @@
 package com.robbix.mp5.map;
 
-import static com.robbix.mp5.ui.obj.DisplayLayer.OVERLAY;
-import static com.robbix.mp5.ui.obj.DisplayLayer.UNDER_UNIT;
-import static com.robbix.mp5.ui.obj.DisplayLayer.UNIT;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -218,7 +214,7 @@ public class LayeredMap
 		deposits.add(deposit);
 		
 		for (DisplayPanel panel : panels)
-			panel.addDisplayObject(new OreDisplayObject(deposit), OVERLAY);
+			panel.addDisplayObject(new OreDisplayObject(deposit));
 	}
 	
 	public void removeOre(Position pos)
@@ -363,7 +359,7 @@ public class LayeredMap
 		costMap.setInfinite(pos);
 		
 		for (DisplayPanel panel : panels)
-			panel.addDisplayObject(new GeyserDisplayObject(pos), UNIT);
+			panel.addDisplayObject(new GeyserDisplayObject(pos));
 	}
 	
 	public void putMagmaVent(Position pos)
@@ -380,7 +376,7 @@ public class LayeredMap
 		costMap.setInfinite(pos);
 		
 		for (DisplayPanel panel : panels)
-			panel.addDisplayObject(new MagmaVentDisplayObject(pos), UNIT);
+			panel.addDisplayObject(new MagmaVentDisplayObject(pos));
 	}
 	
 	public boolean isAlive(Position pos)
@@ -788,11 +784,11 @@ public class LayeredMap
 		
 		for (DisplayPanel panel : panels)
 		{
-			panel.addDisplayObject(new UnitDisplayObject(unit), UNIT);
-			panel.addDisplayObject(new StatusLightDisplayObject(unit), OVERLAY);
+			panel.addDisplayObject(new UnitDisplayObject(unit));
+			panel.addDisplayObject(new StatusLightDisplayObject(unit));
 			
 			if (mine)
-				panel.addDisplayObject(new MinePlatformDisplayObject(unit), UNDER_UNIT);
+				panel.addDisplayObject(new MinePlatformDisplayObject(unit));
 		}
 	}
 	

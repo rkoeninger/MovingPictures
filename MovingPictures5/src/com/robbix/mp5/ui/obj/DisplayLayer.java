@@ -8,7 +8,7 @@ public enum DisplayLayer
 	SURFACE(null),
 	UNDER_UNIT(null),
 	UNIT(Comparators.Z_ORDER),
-	OVER_UNIT(null),
+	OVER_UNIT(Comparators.Z_ORDER),
 	AIR(null),
 	OVERLAY(null);
 	

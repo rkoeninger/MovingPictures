@@ -20,6 +20,11 @@ public class MinePlatformDisplayObject extends DisplayObject
 		this.mine = mine;
 	}
 	
+	public DisplayLayer getDisplayLayer()
+	{
+		return DisplayLayer.UNDER_UNIT;
+	}
+	
 	public boolean isAlive()
 	{
 		return !mine.isFloating() && !mine.isDead();

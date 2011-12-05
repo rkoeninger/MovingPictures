@@ -18,6 +18,11 @@ public class StatusLightDisplayObject extends DisplayObject
 		this.unit = unit;
 	}
 	
+	public DisplayLayer getDisplayLayer()
+	{
+		return DisplayLayer.OVERLAY;
+	}
+	
 	public boolean isAlive()
 	{
 		return !unit.isDead() && !unit.isFloating();

@@ -19,6 +19,8 @@ public abstract class DisplayObject
 		return panel;
 	}
 	
+	public abstract DisplayLayer getDisplayLayer();
+	
 	public abstract boolean isAlive();
 	
 	public abstract void paint(DisplayGraphics g);

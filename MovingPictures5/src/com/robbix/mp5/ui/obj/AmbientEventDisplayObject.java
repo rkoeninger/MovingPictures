@@ -30,6 +30,11 @@ public class AmbientEventDisplayObject extends DisplayObject
 		return frameCount < 0 || frame < frameCount;
 	}
 	
+	public DisplayLayer getDisplayLayer()
+	{
+		return DisplayLayer.OVER_UNIT;
+	}
+	
 	public void paint(DisplayGraphics g)
 	{
 		SpriteLibrary lib = panel.getSpriteLibrary();

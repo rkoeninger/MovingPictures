@@ -21,6 +21,11 @@ public class UnitDisplayObject extends DisplayObject
 		this.unit = unit;
 	}
 	
+	public DisplayLayer getDisplayLayer()
+	{
+		return DisplayLayer.UNIT;
+	}
+	
 	public boolean isAlive()
 	{
 		return !unit.isDead() && !unit.isFloating() && !unit.isDismissed();

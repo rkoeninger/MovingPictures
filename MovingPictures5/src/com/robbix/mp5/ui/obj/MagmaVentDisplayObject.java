@@ -19,6 +19,11 @@ public class MagmaVentDisplayObject extends DisplayObject
 		this.pos = pos;
 	}
 	
+	public DisplayLayer getDisplayLayer()
+	{
+		return DisplayLayer.UNIT;
+	}
+	
 	public boolean isAlive()
 	{
 		return panel.getMap().hasMagmaVent(pos);

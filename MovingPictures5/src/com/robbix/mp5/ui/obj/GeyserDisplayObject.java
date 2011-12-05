@@ -19,6 +19,11 @@ public class GeyserDisplayObject extends DisplayObject
 		this.pos = pos;
 	}
 	
+	public DisplayLayer getDisplayLayer()
+	{
+		return DisplayLayer.UNIT;
+	}
+	
 	public boolean isAlive()
 	{
 		return panel.getMap().hasGeyser(pos);
