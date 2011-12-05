@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.robbix.mp5.ai.task.Task;
+import com.robbix.mp5.map.Entity;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.player.Player;
 import com.robbix.utils.Direction;
@@ -20,7 +21,7 @@ import static com.robbix.mp5.unit.Activity.*;
  * Hashcode and equals methods remain defaults, since there should
  * not be two Unit objects describing the same unit.
  */
-public class Unit
+public class Unit extends Entity
 {
 	private static AtomicInteger nextSerial = new AtomicInteger();
 	
