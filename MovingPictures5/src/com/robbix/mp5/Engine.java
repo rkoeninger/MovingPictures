@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 import javax.swing.Timer;
 
+import com.robbix.mp5.map.Entity;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.ani.AmbientAnimation;
@@ -128,24 +129,19 @@ public class Engine
 				synchronized (game.getTriggers())
 				{
 					for (Trigger trigger : game.getTriggers())
-					{
 						trigger.step(Game.game, frame);
-					}
 				}
 				
 				/*
 				 * Mechanics
 				 */
 				for (Unit unit : map.getUnitIterator())
-				{
-					if (unit.isDead() || unit.isFloating())
-						continue;
-					
-					unit.step();
-					
-					if (unit.hasTurret())
-						unit.getTurret().step();
-				}
+					if (!unit.isDead() && !unit.isFloating())
+						unit.step();
+				
+				for (Entity entity : game.getFreeEntities())
+					if (entity.isAlive())
+						entity.step();
 				
 				/*
 				 * Animation

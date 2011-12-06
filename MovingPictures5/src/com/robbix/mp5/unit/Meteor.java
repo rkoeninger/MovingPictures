@@ -39,4 +39,9 @@ public class Meteor extends Entity
 	{
 		return null;
 	}
+	
+	public void step()
+	{
+		
+	}
 }

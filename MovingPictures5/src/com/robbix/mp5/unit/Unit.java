@@ -177,6 +177,11 @@ public class Unit extends Entity
 		return hp <= 0;
 	}
 	
+	public boolean isAlive()
+	{
+		return !isDead();
+	}
+	
 	public boolean hasChassis()
 	{
 		return chassis != null;
@@ -787,6 +792,9 @@ public class Unit extends Entity
 			if (defaultTask != null)
 				defaultTask.step(this);
 		}
+		
+		if (hasTurret())
+			turret.step();
 	}
 
 	/**

@@ -21,6 +21,7 @@ import com.robbix.mp5.ai.task.EarthworkerConstructTask;
 import com.robbix.mp5.ai.task.PathTask;
 import com.robbix.mp5.ai.task.RotateTask;
 import com.robbix.mp5.ai.task.SteerTask;
+import com.robbix.mp5.map.Entity;
 import com.robbix.mp5.map.Fixture;
 import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.map.TileSet;
@@ -96,6 +97,8 @@ public class Game
 	private Set<Trigger> triggers;
 	private List<Runnable> pendingDoLaters;
 	
+	private Collection<Entity> entities;
+	
 	private int frame = 0;
 	
 	private GameListener.Helper listenerHelper = new GameListener.Helper();
@@ -110,6 +113,7 @@ public class Game
 		players.put(0, defaultPlayer);
 		triggers = Collections.synchronizedSet(new HashSet<Trigger>());
 		pendingDoLaters = new ArrayList<Runnable>();
+		entities = new ArrayList<Entity>();
 		Game.game = this;
 	}
 	
@@ -152,6 +156,16 @@ public class Game
 		{
 			pendingDoLaters.clear();
 		}
+	}
+	
+	public void addEntity(Entity e)
+	{
+		entities.add(e);
+	}
+	
+	public RIterator<Entity> getFreeEntities()
+	{
+		return RIterator.iterate(new ArrayList<Entity>(entities));
 	}
 	
 	public RIterator<Runnable> getDoLaters()
@@ -579,7 +593,7 @@ public class Game
 	public void selfDestruct(Unit unit)
 	{
 		unit.setHP(0);
-		getDisplay().addDisplayObject(new UnitDeathDisplayObject(unit, frame));
+		getDisplay().addDisplayObject(new UnitDeathDisplayObject(unit, frame, true));
 		
 		if (unit.isStructure() || unit.getType().isGuardPostType())
 		{
