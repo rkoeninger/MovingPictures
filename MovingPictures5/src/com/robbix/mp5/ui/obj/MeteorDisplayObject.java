@@ -33,38 +33,32 @@ public class MeteorDisplayObject extends DisplayObject
 	{
 		SpriteLibrary lib = panel.getSpriteLibrary();
 		int frame = Game.game.getFrame() - meteor.getFormationTime();
-		int frameCount = 0;
-		double distance = 0;
-		double angle = 0;
 		Point2D point = meteor.getAbsPoint();
 		
-		if (frame < 5)
+		if (meteor.isForming())
 		{
 			SpriteGroup forming = lib.getAmbientSpriteGroup("aMeteor", "forming");
-			double progress = (frameCount - frame) / (double)(frameCount);
-			double x = point.getX() + distance *  Math.cos(angle) * progress;
-			double y = point.getY() + distance * -Math.sin(angle) * progress;
-			g.draw(forming.getFrame(frame), new Point2D.Double(x, y));
+			g.draw(forming.getFrame(frame), point);
 		}
-		else if (frame > frameCount - 9)
+		else if (meteor.isCrashing())
 		{
 			SpriteGroup impact  = lib.getAmbientSpriteGroup("aMeteor", "impact");
-			int spriteFrame = impact.getFrameCount() - (frameCount - frame + 1);
-			g.draw(impact.getFrame(spriteFrame), point);
+			g.draw(impact.getFrame(Game.game.getFrame() - meteor.getImpactTime()), point);
 		}
-		else
+		else if (meteor.isFlying())
 		{
 			SpriteGroup flying  = lib.getAmbientSpriteGroup("aMeteor", "flying");
 			Sprite sprite = flying.getFrame(frame % flying.getFrameCount());
-			double progress = (frameCount - frame) / (double)(frameCount);
-			double x = point.getX() + distance *  Math.cos(angle) * progress;
-			double y = point.getY() + distance * -Math.sin(angle) * progress;
-			g.draw(sprite, new Point2D.Double(x, y));
+			g.draw(sprite, point);
 		}
 	}
 	
 	public Rectangle2D getBounds()
 	{
-		return null;
+		double x = meteor.getTargetPosition().x - 0.5;
+		double y = meteor.getTargetPosition().y + 0.5;
+		double w = meteor.getAbsPoint().getX() - x;
+		double h = meteor.getAbsPoint().getY() - y;
+		return new Rectangle2D.Double(x, y, w, h);
 	}
 }

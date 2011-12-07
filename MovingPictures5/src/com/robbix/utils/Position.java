@@ -39,6 +39,12 @@ public class Position implements RIterable<Position>
 		this.y = y;
 	}
 	
+	public Position(Point2D point)
+	{
+		this.x = (int)point.getX();
+		this.y = (int)point.getY();
+	}
+	
 	/**
 	 * Returns a new Position whose coordinates are shifted by &lt;dx, dy&gt;.
 	 */
