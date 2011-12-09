@@ -18,16 +18,17 @@ public class Meteor extends Entity
 	private double totalDistance = 20;
 	private double angle = 35 * Math.PI / 180; // in rads
 	
+	private Point2D targetPoint;
 	private Point2D point;
 	
 	public Meteor(Position target, int startTime)
 	{
 		this.target = target;
 		this.startTime = startTime;
-		this.point = target.getCenterPoint();
+		this.targetPoint = target.getCenterPoint();
 		point = new Point2D.Double(
-			point.getX() + totalDistance *  cos(angle),
-			point.getX() + totalDistance * -sin(angle)
+			targetPoint.getX() + totalDistance *  cos(angle),
+			targetPoint.getY() + totalDistance * -sin(angle)
 		);
 	}
 	
@@ -59,6 +60,18 @@ public class Meteor extends Entity
 		return frame >= duration - 9 ;
 	}
 	
+	public String getStatusString()
+	{
+		String str = point + " ";
+		
+		if (!isAlive()) str += "dead";
+		else if (isForming()) str += "forming";
+		else if (isFlying()) str += "flying";
+		else if (isCrashing()) str += "crashing";
+		
+		return str;
+	}
+	
 	public int getFormationTime()
 	{
 		return startTime;
@@ -86,6 +99,8 @@ public class Meteor extends Entity
 	
 	public void step()
 	{
+		System.out.println("Meteor step(): " + getStatusString());
+		
 		if (Game.game.getFrame() == startTime)
 		{
 			Game.game.playSound("meteor", target);
@@ -106,9 +121,13 @@ public class Meteor extends Entity
 		{
 			double progress = (getImpactTime() - Game.game.getFrame()) / (double)(duration - 9);
 			point = new Point2D.Double(
-				point.getX() + totalDistance * progress *  cos(angle),
-				point.getX() + totalDistance * progress * -sin(angle)
+				targetPoint.getX() + totalDistance * progress *  cos(angle),
+				targetPoint.getY() + totalDistance * progress * -sin(angle)
 			);
+		}
+		else
+		{
+			point = targetPoint;
 		}
 	}
 }

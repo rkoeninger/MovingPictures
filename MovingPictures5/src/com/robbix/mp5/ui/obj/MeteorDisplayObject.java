@@ -31,6 +31,9 @@ public class MeteorDisplayObject extends DisplayObject
 	
 	public void paint(DisplayGraphics g)
 	{
+		if (isAlive())
+			return;
+		
 		SpriteLibrary lib = panel.getSpriteLibrary();
 		int frame = Game.game.getFrame() - meteor.getFormationTime();
 		Point2D point = meteor.getAbsPoint();

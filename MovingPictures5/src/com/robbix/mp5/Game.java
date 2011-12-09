@@ -32,13 +32,14 @@ import com.robbix.mp5.ui.SoundBank;
 import com.robbix.mp5.ui.SpriteLibrary;
 import com.robbix.mp5.ui.ani.AcidCloudAnimation;
 import com.robbix.mp5.ui.ani.LaserAnimation;
-import com.robbix.mp5.ui.ani.MeteorAnimation;
 import com.robbix.mp5.ui.ani.MicrowaveAnimation;
 import com.robbix.mp5.ui.ani.RPGAnimation;
 import com.robbix.mp5.ui.ani.RailGunAnimation;
 import com.robbix.mp5.ui.ani.WeaponAnimation;
+import com.robbix.mp5.ui.obj.MeteorDisplayObject;
 import com.robbix.mp5.ui.obj.UnitDeathDisplayObject;
 import com.robbix.mp5.unit.HealthBracket;
+import com.robbix.mp5.unit.Meteor;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.utils.CostMap;
@@ -324,25 +325,25 @@ public class Game
 		
 		WeaponAnimation fireAnimation = null;
 		
-		if (attacker.getType().getName().contains("Laser"))
+		if (attacker.is("Laser"))
 		{
-			fireAnimation = new LaserAnimation(game.getSpriteLibrary(), attacker, target);
+			fireAnimation = new LaserAnimation(spriteLib, attacker, target);
 		}
-		else if (attacker.getType().getName().contains("Microwave"))
+		else if (attacker.is("Microwave"))
 		{
-			fireAnimation = new MicrowaveAnimation(game.getSpriteLibrary(), attacker, target);
+			fireAnimation = new MicrowaveAnimation(spriteLib, attacker, target);
 		}
-		else if (attacker.getType().getName().contains("RailGun"))
+		else if (attacker.is("RailGun"))
 		{
-			fireAnimation = new RailGunAnimation(game.getSpriteLibrary(), attacker, target);
+			fireAnimation = new RailGunAnimation(spriteLib, attacker, target);
 		}
-		else if (attacker.getType().getName().contains("RPG"))
+		else if (attacker.is("RPG"))
 		{
-			fireAnimation = new RPGAnimation(game.getSpriteLibrary(), attacker, target);
+			fireAnimation = new RPGAnimation(spriteLib, attacker, target);
 		}
-		else if (attacker.getType().getName().contains("AcidCloud"))
+		else if (attacker.is("AcidCloud"))
 		{
-			fireAnimation = new AcidCloudAnimation(game.getSpriteLibrary(), attacker, target);
+			fireAnimation = new AcidCloudAnimation(spriteLib, attacker, target);
 		}
 		
 		attacker.assignNow(new AttackTask(target, fireAnimation));
@@ -635,7 +636,10 @@ public class Game
 	
 	public void doSpawnMeteor(Position pos)
 	{
-		getDisplay().cueAnimation(new MeteorAnimation(spriteLib, pos));
-		Game.game.playSound("meteor", pos);
+		Meteor meteor = new Meteor(pos, frame);
+		entities.add(meteor);
+		
+		for (DisplayPanel panel : displays)
+			panel.addDisplayObject(new MeteorDisplayObject(meteor));
 	}
 }
