@@ -13,10 +13,17 @@ import com.robbix.mp5.unit.Meteor;
 public class MeteorDisplayObject extends DisplayObject
 {
 	private Meteor meteor;
+	private Rectangle2D baseBounds;
 	
 	public MeteorDisplayObject(Meteor meteor)
 	{
 		this.meteor = meteor;
+		this.baseBounds = new Rectangle2D.Double(
+			meteor.getTargetPosition().x - 1,
+			meteor.getTargetPosition().y - 1,
+			3,
+			3
+		);
 	}
 	
 	public DisplayLayer getDisplayLayer()
@@ -31,7 +38,7 @@ public class MeteorDisplayObject extends DisplayObject
 	
 	public void paint(DisplayGraphics g)
 	{
-		if (isAlive())
+		if (!isAlive())
 			return;
 		
 		SpriteLibrary lib = panel.getSpriteLibrary();
@@ -40,18 +47,19 @@ public class MeteorDisplayObject extends DisplayObject
 		
 		if (meteor.isForming())
 		{
-			SpriteGroup forming = lib.getAmbientSpriteGroup("aMeteor", "forming");
-			g.draw(forming.getFrame(frame), point);
+			SpriteGroup group = lib.getAmbientSpriteGroup("aMeteor", "forming");
+			g.draw(group.getFrame(frame), point);
 		}
 		else if (meteor.isCrashing())
 		{
-			SpriteGroup impact  = lib.getAmbientSpriteGroup("aMeteor", "impact");
-			g.draw(impact.getFrame(Game.game.getFrame() - meteor.getImpactTime()), point);
+			SpriteGroup group  = lib.getAmbientSpriteGroup("aMeteor", "impact");
+			Sprite sprite = group.getFrame(Game.game.getFrame() - meteor.getImpactTime());
+			g.draw(sprite, point);
 		}
 		else if (meteor.isFlying())
 		{
-			SpriteGroup flying  = lib.getAmbientSpriteGroup("aMeteor", "flying");
-			Sprite sprite = flying.getFrame(frame % flying.getFrameCount());
+			SpriteGroup group  = lib.getAmbientSpriteGroup("aMeteor", "flying");
+			Sprite sprite = group.getFrame(frame % group.getFrameCount());
 			g.draw(sprite, point);
 		}
 	}
@@ -61,7 +69,7 @@ public class MeteorDisplayObject extends DisplayObject
 		double x = meteor.getTargetPosition().x - 0.5;
 		double y = meteor.getTargetPosition().y + 0.5;
 		double w = meteor.getAbsPoint().getX() - x;
-		double h = meteor.getAbsPoint().getY() - y;
-		return new Rectangle2D.Double(x, y, w, h);
+		double h = y - meteor.getAbsPoint().getY();
+		return baseBounds.createUnion(new Rectangle2D.Double(x, y, w, h));
 	}
 }

@@ -99,8 +99,6 @@ public class Meteor extends Entity
 	
 	public void step()
 	{
-		System.out.println("Meteor step(): " + getStatusString());
-		
 		if (Game.game.getFrame() == startTime)
 		{
 			Game.game.playSound("meteor", target);
