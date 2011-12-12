@@ -4,6 +4,7 @@
 		path="./cloud1"
 		   fileNumber="13787"
 		   frameCount="5"
+		   delay="2"
 		   x="-93"
 		   y="-89">
 		<OffsetFrame x="80" y="74"/>
@@ -16,6 +17,7 @@
 		path="./cloud2"
 		   fileNumber="13792"
 		   frameCount="8"
+		   delay="2"
 		   x="-93"
 		   y="-89">
 		<OffsetFrame x="24" y="16"/>
@@ -31,6 +33,7 @@
 		path="./cloud3"
 		   fileNumber="13800"
 		   frameCount="8"
+		   delay="2"
 		   x="-93"
 		   y="-89">
 		<OffsetFrame x="24" y="16"/>

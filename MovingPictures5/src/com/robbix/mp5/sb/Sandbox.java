@@ -71,12 +71,14 @@ import com.robbix.mp5.sb.demo.Demo;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.DisplayPanelView;
 import com.robbix.mp5.ui.DisplayWindow;
+import com.robbix.mp5.ui.obj.AcidCloudDisplayObject;
 import com.robbix.mp5.ui.overlay.PlaceBulldozeOverlay;
 import com.robbix.mp5.ui.overlay.PlaceFixtureOverlay;
 import com.robbix.mp5.ui.overlay.PlaceResourceOverlay;
 import com.robbix.mp5.ui.overlay.PlaceUnitOverlay;
 import com.robbix.mp5.ui.overlay.SelectUnitOverlay;
 import com.robbix.mp5.ui.overlay.SpawnMeteorOverlay;
+import com.robbix.mp5.unit.AcidCloud;
 import com.robbix.mp5.unit.Command;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
@@ -88,6 +90,7 @@ import com.robbix.utils.RColor;
 import com.robbix.utils.RImage;
 import com.robbix.utils.RMenuItem;
 import com.robbix.utils.RRadioButtonMenuItem;
+import com.robbix.utils.Region;
 import com.robbix.utils.Utils;
 
 /**
@@ -165,6 +168,7 @@ public class Sandbox extends JApplet
 	private static JMenuItem addTabMenuItem;
 	private static JMenuItem splitDisplayMenuItem;
 	private static JMenuItem fullScreenMenuItem;
+	private static JMenuItem acidCloudMenuItem;
 	private static JMenuItem spawnMeteorMenuItem;
 	private static JMenuItem meteorShowerMenuItem;
 	private static JMenuItem placeGeyserMenuItem;
@@ -281,6 +285,7 @@ public class Sandbox extends JApplet
 		addTabMenuItem         = new JMenuItem("Add Tab");
 		splitDisplayMenuItem   = new JMenuItem("Split Display");
 		fullScreenMenuItem     = new JMenuItem("Full Screen");
+		acidCloudMenuItem      = new JMenuItem("Spawn Acid Cloud");
 		spawnMeteorMenuItem    = new JMenuItem("Spawn Meteor");
 		meteorShowerMenuItem   = new JMenuItem("Meteor Shower");
 		placeGeyserMenuItem    = new JMenuItem("Place Geyser");
@@ -381,6 +386,7 @@ public class Sandbox extends JApplet
 		addTabMenuItem        .addActionListener(listener);
 		splitDisplayMenuItem  .addActionListener(listener);
 		fullScreenMenuItem    .addActionListener(listener);
+		acidCloudMenuItem     .addActionListener(listener);
 		meteorShowerMenuItem  .addActionListener(listener);
 		spawnMeteorMenuItem   .addActionListener(listener);
 		playSoundMenuItem     .addActionListener(listener);
@@ -444,6 +450,7 @@ public class Sandbox extends JApplet
 		placeResourceMenu.add(placeRare2);
 		placeResourceMenu.add(placeRare3);
 		terrainMenu.add(placeResourceMenu);
+		disastersMenu.add(acidCloudMenuItem);
 		disastersMenu.add(spawnMeteorMenuItem);
 		disastersMenu.add(meteorShowerMenuItem);
 		unitMenu.add(addUnitMenu);
@@ -764,6 +771,16 @@ public class Sandbox extends JApplet
 				frame.validate();
 				splitPane.setDividerLocation(splitPane.getWidth() / 2);
 				engine.pause();
+			}
+			else if (e.getSource() == acidCloudMenuItem)
+			{
+				Region r = Game.game.getMap().getBounds();
+				
+				AcidCloud cloud = new AcidCloud(r.getCenter(), Game.game.getFrame());
+				Game.game.addEntity(cloud);
+				
+				for (DisplayPanel panel : Game.game.getDisplays())
+					panel.addDisplayObject(new AcidCloudDisplayObject(cloud));
 			}
 			else if (e.getSource() == meteorShowerMenuItem)
 			{
