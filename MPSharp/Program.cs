@@ -15,8 +15,6 @@ namespace MPSharp
         [STAThread]
         static void Main()
         {
-			foreach (GridPos dir in new GridPos(3, 4).Get8Neighbors(Direction.NW)) Console.WriteLine(dir);
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainWindow());
