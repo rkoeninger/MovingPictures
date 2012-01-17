@@ -6,8 +6,8 @@ namespace MPSharp.Basics
 {
 	public struct AbsPos : IEquatable<AbsPos>
 	{
-		private float x;
-		private float y;
+		private readonly float x;
+		private readonly float y;
 
 		public float X{ get{ return x; } }
 		public float Y{ get{ return y; } }
@@ -50,6 +50,13 @@ namespace MPSharp.Basics
 			return (float) Math.Sqrt(dx * dx + dy * dy);
 		}
 		
+		public float GetAngle(AbsPos pos)
+		{
+			float dx = x - pos.x;
+			float dy = y - pos.y;
+			return ((float) -Math.Atan2(dy, dx)).NormalizeRevAngle();
+		}
+
 		public static AbsPos operator + (AbsPos a, AbsPos b)
 		{
 			return new AbsPos(a.x + a.y, b.x + b.y);
@@ -68,11 +75,6 @@ namespace MPSharp.Basics
 		public GridPos ToGridPos()
 		{
 			return new GridPos((int) Math.Round(x), (int) Math.Round(y));
-		}
-
-		public Point ToPoint(int spotSize)
-		{
-			return new Point((int) (x * spotSize), (int) (y * spotSize));
 		}
 
 		public override String ToString()

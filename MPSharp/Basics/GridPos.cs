@@ -5,8 +5,8 @@ namespace MPSharp.Basics
 {
 	public struct GridPos : IEquatable<GridPos>
 	{
-		private int x;
-		private int y;
+		private readonly int x;
+		private readonly int y;
 
 		public int X{ get{ return x; } }
 		public int Y{ get{ return y; } }
@@ -17,28 +17,36 @@ namespace MPSharp.Basics
 			this.y = y;
 		}
 		
-		public List<GridPos> Get4Neighbors()
+		public IEnumerable<GridPos> Get4Neighbors()
 		{
-			List<GridPos> neighbors = new List<GridPos>(4);
-			neighbors.Add(new GridPos(x + 1, y    ));
-			neighbors.Add(new GridPos(x,     y - 1));
-			neighbors.Add(new GridPos(x - 1, y    ));
-			neighbors.Add(new GridPos(x,     y + 1));
-			return neighbors;
+			return Get4Neighbors(Direction.E);
 		}
 
-		public List<GridPos> Get8Neighbors()
+		public IEnumerable<GridPos> Get4Neighbors(Direction start, bool cw = false)
 		{
-			List<GridPos> neighbors = new List<GridPos>(8);
-			neighbors.Add(new GridPos(x + 1, y    ));
-			neighbors.Add(new GridPos(x + 1, y - 1));
-			neighbors.Add(new GridPos(x,     y - 1));
-			neighbors.Add(new GridPos(x - 1, y - 1));
-			neighbors.Add(new GridPos(x - 1, y    ));
-			neighbors.Add(new GridPos(x - 1, y + 1));
-			neighbors.Add(new GridPos(x,     y + 1));
-			neighbors.Add(new GridPos(x + 1, y + 1));
-			return neighbors;
+			if (!start.IsCardinality(Direction.Cardinality.Fourth))
+				throw new ArgumentException("Must be 4th turn", "start");
+
+			IEnumerable<Direction> fourWays = Direction.GetEnumerator(start, cw ? -4 : 4);
+
+			foreach (Direction dir in fourWays)
+				yield return dir.Apply(this);
+		}
+		
+		public IEnumerable<GridPos> Get8Neighbors()
+		{
+			return Get8Neighbors(Direction.E);
+		}
+
+		public IEnumerable<GridPos> Get8Neighbors(Direction start, bool cw = false)
+		{
+			if (!start.IsCardinality(Direction.Cardinality.Eighth))
+				throw new ArgumentException("Must be 4th or 8th turn", "start");
+
+			IEnumerable<Direction> eightWays = Direction.GetEnumerator(start, cw ? -2 : 2);
+
+			foreach (Direction dir in eightWays)
+				yield return dir.Apply(this);
 		}
 
 		public bool IsColinear(GridPos pos)
@@ -106,6 +114,13 @@ namespace MPSharp.Basics
 			return (max - min) + min * Sqrt2;
 		}
 		
+		public float GetAngle(GridPos pos)
+		{
+			float dx = x - pos.x;
+			float dy = y - pos.y;
+			return ((float) -Math.Atan2(dy, dx)).NormalizeRevAngle();
+		}
+
 		public static GridPos operator + (GridPos a, GridPos b)
 		{
 			return new GridPos(a.x + a.y, b.x + b.y);

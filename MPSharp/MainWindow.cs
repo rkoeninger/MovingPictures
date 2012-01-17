@@ -25,7 +25,8 @@ namespace MPSharp
         {
             Graphics g = e.Graphics;
             Pen p = new Pen(Color.Red);
-            g.DrawRectangle(null, 0, 0, panel1.Width, panel1.Height);
+			g.Clear(Color.White);
+            g.DrawRectangle(p, 0, 0, panel1.Width - 1, panel1.Height - 1);
         }
     }
 }
