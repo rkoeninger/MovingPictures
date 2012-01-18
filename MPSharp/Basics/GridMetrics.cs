@@ -5,6 +5,8 @@ namespace MPSharp.Basics
 {
 	public class GridMetrics
 	{
+		#region Members and Constructor
+
 		private readonly int rootSpotSize;
 
 		public int SpotSize
@@ -43,6 +45,10 @@ namespace MPSharp.Basics
 			YOffset = 0;
 		}
 
+		#endregion
+
+		#region Conversions
+
 		public Point ToPoint(AbsPos pos)
 		{
 			int x = XOffset + (int) (pos.X * SpotSize);
@@ -56,5 +62,7 @@ namespace MPSharp.Basics
 			float y = (point.Y - YOffset) / (float) SpotSize;
 			return new AbsPos(x, y);
 		}
+
+		#endregion
 	}
 }

@@ -24,7 +24,7 @@ namespace MPSharp.Basics
 
 		public IEnumerable<GridPos> Get4Neighbors(Direction start, bool cw = false)
 		{
-			if (!start.IsCardinality(Direction.Cardinality.Fourth))
+			if (!start.HasCardinality(Direction.Cardinality.Fourth))
 				throw new ArgumentException("Must be 4th turn", "start");
 
 			IEnumerable<Direction> fourWays = Direction.GetEnumerator(start, cw ? -4 : 4);
@@ -40,7 +40,7 @@ namespace MPSharp.Basics
 
 		public IEnumerable<GridPos> Get8Neighbors(Direction start, bool cw = false)
 		{
-			if (!start.IsCardinality(Direction.Cardinality.Eighth))
+			if (!start.HasCardinality(Direction.Cardinality.Eighth))
 				throw new ArgumentException("Must be 4th or 8th turn", "start");
 
 			IEnumerable<Direction> eightWays = Direction.GetEnumerator(start, cw ? -2 : 2);
@@ -125,6 +125,11 @@ namespace MPSharp.Basics
         {
             return new GridPos(x + dx, y + dy);
         }
+
+		public GridPos Shift(Direction dir)
+		{
+			return new GridPos(x + dir.DX, y + dir.DY);
+		}
 
         public GridPos Project(Direction dir, int distance)
         {

@@ -4,24 +4,27 @@ using System.Collections.Generic;
 
 namespace MPSharp.Basics
 {
-	public class Region : IEnumerable<GridPos>
+	public abstract class Region : IEnumerable<GridPos>
 	{
-        public int X{get; private set;}
-        public int Y{get; private set;}
+		// Upper-left corner of anchor pos, usually upper-left corner
+        public int X{get; protected set;}
+        public int Y{get; protected set;}
 
         /// <summary>Enclosed area; number of GridPos returned by Enumerator.</summary>
-        public int Area{get; private set;}
+        public int Area{get; protected set;}
 
-        public bool Contains(GridPos pos)
-        {
-            return false;
-        }
+		public abstract Region Move(int x, int y);
 
-        public IEnumerator<GridPos> GetEnumerator()
-        {
-            for (int i = 0; i < 5; ++i)
-                yield return new GridPos(i, 4);
-        }
+		public Region Move(GridPos pos)
+		{
+			return Move(pos.X, pos.Y);
+		}
+
+		public abstract Region Shift(int dx, int dy);
+
+        public abstract bool Contains(GridPos pos);
+
+        public abstract IEnumerator<GridPos> GetEnumerator();
 
         #region Boilerplate
         IEnumerator IEnumerable.GetEnumerator()

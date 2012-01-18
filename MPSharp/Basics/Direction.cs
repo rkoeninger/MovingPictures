@@ -17,21 +17,35 @@ namespace MPSharp.Basics
 			return list[(int) enumValue];
 		}
 
-		public Direction.Enum GetEnumValue()
-		{
-			return (Direction.Enum) Ordinal;
-		}
-        
         #endregion
 
-        #region Cardinality Checking
-        
-        /// <summary>Determines if this direction falls under the given order flag.</summary>
-		/// <remarks>By default, a fourth turn counts as an eigth turn,
-		/// but an eigth turn might not count as a fouth turn</remarks>
-		public bool IsCardinality(Cardinality cardinal, bool exclusively = false)
+		#region Neighbors Compatibility
+
+		public Neighbors ToNeighbor()
 		{
-			return exclusively ? (cardinal | Cardinal) == cardinal : (cardinal | Cardinal) != 0;
+			switch (EnumValue)
+			{
+			case Direction.Enum.N : return Neighbors.N;
+			case Direction.Enum.S : return Neighbors.S;
+			case Direction.Enum.E : return Neighbors.E;
+			case Direction.Enum.W : return Neighbors.W;
+			}
+
+			throw new NotSupportedException("Must be fourth cardinality");
+		}
+
+		#endregion
+
+		#region Cardinality Checking
+
+		public bool IsCardinality(Cardinality cardinal)
+		{
+			return cardinal == Cardinal;
+		}
+
+		public bool HasCardinality(Cardinality cardinal)
+		{
+			return (cardinal | Cardinal) == cardinal;
 		}
 
         [Flags]
@@ -42,10 +56,10 @@ namespace MPSharp.Basics
 
         #endregion
 
+        #region Instance Declarations and Listing
+
         private static readonly Direction[] list = new Direction[16];
 		private static readonly Dictionary<String,Direction> dict = new Dictionary<String,Direction>(16);
-
-        #region Instance Declarations
 
         public static readonly Direction E   = new Direction( 0, +1,  0, 0.0000f, "e",   "East");
 		public static readonly Direction ENE = new Direction( 1,  0,  0, 0.0625f, "ene", "East-North-East");
@@ -68,22 +82,24 @@ namespace MPSharp.Basics
 
         #region Members and Constructor
 
-        public int Ordinal         { get; private set; }
-		public int DX              { get; private set; }
-		public int DY              { get; private set; }
-		public Cardinality Cardinal{ get; private set; }
-		public float Angle         { get; private set; }
-		public float RadianAngle   { get; private set; }
-		public float DegreeAngle   { get; private set; }
-		public float Cos           { get; private set; }
-		public float Sin           { get; private set; }
-		public float Tan           { get; private set; }
-		public String Name         { get; private set; }
-		public String FullName     { get; private set; }
+        public int Ordinal             { get; private set; }
+		public Direction.Enum EnumValue{ get; private set; }
+		public int DX                  { get; private set; }
+		public int DY                  { get; private set; }
+		public Cardinality Cardinal    { get; private set; }
+		public float Angle             { get; private set; }
+		public float RadianAngle       { get; private set; }
+		public float DegreeAngle       { get; private set; }
+		public float Cos               { get; private set; }
+		public float Sin               { get; private set; }
+		public float Tan               { get; private set; }
+		public String Name             { get; private set; }
+		public String FullName         { get; private set; }
 
 		private Direction(int ordinal, int dx, int dy, float angle, String name, String fullName) : this()
 		{
 			Ordinal = ordinal;
+			EnumValue = (Direction.Enum) ordinal;
 			DX = dx;
 			DY = dy;
 			Cardinal = Cardinality.Sixteenth;

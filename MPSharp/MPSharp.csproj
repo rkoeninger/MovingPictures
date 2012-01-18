@@ -50,10 +50,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basics\AbsPos.cs" />
+    <Compile Include="Basics\CostMap.cs" />
     <Compile Include="Basics\Direction.cs" />
     <Compile Include="Basics\Grid.cs" />
     <Compile Include="Basics\GridMetrics.cs" />
     <Compile Include="Basics\GridPos.cs" />
+    <Compile Include="Basics\Neighbors.cs" />
+    <Compile Include="Basics\RectRegion.cs" />
     <Compile Include="Basics\Region.cs" />
     <Compile Include="Basics\RMath.cs" />
     <Compile Include="MainWindow.cs">
