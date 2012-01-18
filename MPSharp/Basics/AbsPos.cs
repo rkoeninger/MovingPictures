@@ -57,6 +57,18 @@ namespace MPSharp.Basics
 			return ((float) -Math.Atan2(dy, dx)).NormalizeRevAngle();
 		}
 
+        public AbsPos Shift(float dx, float dy)
+        {
+            return new AbsPos(x + dx, y + dy);
+        }
+
+        public AbsPos Project(float angle, float distance)
+        {
+            float dx = (float) +Math.Cos(angle) * distance;
+            float dy = (float) -Math.Sin(angle) * distance;
+            return new AbsPos(x + dx, y + dy);
+        }
+
 		public static AbsPos operator + (AbsPos a, AbsPos b)
 		{
 			return new AbsPos(a.x + a.y, b.x + b.y);
@@ -74,7 +86,7 @@ namespace MPSharp.Basics
 		
 		public GridPos ToGridPos()
 		{
-			return new GridPos((int) Math.Round(x), (int) Math.Round(y));
+			return new GridPos((int) x, (int) y);
 		}
 
 		public override String ToString()

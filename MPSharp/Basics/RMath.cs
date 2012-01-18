@@ -15,6 +15,11 @@ namespace MPSharp.Basics
 			return (f % 1.0f + 1.0f) % 1.0f;
 		}
 		
+        public static int RevsToNSteps(this float f, int n)
+        {
+            return (((int) Math.Round(f.NormalizeRevAngle() * n)) % n + n) % n;
+        }
+
 		public static bool IsPowerOfTwo(this int i)
 		{
 			return (i > 0) && ((i & (i - 1)) == 0);

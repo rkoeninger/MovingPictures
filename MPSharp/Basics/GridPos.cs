@@ -121,6 +121,16 @@ namespace MPSharp.Basics
 			return ((float) -Math.Atan2(dy, dx)).NormalizeRevAngle();
 		}
 
+        public GridPos Shift(int dx, int dy)
+        {
+            return new GridPos(x + dx, y + dy);
+        }
+
+        public GridPos Project(Direction dir, int distance)
+        {
+            return new GridPos(x + dir.DX * distance, y + dir.DY * distance);
+        }
+
 		public static GridPos operator + (GridPos a, GridPos b)
 		{
 			return new GridPos(a.x + a.y, b.x + b.y);
@@ -136,12 +146,12 @@ namespace MPSharp.Basics
 			return new GridPos(-pos.x, -pos.y);
 		}
 		
-		public AbsPos ToAbsPosCorner()
+		public AbsPos ToCornerAbsPos()
 		{
 			return new AbsPos(x, y);
 		}
 
-		public AbsPos ToAbsPosCentered()
+		public AbsPos ToCenterAbsPos()
 		{
 			return new AbsPos(x + 0.5f, y + 0.5f);
 		}

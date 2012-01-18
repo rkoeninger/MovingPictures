@@ -1,26 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace MPSharp.Basics
 {
 	public struct Direction : IEquatable<Direction>
-	{
-		public enum Enum
+    {
+        #region Enum Compatibility
+
+        public enum Enum
 		{
 			E = 0, ENE, NE, NNE, N, NNW, NW, WNW, W, WSW, SW, SSW, S, SSE, SE, ESE
 		}
+        
+        public static Direction ForEnumValue(Direction.Enum enumValue)
+		{
+			return list[(int) enumValue];
+		}
 
-		[Flags]
+		public Direction.Enum GetEnumValue()
+		{
+			return (Direction.Enum) Ordinal;
+		}
+        
+        #endregion
+
+        #region Cardinality Checking
+        
+        /// <summary>Determines if this direction falls under the given order flag.</summary>
+		/// <remarks>By default, a fourth turn counts as an eigth turn,
+		/// but an eigth turn might not count as a fouth turn</remarks>
+		public bool IsCardinality(Cardinality cardinal, bool exclusively = false)
+		{
+			return exclusively ? (cardinal | Cardinal) == cardinal : (cardinal | Cardinal) != 0;
+		}
+
+        [Flags]
 		public enum Cardinality
 		{
 			Fourth = 1, Eighth = 2, Sixteenth = 4
 		}
-		
-		private static readonly Direction[] list = new Direction[16];
+
+        #endregion
+
+        private static readonly Direction[] list = new Direction[16];
 		private static readonly Dictionary<String,Direction> dict = new Dictionary<String,Direction>(16);
 
-		public static readonly Direction E   = new Direction( 0, +1,  0, 0.0000f, "e",   "East");
+        #region Instance Declarations
+
+        public static readonly Direction E   = new Direction( 0, +1,  0, 0.0000f, "e",   "East");
 		public static readonly Direction ENE = new Direction( 1,  0,  0, 0.0625f, "ene", "East-North-East");
 		public static readonly Direction NE  = new Direction( 2, +1, +1, 0.1250f, "ne",  "North-East");
 		public static readonly Direction NNE = new Direction( 3,  0,  0, 0.1875f, "nne", "North-North-East");
@@ -37,7 +64,11 @@ namespace MPSharp.Basics
 		public static readonly Direction SE  = new Direction(14, +1, +1, 0.8750f, "se",  "South-East");
 		public static readonly Direction ESE = new Direction(15,  0,  0, 0.9375f, "ese", "East-South-East");
 
-		public int Ordinal         { get; private set; }
+        #endregion
+
+        #region Members and Constructor
+
+        public int Ordinal         { get; private set; }
 		public int DX              { get; private set; }
 		public int DY              { get; private set; }
 		public Cardinality Cardinal{ get; private set; }
@@ -70,14 +101,13 @@ namespace MPSharp.Basics
 			dict.Add(Name, this);
 		}
 
-		public static Direction ForEnumValue(Direction.Enum enumValue)
-		{
-			return list[(int) enumValue];
-		}
+        #endregion
 
-		public Direction.Enum GetEnumValue()
+        #region Object Class Overrides
+
+        public override String ToString()
 		{
-			return (Direction.Enum) Ordinal;
+			return Name;
 		}
 
 		public override int GetHashCode()
@@ -105,21 +135,39 @@ namespace MPSharp.Basics
 			return !a.Equals(b);
 		}
 
-		/// <summary>Determines if this direction falls under the given order flag.</summary>
-		/// <remarks>By default, a fourth turn counts as an eigth turn,
-		/// but an eigth turn might not count as a fouth turn</remarks>
-		public bool IsCardinality(Cardinality cardinal, bool exclusively = false)
-		{
-			return exclusively ? (cardinal | Cardinal) == cardinal : (cardinal | Cardinal) != 0;
-		}
+        #endregion
 
-		public GridPos Apply(GridPos pos)
+        #region Apply to GridPos
+
+        public GridPos Apply(GridPos pos)
 		{
 			if (DX == 0 && DY == 0)
 				throw new NotSupportedException("Direction must be 8th-turn to apply to GridPos");
 
 			return new GridPos(pos.X + DX, pos.Y + DY);
 		}
+
+        public GridPos Apply(GridPos pos, int distance)
+        {
+			if (DX == 0 && DY == 0)
+				throw new NotSupportedException("Direction must be 8th-turn to apply to GridPos");
+
+			return new GridPos(pos.X + DX * distance, pos.Y + DY * distance);
+        }
+
+        #endregion
+
+        #region Manipulation
+
+        public Direction FlipHorizontal()
+        {
+            return ForOffset(-DX, DY);
+        }
+
+        public Direction FlipVertical()
+        {
+            return ForOffset(DX, -DY);
+        }
 
 		public Direction Reverse(Direction dir)
 		{
@@ -131,7 +179,37 @@ namespace MPSharp.Basics
 			return list[((Ordinal + steps) % list.Length + list.Length) % list.Length];
 		}
 
-		public static Direction ForAngle(float angle)
+        public Direction Rotate(float angle)
+        {
+            return list[(Angle + angle).RevsToNSteps(16)];
+        }
+
+        #endregion
+
+        #region Displacement
+
+        public int GetDisplacement(Direction dir)
+        {
+            int forward = (dir.Ordinal - Ordinal + 16) % 16;
+            int reverse = (Ordinal - dir.Ordinal + 16) % 16;
+            return reverse < forward ? -reverse : forward;
+        }
+
+        public int GetForwardDisplacement(Direction dir)
+        {
+            return (dir.Ordinal - Ordinal + 16) % 16;
+        }
+
+        public int GetReverseDisplacement(Direction dir)
+        {
+            return (Ordinal - dir.Ordinal + 16) % 16;
+        }
+
+        #endregion
+
+        #region Static For___() Methods
+
+        public static Direction ForAngle(float angle)
 		{
 			return list[(int) (angle.NormalizeRevAngle() * 16)];
 		}
@@ -141,13 +219,21 @@ namespace MPSharp.Basics
 			if (precision != 4 && precision != 8 && precision != 16)
 				throw new ArgumentException("Must be one of: 4, 8, 16", "precision");
 
-			return list[(int) Math.Round(angle.NormalizeRevAngle() * precision) * (16 / precision)];
+			return list[angle.RevsToNSteps(precision) * (16 / precision)];
 		}
 
 		public static Direction ForOffset(int dx, int dy)
 		{
 			return ForAngle((float)-Math.Atan2(dy, dx));
 		}
+
+        public static Direction ForMove(GridPos a, GridPos b)
+        {
+            if (!a.Is8Neighbor(b))
+                throw new ArgumentException("b must in a's 8-neighborhood");
+
+            return ForOffset(b.X - a.X, b.Y - a.Y);
+        }
 
 		public static Direction ForName(String name)
 		{
@@ -161,12 +247,20 @@ namespace MPSharp.Basics
 			}
 		}
 
-		public override String ToString()
-		{
-			return Name;
-		}
+        #endregion
 
-		public static IEnumerable<Direction> GetEnumerator()
+        #region Enumeration Methods
+
+        public IEnumerable<Direction> GetAlternatives(bool turnPriority = true)
+        {
+            if (!IsCardinality(Cardinality.Eighth))
+                throw new NotSupportedException("Not supported for 16th-cardinality turns");
+
+            for (int alt = 0; alt <= 6; ++alt)
+                yield return Rotate(((alt++ / 2) + 1) * ((alt % 2 == 0) ^ turnPriority ? 2 : -2));
+        }
+
+        public static IEnumerable<Direction> GetEnumerator()
 		{
 			return GetEnumerator(E, 1);
 		}
@@ -187,6 +281,8 @@ namespace MPSharp.Basics
 				current != start || count == 0;
 				current = current.Rotate(increment), count++)
 				yield return current;
-		}
-	}
+        }
+
+        #endregion
+    }
 }
