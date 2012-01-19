@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace MPSharp.Basics
 {
@@ -9,6 +7,8 @@ namespace MPSharp.Basics
 	{
 		public int Width { get; protected set; }
 		public int Height{ get; protected set; }
+        public int MaxX  { get; protected set; }
+        public int MaxY  { get; protected set; }
 
 		public RectRegion(int x, int y, int w, int h)
 		{
@@ -17,7 +17,7 @@ namespace MPSharp.Basics
 				x += w;
 				w = -w;
 			}
-		
+		    
 			if (h < 0)
 			{
 				y += h;
@@ -26,6 +26,8 @@ namespace MPSharp.Basics
 			
 			X = x;
 			Y = y;
+            MaxX = x + w;
+            MaxY = y + h;
 			Width = w;
 			Height = h;
 			Area = w * h;
@@ -54,5 +56,10 @@ namespace MPSharp.Basics
 			for (int y = Y; y < Y + Height; ++y)
 				yield return new GridPos(x, y);
 		}
+
+        public AbsArea ToAbsArea()
+        {
+            return new AbsArea(X, Y, Width, Height);
+        }
 	}
 }

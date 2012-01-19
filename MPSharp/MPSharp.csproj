@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Basics\AbsArea.cs" />
     <Compile Include="Basics\AbsPos.cs" />
     <Compile Include="Basics\CostMap.cs" />
     <Compile Include="Basics\Direction.cs" />
@@ -59,12 +60,15 @@
     <Compile Include="Basics\RectRegion.cs" />
     <Compile Include="Basics\Region.cs" />
     <Compile Include="Basics\RMath.cs" />
+    <Compile Include="Display\Display.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Map\MapGrid.cs" />
+    <Compile Include="Map\Tile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainWindow.resx">

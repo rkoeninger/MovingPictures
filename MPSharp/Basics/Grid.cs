@@ -8,8 +8,6 @@ namespace MPSharp.Basics
 
     public class Grid<T> : IEnumerable<T>
 	{
-		public delegate T Transform(T val);
-		
 		#region Members and Constructors
 
 		private Cell[,] cells;
@@ -79,13 +77,23 @@ namespace MPSharp.Basics
 
 		#endregion
 
-		#region Find
+		#region Contains, Find
+
+        public bool Contains(Predicate<T> predicate)
+        {
+            for (int x = 0; x < Width;  ++x)
+            for (int y = 0; y < Height; ++y)
+                if (predicate(cells[x,y]))
+                    return true;
+
+            return false;
+        }
 
 		public List<GridPos> Find(Predicate<T> predicate)
 		{
 			List<GridPos> results = new List<GridPos>((Width + Height) / 2);
 
-            for (int x = 0; x < Width; ++x)
+            for (int x = 0; x < Width;  ++x)
             for (int y = 0; y < Height; ++y)
                 if (predicate(cells[x,y]))
 					results.Add(new GridPos(x, y));
@@ -93,73 +101,79 @@ namespace MPSharp.Basics
 			return results;
 		}
 
-		// TODO: Add conveinence methods for TryFindClosest
+        public bool TryFindClosest(Predicate<T> predicate, GridPos pos, out GridPos result)
+        {
+            return TryFindClosest(predicate, pos, out result, Bounds);
+        }
+
+        // TODO: implement limitation of Region (should be just RectRegion or generic Region?)
 
 		public bool TryFindClosest(
 			Predicate<T> predicate,
-			out GridPos pos,
+			GridPos pos,
+            out GridPos result,
 			Region region,
 			float minDistance = 0,
 			float maxDistance = Single.PositiveInfinity)
 		{
-
-
-			/*
 			int iteration = (int) (minDistance * 1.414);
 			int maxIteration =
-				Double.isInfinite(maxDistance) || maxDistance > Integer.MAX_VALUE
+				Double.IsPositiveInfinity(maxDistance) || maxDistance > Int32.MaxValue
 				? -1
 				: (int) maxDistance;
-		
+		    
 			if (iteration == 0)
 			{
-				if (cond.accept(get(pos)))
-					return pos;
-			
+				if (predicate(this[pos]))
+				{
+                    result = pos;
+                    return true;
+                }
+			    
 				iteration = 1;
 			}
-		
-			double closestDistance = Double.POSITIVE_INFINITY;
-			Position closestPos = null;
+		    
+			double closestDistance = Double.PositiveInfinity;
+			GridPos? closestPos = null;
 		
 			int startX, stopX, startY, stopY;
-			boolean nEdge, sEdge, eEdge, wEdge;
+			bool nEdge, sEdge, eEdge, wEdge;
 
 			// TODO: comment algorithm
 			do
 			{
-				wEdge = pos.x - iteration >= 0;
-				startX = Math.max(pos.x - iteration, 0);
+				wEdge = pos.X - iteration >= 0;
+				startX = Math.Max(pos.X - iteration, 0);
 
-				nEdge = pos.y - iteration >= 0;
-				startY = Math.max(pos.y - iteration, 0);
+				nEdge = pos.Y - iteration >= 0;
+				startY = Math.Max(pos.Y - iteration, 0);
 			
-				eEdge = pos.x + iteration < w;
-				stopX = Math.min(pos.x + iteration, w - 1);
+				eEdge = pos.X + iteration < Width;
+				stopX = Math.Min(pos.X + iteration, Width - 1);
 
-				sEdge = pos.y + iteration < h;
-				stopY = Math.min(pos.y + iteration, h - 1);
+				sEdge = pos.Y + iteration < Height;
+				stopY = Math.Min(pos.Y + iteration, Height - 1);
 			
 				if (nEdge || sEdge)
 					for (int x = startX; x <= stopX; ++x)
 					{
-						if (nEdge && cond.accept(get(x, startY)))
+						if (nEdge && predicate(this[x, startY]))
 						{
-							double distSq = distanceSq(pos.x, pos.y, x, startY);
+							double distSq = DistanceSq(pos.X, pos.Y, x, startY);
 							if (distSq < closestDistance)
 							{
 								closestDistance = distSq;
-								closestPos = new Position(x, startY);
+								closestPos = new GridPos(x, startY);
 							}
 						}
 					
-						if (sEdge && cond.accept(get(x, stopY)))
+						if (sEdge && predicate(this[x, stopY]))
 						{
-							double distSq = distanceSq(pos.x, pos.y, x, stopY);
+							double distSq = DistanceSq(pos.X, pos.Y, x, stopY);
 							if (distSq < closestDistance)
 							{
 								closestDistance = distSq;
-								closestPos = new Position(x, stopY);
+								closestPos = new GridPos(x, stopY);
 							}
 						}
 					}
@@ -170,74 +184,92 @@ namespace MPSharp.Basics
 				if (wEdge || eEdge)
 					for (int y = startY; y <= stopY; ++y) 
 					{
-						if (wEdge && cond.accept(get(startX, y)))
+						if (wEdge && predicate(this[startX, y]))
 						{
-							double distSq = distanceSq(pos.x, pos.y, startX, y);
+							double distSq = DistanceSq(pos.X, pos.Y, startX, y);
 							if (distSq < closestDistance)
 							{
 								closestDistance = distSq;
-								closestPos = new Position(startX, y);
+								closestPos = new GridPos(startX, y);
 							}
 						}
 					
-						if (eEdge && cond.accept(get(stopX, y)))
+						if (eEdge && predicate(this[stopX, y]))
 						{
-							double distSq = distanceSq(pos.x, pos.y, stopX, y);
+							double distSq = DistanceSq(pos.X, pos.Y, stopX, y);
 							if (distSq < closestDistance)
 							{
 								closestDistance = distSq;
-								closestPos = new Position(stopX, y);
+								closestPos = new GridPos(stopX, y);
 							}
 						}
 					}
 
-				if (closestPos != null && maxIteration == -1)
+				if (closestPos.HasValue && maxIteration == -1)
 				{
-					double dy = Math.abs(pos.y - closestPos.y);
-					double dx = Math.abs(pos.x - closestPos.x);
-					maxIteration = (int) Math.sqrt(dx*dx + dy*dy);
+					double dy = Math.Abs(pos.Y - closestPos.Value.Y);
+					double dx = Math.Abs(pos.X - closestPos.Value.X);
+					maxIteration = (int) Math.Sqrt(dx*dx + dy*dy);
 				}
 			
-				boolean allOutOfBounds = !(nEdge || sEdge || wEdge || eEdge);
-				boolean finalIteration = maxIteration != -1
-									  && iteration >= maxIteration;
+				bool allOutOfBounds = !(nEdge || sEdge || wEdge || eEdge);
+				bool finalIteration = maxIteration != -1
+								   && iteration >= maxIteration;
 			
 				if (finalIteration || allOutOfBounds)
 				{
-					if (closestPos == null)
-						return null;
+					if (!closestPos.HasValue)
+                    {
+                        result = new GridPos();
+                        return false;
+                    }
 				
-					double distance = closestPos.getDistance(pos);
-					return distance <= maxDistance && distance >= minDistance
-						? closestPos
-						: null;
+					double distance = closestPos.Value.GetDistance(pos);
+					
+                    if (distance <= maxDistance && distance >= minDistance)
+                    {
+                        result = closestPos.Value;
+                        return true;
+                    }
+                    else
+                    {
+                        result = new GridPos();
+                        return false;
+                    }
 				}
 
 				iteration++;
 			}
 			while (nEdge || sEdge || wEdge || eEdge);
 
-			if (closestPos == null)
-				return null;
+			if (!closestPos.HasValue)
+            {
+                result = new GridPos();
+				return false;
+            }
 		
-			double distance = closestPos.getDistance(pos);
-			return distance <= maxDistance && distance >= minDistance
-				? closestPos
-				: null;
-			*/
-
-
-
-			pos = new GridPos();
-			return false;
+			double distance2 = closestPos.Value.GetDistance(pos);
+			
+            if (distance2 <= maxDistance && distance2 >= minDistance)
+            {
+                result = closestPos.Value;
+                return true;
+            }
+            else
+            {
+                result = new GridPos();
+                return false;
+            }
 		}
 
-		#endregion
+        private double DistanceSq(int x1, int y1, int x2, int y2)
+        {
+            int dx = x1 - x2;
+            int dy = y1 - y2;
+            return (dx * dx) + (dy * dy);
+        }
 
-		// public GridPos FindLast(T val)
-        // FindAll
-        // FindClosest
-		// public bool Contains(T val)
+		#endregion
 
 		#region Enumeration
 
