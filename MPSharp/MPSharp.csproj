@@ -69,6 +69,7 @@
     </Compile>
     <Compile Include="Map\MapGrid.cs" />
     <Compile Include="Map\Tile.cs" />
+    <Compile Include="Map\TileSet.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainWindow.resx">
