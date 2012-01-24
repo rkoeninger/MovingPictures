@@ -100,6 +100,13 @@ public class DisplayGraphics extends Graphics2D
 		g.fillRect(x, y, gm.tileSize, gm.tileSize);
 	}
 	
+	public void fillPosition(int px, int py)
+	{
+		int x = px * gm.tileSize + gm.xOffset;
+		int y = py * gm.tileSize + gm.yOffset;
+		g.fillRect(x, y, gm.tileSize, gm.tileSize);
+	}
+	
 	public void draw(Region region)
 	{
 		int x = region.x * gm.tileSize + gm.xOffset;
@@ -257,6 +264,15 @@ public class DisplayGraphics extends Graphics2D
 	{
 		int x = pos.x * gm.tileSize + gm.xOffset + xOffset;
 		int y = pos.y * gm.tileSize + gm.yOffset + yOffset; 
+		int w = img.getWidth(null);
+		int h = img.getHeight(null);
+		g.drawImage(img, x, y, x + scale(w), y + scale(h), 0, 0, w, h, null);
+	}
+	
+	public void drawImageAtPosition(Image img, int px, int py)
+	{
+		int x = (int) (px * gm.tileSize) + gm.xOffset;
+		int y = (int) (py * gm.tileSize) + gm.yOffset; 
 		int w = img.getWidth(null);
 		int h = img.getHeight(null);
 		g.drawImage(img, x, y, x + scale(w), y + scale(h), 0, 0, w, h, null);

@@ -821,18 +821,19 @@ public class DisplayPanel extends JComponent
 	 */
 	private void drawSurface(DisplayGraphics g, Region region)
 	{
-		for (Position pos : region)
+		for (int x = region.x; x < region.getMaxX(); ++x)
+		for (int y = region.y; y < region.getMaxY(); ++y)
 		{
-			Tile tile = tiles.getTile(map.getTileCode(pos));
+			Tile tile = tiles.getTile(map.getTileCode(x, y));
 			
 			if (gm.scale >= minShowUnitScale)
 			{
-				g.drawImage(tile.getImage(), pos);
+				g.drawImageAtPosition(tile.getImage(), x, y);
 			}
 			else
 			{
 				g.setColor(tile.getAverageColor());
-				g.fill(pos);
+				g.fillPosition(x, y);
 			}
 		}
 	}
@@ -857,18 +858,17 @@ public class DisplayPanel extends JComponent
 		for (int x = region.x; x < region.getMaxX(); ++x)
 		for (int y = region.y; y < region.getMaxY(); ++y)
 		{
-			Position pos = new Position(x, y);
-			Unit occupant = map.getUnit(pos);
+			Unit occupant = map.getUnit(x, y);
 			boolean needsConnection = occupant != null && occupant.needsConnection();
 			boolean isSource        = occupant != null && occupant.isConnectionSource();
 			boolean hasConnection   = occupant != null && occupant.needsConnection()
 			                                           && occupant.isConnected();
 			
-			if (map.hasTube(pos) || needsConnection || isSource)
+			if (map.hasTube(x, y) || needsConnection || isSource)
 			{
-				boolean alive = (map.isAlive(pos) || hasConnection || isSource);
+				boolean alive = (map.isAlive(x, y) || hasConnection || isSource);
 				g.setColor(alive ? InputOverlay.TRANS_GREEN : InputOverlay.TRANS_RED);
-				g.fill(pos);
+				g.fillPosition(x, y);
 			}
 		}
 	}

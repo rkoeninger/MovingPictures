@@ -379,12 +379,17 @@ public class LayeredMap
 			panel.addDisplayObject(new MagmaVentDisplayObject(pos));
 	}
 	
-	public boolean isAlive(Position pos)
+	public boolean isAlive(int x, int y)
 	{
-		if (!bounds.contains(pos))
+		if (!bounds.contains(x, y))
 			return false;
 		
-		return grid.get(pos).alive;
+		return grid.get(x, y).alive;
+	}
+	
+	public boolean isAlive(Position pos)
+	{
+		return isAlive(pos.x, pos.y);
 	}
 	
 	private void assessConnections()
@@ -552,12 +557,17 @@ public class LayeredMap
 		return grid.get(pos).fixture == Fixture.WALL;
 	}
 	
-	public boolean hasTube(Position pos)
+	public boolean hasTube(int x, int y)
 	{
-		if (!bounds.contains(pos))
+		if (!bounds.contains(x, y))
 			return false;
 		
-		return grid.get(pos).fixture == Fixture.TUBE;
+		return grid.get(x, y).fixture == Fixture.TUBE;
+	}
+	
+	public boolean hasTube(Position pos)
+	{
+		return hasTube(pos.x, pos.y);
 	}
 	
 	public boolean hasGeyser(Position pos)
@@ -816,9 +826,12 @@ public class LayeredMap
 	
 	public Unit getUnit(Position pos)
 	{
-		
-		
-		return grid.get(pos).occupant;
+		return getUnit(pos.x, pos.y);
+	}
+	
+	public Unit getUnit(int x, int y)
+	{
+		return grid.get(x, y).occupant;
 	}
 	
 	public Set<Unit> getUnits(Region region)
