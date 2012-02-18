@@ -43,7 +43,7 @@ public class RPGAnimation extends WeaponAnimation
 		super(lib, attacker, target);
 		
 		puffs = new HashSet<SmokePuff>();
-
+		
 		distance = getFireOrigin().distance(getFireImpact());
 		angle = Math.atan2(
 			getFireOrigin().getY() - getFireImpact().getY(),

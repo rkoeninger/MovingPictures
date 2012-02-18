@@ -147,6 +147,28 @@ public class Game
 		pendingDoLaters.add(doRun);
 	}
 	
+	public void playSoundLater(final String sound, final Position pos)
+	{
+		doLater(new Runnable()
+		{
+			public void run()
+			{
+				playSound(sound, pos);
+			}
+		});
+	}
+	
+	public void doSplashDamageLater(final Position pos, final double d, final int r)
+	{
+		doLater(new Runnable()
+		{
+			public void run()
+			{
+				doSplashDamage(pos, d, r);
+			}
+		});
+	}
+	
 	public RIterator<Runnable> getAndClearDoLaters()
 	{
 		try
@@ -162,6 +184,11 @@ public class Game
 	public void addEntity(Entity e)
 	{
 		entities.add(e);
+	}
+	
+	public void removeEntity(Entity e)
+	{
+		entities.remove(e);
 	}
 	
 	public RIterator<Entity> getFreeEntities()

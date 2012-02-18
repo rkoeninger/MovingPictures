@@ -2,7 +2,9 @@
 <UnitType type="chassis" unitType="pLynxChassis" civ="Plymouth">
 	<DisplayName>Lynx Chassis</DisplayName>
 	<Acknowledgement>lynx</Acknowledgement>
-	<Commands/>
+	<Commands>
+		<Command>attack</Command>
+	</Commands>
 	<Cost>
 		<Resource type="common ore" amount="100"/>
 	</Cost>

@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -80,6 +81,7 @@ import com.robbix.mp5.ui.overlay.SelectUnitOverlay;
 import com.robbix.mp5.ui.overlay.SpawnMeteorOverlay;
 import com.robbix.mp5.unit.AcidCloud;
 import com.robbix.mp5.unit.Command;
+import com.robbix.mp5.unit.Rocket;
 import com.robbix.mp5.unit.Unit;
 import com.robbix.mp5.unit.UnitFactory;
 import com.robbix.mp5.unit.UnitType;
@@ -169,6 +171,7 @@ public class Sandbox extends JApplet
 	private static JMenuItem splitDisplayMenuItem;
 	private static JMenuItem fullScreenMenuItem;
 	private static JMenuItem acidCloudMenuItem;
+	private static JMenuItem testRocketMenuItem;
 	private static JMenuItem spawnMeteorMenuItem;
 	private static JMenuItem meteorShowerMenuItem;
 	private static JMenuItem placeGeyserMenuItem;
@@ -210,6 +213,8 @@ public class Sandbox extends JApplet
 			
 			if      (arg.equals("-lazyLoadSprites"))  lazyLoadSprites  = true;
 			else if (arg.equals("-lazyLoadSounds"))   lazyLoadSounds   = true;
+			else if (arg.equals("-preLoadSprites"))   lazyLoadSprites  = false;
+			else if (arg.equals("-preLoadSounds"))    lazyLoadSounds   = false;
 			else if (arg.equals("-asyncLoadSprites")) asyncLoadSprites = true;
 			else if (arg.equals("-syncLoadSprites"))  asyncLoadSprites = false;
 			else if (arg.equals("-soundOn"))          soundOn          = true;
@@ -286,6 +291,7 @@ public class Sandbox extends JApplet
 		splitDisplayMenuItem   = new JMenuItem("Split Display");
 		fullScreenMenuItem     = new JMenuItem("Full Screen");
 		acidCloudMenuItem      = new JMenuItem("Spawn Acid Cloud");
+		testRocketMenuItem     = new JMenuItem("Test Rocket");
 		spawnMeteorMenuItem    = new JMenuItem("Spawn Meteor");
 		meteorShowerMenuItem   = new JMenuItem("Meteor Shower");
 		placeGeyserMenuItem    = new JMenuItem("Place Geyser");
@@ -387,6 +393,7 @@ public class Sandbox extends JApplet
 		splitDisplayMenuItem  .addActionListener(listener);
 		fullScreenMenuItem    .addActionListener(listener);
 		acidCloudMenuItem     .addActionListener(listener);
+		testRocketMenuItem    .addActionListener(listener);
 		meteorShowerMenuItem  .addActionListener(listener);
 		spawnMeteorMenuItem   .addActionListener(listener);
 		playSoundMenuItem     .addActionListener(listener);
@@ -451,6 +458,7 @@ public class Sandbox extends JApplet
 		placeResourceMenu.add(placeRare3);
 		terrainMenu.add(placeResourceMenu);
 		disastersMenu.add(acidCloudMenuItem);
+		disastersMenu.add(testRocketMenuItem);
 		disastersMenu.add(spawnMeteorMenuItem);
 		disastersMenu.add(meteorShowerMenuItem);
 		unitMenu.add(addUnitMenu);
@@ -781,6 +789,11 @@ public class Sandbox extends JApplet
 				
 				for (DisplayPanel panel : Game.game.getDisplays())
 					panel.addDisplayObject(new AcidCloudDisplayObject(cloud));
+			}
+			else if (e.getSource() == testRocketMenuItem)
+			{
+				Rocket rocket = new Rocket(new Point2D.Double(0.5, 0.5), new Point2D.Double(4.5, 4.5), 50);
+				Game.game.addEntity(rocket);
 			}
 			else if (e.getSource() == meteorShowerMenuItem)
 			{

@@ -836,8 +836,7 @@ public class LayeredMap
 	
 	public Set<Unit> getUnits(Region region)
 	{
-		if (! bounds.contains(region))
-			throw new IndexOutOfBoundsException();
+		region = region.getIntersection(bounds);
 		
 		Set<Unit> occupants = new HashSet<Unit>();
 		

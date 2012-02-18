@@ -10,6 +10,7 @@ import com.robbix.mp5.map.LayeredMap;
 import com.robbix.mp5.ui.DisplayPanel;
 import com.robbix.mp5.ui.ani.AmbientAnimation;
 import com.robbix.mp5.unit.Unit;
+import com.robbix.utils.RIterator;
 
 public class Engine
 {
@@ -139,9 +140,13 @@ public class Engine
 					if (!unit.isDead() && !unit.isFloating())
 						unit.step();
 				
-				for (Entity entity : game.getFreeEntities())
+				RIterator<Entity> entityItr = game.getFreeEntities();
+				
+				for (Entity entity : entityItr)
 					if (entity.isAlive())
 						entity.step();
+					else
+						game.removeEntity(entity);
 				
 				/*
 				 * Animation
