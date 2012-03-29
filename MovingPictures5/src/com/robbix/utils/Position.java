@@ -159,6 +159,31 @@ public class Position implements RIterable<Position>
 		return String.format("(%1$d, %2$d)", x, y);
 	}
 	
+	/**
+	 * Parses a pair of integer co-ordinates of the form "(x, y)" into a position.
+	 */
+	public static Position parse(String text)
+	{
+		text = text.trim();
+		
+		if (text.startsWith("(") || text.endsWith(")"))
+		{
+			if (text.length() < 2 || text.charAt(0) != '(' || text.charAt(text.length() - 1) != ')')
+				throw new IllegalArgumentException("Mis-matched parentheses");
+			
+			text = text.substring(1, text.length() - 2);
+		}
+		
+		String[] parts = text.split(",");
+		
+		if (parts.length != 2)
+			throw new IllegalArgumentException("Wrong number of co-ordinates");
+		
+		int x = Integer.parseInt(parts[0].trim());
+		int y = Integer.parseInt(parts[1].trim());
+		return new Position(x, y);
+	}
+	
 	public RIterator<Position> iterator()
 	{
 		return new MeIterator();
