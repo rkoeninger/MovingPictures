@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Map>
+	<Dimension width="16" height="16"/>
+	<TileSet name="greenworld"/>
+	<Grid>
+		<Position x="0" y="0">
+			<Tile code="grass/plain/12"/>
+		</Position>
+		...
+		<Position x="1" y="0">
+			<Tile code="grass/wall/3"><!-- This could be left abstracted (just "a grass tile with a wall") -->
+				<Wall health="400"/>
+			</Tile>
+		</Position>
+		...
+		<Position x="4" y="5">
+			<Tile code="grass/tube/3">
+				<Wall health="1300"/>
+			</Tile>
+		</Position>
+		...
+		<Position x="3" y="4">
+			<Tile code="grass/blast/2">
+				<Blast count="1"/>
+			</Tile>
+		</Position>
+		...
+	</Grid>
+</Map>

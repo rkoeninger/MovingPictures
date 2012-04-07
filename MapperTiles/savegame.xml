@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<GameState>
+	<Mediator><!-- Could also be called "Rules" -->
+	</Mediator>
+	<History>
+		<Event time="23">
+		</Event>
+		<Event time="31">
+		</Event>
+		<Event time="65">
+		</Event>
+		<Event time="75">
+		</Event>
+		<Event time="132">
+		</Event>
+	</History>
+	<Players>
+		<Player id="1" type="human" civ="Plymouth" name="AnHero" color="#ff0000">
+			<Relations>
+				<Relation playerID="2" condition="enemy" mutable="true"/>
+				
+				<!-- Relation with player 3 defaults to neutral -->
+				
+				<!-- Game started as ally game, not allowed to backstab, so not mutable -->
+				<Relation playerID="4" condition="ally" mutable="false"/>
+				
+				<!-- "avoid" relation can occur after fighting -->
+				<Relation playerID="5" condition="avoid" mutable="true"/>
+			</Relations>
+			<Resources>
+				<Resource type="commonOre" amount="1000"/>
+				<Resource type="rareOre"   amount="800"/>
+				<Resource type="food"      amount="1200"/>
+			</Resources>
+			<Population>
+				<Workers    amount="40"/>
+				<Scientists amount="15"/>
+				<Children   amount="30"/>
+				<Morale     level="85" vector="-10"/>
+			</Population>
+		</Player>
+		<Player id="2" type="ai" civ="Eden" name="Eden Colony" color="#0000ff">
+			<Relations>
+				...
+			</Relations>
+			<Resources>
+				...
+			</Resources>
+			<Population>
+				...
+			</Population>
+		</Player>
+	</Players>
+	<UnitTypes><!-- Things like dynamic changes to vehicle types/tasks would all need to be recorded -->
+		<UnitLibrary>
+			<!-- Info about which unit definition files were loaded -->
+		</UnitLibrary>
+		<UnitType type="vehicle" name="pCargoTruck">
+			<MaxHP value="120"/>
+			<Armor value="NONE"/>
+			<PossibleStatus>
+				<EMP baseDuration="400"/>
+				<Sticky baseDuration="600"/>
+			</PossibleStatus>
+		</UnitType>
+	</UnitTypes>
+	<Units>
+		<Unit type="pCargoTruck" owner="1">
+		
+			<Position x="34" y="123" xOffset="4" yOffset="-4"/>
+			<Direction name="nw"/>
+			<HP value="100"/>
+			
+			<Status><!-- Empty tag means normal status -->
+				<EMP duration="60" totalDuration="360"/><!-- Unit suffered 60 of 360 time units -->
+			</Status>
+			
+			<TaskList><!-- Empty element indicates empty list -->
+			</TaskList>
+			
+			<DefaultTask><!-- Empty element indicates null -->
+				<Task>
+					...
+				</Task>
+			</DefaultTask>
+			
+		</Unit>
+	</Units>
+	<Map/><!-- Wouldn't normally be empty, refer to Map xml example -->
+</GameState>
