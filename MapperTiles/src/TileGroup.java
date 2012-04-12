@@ -1,4 +1,5 @@
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,6 +19,8 @@ public class TileGroup
 		
 		String line = null;
 		
+		RectangleBuilder rb = new RectangleBuilder();
+		
 		while ((line = reader.readLine()) != null)
 		{
 			String[] lineParts = line.split(" ");
@@ -29,19 +32,25 @@ public class TileGroup
 			
 			tile.setGroup(group);
 			
-			group.tiles.put(
+			Point p = 
 				new Point(
 					Integer.parseInt(lineParts[0]),//relative x
 					Integer.parseInt(lineParts[1])//relative y
-				),
-				tile
-			);
+				);
+			
+			rb.add(p);
+			
+			group.tiles.put(p, tile);
 		}
+		
+		group.r = rb.r;
 		
 		return group;
 	}
 	
 	private Map<Point, Tile> tiles;
+	
+	private Rectangle r;
 	
 	public TileGroup()
 	{
@@ -53,8 +62,24 @@ public class TileGroup
 		return getTile(p.x, p.y);
 	}
 	
+	public Point getPosition(Tile tile)
+	{
+		for (Map.Entry<Point, Tile> e : tiles.entrySet())
+		{
+			if (e.getValue().equals(tile))
+				return e.getKey();
+		}
+		
+		return null;
+	}
+	
+	public Rectangle getRectangle()
+	{
+		return r;
+	}
+	
 	public Tile getTile(int x, int y)
 	{
-		return null;
+		return tiles.get(new Point(x, y));
 	}
 }

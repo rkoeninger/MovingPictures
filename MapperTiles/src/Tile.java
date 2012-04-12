@@ -1,4 +1,5 @@
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
@@ -8,6 +9,7 @@ import java.util.Map;
 public class Tile
 {
 	public static boolean blendOnDownsample = true;
+	public static boolean antialiasOnUpsample = false;//TODO: fix
 	
 	public static final Tile NULL = new Tile(new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB), 0);
 	
@@ -25,6 +27,14 @@ public class Tile
 	public TileGroup getGroup()
 	{
 		return group;
+	}
+	
+	public Point getGroupPosition()
+	{
+		if (group == null)
+			return null;
+		
+		return group.getPosition(this);
 	}
 	
 	public boolean isGroupMember()
@@ -126,19 +136,74 @@ public class Tile
 
 			scaledImage = new BufferedImage(32 << scale, 32 << scale, BufferedImage.TYPE_INT_ARGB);
 			WritableRaster scaledRaster = scaledImage.getRaster();
-			int[] pixel = new int[4];
-			pixel[3] = 255;
+			int[] pixel1 = new int[4];
+			int[] pixel2 = new int[4];
+			int[] pixel3 = new int[4];
+			int[] pixel4 = new int[4];
+			pixel1[3] = 255;
+			pixel2[3] = 255;
+			pixel3[3] = 255;
+			pixel4[3] = 255;
 			
 			for (int x = 0; x < baseImage.getWidth();  ++x)
 			for (int y = 0; y < baseImage.getHeight(); ++y)
 			{
-				baseRaster.getPixel(x, y, pixel);
-				
-				// TODO: Anti-alias instead of just spread each pixel into four
-				scaledRaster.setPixel(x * 2    , y * 2    , pixel);
-				scaledRaster.setPixel(x * 2 + 1, y * 2    , pixel);
-				scaledRaster.setPixel(x * 2    , y * 2 + 1, pixel);
-				scaledRaster.setPixel(x * 2 + 1, y * 2 + 1, pixel);
+				if (antialiasOnUpsample)
+				{
+					baseRaster.getPixel(x, y, pixel1);
+					
+					if (x < baseImage.getWidth() - 1)
+					{
+						baseRaster.getPixel(x + 1, y, pixel2);
+						
+						pixel2[0] = (pixel1[0] + pixel2[0]) / 2;
+						pixel2[1] = (pixel1[1] + pixel2[1]) / 2;
+						pixel2[2] = (pixel1[2] + pixel2[2]) / 2;
+					}
+					else
+					{
+						System.arraycopy(pixel1, 0, pixel2, 0, 4);
+					}
+					
+					if (y < baseImage.getHeight() - 1)
+					{
+						baseRaster.getPixel(x, y + 1, pixel2);
+						
+						pixel3[0] = (pixel1[0] + pixel3[0]) / 2;
+						pixel3[1] = (pixel1[1] + pixel3[1]) / 2;
+						pixel3[2] = (pixel1[2] + pixel3[2]) / 2;
+					}
+					else
+					{
+						System.arraycopy(pixel1, 0, pixel3, 0, 4);
+					}
+					
+					if (x < baseImage.getWidth() - 1 && y < baseImage.getHeight() - 1)
+					{
+						baseRaster.getPixel(x + 1, y + 1, pixel2);
+						
+						pixel4[0] = (pixel1[0] + pixel4[0]) / 2;
+						pixel4[1] = (pixel1[1] + pixel4[1]) / 2;
+						pixel4[2] = (pixel1[2] + pixel4[2]) / 2;
+					}
+					else
+					{
+						System.arraycopy(pixel1, 0, pixel4, 0, 4);
+					}
+					
+					scaledRaster.setPixel(x * 2    , y * 2    , pixel1);
+					scaledRaster.setPixel(x * 2 + 1, y * 2    , pixel2);
+					scaledRaster.setPixel(x * 2    , y * 2 + 1, pixel3);
+					scaledRaster.setPixel(x * 2 + 1, y * 2 + 1, pixel4);
+				}
+				else
+				{
+					baseRaster.getPixel(x, y, pixel1);
+					scaledRaster.setPixel(x * 2    , y * 2    , pixel1);
+					scaledRaster.setPixel(x * 2 + 1, y * 2    , pixel1);
+					scaledRaster.setPixel(x * 2    , y * 2 + 1, pixel1);
+					scaledRaster.setPixel(x * 2 + 1, y * 2 + 1, pixel1);
+				}
 			}
 		}
 		else
