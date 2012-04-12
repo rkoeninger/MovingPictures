@@ -1,0 +1,4 @@
+0 0 2 iceberg1.bmp
+1 0 2 iceberg2.bmp
+0 1 2 iceberg3.bmp
+1 1 2 iceberg4.bmp

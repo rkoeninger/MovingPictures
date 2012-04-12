@@ -1,0 +1,4 @@
+0 0 1 crater1.bmp
+1 0 1 crater2.bmp
+1 1 1 crater3.bmp
+0 1 1 crater4.bmp
