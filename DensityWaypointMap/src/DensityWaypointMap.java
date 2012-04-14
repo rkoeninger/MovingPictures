@@ -67,7 +67,7 @@ public class DensityWaypointMap
 			}
 		});
 		
-		final int[][] waypointGraph = new int[w][h];
+		//final int[][] waypointGraph = new int[w][h];
 		
 		final Set<Point> waypoints = new HashSet<Point>();
 		
