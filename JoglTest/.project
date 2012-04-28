@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>jogamp-windows-amd64</name>
-			<type>2</type>
-			<locationURI>PROJECT_LOC/lib/jogamp-windows-amd64</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>
