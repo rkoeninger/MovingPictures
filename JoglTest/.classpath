@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="jogamp-windows-amd64/jar/gluegen.jar" sourcepath="jogamp-windows-amd64/gluegen-java-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="http://jogamp.org/deployment/jogamp-next/javadoc/gluegen/javadoc/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="JoglTest/jogamp-windows-amd64/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="jogamp-windows-amd64/jar/joal.jar" sourcepath="jogamp-windows-amd64/joal-java-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="http://jogamp.org/deployment/jogamp-next/javadoc/joal/javadoc/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="JoglTest/jogamp-windows-amd64/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="jogamp-windows-amd64/jar/jogl.all.jar" sourcepath="jogamp-windows-amd64/jogl-java-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="http://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="JoglTest/jogamp-windows-amd64/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
