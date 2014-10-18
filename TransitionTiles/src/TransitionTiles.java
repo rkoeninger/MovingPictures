@@ -26,18 +26,13 @@ import javax.swing.JPanel;
 
 public class TransitionTiles
 {
-	static String tileSetFolder =
-		"..\\OP2Tileset";
+	static String tileSetFolder = "..\\OP2Tileset";
+	static String ogTileSet = "well0010\\well";
+	static String bgTileSet = "well0006\\well";
 	
-	static String ogTileSet =
-		"well0010\\well";
-	
-	static String bgTileSet =
-		"well0006\\well";
-	
-	static Color O_FAMILY = new Color(128, 68, 13);
-	static Color G_FAMILY = new Color(115, 106, 87);
-	static Color B_FAMILY = new Color(0, 0, 0); // BE MORE PRECISE
+	static Color O_FAMILY = new Color(129, 70, 8);
+	static Color G_FAMILY = new Color(100, 106, 86);
+	static Color B_FAMILY = new Color(51, 50, 48);
 	
 	static enum Family{O,G,B}
 	
@@ -128,7 +123,7 @@ public class TransitionTiles
 		System.exit(0);
 	}
 	
-	static void showAdjacentTilesDialog(final Tile ta,final  Tile tb,final int side)
+	static void showAdjacentTilesDialog(final Tile ta, final Tile tb, final int side)
 	{
 		final BufferedImage a = ta.img;
 		final BufferedImage b = tb.img;
@@ -252,7 +247,7 @@ public class TransitionTiles
 		}
 	}
 	
-	static boolean showGrid = true;
+	static boolean showGrid = false;
 	
 	static class KeyListener extends KeyAdapter
 	{
