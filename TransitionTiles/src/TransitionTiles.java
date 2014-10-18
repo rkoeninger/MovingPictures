@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 public class TransitionTiles
 {
 	static String tileSetFolder =
-		"C:\\users\\bort\\downloads\\newgames\\OP2Tileset";
+		"..\\OP2Tileset";
 	
 	static String ogTileSet =
 		"well0010\\well";
