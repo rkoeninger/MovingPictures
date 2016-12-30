@@ -439,7 +439,7 @@ public class Grid<T> implements RIterable<T>
 		if (cond == null)
 			throw new IllegalArgumentException("Filter may not be null");
 		
-		int iteration = (int) (minDistance * 1.414);
+		int iteration = (int) (minDistance * 0.7071);
 		int maxIteration =
 			Double.isInfinite(maxDistance) || maxDistance > Integer.MAX_VALUE
 			? -1
