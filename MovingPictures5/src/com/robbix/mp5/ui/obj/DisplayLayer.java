@@ -59,9 +59,28 @@ class Comparators
 					return b.getMaxY() >= a.getMaxY() - 1 ? B_ON_TOP : A_ON_TOP;
 				}
 			}
-			
-			if (a.getX() > b.getX()) return A_ON_TOP;
-			if (a.getX() < b.getX()) return B_ON_TOP;
+			if (a.getX() > b.getX())
+			{
+				if (a.getMaxX() > b.getMaxX())
+				{
+					return A_ON_TOP;
+				}
+				if (a.getMaxX() < b.getMaxX())
+				{
+					return a.getMaxX() >= b.getMaxX() - 1 ? A_ON_TOP : B_ON_TOP;
+				}
+			}
+			if (b.getX() > a.getX())
+			{
+				if (b.getMaxX() > a.getMaxX())
+				{
+					return B_ON_TOP;
+				}
+				if (b.getMaxX() < a.getMaxX())
+				{
+					return b.getMaxX() >= a.getMaxX() - 1 ? B_ON_TOP : A_ON_TOP;
+				}
+			}
 			
 			return 0;
 		}
