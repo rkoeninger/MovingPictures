@@ -18,8 +18,6 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -37,7 +35,6 @@ import javax.sound.sampled.Line;
 import javax.sound.sampled.SourceDataLine;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
-import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -47,10 +44,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.JWindow;
 import javax.swing.KeyStroke;
@@ -100,30 +95,30 @@ import com.robbix.utils.Utils;
  * 
  * @author bort
  */
-public class Sandbox extends JApplet
+public class Sandbox extends JFrame
 {
 	private static final long serialVersionUID = 1L;
 	
-	public void init()
-	{
-		try
-		{
-			String resDirPath = getParameter("resDir");
-			if (resDirPath == null) resDirPath = "./../res";
-			main(new String[]{"-resDir:" + resDirPath});
-			frame.setVisible(false);
-			this.setLayout(new BorderLayout());
-			this.setJMenuBar(frame.getJMenuBar());
-			this.add(panel, BorderLayout.CENTER);
-			this.add(commandBar, BorderLayout.NORTH);
-		}
-		catch (Exception exc)
-		{
-			StringWriter excString = new StringWriter();
-			exc.printStackTrace(new PrintWriter(excString));
-			add(new JScrollPane(new JTextArea(excString.toString())));
-		}
-	}
+//	public static void main(String[] args) throws IOException
+//	{
+//		try
+//		{
+//			String resDirPath = getParameter("resDir");
+//			if (resDirPath == null) resDirPath = "./../res";
+//			main0(new String[]{"-resDir:" + resDirPath});
+//			frame.setVisible(false);
+//			this.setLayout(new BorderLayout());
+//			this.setJMenuBar(frame.getJMenuBar());
+//			this.add(panel, BorderLayout.CENTER);
+//			this.add(commandBar, BorderLayout.NORTH);
+//		}
+//		catch (Exception exc)
+//		{
+//			StringWriter excString = new StringWriter();
+//			exc.printStackTrace(new PrintWriter(excString));
+//			add(new JScrollPane(new JTextArea(excString.toString())));
+//		}
+//	}
 	
 	private static File resDir = new File("./res");
 	

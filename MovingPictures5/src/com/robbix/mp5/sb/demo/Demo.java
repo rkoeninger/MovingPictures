@@ -26,7 +26,7 @@ public abstract class Demo
 			
 			for (Class<?> clazz : getSubclasses(Demo.class))
 			{
-				Demo demo = (Demo) clazz.newInstance();
+				Demo demo = (Demo) clazz.getDeclaredConstructor().newInstance();
 				demos.put(demo.getName(), demo);
 			}
 			

@@ -152,7 +152,7 @@ public class CostMap extends Grid<Double>
 	
 	public void setZero(int x, int y)
 	{
-		super.set(x, y, new Double(0));
+		super.set(x, y, 0.0);
 	}
 	
 	public void scale(double weight)

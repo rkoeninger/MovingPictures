@@ -52,8 +52,8 @@ public class AudioFormatDialog extends JDialog
 		return dialog.cancelled ? null : dialog.getFormat();
 	}
 	
-	private JComboBox sampleRateComboBox;
-	private JComboBox sampleSizeComboBox;
+	private JComboBox<Integer> sampleRateComboBox;
+	private JComboBox<Integer> sampleSizeComboBox;
 	private JCheckBox monoCheckBox;
 	private JCheckBox signedCheckBox;
 	private JCheckBox bigEndianCheckBox;
@@ -69,9 +69,9 @@ public class AudioFormatDialog extends JDialog
 		if (! format.getEncoding().toString().contains("PCM"))
 			throw new IllegalArgumentException("Must be PCM");
 		
-		sampleRateComboBox = new JComboBox(sampleRates);
+		sampleRateComboBox = new JComboBox<Integer>(sampleRates);
 		sampleRateComboBox.setSelectedItem(44100);
-		sampleSizeComboBox = new JComboBox(sampleSizes);
+		sampleSizeComboBox = new JComboBox<Integer>(sampleSizes);
 		sampleSizeComboBox.setSelectedItem(16);
 		monoCheckBox = new JCheckBox("Mono", false);
 		signedCheckBox = new JCheckBox("Signed", true);

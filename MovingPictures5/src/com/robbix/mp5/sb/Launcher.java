@@ -25,10 +25,10 @@ public class Launcher
 		
 		final JDialog dialog = new JDialog();
 		dialog.setTitle("Sandbox Launcher");
-		final JComboBox mapComboBox = new JComboBox(getMapAndDemoOptions());
+		final JComboBox<String> mapComboBox = new JComboBox<String>(getMapAndDemoOptions());
 		mapComboBox.setSelectedItem("map:plain-16-16");
 		mapComboBox.setMaximumRowCount(16);
-		final JComboBox tileSetBox = new JComboBox(getTileSetOptions());
+		final JComboBox<String> tileSetBox = new JComboBox<String>(getTileSetOptions());
 		tileSetBox.setSelectedItem("tileSet:newTerraDirt");
 		tileSetBox.setMaximumRowCount(16);
 		final JCheckBox lazySpritesCheckBox = new JCheckBox("Load Sprites on Demand");

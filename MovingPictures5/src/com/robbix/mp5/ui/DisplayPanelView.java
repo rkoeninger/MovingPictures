@@ -111,7 +111,7 @@ public class DisplayPanelView extends JComponent
 	{
 		public void keyPressed(KeyEvent e)
 		{
-			if (e.getModifiers() == 0)
+			if (e.getModifiersEx() == 0)
 			{
 				switch (e.getKeyCode())
 				{
@@ -131,7 +131,7 @@ public class DisplayPanelView extends JComponent
 		
 		public void keyReleased(KeyEvent e)
 		{
-			if (e.getModifiers() == 0)
+			if (e.getModifiersEx() == 0)
 			{
 				switch (e.getKeyCode())
 				{

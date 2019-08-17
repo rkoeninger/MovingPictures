@@ -40,9 +40,8 @@ public enum Neighbors
 		case S: return S;
 		case E: return E;
 		case W: return W;
+		default: throw new IllegalArgumentException("Direction not quarter-turn");
 		}
-		
-		throw new IllegalArgumentException("Direction not quarter-turn");
 	}
 	
 	/**

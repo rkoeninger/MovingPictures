@@ -55,11 +55,12 @@ public class LOCCounter
 			
 			while (reader.readLine() != null)
 				lines++;
-
+			
 			println(file, lines);
 			
 			infos.add(new FileInfo(file, lines));
 			
+			reader.close();
 			return lines;
 		}
 		else

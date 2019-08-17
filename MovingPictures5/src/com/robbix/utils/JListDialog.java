@@ -34,7 +34,7 @@ public class JListDialog extends JDialog
 {
 	private static final long serialVersionUID = -5552359529097955550L;
 	
-	private JList list;
+	private JList<String> list;
 	private JButton setButton;
 	private JButton cancelButton;
 	
@@ -143,7 +143,7 @@ public class JListDialog extends JDialog
 		dialog.setVisible(true);
 		dialog.dispose();
 		
-		return dialog.cancelled ? null : dialog.list.getSelectedValues();
+		return dialog.cancelled ? null : dialog.list.getSelectedValuesList().toArray();
 	}
 	
 	public static Object[] showMultiSelectDialog(Object[] possibleValues)
@@ -267,15 +267,22 @@ public class JListDialog extends JDialog
 		setButton = new JButton(selectButtonText);
 		setButton.addActionListener(buttonListener);
 		
-		list = new JList(possibleValues);
+		String[] stringValues = new String[possibleValues.length];
+		
+		for (int i = 0; i < possibleValues.length; ++i)
+		{
+			stringValues[i] = possibleValues[i] == null ? "null" : possibleValues[i].toString();
+		}
+		
+		list = new JList<String>(stringValues);
 		list.addMouseListener(listClickListener);
 		list.setLayoutOrientation(JList.VERTICAL);
 		
-		Object longValue = "";
+		String longValue = "";
 		
-		for (Object value : possibleValues)
+		for (String value : stringValues)
 		{
-			if (value.toString().length() > longValue.toString().length())
+			if (value.length() > longValue.length())
 				longValue = value;
 		}
 		

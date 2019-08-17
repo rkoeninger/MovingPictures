@@ -54,8 +54,8 @@ public class SoundPlayer extends JFrame
 	private static final long serialVersionUID = 1L;
 	
 	private SoundBank sounds;
-	private JList list;
-	private DefaultListModel listModel;
+	private JList<String> list;
+	private DefaultListModel<String> listModel;
 	private SoundWavePanel preview;
 	private JPopupMenu unloadPopup;
 	
@@ -70,8 +70,8 @@ public class SoundPlayer extends JFrame
 			public void moduleLoaded(ModuleEvent e){buildList();}
 			public void moduleUnloaded(ModuleEvent e){buildList();}
 		});
-		listModel = new DefaultListModel();
-		list = new JList(listModel);
+		listModel = new DefaultListModel<String>();
+		list = new JList<String>(listModel);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		buildList();
 		JButton playButton = new JButton("Play");

@@ -177,6 +177,7 @@ public class DisplayGraphics extends Graphics2D
 		case S: g.drawLine(fx0, fy1, tx0, ty0); g.drawLine(fx1, fy1, tx1, ty0); break;
 		case E: g.drawLine(fx1, fy0, tx0, ty0); g.drawLine(fx1, fy1, tx0, ty1); break;
 		case W: g.drawLine(fx0, fy0, tx1, ty0); g.drawLine(fx0, fy1, tx1, ty1); break;
+		default: break;
 		}
 	}
 	
@@ -193,6 +194,7 @@ public class DisplayGraphics extends Graphics2D
 		case S: g.drawLine(x0, y1, x1, y1); break;
 		case E: g.drawLine(x1, y0, x1, y1); break;
 		case W: g.drawLine(x0, y0, x0, y1); break;
+		default: break;
 		}
 	}
 	
@@ -230,6 +232,7 @@ public class DisplayGraphics extends Graphics2D
 		case S: g.fillRect(fx0, fy1, fx1 - fx0, ty0 - fy1); break;
 		case E: g.fillRect(fx1, fy0, tx0 - fx1, ty1 - ty0); break;
 		case W: g.fillRect(tx1, ty0, fx0 - tx1, ty1 - ty0); break;
+		default: break;
 		}
 	}
 	
