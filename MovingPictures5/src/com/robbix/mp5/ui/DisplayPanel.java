@@ -902,7 +902,17 @@ public class DisplayPanel extends JComponent
 				}
 				
 				if (layer.comparator != null)
-					Collections.sort(listCopy, layer.comparator);
+				{
+					try
+					{
+						Collections.sort(listCopy, layer.comparator);
+					}
+					catch (IllegalArgumentException e)
+					{
+						// FIXME: Comparators.Z_ORDER is causing IllegalArgumentException
+						//        "Comparison method violates its general contract!"
+					}
+				}
 				
 				for (DisplayObject dObj : listCopy)
 					dObj.paint(g);
